@@ -1,2 +1,2 @@
-# function_api
-relize my idea by test
+#API for some function
+  自己的一些想法，通过编程的方法去实现，代码优化，简化函数接口，便于使用（英语太菜，想半天想不出来怎么写）
