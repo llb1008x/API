@@ -411,23 +411,23 @@ typedef signed int(*CHARGING_CONTROL) (CHARGING_CTRL_CMD cmd, void *data);
 
 CHARGING_CONTROL battery_charging_control;
 
-定义轮训接口
+/*定义轮训接口*/
 static void get_charging_control(void)
 {
 	battery_charging_control = chr_control_interface;
 }
 
 
-定义这样一个函数指针，负责调用不同的函数处理不同的命令和数据
+/*定义这样一个函数指针，负责调用不同的函数处理不同的命令和数据*/
 typedef  s32(*BATTERY_METER_CONTROL)  (int cmd, void *data);
 BATTERY_METER_CONTROL  battery_meter_ctrl = NULL;
 
-将bm_ctrl_cmd接口给那个函数指针，调用不同的函数接口
+/*将bm_ctrl_cmd接口给那个函数指针，调用不同的函数接口*/
 battery_meter_ctrl = bm_ctrl_cmd;
 
 
-对具体的函数调用指针轮训，调用。这样操作是为了方便移植，可以针对不同的芯片定义不同的
-chargnig_func函数指针数组
+/*对具体的函数调用指针轮训，调用。这样操作是为了方便移植，可以针对不同的芯片定义不同的
+chargnig_func函数指针数组*/
 kal_int32 chr_control_interface(CHARGING_CTRL_CMD cmd, void *data)
 {
 	kal_int32 status;
@@ -466,7 +466,7 @@ static kal_uint32(*const charging_func[CHARGING_CMD_NUMBER]) (void *data) = {
 		
 		battery_meter_ctrl = bm_ctrl_cmd;
  
-6.代码相关的文件（注意不同的项目不一样）
+6./*代码相关的文件（注意不同的项目不一样）
 	芯片相关的代码：/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/kernel-3.18/drivers/misc/mediatek/power/mt6755
 	充电相关的代码：/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/kernel-3.18/drivers/power/mediatek
 			修改的gionee目录下：/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/gionee/code/driver/project_common/BBL7337_DRV_COMMON/	kernel-3.18/drivers/power/mediatek
@@ -485,18 +485,19 @@ static kal_uint32(*const charging_func[CHARGING_CMD_NUMBER]) (void *data) = {
 	/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/gionee/config
 
 	/.local/share/Trash/files 垃圾箱目录？
+*/
 
 
 
 
-
-8.这个宏的定义是什么意思 
-#if defined(CONFIG_POWER_EXT) 条件编译 定义了这个宏就为真
+8./*这个宏的定义是什么意思 
 相比以前的#if CONFIG_POWER_EXIT 用法要灵活
-当然条件编译的用法要学
+当然条件编译的用法要学*/
+#if defined(CONFIG_POWER_EXT)  /*条件编译 定义了这个宏就为真*/
 
 
-9.定时器
+
+9./*定时器*/
 	if (time_after(last_timer, timeout)) {
 		if (!timer_pending(&musb_idle_timer))
 			last_timer = timeout;
@@ -508,9 +509,9 @@ static kal_uint32(*const charging_func[CHARGING_CMD_NUMBER]) (void *data) = {
 	last_timer = timeout;
 
 
-10.察看中断号 cat  /proc/interrupts
+10./*察看中断号 cat  /proc/interrupts
 
-G1605A的中断
+G1605A的中断*/
            CPU0       CPU1       
  29:          0          0       GIC  29  arch_timer
  30:     250493      63863       GIC  30  arch_timer
@@ -599,9 +600,9 @@ IPI5:         0          0       IRQ work interrupts
 
 
 
-11.usb_otg设备的处理过程和GPIO的配置
+11./*usb_otg设备的处理过程和GPIO的配置*/
 
-	1.设备树相关的配置(基本的设备树的配置)
+	/*1.设备树相关的配置(基本的设备树的配置)*/
 
 	usb0:usb20@11200000 {				//USB20的基地址为11200000
 		compatible = "mediatek,mt6735-usb20";	//通过设备树匹配的名称mt6735-usb20
@@ -671,7 +672,7 @@ IPI5:         0          0       IRQ work interrupts
 		status = "okay";
 	};
 
-12.枚举的用法enum
+12./*枚举的用法enum*/
 
 
 
@@ -679,7 +680,7 @@ IPI5:         0          0       IRQ work interrupts
 
 
 
-13.充电相关的几个代码
+13./*充电相关的几个代码*/
 	
 	1.upmu_is_chr_det()
 	字面意思是电源管理系统对充电的检测，至于这个宏CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT应该是是否支持电池给手机充电或者电池给外设充电
@@ -696,7 +697,7 @@ IPI5:         0          0       IRQ work interrupts
 	} CHARGER_TYPE;
 	
 
-	pmic中断的设置，（可能是触发了某个中断，转换成这个中断对应的状态，什么样的配置）	
+	/*pmic中断的设置，（可能是触发了某个中断，转换成这个中断对应的状态，什么样的配置）	*/
 	/*****************************************************************************
 	 * interrupt Setting
 	 ******************************************************************************/
@@ -783,11 +784,11 @@ IPI5:         0          0       IRQ work interrupts
 				MT6328_INT_CON2_CLR, interrupt_status2),
 	};
 
-这整个过程可能是中断触发，执行回调函数，回调函数里面对中断的类型进行遍历，跟哪个状态对比，符合的就产生对应的配置
-什么样的状态
+/*这整个过程可能是中断触发，执行回调函数，回调函数里面对中断的类型进行遍历，跟哪个状态对比，符合的就产生对应的配置
+什么样的状态*/
 
 
-14.创建设备节点，上层向设备节点写值，是否打开开关，底层读写寄存器		
+14./*创建设备节点，上层向设备节点写值，是否打开开关，底层读写寄存器		*/
 
 	//Gionee GuoJianqiu 201601026 modify for OTG SWITCH begin
 	#if defined(GN_BATTERY_OTGCHARGE_SWITCH_SUPPORT)
@@ -830,9 +831,9 @@ IPI5:         0          0       IRQ work interrupts
 	#endif
 	//Gionee GuoJianqiu 201601026 modify for OTG SWITCH end
 
-15.电池电量的计算，及一些参数的变化
+15./*电池电量的计算，及一些参数的变化
 
-上面当电量充到100%后，如果使用GM2.0算法，就会重置电池的一些参数
+上面当电量充到100%后，如果使用GM2.0算法，就会重置电池的一些参数*/
 
 a.更新电池老化系数
 void fg_qmax_update_for_aging(void)
@@ -884,7 +885,7 @@ void fg_qmax_update_for_aging(void)
 #endif
 }
 
-16.对不同数据的取平均运算
+16./*对不同数据的取平均运算*/
 
 static unsigned int mt_battery_average_method(BATTERY_AVG_ENUM type, unsigned int *bufferdata,
 					      unsigned int data, signed int *sum,
@@ -976,7 +977,7 @@ static void mt_battery_average_method_init(BATTERY_AVG_ENUM type, unsigned int *
 	}
 }
 
-17.遍历双向链表，用法具有通用性，高级进阶，数据结构和算法
+17./*遍历双向链表，用法具有通用性，高级进阶，数据结构和算法*/
 #define list_for_each_entry(pos, head, member)				\
 	for (pos = list_entry((head)->next, typeof(*pos), member);	\
 	     &pos->member != (head); 	\
