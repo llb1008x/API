@@ -835,7 +835,7 @@ IPI5:         0          0       IRQ work interrupts
 
 上面当电量充到100%后，如果使用GM2.0算法，就会重置电池的一些参数*/
 
-a.更新电池老化系数
+/*a.更新电池老化系数*/
 void fg_qmax_update_for_aging(void)
 {
 #if defined(CONFIG_POWER_EXT)
