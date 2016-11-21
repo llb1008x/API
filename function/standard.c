@@ -10,6 +10,22 @@ battery_log(BAT_LOG_FULL, "wait event 1\n");
 //GioneeDrv LiLuBao 20161009 modify for platform change end
 
 
+自己添加的宏
+#define  GNDRV_LLB_CHANGE
+修改模式
+//GioneeDrv LiLuBao 20161109 modify for platform change begin
+
+#if defined(GNDRV_LLB_CHANGE)
+     KPOC_LOGI("[ChargingAnimation: %s %d],in  bootlogo_show_charging modify by llb",__FUNCTION__,__LINE__);	
+#endif
+
+
+......
+
+//GioneeDrv LiLuBao 20161009 modify for platform change end
+
+
+
 
 #define BMLOG_DEBUG_LEVEL   7
 
@@ -693,7 +709,7 @@ IPI5:         0          0       IRQ work interrupts
 		STANDARD_HOST,		/* USB : 450mA */
 		CHARGING_HOST,		/* 往外供电 */
 		NONSTANDARD_CHARGER,	/* AC : 450mA~1A */
-		STANDARD_CHARGER,	/* AC : ~1A */
+		STANDARD_CHARGER,	/* AC 充电器的电流大: ~1A */
 	} CHARGER_TYPE;
 	
 
