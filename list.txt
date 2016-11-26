@@ -1,0 +1,14 @@
+
+查找的资料：
+
+
+USB眼图：
+http://blog.csdn.net/vvcumt/article/details/38852347
+
+
+linux  thermal体系框架
+http://kernel.meizu.com/linux-thermal-framework-intro.html
+
+
+Linux动态频率调节系统CPUFreq 
+http://blog.chinaunix.net/uid-20321537-id-4049149.html
