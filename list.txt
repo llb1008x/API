@@ -12,3 +12,7 @@ http://kernel.meizu.com/linux-thermal-framework-intro.html
 
 Linux动态频率调节系统CPUFreq 
 http://blog.chinaunix.net/uid-20321537-id-4049149.html
+
+
+ubuntu下配置git和github初体验 "
+http://blog.chinaunix.net/uid-24782829-id-3183604.html
