@@ -1,267 +1,39 @@
 
+1.thransplant移植相关
 
-提交的代码，注意最后的覆盖路径
+2.power功耗
 
-文档好乱有必要整理一下
+3.charging充电
 
+4.thermal温升
 
-Fuel_gauge更换了充电芯片？
+5.USB&&OTG相关的
 
+6.anthor其他问题
 
-机器充电失败
-/*
-{
-2016.10.31   充电充不进去
 
 
-充电失败
 
-1.现象：
-  a.充电测试失败
-  无论是交流充电还是usb，充电电压是在增加，但是电流是负，且电量越来越少。
-  b.充电芯片是正常工作的，起码充进去了电，但是充的比耗的多
-  
+Fuel_gauge更换了充电芯片
+以前只是廉价的替代芯片
 
-2.可能的原因：
-  a.软件：pmic未工作，或者未挂上i2c总线
-  b.硬件：电源管理芯片出现问题，或内部硬件短路，造成较大的功耗。
-  c.我理解的可能原因，电池对外放电（电流为负）
+送测有那几个版本？
+CMCC ，CTA他们送的是T54版本的软件
 
-之前原因是充电芯片没有焊好，现在又有新现象
 
 
-3.待解决的问题
-   a.明确打印出来的那几个物理量的意思，充放电过程什么变化情况。
-log:
-	bat_routine_thr][kernel]AvgVbat 3806,bat_vol 3749, AvgI 0, I 0, VChr 0, AvgT 29, T 30, ZCV 3864, CHR_Type 0, SOC  54: 54: 54
 
-	bat_routine_thr][kernel]AvgVbat 3804,bat_vol 3725, AvgI 505, I -775, VChr 5137, AvgT 29, T 29, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3800,bat_vol 3694, AvgI 465, I -655, VChr 5137, AvgT 29, T 30, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3796,bat_vol 3718, AvgI 427, I -586, VChr 5137, AvgT 29, T 29, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3793,bat_vol 3707, AvgI 385, I -706, VChr 5128, AvgT 29, T 29, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3788,bat_vol 3675, AvgI 344, I -706, VChr 5128, AvgT 29, T 30, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3784,bat_vol 3691, AvgI 306, I -586, VChr 5128, AvgT 29, T 31, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3781,bat_vol 3726, AvgI 264, I -706, VChr 5137, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3778,bat_vol 3717, AvgI 225, I -620, VChr 5516, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3775,bat_vol 3716, AvgI 184, I -689, VChr 5128, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3772,bat_vol 3719, AvgI 142, I -689, VChr 5128, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3768,bat_vol 3702, AvgI 102, I -655, VChr 5128, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-	bat_routine_thr][kernel]AvgVbat 3765,bat_vol 3730, AvgI 65, I -568, VChr 5610, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
-
-
-battery_log(BAT_LOG_CRTI,
-	    "[kernel]AvgVbat %d,bat_vol %d, AvgI %d, I %d, VChr %d, AvgT %d, T %d, ZCV %d, CHR_Type %d, SOC %3d:%3d:%3d\n",
-	    BMT_status.bat_vol, bat_vol, BMT_status.ICharging, ICharging,
-	    BMT_status.charger_vol, BMT_status.temperature, temperature, BMT_status.ZCV,
-	    BMT_status.charger_type, BMT_status.SOC, BMT_status.UI_SOC, BMT_status.UI_SOC2);
-
-
-AvgVbat ：电池的平均电压 
-	ret = battery_meter_ctrl(BATTERY_METER_CMD_GET_ADC_V_BAT_SENSE, &val)--->BMT_status.bat_vol =mt_battery_average_method(BATTERY_AVG_VOLT, &batteryVoltageBuffer[0],
-						      ZCV, &bat_sum, batteryIndex);
-
-bat_vol：电池的电压 ret = battery_meter_ctrl(BATTERY_METER_CMD_GET_ADC_V_BAT_SENSE, &val)
-
-AvgI:平均充电电流（跟上面相似）
-
-I   ：充电电流，以前是通过检测充电引脚正负极参数，做适当的补偿，算出充电的电流，现在是通过充电芯片，IC算出电流，然后读取寄存器的值
-
-电压，电流的变化跟之前的充电过程一样，涓流->恒流->恒压->充满--->检测是否小于回充电压，是否打电话等条件，在判断是否要充电，充电还是放电主要看充电器电压，然后电池电压，
-电流的变化，温度是否正常
-
-VChr	：充电器的电压
-
-AvgT	：电池的平均温度
-
-T	：电池的温度
-
-ZCV	：电池当前的开路电压，这个开路电压跟当前的温度有关，导入的温度曲线，通过线性插值法找到具体的温度对应的电压
-
-CHR_Type：充电接口的类型
-
-SOC	:底层的电量
-
-UI_SOC	:上层的电量
-
-   force_get_tbat()---》BattVoltToTemp（）上面的那几个运算，什么do_div。。。64位的除法    	
-
-
-   b.pmic工作的过程，如何确定i2c是否正常工作
-   安装了i2c_tools，还有什么dump register?上面有一个打印pmic寄存器的log，正常打印，i2c设备应该正常。
-
-
-
-   c.充电升降压调节的控制具体怎么控制的，双充电芯片？
-定义的输入输出电流开关的宏
-CONFIG_MTK_SWITCH_INPUT_OUTPUT_CURRENT_SUPPORT
-
-定义的开关标志位g_bcct_flag    g_bcct_input_flag，好像跟温度有关的
-
-快充部分有相应的升压调节，快充部分的升压通过充电适配器升高电压，而快充的通信好像是循环升压，看是否变化，变化了，证明连接上了，多了次数的判断，满足条件，可以快充。
-mtk_ta_retry_increase()->mtk_ta_increase()->control的那个宏，set_ta_current将电压逐渐升到12
-
-而普通的升压跟充电模式相关，应该在各种模式中，调度算法里 select_charging_current()设置充电电流，涓流->恒流->恒压->充满--->检测是否小于回充电压，
-是否打电话等条件，在判断是否要充电，充电还是放电主要看充电器电压，然后电池电压，电流的变化，温度是否正常
-
-基于输入电压的动态电源管理 (VIN-DPM)：电源和充电器之间的电阻会阻碍充电器从电源获得最大功率，导致电源电压陡降，造成充电器欠压闭锁。
-已经有了用来计算充电器所需最小电源电压的方程式，其可计算既定电源适配器的最大充电电流。此外， VIN-DPM 特性还能动态地降低充电器的输入电流限值，避免适配器电压陡降，
-因而允许使用多种类型的适配器和/或电源连接
-
-双充电芯片：
-两个充电芯片同时为电池工作，可以降低充电的温度（热量分散到两个芯片上）
-定义的这个宏：CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT
-
-
-
-   d.反向充电，升压，USB，otg
-
-当设备检测到USB_ID信号为低时，表该设备应作为Host（主机，也称A设备）用。
-当设备检测到USB_ID信号为高时，表示该设备作为Slave(外设，也称B设备）用。
-
-switch_int_to_device   switch_int_to_host  ，根据变量的值判断进入device还是host，而这个值是是读取寄存器的值，iddig
-pinctrl_select_state控制gpio引脚的状态，
-反向充电应该跟USB_OTG有关，当检测到USB 的id引脚为0，otg模式，触发中断。当然逻辑好像改了，如果是OTG充电模式，上层要点击确定，使OTG中断使能，才可以反向充电。
-
-is_enter_mmi_test 反向充电测试开关
-
-
-开机充电，关机充电 ，低电量保护？
-
-正常开机充电，一直再看。
-
-关机充电：
-
-       关机时充电器检测代码在lk部分，当接入充电器时，PMIC会通过ADC采样，检测Vchrg（charger/usb电源）电压，
-判断Vchrg的值如果在这个区间：4.4v~6.5v，系统就会开始进入充电过程，这个过程包括show low battery logo，接着
-显示充电电量logo。
-相关代码：
-mt6572/mediatek/platform/mt6572/lk/platform.c
-
-查看函数void platform_init(void)：
-
-充电器检测：
-充电过程中，upmu_is_chr_det() 检测Vchrg状态，返回KAL_FALSE则power off。
-#ifdef MTK_KERNEL_POWER_OFF_CHARGING
-    if((g_boot_arg->boot_reason == BR_USB) && (upmu_is_chr_det() == KAL_FALSE))
-    {
-        printf("[%s] Unplugged Charger/Usb between Pre-loader and Uboot in Kernel Charging Mode, Power Off \n", __func__);
-        mt6575_power_off();
-    }
-#endif
-
-显示LCM背光：
-#ifndef DISABLE_FOR_BRING_UP
-    mt65xx_backlight_on(); //[TODO] workaround
-#endif
-
-boot模式选择，用于区分开机过程。
-boot_mode_select();
-
-显示low battery logo，点亮充电指示灯：
-
-        if(kernel_charging_boot() == 1) //关机充电状态
-        {
-                mt_disp_power(TRUE);
-                mt_disp_show_low_battery();
-                mt_disp_wait_idle();
-#ifndef DISABLE_FOR_BRING_UP
-                mt65xx_leds_brightness_set(6, 110);
-#endif
-        }
-
-kernel_charging_boot定义：
-#if defined (MTK_KERNEL_POWER_OFF_CHARGING)
-int kernel_charging_boot(void)
-{
-        if((g_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || g_boot_mode == LOW_POWER_OFF_CHARGING_BOOT) && upmu_is_chr_det() == KAL_TRUE)
-        {
-                printf("[%s] Kernel Power Off Charging with Charger/Usb \n", __func__);
-                return  1;
-        }
-        else if((g_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || g_boot_mode == LOW_POWER_OFF_CHARGING_BOOT) && upmu_is_chr_det() == KAL_FALSE)
-        {
-                printf("[%s] Kernel Power Off Charging without Charger/Usb \n", __func__);
-                return -1;
-        }
-        else
-                return 0;
-}
-#endif
-
-
-   e.分析那个电池曲线，出现的什么问题，自己想（虽然不是我解决的）
-充电时间有点长
-
-	
-
-   f.ZCV电池曲线，导入，操作
-	battery_profile_tX 几个数组
-
-   g.充电类型的判断
-	
-   pmic和USB都要ready,PMU检测充电端是否正常工作
-
-
-SS：高优先级--->温度的调控，处理算法，  h.thermal相关的内容还是不太清楚
-
-
-待机状态下有些会定期唤醒
-	1.modem不太了解，经常唤醒，耗电很大
-	2.1800s定期唤醒（30min），防睡死，1%检测中断
-
-充电状态下BAT_thread几个线程10s唤醒一次
-
-
-
-
-2016.11.18
-
-
-1.现象：
-	机器插上充电器或者USB充电电流为负
-
-
-2.可能的原因：
-	a.跟上次类似充电芯片未正常工作
-	b.根据log,fg_coulomb的数值，i2c传输数据有问题 
-        c.充电芯片未正常工作，或者充电接口出现问题（未充电时电流等其他都是正常的）
-	
-
-
-
-
-
- 
-
-
-}*/
-
-
-
-
-
-
-
-
-transplant代码移植相关的：
+transplant代码移植相关：
 /*{
 
-GNSPR #53551  20161107	电源管理：关机充电动画改善（移植充电显示相关的，BBL7332的hd720图标，S8的代码）
-高优先级解决SSS：
+GNSPR#53551  	电源管理：关机充电动画改善（移植充电显示相关的，BBL7332的hd720图标，S8的代码）
+代码不多，也没什么变化，主要是细节（图片的差异用beyond compare，rules.mk里图片加进去的数组下标要对应，
+编译烧版本要知道烧哪了，是否编译进去了）
 
+多用beyond compare找差异
 
 1.移植需要注意的地方（首先应该明确关机充电流程，充电logo显示，切换，要不要把开机，关机动画也顺便修改一下）
+
 	
   hd720充电的图标--->rules.mk要加进去编译成logo.bin
 	rules.mk
@@ -292,23 +64,24 @@ GNSPR #53551  20161107	电源管理：关机充电动画改善（移植充电显
 	external目录下show_animation_common.c，
 	cust_display.h ，bootlogo.cpp  ，common.cpp，charging_animation.cpp
 
+	gionee目录下有几个是要分层加编译选项的
+
 	
-	vendor/mediatek/proprietary/external/charger/Android.mk 脚本里面加了
+	vendor/mediatek/proprietary/external/charger/Android.mk 脚本里面加了--->这个不需要
 	#Gionee LiLuBao 20161110 modify for gioneelogo begin
 	ifeq ($(CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT), yes)
 	LOCAL_CFLAGS += -DCONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT
 	endif
 	#Gionee LiLuBao 20161110 modify for gioneelogo begin
 
-
 	编译的脚本改的有问题？改的一直打印不出来,这么简单的工作搞那么长时间....
 	宏开关以外的也没打印？
 	rules.mk	Android.mk	gnbj6737t_66_m0.mk	G1605A.mk
 
 	单编有时候有问题，改的目录也不对，log的等级不够？
-	
-  手机还有好几个版本CMCC ，CTA ，sign	
+	其实是你烧错了地方
 
+	
 	a.代码相关
 	CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT这个宏控制S8关机充电显示的图标
 
@@ -334,7 +107,6 @@ GNSPR #53551  20161107	电源管理：关机充电动画改善（移植充电显
 	gionee/project/BBL7332/vendor/mediatek/proprietary/external/charger/common.cpp:	#if defined(CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT) 
 	gionee/project/BBL7332A02_A/bootable/bootloader/lk/project/gionee6735_65c_l1.mk:#CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT = yes
 	gionee/project/BBL7332A02_A/bootable/bootloader/lk/project/gionee6735_65c_l1.mk:#DEFINES += CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT
-
 
 	gionee/alps_drv/bootable/bootloader/lk/dev/logo/rules.mk:ifeq ($(strip $(CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT)), yes)
 	gionee/alps_drv/bootable/bootloader/lk/platform/mt6735/platform.c:            #if defined(CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT)
@@ -365,8 +137,6 @@ GNSPR #53551  20161107	电源管理：关机充电动画改善（移植充电显
 	 */
 
 
-	logo.bin怎么生成的，boot_logo,kernel_logo怎么调用的，从哪开始调用的，动画（应该是以一定频率播放图片），fstab分区，电量的百分比变化
-
 	logo index 反应不同状态logo，数组下标
 	// Common LOGO index
 	#define BOOT_LOGO_INDEX   0 
@@ -385,35 +155,10 @@ GNSPR #53551  20161107	电源管理：关机充电动画改善（移植充电显
 
 
 3.总结，这次移植用了这么长时间，好心酸.....，最后发现图片压缩的一个脚本有问题
-	a.android平台常见的即可中分辨率
+	
+	a.有时间把整个流程走一遍？
+	logo.bin怎么生成的，boot_logo,kernel_logo怎么调用的，从哪开始调用的，动画（应该是以一定频率播放图片），fstab分区，电量的百分比变化
 
-	标屏	分辨率		宽屏		分辨率
-	QVGA	320×240		WQVGA		400×240
-
-	VGA	640×480		WVGA		800×480	
-		
-	SVGA	800×600		WSVGA		1024×600
-		
-	XGA	1024×768	WXGA		1280×768/1280×800/1280*960
-	
-	SXGA	1280×1024	WXGA+		1440×900
-	
-	SXGA+	1400×1050	WSXGA+		1680×1050
-	
-	UXGA	1600×1200	WUXGA		1920×1200
-	
-	QXGA	2048×1536	WQXGA		2560×1536
-	
-
-	VGA：Video Graphics Array，即：显示绘图矩阵，相当于640×480 像素；
-	HVGA：Half-size VGA，即：VGA的一半，分辨率为480×320，像三星盖世Ace S5830就是使用这分辨率；
-	QVGA：Quarter VGA，即：VGA的四分之一，分辨率为320×240，一般用于小屏手机 像三星盖世Mini S5570就是使用这分辨率；
-
-	WQVGA：Wide Quarter VGA，即：扩大的QVGA，分辨率比QVGA高，比VGA低，一般是：400×240，480×272；
-	WVGA：Wide Video Graphics Array，即：扩大的VGA，分辨率为800×480像素，像三星i9000就是使用这分辨率；
-
-	FWVGA：Full Wide VGA ，数码产品屏幕材质的一种，VGA的另一种形式，比WVGA分辨率高，别名 ： Full Wide VGA, ，其分辨 率为854×480象素(16:9)。
-	
 
 	b.关机充电的流程，充电动画
 	
@@ -429,6 +174,7 @@ GNSPR #53551  20161107	电源管理：关机充电动画改善（移植充电显
 	
 		2.关机状态下，只走到init阶段
 	
+
 
 	c.关机状态下主要涉及两个过程
 	lk阶段：
@@ -477,6 +223,7 @@ void fill_animation_logo(unsigned int index, void *fill_addr, void * dec_logo_ad
 
     fill_rect_with_content(fill_addr, rect, dec_logo_addr, phical_screen, bits);
 
+
 }
 	
 
@@ -510,7 +257,17 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 
 
 
+	移植OTG开关到BBL7515上，USB协议是
+
+
+
+
+
+
+
+
 }*/
+
 
 
 
@@ -533,11 +290,39 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 power待机功耗相关的
 /*{
 
+	基本的概念：
+	1.Cell standby：手机搜索信号的稳定
+
+	2.volte：
+	VoLTE是基于IMS的语音业务。IMS由于支持多种接入和丰富的多媒体业务，成为全IP时代的核心网标准架构。
+	经历了过去几年的发展成熟后，如今IMS已经跨越裂谷，成为固定话音领域VoBB、PSTN网改的主流选择，而且也被3GPP、GSMA确定为移动语音的标准架构
+	。VoLTE即Voice over LTE，它是一种IP数据传输技术，无需2G/3G网，全部业务承载于4G网络上，可实现数据与语音业务在同一网络下的统一。
+	换言之，4G网络下不仅仅提供高速率的数据业务，同时还提供高质量的音视频通话，后者便需要VoLTE技术来实现。
+
+
 1.功耗要注意的几个地方
- 
-	
-	a.首先明确是否有modem log，c2kmdlog文件，modem log 特别耗电，而且站空间然后察看modem log的时间变化。
-	c2kmdlog文件应该是记录传输的数据，recycle_config
+
+	a.首先明确是否有modem log，c2kmdlog文件，modem log 特别耗电，而且占空间然后察看modem log的时间变化。
+	c2kmdlog文件应该是记录传输的数据，recycle_config，modem log会经常唤醒系统，导致系统没有睡下去，所以耗电量肯定高，
+	开始那几个谁开的modem log耗电四五十的。
+
+	modem常用的几个信道，哪些跟耗电密切相关的？
+	{
+		channel 10是AT交互
+		channel 14是读写nvram
+		channel 34是与WCN通信，告知wifi当前modem所使用频段。
+		
+		10是跟at command有关，一般都是网络变化
+		55是跟volte相关
+		
+		基本上，上述3个channel的跟modem的网络唤醒有关。
+
+		wakeup source:(2/42)
+		42是modem log开关
+		20是流量
+
+	}
+
 	
 	b.抓取battersystats.log和wakeup_sources.log，以及导出mobile log；
 	抓取方法：
@@ -546,40 +331,17 @@ power待机功耗相关的
 
 	c.比较关键的两个log文件batterystats.log和kernel.log
 	batterystats.log记录系统耗电的过程
-		radio信号
-
-
+	
 	1.signal level 当前环境的信号质量
+	信号质量差，modem一直在找信号，耗电量肯定大，所以网络环境变化在一定程度上也会造成耗电。
+
 	2.wake lock 应用是否长时间占用锁
-	wake up alarm, wake up by
+	wake up alarm, wake up by 
+	以上两个都有一个限度，什么样才属于过度，什么样在合理范围内?
 
 	3.系统是否被经常被应用唤醒
-	在sys.log目录下，搜索alarm
-	应用推送业务，频繁唤醒？
-
-	Cell standby手机搜索信号的稳定，
-
-	volte：
-	VoLTE是基于IMS的语音业务。IMS由于支持多种接入和丰富的多媒体业务，成为全IP时代的核心网标准架构。
-	经历了过去几年的发展成熟后，如今IMS已经跨越裂谷，成为固定话音领域VoBB、PSTN网改的主流选择，而且也被3GPP、GSMA确定为移动语音的标准架构
-	。VoLTE即Voice over LTE，它是一种IP数据传输技术，无需2G/3G网，全部业务承载于4G网络上，可实现数据与语音业务在同一网络下的统一。
-	换言之，4G网络下不仅仅提供高速率的数据业务，同时还提供高质量的音视频通话，后者便需要VoLTE技术来实现。
-
-
-	channel 10是AT交互
-	channel 14是读写nvram
-	channel 34是与WCN通信，告知wifi当前modem所使用频段。
-	
-	10是跟at command有关，一般都是网络变化
-	AT command
-	55是跟volte相关
-	
-	基本上，上述3个channel的跟modem的网络唤醒有关。
-
-	wakeup source:(2/42)
-	42是modem log开关
-	20是流量
-
+	在sys.log目录下，搜索alarm 
+	应用推送业务，频繁唤醒。
 
 	kernel部分的统计思路是：
 	1. 搜索"wake up by"关键字，只看kworker或是system_server进程打印的
@@ -593,13 +355,18 @@ power待机功耗相关的
 	2. 只查找type为0和type为2的alarm
 	3. 过滤package name做统计
 
-	极致省电模式电流：？
-	飞行模式待机电流：3  4mA
-	未开数据待机电流：5—6mA
+	
+	极致省电模式电流：5mA以上
+	飞行模式待机电流：3——4mA
+	未开数据待机电流：5——6mA
 	开数据:10mA< x < 20mA
 	开wifi待机电流：<20mA
 	正常的待机电流小于20mA，所以超过20mA有异常
 	这些只是一部分的待机电流
+
+	待机功耗，待机电流就你们问题多
+
+
 
 	功耗测试的标准：
 	1.移动运营商的电流为9ma，电信运营商的电流为9mA，联通运营商的电流为16mA
@@ -970,6 +737,9 @@ GNSPR #56384
 
 
 
+GNSPR#58813 送测待机电流偏高
+
+
 
 };
 
@@ -1114,7 +884,7 @@ MTK提供的解决方法
 	dprintf(CRITICAL, "[PROFILE] ------- show logo takes %d ms --------
 	", (int)get_timer(time_show_logo));
 	#endif
-	// add bebug by mtk ALPS02765977 20160624
+	/*add bebug by mtk ALPS02765977 20160624
 	dlpt_init_inLK();
 
 
@@ -1535,4 +1305,247 @@ mt_gpufreqs_power[2].gpufreq_power = 396
 	
 
 
+
+
+
+
+
+
+
+
+
+another其他问题
+/*
+{
+
+
+GNSPR#52112 MMI充电测试失败
+	1.现象：
+	a.充电测试失败
+	无论是交流充电还是usb，充电电压是在增加，但是电流是负，且电量越来越少。
+	b.充电芯片是正常工作的，起码充进去了电，但是充的比耗的多
+	
+
+	2.可能的原因：
+	a.软件：pmic未工作，或者未挂上i2c总线
+	b.硬件：电源管理芯片出现问题，或内部硬件短路，造成较大的功耗。
+	c.我理解的可能原因，电池对外放电（电流为负）
+
+	原因：充电芯片没有焊好
+
+
+GNSPR#55817 MMI充电测试失败
+
+	1.现象：
+		机器插上充电器或者USB充电电流为负
+
+
+	2.可能的原因：
+		a.跟上次类似充电芯片未正常工作
+		b.根据log,fg_coulomb的数值，i2c传输数据有问题 
+			c.充电芯片未正常工作，或者充电接口出现问题（未充电时电流等其他都是正常的）
+
+	原因：又是充电芯片没焊好导致的充电芯片没有正常工作
+
+
+
+
+
+待解决的问题
+   /*a.明确打印出来的那几个物理量的意思，充放电过程什么变化情况。*/
+log:
+	bat_routine_thr][kernel]AvgVbat 3806,bat_vol 3749, AvgI 0, I 0, VChr 0, AvgT 29, T 30, ZCV 3864, CHR_Type 0, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3804,bat_vol 3725, AvgI 505, I -775, VChr 5137, AvgT 29, T 29, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3800,bat_vol 3694, AvgI 465, I -655, VChr 5137, AvgT 29, T 30, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3796,bat_vol 3718, AvgI 427, I -586, VChr 5137, AvgT 29, T 29, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3793,bat_vol 3707, AvgI 385, I -706, VChr 5128, AvgT 29, T 29, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3788,bat_vol 3675, AvgI 344, I -706, VChr 5128, AvgT 29, T 30, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3784,bat_vol 3691, AvgI 306, I -586, VChr 5128, AvgT 29, T 31, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3781,bat_vol 3726, AvgI 264, I -706, VChr 5137, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3778,bat_vol 3717, AvgI 225, I -620, VChr 5516, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3775,bat_vol 3716, AvgI 184, I -689, VChr 5128, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3772,bat_vol 3719, AvgI 142, I -689, VChr 5128, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3768,bat_vol 3702, AvgI 102, I -655, VChr 5128, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+	bat_routine_thr][kernel]AvgVbat 3765,bat_vol 3730, AvgI 65, I -568, VChr 5610, AvgT 29, T 32, ZCV 3864, CHR_Type 1, SOC  54: 54: 54
+
+
+battery_log(BAT_LOG_CRTI,
+	    "[kernel]AvgVbat %d,bat_vol %d, AvgI %d, I %d, VChr %d, AvgT %d, T %d, ZCV %d, CHR_Type %d, SOC %3d:%3d:%3d\n",
+	    BMT_status.bat_vol, bat_vol, BMT_status.ICharging, ICharging,
+	    BMT_status.charger_vol, BMT_status.temperature, temperature, BMT_status.ZCV,
+	    BMT_status.charger_type, BMT_status.SOC, BMT_status.UI_SOC, BMT_status.UI_SOC2);
+
+
+AvgVbat ：电池的平均电压 
+	ret = battery_meter_ctrl(BATTERY_METER_CMD_GET_ADC_V_BAT_SENSE, &val)--->BMT_status.bat_vol =mt_battery_average_method(BATTERY_AVG_VOLT, 
+		&batteryVoltageBuffer[0], ZCV, &bat_sum, batteryIndex);
+
+bat_vol：电池的电压 ret = battery_meter_ctrl(BATTERY_METER_CMD_GET_ADC_V_BAT_SENSE, &val)
+
+AvgI:平均充电电流（跟上面相似）
+
+I   ：充电电流，以前是通过检测充电引脚正负极参数，做适当的补偿，算出充电的电流，现在是通过充电芯片，IC算出电流，然后读取寄存器的值
+
+电压，电流的变化跟之前的充电过程一样，涓流->恒流->恒压->充满--->检测是否小于回充电压，是否打电话等条件，在判断是否要充电，充电还是放电主要看充电器电压，然后电池电压，
+电流的变化，温度是否正常
+
+VChr	：充电器的电压
+
+AvgT	：电池的平均温度
+
+T	：电池的温度
+
+ZCV	：电池当前的开路电压，这个开路电压跟当前的温度有关，导入的温度曲线，通过线性插值法找到具体的温度对应的电压
+
+CHR_Type：充电接口的类型
+
+SOC	:底层的电量
+
+UI_SOC	:上层的电量
+
+   force_get_tbat()---》BattVoltToTemp（）上面的那几个运算，什么do_div。。。64位的除法    	
+
+
+   /*b.pmic工作的过程，如何确定i2c是否正常工作*/
+   安装了i2c_tools，还有什么dump register?上面有一个打印pmic寄存器的log，正常打印，i2c设备应该正常。
+
+
+
+   /*c.充电升降压调节的控制具体怎么控制的，双充电芯片？*/
+定义的输入输出电流开关的宏
+CONFIG_MTK_SWITCH_INPUT_OUTPUT_CURRENT_SUPPORT
+
+定义的开关标志位g_bcct_flag    g_bcct_input_flag，好像跟温度有关的
+
+快充部分有相应的升压调节，快充部分的升压通过充电适配器升高电压，而快充的通信好像是循环升压，看是否变化，变化了，证明连接上了，多了次数的判断，满足条件，可以快充。
+mtk_ta_retry_increase()->mtk_ta_increase()->control的那个宏，set_ta_current将电压逐渐升到12
+
+而普通的升压跟充电模式相关，应该在各种模式中，调度算法里 select_charging_current()设置充电电流，涓流->恒流->恒压->充满--->检测是否小于回充电压，
+是否打电话等条件，在判断是否要充电，充电还是放电主要看充电器电压，然后电池电压，电流的变化，温度是否正常
+
+基于输入电压的动态电源管理 (VIN-DPM)：电源和充电器之间的电阻会阻碍充电器从电源获得最大功率，导致电源电压陡降，造成充电器欠压闭锁。
+已经有了用来计算充电器所需最小电源电压的方程式，其可计算既定电源适配器的最大充电电流。此外， VIN-DPM 特性还能动态地降低充电器的输入电流限值，避免适配器电压陡降，
+因而允许使用多种类型的适配器和/或电源连接
+
+双充电芯片：
+两个充电芯片同时为电池工作，可以降低充电的温度（热量分散到两个芯片上）
+定义的这个宏：CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT
+
+
+
+   /*d.反向充电，升压，USB，otg*/
+
+当设备检测到USB_ID信号为低时，表该设备应作为Host（主机，也称A设备）用。
+当设备检测到USB_ID信号为高时，表示该设备作为Slave(外设，也称B设备）用。
+
+switch_int_to_device   switch_int_to_host  ，根据变量的值判断进入device还是host，而这个值是是读取寄存器的值，iddig
+pinctrl_select_state控制gpio引脚的状态，
+反向充电应该跟USB_OTG有关，当检测到USB 的id引脚为0，otg模式，触发中断。当然逻辑好像改了，如果是OTG充电模式，上层要点击确定，使OTG中断使能，才可以反向充电。
+
+is_enter_mmi_test 反向充电测试开关
+
+
+开机充电，关机充电 ，低电量保护？
+
+正常开机充电，一直再看。
+
+关机充电：
+
+       关机时充电器检测代码在lk部分，当接入充电器时，PMIC会通过ADC采样，检测Vchrg（charger/usb电源）电压，
+判断Vchrg的值如果在这个区间：4.4v~6.5v，系统就会开始进入充电过程，这个过程包括show low battery logo，接着
+显示充电电量logo。
+相关代码：
+mt6572/mediatek/platform/mt6572/lk/platform.c
+
+查看函数void platform_init(void)：
+
+充电器检测：
+充电过程中，upmu_is_chr_det() 检测Vchrg状态，返回KAL_FALSE则power off。
+#ifdef MTK_KERNEL_POWER_OFF_CHARGING
+    if((g_boot_arg->boot_reason == BR_USB) && (upmu_is_chr_det() == KAL_FALSE))
+    {
+        printf("[%s] Unplugged Charger/Usb between Pre-loader and Uboot in Kernel Charging Mode, Power Off \n", __func__);
+        mt6575_power_off();
+    }
+#endif
+
+显示LCM背光：
+#ifndef DISABLE_FOR_BRING_UP
+    mt65xx_backlight_on(); //[TODO] workaround
+#endif
+
+boot模式选择，用于区分开机过程。
+boot_mode_select();
+
+显示low battery logo，点亮充电指示灯：
+
+        if(kernel_charging_boot() == 1) //关机充电状态
+        {
+                mt_disp_power(TRUE);
+                mt_disp_show_low_battery();
+                mt_disp_wait_idle();
+#ifndef DISABLE_FOR_BRING_UP
+                mt65xx_leds_brightness_set(6, 110);
+#endif
+        }
+
+kernel_charging_boot定义：
+#if defined (MTK_KERNEL_POWER_OFF_CHARGING)
+int kernel_charging_boot(void)
+{
+        if((g_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || g_boot_mode == LOW_POWER_OFF_CHARGING_BOOT) && upmu_is_chr_det() == KAL_TRUE)
+        {
+                printf("[%s] Kernel Power Off Charging with Charger/Usb \n", __func__);
+                return  1;
+        }
+        else if((g_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || g_boot_mode == LOW_POWER_OFF_CHARGING_BOOT) && upmu_is_chr_det() == KAL_FALSE)
+        {
+                printf("[%s] Kernel Power Off Charging without Charger/Usb \n", __func__);
+                return -1;
+        }
+        else
+                return 0;
+}
+#endif
+
+
+   /*e.分析那个电池曲线，出现的什么问题，自己想（虽然不是我解决的）*/
+充电时间有点长
+
+	
+
+   /*f.ZCV电池曲线，导入，操作*/
+	battery_profile_tX 几个数组
+
+   /*g.充电类型的判断*/
+	
+   pmic和USB都要ready,PMU检测充电端是否正常工作
+
+
+SS：高优先级--->温度的调控，处理算法，  h.thermal相关的内容还是不太清楚
+
+
+待机状态下有些会定期唤醒
+	1.modem不太了解，经常唤醒，耗电很大
+	2.1800s定期唤醒（30min），防睡死，1%检测中断
+
+充电状态下BAT_thread几个线程10s唤醒一次
+
+
+
+
+
+}*/
 
