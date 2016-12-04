@@ -1,0 +1,1119 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+     
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    
+<head>   
+   
+
+    <script type="text/javascript" src="http://c.csdnimg.cn/pubfooter/js/tracking.js" charset="utf-8"></script>  
+
+    <script type="text/javascript">
+        var protocol = window.location.protocol;
+        document.write('<script type="text/javascript" src="' + protocol + '//csdnimg.cn/pubfooter/js/repoAddr2.js?v=' + Math.random() + '"></' + 'script>');
+    </script>
+
+  
+ <meta http-equiv="Cache-Control" content="no-siteapp" /><link rel="alternate" media="handheld" href="#" />
+
+    <title>earlysuspend、autosleep以及wakeup_count三种休眠机制的分析和比较 - 撒哈拉的绿洲
+        - 博客频道 - CSDN.NET</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="我们都有伤疤，内在的或外在的，无论因为什么什么原因伤在哪个部位" />
+    <script src="http://static.blog.csdn.net/scripts/jquery.js" type="text/javascript"></script>
+      <script type="text/javascript" src="http://static.blog.csdn.net/scripts/jquery-version.js"></script>
+    <script type="text/javascript" src="http://static.blog.csdn.net/scripts/ad.js?v=1.1"></script>
+        <!--new top-->
+               <link rel="stylesheet" href="http://c.csdnimg.cn/public/common/toolbar/css/index.css">        <!--new top-->
+    
+      <!-- ad begin -->
+         <script language="javascript" type="text/javascript" src="http://ads.csdn.net/js/tracking.js"></script>
+    <!-- ad end-->
+
+    <link rel="Stylesheet" type="text/css" href="http://static.blog.csdn.net/skin/light_blue/css/style.css?v=1.1" />
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="/wlwl0071986/rss/list" />
+    <link rel="shortcut icon" href="http://c.csdnimg.cn/public/favicon.ico" />
+    <link type="text/css" rel="stylesheet" href="http://static.blog.csdn.net/scripts/SyntaxHighlighter/styles/default_relax.css" />
+ 
+
+
+</head>
+<body>
+    <!-- 广告位开始 -->
+        <ins data-revive-zoneid="149" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+    <!-- 广告位结束 -->
+
+    
+   
+      <!--new top-->
+    <script id="toolbar-tpl-scriptId" fixed="true" prod="blog" skin="black" src="http://c.csdnimg.cn/public/common/toolbar/js/html.js" type="text/javascript"></script>
+     <!--new top-->
+    <div id="container">
+        <div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h2>
+                <a href="http://blog.csdn.net/wlwl0071986">撒哈拉的绿洲</a></h2>
+            <h3>菜鸟的成长路...</h3>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>
+            
+                <li id="btnContents"><a href="http://blog.csdn.net/wlwl0071986?viewmode=contents"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_mulu'])">
+                    <img src="http://static.blog.csdn.net/images/ico_list.gif">目录视图</span></a></li>
+                <li id="btnView"><a href="http://blog.csdn.net/wlwl0071986?viewmode=list"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_zhaiyao'])">
+                    <img src="http://static.blog.csdn.net/images/ico_summary.gif">摘要视图</span></a></li>
+                <li id="btnRss"><a href="http://blog.csdn.net/wlwl0071986/rss/list"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_RSS'])">
+                    <img src="http://static.blog.csdn.net/images/ico_rss.gif">订阅</span></a></li>                
+            
+
+            </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "wlwl0071986";
+    var _blogger = username;
+    var blog_address = "http://blog.csdn.net/wlwl0071986";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";  
+</script>
+
+        <div id="body">
+            <div id="main">
+                <div class="main">
+                        <div class="ad_class">
+<div class="notice tracking-ad" data-mod='popu_3' > 
+
+
+<a href="http://ask.csdn.net/subjects/9">
+<font color=blue>【专家问答】韦玮：Python基础编程实战专题</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://lib.csdn.net/base/swift/resource">
+<font color=red>【知识库】Swift资源大集合
+</font></a>
+&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/csdnproduct/article/details/51668917">
+<font color=blue>【公告】博客新皮肤上线啦</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://blog.csdn.net/robbin2015/article/details/51683764">
+<font color=red>快来领福利：C币、机械键盘
+</font></a>
+&nbsp;&nbsp;&nbsp;
+</font></a>
+</div>                        </div>
+                        
+
+
+
+<!-- 广告位开始 -->
+<ins data-revive-zoneid="72" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+<!-- 广告位结束 -->
+
+  
+<link href="http://static.blog.csdn.net/css/comment1.css" type="text/css" rel="stylesheet" />
+<link href="http://static.blog.csdn.net/css/style1.css" type="text/css" rel="stylesheet" />
+<script language='JavaScript' type='text/javascript' src='http://download.csdn.net/js/jquery.cookie.js'></script>
+<script type="text/javascript" src="http://c.csdnimg.cn/rabbit/search-service/main.js"></script>
+<link rel="stylesheet" href="http://static.blog.csdn.net/public/res-min/markdown_views.css?v=1.0" />
+<link rel="stylesheet" href="http://static.blog.csdn.net/css/category.css?v=1.0" />
+<script type="text/javascript" src="http://static.blog.csdn.net/public/res/bower-libs/MathJax/MathJax.js?config=TeX-AMS_HTML"></script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/web-storage-cache.min.js"></script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/replace.min.js"></script>
+
+<link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_code.css" />
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/saveToCode.js"></script>
+
+
+  <script type="text/ecmascript">
+      window.quickReplyflag = true;
+           
+            var isBole = false;
+            
+          
+    </script>
+<div id="article_details" class="details">
+    <div class="article_title">   
+         <span class="ico ico_type_Original"></span>
+
+
+    <h1>
+        <span class="link_title"><a href="/wlwl0071986/article/details/42672591">
+        earlysuspend、autosleep以及wakeup_count三种休眠机制的分析和比较            
+        </a></span>
+    </h1>
+</div>
+
+   
+
+        <div class="article_manage clearfix">
+        <div class="article_l">
+            <span class="link_categories">
+            标签：
+              <a href='http://www.csdn.net/tag/Android' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">Android</a><a href='http://www.csdn.net/tag/Linux' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">Linux</a><a href='http://www.csdn.net/tag/autosleep' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">autosleep</a><a href='http://www.csdn.net/tag/wakeup' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">wakeup</a><a href='http://www.csdn.net/tag/%e4%bc%91%e7%9c%a0' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">休眠</a>
+            </span>
+        </div>
+        <div class="article_r">
+            <span class="link_postdate">2015-01-13 10:55</span>
+            <span class="link_view" title="阅读次数">2438人阅读</span>
+            <span class="link_comments" title="评论次数"> <a href="#comments" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_pinglun'])">评论</a>(3)</span>
+            <span class="link_collect tracking-ad" data-mod="popu_171"> <a href="javascript:void(0);" onclick="javascript:collectArticle('earlysuspend、autosleep以及wakeup_count三种休眠机制的分析和比较','42672591');return false;" title="收藏">收藏</a></span>
+             <span class="link_report"> <a href="#report" onclick="javascript:report(42672591,2);return false;" title="举报">举报</a></span>
+
+        </div>
+    </div>
+    <div class="embody"  style="display:none" id="embody">
+        <span class="embody_t">本文章已收录于：</span>
+        <div class="embody_c" id="lib" value="{&quot;err&quot;:0,&quot;msg&quot;:&quot;ok&quot;,&quot;data&quot;:[]}"></div>
+    </div>
+    <style type="text/css">        
+            .embody{
+                padding:10px 10px 10px;
+                margin:0 -20px;
+                border-bottom:solid 1px #ededed;                
+            }
+            .embody_b{
+                margin:0 ;
+                padding:10px 0;
+            }
+            .embody .embody_t,.embody .embody_c{
+                display: inline-block;
+                margin-right:10px;
+            }
+            .embody_t{
+                font-size: 12px;
+                color:#999;
+            }
+            .embody_c{
+                font-size: 12px;
+            }
+            .embody_c img,.embody_c em{
+                display: inline-block;
+                vertical-align: middle;               
+            }
+             .embody_c img{               
+                width:30px;
+                height:30px;
+            }
+            .embody_c em{
+                margin: 0 20px 0 10px;
+                color:#333;
+                font-style: normal;
+            }
+    </style>
+    <script  type="text/javascript">
+        $(function () {
+            try
+            {
+                var lib = eval("("+$("#lib").attr("value")+")");
+                var html = "";
+                if (lib.err == 0) {
+                    $.each(lib.data, function (i) {
+                        var obj = lib.data[i];
+                        //html += '<img src="' + obj.logo + '"/>' + obj.name + "&nbsp;&nbsp;";
+                        html += ' <a href="' + obj.url + '" target="_blank">';
+                        html += ' <img src="' + obj.logo + '">';
+                        html += ' <em><b>' + obj.name + '</b></em>';
+                        html += ' </a>';
+                    });
+                    if (html != "") {
+                        setTimeout(function () {
+                            $("#lib").html(html);                      
+                            $("#embody").show();
+                        }, 100);
+                    }
+                }      
+            } catch (err)
+            { }
+            
+        });
+    </script>
+      <div class="category clearfix">
+        <div class="category_l">
+           <img src="http://static.blog.csdn.net/images/category_icon.jpg">
+            <span>分类：</span>
+        </div>
+        <div class="category_r">
+                    <label  onclick="GetCategoryArticles('2487139','wlwl0071986','top','42672591');">
+                        <span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_fenlei']);">电源管理<em>（6）</em></span>
+                      <img class="arrow-down" src="http://static.blog.csdn.net/images/arrow_triangle _down.jpg" style="display:inline;">
+                      <img class="arrow-up" src="http://static.blog.csdn.net/images/arrow_triangle_up.jpg" style="display:none;">
+                        <div class="subItem">
+                            <div class="subItem_t"><a  href="http://blog.csdn.net/wlwl0071986/article/category/2487139"  target="_blank">作者同类文章</a><i class="J_close">X</i></div>
+                            <ul class="subItem_l" id="top_2487139">                            
+                            </ul>
+                        </div>
+                    </label>                    
+        </div>
+    </div>
+    <script   type="text/javascript" src="http://static.blog.csdn.net/scripts/category.js"></script>  
+        <div   class="bog_copyright">         
+            <p  class="copyright_p" >版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+        </div>
+
+  
+
+  
+  
+     
+
+<div id="article_content" class="article_content">
+
+<p><span style="font-size:24px">一、Opportunistic sleep引言</span></p>
+<p><span style="font-size:18px">1. 背景</span></p>
+<p><span style="font-size:18px">（1）&nbsp;android 面临的问题</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;Opportunistic sleep: 当没有任务时，需要寻找时机，进入suspended</span></p>
+<p><span style="font-size:18px">（2） 3类同步问题</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.&nbsp;内核:driver处理event的过程中，系统不能suspend</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; b.&nbsp;用户:用户进程处理的过程中系统不能suspend</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c.&nbsp;内核与用户交互:&nbsp;</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 休眠过程中，触发event, 需abort suspend流程;</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; event 事件需用户态处理完毕后，才能suspend;</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113100058894?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">2. earlysuspend</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113100245972?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">3. autosleep</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113100344878?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">4. wakeup_count</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113100429812?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">5. 三种休眠机制的比较</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113100815148?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">（1）有关earlysuspend的讨论</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.&nbsp;更改了suspend 流程，引入了earlysuspend 接口；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; b.&nbsp;社区对该patch,有误解，认为其要替代runtime；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c.&nbsp;wakelock 实现过于复杂，名称易造成误解；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; d.&nbsp;mini-summit: 有nokia 开发者,缺乏android 开发者，引入了非技术性的讨论；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.&nbsp;应该使用pm_runtime, cpuidle; susupend 不应该存在；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; f. 唤醒源的处理过程，贯穿整个系统，影响较大；</span></p>
+<p style="text-align:left"><span style="font-size:18px">（2）有关autosleep的讨论</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.&nbsp;android 市场份额越来越大，很多driver src code 脱离了mainline；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; b.&nbsp;Linus 认为需要合并android 的特性：suspend block；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c.&nbsp;Rafael J. Wysocki 认为时机已经成熟，提出了新的解决方案；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; d.&nbsp;社区对该opportunisic suspend patch, 有误解，引入了非技术性的讨论：重新设计后，命名为autosleep；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; e.&nbsp;考虑到android 的兼容性，接口上保留了wakelock; 实现上，进行了改进；</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113101402890?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">（3）有关wakeup_count的讨论</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; a.&nbsp;在userspace 基于wakeup_count 实现的 opportunistic sleep 机制；(与autosleep 类&#20284;)；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; b.&nbsp;内核空间，无wake_lock 概念；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; c.&nbsp;无suspend block 概念；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; d.&nbsp;suspend 触发的时机，全部交由用户空间负责；</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113101700562?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">6.&nbsp;引入autosleep &nbsp; | &nbsp;wakeup count的理由</span></p>
+<p style="text-align:left"><span style="font-size:18px">（1）earlysuspend 被内核抛弃，需自己打补丁；</span></p>
+<p style="text-align:left"><span style="font-size:18px">（2）使用earlysuspend, 对内核改动较大，更改了suspend 流程, 无法合并入mainline；</span></p>
+<p style="text-align:left"><span style="font-size:18px">（3）对设备驱动影响较大，需额外实现earlysuspend 接口,不利于upstream；</span></p>
+<p style="text-align:left"><span style="font-size:18px">（4）earlysuspend 已存在的问题：例如只支持开关屏时执行earlysuspend, 不利于动态功耗的优化；</span></p>
+<p style="text-align:left"><span style="font-size:18px">（5）pm_runtime 已经在display, usb 等设备使用；</span></p>
+<p style="text-align:left"><span style="font-size:18px">（6）upstream 的需求；</span></p>
+<p style="text-align:left"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:24px">二、opportunistic sleep 框架</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113102253508?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:24px">三、wakeup source 框架</span></p>
+<p style="text-align:left"><span style="font-size:18px">1. 功能</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; a.&nbsp;抽象wakeup source和wakeup event的概念；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; b.&nbsp;向各个device driver提供wakeup source的注册、使能等接口；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; c.&nbsp;向各个device driver提供wakeup event的上报、停止等接口；</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; d.&nbsp;向上层的PM core（包括wakeup count、auto sleep、suspend、hibernate等模块）提供wakeup event的查询接</span></p>
+<p style="text-align:left"><span style="font-size:18px">&nbsp; &nbsp; &nbsp; &nbsp; 口，</span><span style="font-size:18px">以判断是否可以suspend、是否需要终止正在进行的suspend；</span></p>
+<p style="text-align:left"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">2. 数据结构</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113102629843?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">（1）registered wakeup events(cnt)和saved_count；</span></p>
+<p style="text-align:left"><span style="font-size:18px">（2）wakeup events in progress(inpr)；</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113102911671?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:18px">3. 相关接口</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113103332251?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113103501873?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113103549640?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113103615546?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p><span style="font-size:18px"><br>
+</span></p>
+<p><span style="font-size:24px">四、wakeup count框架</span></p>
+<p><span style="font-size:18px">1. 目标</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; 有唤醒事件需处理时：<br>
+<span style="white-space:pre"></span>若系统在运行过程中，不能进入suspend;<br>
+<span style="white-space:pre"></span>若已进入suspend 流程，需及时退出;<br>
+</span></p>
+<p><span style="font-size:18px"><br>
+</span></p>
+<p><span style="font-size:18px">2. 接口</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; a.&nbsp;bool pm_get_wakeup_count(unsigned int *count, bool block);</span></p>
+<p><span style="font-size:18px">&nbsp; &nbsp; b.&nbsp;bool pm_save_wakeup_count(unsigned int count);</span></p>
+<p><span style="font-size:18px"><br>
+</span></p>
+<p><span style="font-size:18px">3. 流程</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113104621707?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113104709287?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:18px"><img alt="" src="http://img.blog.csdn.net/20150113104819893?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2x3bDAwNzE5ODY=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center"><br>
+</span></p>
+<p><span style="font-size:18px"><br>
+</span></p>
+   
+</div>
+
+
+
+
+<!-- Baidu Button BEGIN -->
+
+
+
+
+<div class="bdsharebuttonbox tracking-ad" style="float: right;" data-mod="popu_172">
+<a href="#" class="bds_more" data-cmd="more" style="background-position:0 0 !important; background-image: url(http://bdimg.share.baidu.com/static/api/img/share/icons_0_16.png?v=d754dcc0.png) !important"></a>
+<a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"  style="background-position:0 -52px !important"></a>
+<a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"style="background-position:0 -104px !important"></a>
+<a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"style="background-position:0 -260px !important"></a>
+<a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"style="background-position:0 -208px !important"></a>
+<a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"style="background-position:0 -1612px !important" ></a>
+</div>
+<script>window._bd_share_config = { "common": { "bdSnsKey": {}, "bdText": "", "bdMini": "1", "bdMiniList": false, "bdPic": "", "bdStyle": "0", "bdSize": "16" }, "share": {} }; with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];</script>
+<!-- Baidu Button END -->
+
+   <link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_detail.css" />
+
+    
+<!--172.16.140.12-->
+
+<!-- Baidu Button BEGIN -->
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=1536434" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+    document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->
+
+ 
+
+        <div id="digg" ArticleId="42672591" >
+            <dl id="btnDigg" class="digg digg_disable"  onclick="btndigga();">
+               
+                 <dt>顶</dt>
+                <dd>2</dd>
+            </dl>
+           
+              
+            <dl id="btnBury" class="digg digg_disable"  onclick="btnburya();">
+              
+                  <dt>踩</dt>
+                <dd>0</dd>               
+            </dl>
+            
+        </div>
+     <div class="tracking-ad" data-mod="popu_222"><a href="javascript:void(0);" >&nbsp;</a>   </div>
+    <div class="tracking-ad" data-mod="popu_223"> <a href="javascript:void(0);" >&nbsp;</a></div>
+    <script type="text/javascript">
+                function btndigga() {
+                    $(".tracking-ad[data-mod='popu_222'] a").click();
+                }
+                function btnburya() {
+                    $(".tracking-ad[data-mod='popu_223'] a").click();
+                }
+            </script>
+
+   <ul class="article_next_prev">
+                <li class="prev_article"><span  onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_shangyipian']);location.href='/wlwl0071986/article/details/42646563';">上一篇</span><a href="/wlwl0071986/article/details/42646563" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_shangyipian'])">LCD主流显示接口介绍</a></li>
+                <li class="next_article"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_xiayipian']);location.href='/wlwl0071986/article/details/42676003';">下一篇</span><a href="/wlwl0071986/article/details/42676003" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_xiayipian'])">安全系统简介</a></li>
+    </ul>
+
+    <div style="clear:both; height:10px;"></div>
+
+
+        <div class="similar_article"  style="display:none">
+                <h4>我的同类文章</h4>
+                <div class="similar_c"style="margin:20px 0px 0px 0px">
+                    <div class="similar_c_t">
+                                <label class="similar_cur">
+                                    <span  style="cursor:pointer"  onclick="GetCategoryArticles('2487139','wlwl0071986','foot','42672591');">电源管理<em>（6）</em></span>
+                                </label>
+                    </div>
+                   
+                    <div class="similar_wrap tracking-ad" data-mod="popu_141"  style="max-height:195px;">
+                        <a href="http://blog.csdn.net" style="display:none">http://blog.csdn.net</a>
+                        <ul class="similar_list fl">                          
+                        </ul>
+
+                        <ul class="similar_list fr">                           
+                        </ul>
+                    </div>
+                </div>
+            </div>    
+    <script  type="text/javascript">
+        $(function () {
+            GetCategoryArticles('2487139', 'wlwl0071986','foot','42672591');
+        });
+    </script>
+      
+</div>
+<div id="suggest"></div>
+         <script  language="javascript" type='text/javascript'>     
+             $(function(){
+                 $.get("/wlwl0071986/svc/GetSuggestContent/42672591",function(data){
+                     $("#suggest").html(data);
+                 });     
+             });             
+         </script>  
+
+
+<style>
+.blog-ass-articl dd {
+color: #369;
+width: 99%; /*修改行*/
+float: left;
+overflow: hidden;
+font: normal normal 12px/23px "SimSun";
+height: 23px;
+margin: 0;
+padding: 0 0 0 10px;
+margin-right: 30px;
+background: url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;
+}
+</style>
+
+ <link rel="stylesheet" href="http://static.blog.csdn.net/css/replace.css"/>
+<div id="relate" data-mod="popu_218"  class="tracking-ad">
+        <div class="relate_t">
+            <h3><span>参考知识库</span></h3>
+        </div>
+        <div class="relate_c">
+        </div>
+</div>
+ 
+
+<dl class="blog-ass-articl" id="res-relatived" > 
+    <div class="embody embody_b" id="libkeyparent"  style="display:none">
+            <span class="embody_t">更多资料请参考：</span>
+            <div class="embody_c" id="libkey"></div>
+    </div>
+
+
+     <dt><span>猜你在找</span></dt>    
+
+
+   
+
+
+    <div id="adCollege" style="width: 42%;float: left;"> 
+        <script src="http://csdnimg.cn/jobreco/job_reco.js" type="text/javascript"></script> 
+        <script type="text/javascript">
+            csdn.position.showEdu({
+                sourceType: "blog",
+                searchType: "detail",
+                searchKey: "42672591",
+                username: "",
+                recordcount: "5",
+                containerId: "adCollege" //容器DIV的id。 
+            });
+        </script> 
+    </div>  
+
+    
+     <div id="res"  data-mod="popu_36"  class="tracking-ad" style="width: 42%;float: left;margin-right: 30px;"></div>
+   
+</dl>
+
+
+<script type="text/javascript">
+    $(function () {
+        setTimeout(function () {
+            var searchtitletags = 'earlysuspend、autosleep以及wakeup_count三种休眠机制的分析和比较' + ',' + $("#tags").html();
+            searchService({
+                index: 'blog',
+                query: searchtitletags,
+                from: 5,
+                size: 5,
+                appendTo: '#res',
+                url: 'recommend',
+                his: 2,
+                client: "blog_cf_enhance",
+                tmpl: '<dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;"><a href="#{ url }" title="#{ title }" strategy="#{ strategy }">#{ title }</a></dd>'
+            });
+        }, 500);
+    });    
+
+ </script>  
+
+    <div id="ad_cen">        
+<!-- 广告位开始 -->
+<ins data-revive-zoneid="71" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+<!-- 广告位结束 -->    </div>  
+
+<div class="comment_class">
+    <div id="comment_title" class="panel_head">
+        <span class="see_comment">查看评论</span><a name="comments"></a></div>
+    <div id="comment_list">
+    </div>
+    <div id="comment_bar">
+    </div>
+    <div id="comment_form">
+    </div>
+    <div class="announce">
+        * 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+</div>
+
+<script type="text/javascript">
+    var fileName = '42672591';
+    var commentscount = 3;
+    var islock = false
+</script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/comment.js"></script>
+    <div id="ad_bot">
+    </div>
+<div id="report_dialog">
+</div>
+
+<div id="d-top"  style="bottom:60px;">
+        <a id="quick-reply" class="btn btn-top q-reply" title="快速回复" style="display:none;">
+            <img src="http://static.blog.csdn.net/images/blog-icon-reply.png" alt="快速回复">
+        </a>    
+
+    <a id="d-top-a" class="btn btn-top backtop"  style="display: none;" title="返回顶部" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_huidaodingbu'])" style="">         
+         <img src="http://static.blog.csdn.net/images/top.png" alt="TOP">
+    </a>
+</div>
+<script type="text/javascript">
+    $(function ()
+    {
+        $("#ad_frm_0").height("90px");
+        
+        setTimeout(function(){
+            $("#ad_frm_2").height("200px");
+        },1000);    
+    });
+  
+</script>
+<style type="text/css">
+    .tag_list
+    {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 1px solid #D7CBC1;
+        color: #000000;
+        font-size: 12px;
+        line-height: 20px;
+        list-style: none outside none;
+        margin: 10px 2% 0 1%;
+        padding: 1px;
+    }
+    .tag_list h5
+    {
+        background: none repeat scroll 0 0 #E0DBD3;
+        color: #47381C;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 5px;
+        margin: 0;
+    }
+    .tag_list h5 a
+    {
+        color: #47381C;
+    }
+    .classify
+    {
+        margin: 10px 0;
+        padding: 4px 12px 8px;
+    }
+    .classify a
+    {
+        margin-right: 20px;
+        white-space: nowrap;
+    }
+</style>
+
+
+<div class="tag_list" style="display:none"></div>
+  <script  language="javascript" type='text/javascript'>     
+      $(function(){
+              setTimeout(function(){
+                  $.get("/wlwl0071986/svc/GetTagContent",function(data){
+                      $(".tag_list").html(data).show();
+                  });     
+              });
+          },500);                       
+ </script> 
+
+
+<div id="pop_win" style="display:none ;position: absolute; z-index: 10000; border: 1px solid rgb(220, 220, 220); top: 222.5px; left: 630px; opacity: 1; background: none 0px 0px repeat scroll rgb(255, 255, 255);">
+    
+</div>
+<div id="popup_mask"></div>
+<style>
+    #popup_mask
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        left: 0px;
+        top: 0px;
+        opacity: 0.3;
+        filter: alpha(opacity=30);
+        display: none;
+    }
+
+</style>
+
+
+
+
+<script type="text/javascript">
+    $(function(){
+        setTimeout(function(){
+            $(".comment_body:contains('回复')").each(function(index,item){
+                var u=$(this).text().split('：')[0].toString().replace("回复","")
+                var thisComment=$(this);
+                if(u)
+                {
+                    $.getJSON("https://passport.csdn.net/get/nick?callback=?", {users: u}, function(a) {
+                        if(a!=null&&a.data!=null&&a.data.length>0)
+                        {
+                            nick=a.data[0].n; 
+                            if(u!=nick)
+                            {
+                                thisComment.text(thisComment.text().replace(u,nick));  
+                            }
+                        }       
+                    });  
+                }
+            });         
+
+        },200);  
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },5000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },10000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },15000);
+        
+        setTimeout(function(){
+            $("a img[src='http://js.tongji.linezing.com/stats.gif']").parent().css({"position":"absolute","left":"50%"});
+        },300);
+    });
+
+    function loginbox(){
+        var $logpop=$("#pop_win");
+        $logpop.html('<iframe src="https://passport.csdn.net/account/loginbox?service=http://static.blog.csdn.net/callback.htm" frameborder="0" height="600" width="400" scrolling="no"></iframe>');
+
+        $('#popup_mask').css({
+            opacity: 0.5,
+            width: $( document ).width() + 'px',
+            height:  $( document ).height() + 'px'
+        });
+        $('#popup_mask').css("display","block");
+ 
+        $logpop.css( {
+            top: ($( window ).height() - $logpop.height())/ 2  + $( window 
+       ).scrollTop() + 'px',
+            left:($( window ).width() - $logpop.width())/ 2
+        } );
+ 
+        setTimeout( function () {
+            $logpop.show();
+            $logpop.css( {
+                opacity: 1
+            } );
+        }, 200 );
+ 
+        $('#popup_mask').unbind("click");
+        $('#popup_mask').bind("click", function(){
+            $('#popup_mask').hide();
+            var $clopop = $("#pop_win");
+            $("#common_ask_div_sc").css("display","none");
+            $clopop.css( {
+                opacity: 0
+            } );
+            setTimeout( function () {
+                $clopop.hide();
+            }, 350 );
+            return false;
+        });
+    }   
+
+</script>
+ <script language="javascript" type="text/javascript" src="http://ads.csdn.net/js/async_new.js"></script>      
+
+
+                        <div class="clear">
+                        </div>
+                    </div>                   
+                
+            </div>
+                   
+           <div id="side">
+    <div class="side">
+<div id="panel_Profile" class="panel">
+<ul class="panel_head"><span>个人资料</span></ul>
+<ul class="panel_body profile">
+<div id="blog_userface">
+    <a href="http://my.csdn.net/wlwl0071986" target="_blank">
+    <img src="http://avatar.csdn.net/A/A/D/1_wlwl0071986.jpg" title="访问我的空间" style="max-width:90%"/>
+    </a>
+    <br />
+    <span><a href="http://my.csdn.net/wlwl0071986" class="user_name" target="_blank">wlwl0071986</a></span>
+</div>
+<div class="interact">
+
+    <a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+
+ <a href="javascript:void(0);" class="letter"  title="[发私信]" onclick="window.open('http://msg.csdn.net/letters/model?receiver=wlwl0071986','_blank','height=350,width=700');_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_sixin'])"></a>  
+</div>
+<div id="blog_medal">
+                         <div class="ico_expert" title="CSDN博客准专家"  onclick="javascript:location='http://blog.csdn.net/experts/rule.html'" style=" cursor:pointer;width:54px;height:60px;background:url('http://c.csdnimg.cn/jifen/images/xunzhang/xunzhang/bokezhunzhuanjiamiddle.png') no-repeat" ></div>
+                <div id="bms_box">
+                                            <a  target="_blank">
+                                                    <img src="http://c.csdnimg.cn/jifen/images/xunzhang/xunzhang/zhuanlandaren.png" onmouseover="m_over_m(this,2)" onmouseout="m_out_m()" alt="2" >
+                                            </a>
+               </div>
+</div>
+<ul id="blog_rank">
+    <li>访问：<span>183309次</span></li>
+    <li>积分：<span>3129</span> </li>    
+    <li >等级： <span style="position:relative;display:inline-block;z-index:1" >
+            <img src="http://c.csdnimg.cn/jifen/images/xunzhang/jianzhang/blog5.png" alt="" style="vertical-align: middle;" id="leveImg">
+            <div id="smallTittle" style=" position: absolute;  left: -24px;  top: 25px;  text-align: center;  width: 101px;  height: 32px;  background-color: #fff;  line-height: 32px;  border: 2px #DDDDDD solid;  box-shadow: 0px 2px 2px rgba (0,0,0,0.1);  display: none;   z-index: 999;">
+            <div style="left: 42%;  top: -8px;  position: absolute;  width: 0;  height: 0;  border-left: 10px solid transparent;  border-right: 10px solid transparent;  border-bottom: 8px solid #EAEAEA;"></div>
+            积分：3129 </div>
+        </span>  </li>
+    <li>排名：<span>第7336名</span></li>
+</ul>
+<ul id="blog_statistics">
+    <li>原创：<span>93篇</span></li>
+    <li>转载：<span>0篇</span></li>
+    <li>译文：<span>0篇</span></li>
+    <li>评论：<span>91条</span></li>
+</ul>
+</ul>
+</div>
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字" /></span>
+        <input id="btnSubmit" type="button" value="搜索" title="search in blog" />
+        <input type="hidden" name="q" id="inputQ" />
+        <input type="hidden" name="t" value="blog" />
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("#btnSubmit").click(function () {           
+            search();
+        });
+
+        $("#frmSearch").submit(function () {
+            search();
+            return false;
+        });
+
+        function search()
+        {
+            var url = "http://so.csdn.net/so/search/s.do?q=" + encodeURIComponent($("#inputSearch").val()) + "&u=" + username + "&t=blog";
+            window.location.href = url;
+        }   
+    });
+</script><div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>博客专栏</span></ul>
+    <ul class="panel_body" id="sp_column">
+    <table cellpadding="0" cellspacing="0"><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/andee.html" target="_blank"><img src="http://img.blog.csdn.net/20160607111942321" style="width:75px;height:75px;" /></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/andee.html" target="_blank">Android项目实战经验</a>
+    <p>文章：18篇</p>
+    <span>阅读：50599</span>
+    </td>
+    </tr></table>
+    </ul>
+</div><div id="panel_Category" class="panel">
+<ul class="panel_head"><span>文章分类</span></ul>
+<ul class="panel_body">    
+                 <li>
+                    <a href="/wlwl0071986/article/category/6147050" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">新技术预研</a><span>(3)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/1305932" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">Debug and Tool</a><span>(16)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6146992" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">调试demo</a><span>(8)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6146938" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">安卓系统框架/运行机制</a><span>(3)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/1294179" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">Linux内核</a><span>(2)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6147007" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">系统启动</a><span>(2)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/2487139" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">电源管理</a><span>(7)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/1294168" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">输入子系统</a><span>(12)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/5941053" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">USB/存储</a><span>(4)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6146916" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">图像/显示</a><span>(9)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6146949" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">UI界面</a><span>(8)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6146966" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">网络/连接</a><span>(3)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6146973" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">系统安全</a><span>(3)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/5985825" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">音频</a><span>(1)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6147040" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">性能优化</a><span>(3)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/6147009" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">搭建环境/系统移植</a><span>(2)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/2627707" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">规范/标准</a><span>(3)</span>
+                </li>
+                 <li>
+                    <a href="/wlwl0071986/article/category/1306100" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">协议</a><span>(3)</span>
+                </li>
+</ul>
+</div><div id="hotarticls" class="panel">
+<ul class="panel_head">
+    <span>       
+阅读排行    </span>
+</ul>
+
+<ul class="panel_body itemlist">
+<li>
+<a href="/wlwl0071986/article/details/8302836" title="高通QPST Download使用方法">高通QPST Download使用方法</a><span>(13574)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/8896718" title="Linux加载DTS设备节点的过程(以高通8974平台为例)">Linux加载DTS设备节点的过程(以高通8974平台为例)</a><span>(10493)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/43307967" title="Battery Charging Specification 1.2 中文详解">Battery Charging Specification 1.2 中文详解</a><span>(7600)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/38778897" title="Android4.4电池管理">Android4.4电池管理</a><span>(6305)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/9746135" title="Android AutoSleep休眠机制">Android AutoSleep休眠机制</a><span>(5827)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/9154541" title="HALL开关介绍">HALL开关介绍</a><span>(5237)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/8302135" title="Android 触摸屏（TP）问题现象分析和解决方法汇总">Android 触摸屏（TP）问题现象分析和解决方法汇总</a><span>(5206)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/8502816" title="TFT模块闪屏（Flicker)现象分析">TFT模块闪屏（Flicker)现象分析</a><span>(5121)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/13168487" title="Android怎样绕开Camera打开手电筒的LED">Android怎样绕开Camera打开手电筒的LED</a><span>(4942)</span>
+</li>
+<li>
+<a href="/wlwl0071986/article/details/14185745" title="Android触摸屏失效后的操作方法">Android触摸屏失效后的操作方法</a><span>(4702)</span>
+</li>
+</ul>
+</div>
+<div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+   
+         <a href="/wlwl0071986/article/details/51601455#comments">Ubuntu小知识（持续更新）</a>
+    <p style="margin:0px;"><a href="/wlwl0071986" class="user_name">wlwl0071986</a>:
+@BingoRiver:你用什么用户登录的，是不是没有权限？
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/51601455#comments">Ubuntu小知识（持续更新）</a>
+    <p style="margin:0px;"><a href="/BingoRiver" class="user_name">BingoRiver</a>:
+请问，我在/etc/profile中配置了环境变量，并source了，能正常使用Java 命令。但是...
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/50957597#comments">ANDROID系统启动流程分析</a>
+    <p style="margin:0px;"><a href="/Amazing7" class="user_name">Amazing7</a>:
+6
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/13168487#comments">Android怎样绕开Camera打开手电筒的LED</a>
+    <p style="margin:0px;"><a href="/wlwl0071986" class="user_name">wlwl0071986</a>:
+@qq_24671941:这个是封装了API，基于该API写的应用只能在自己平台上使用。
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/13168487#comments">Android怎样绕开Camera打开手电筒的LED</a>
+    <p style="margin:0px;"><a href="/qq_24671941" class="user_name">qq_24671941</a>:
+
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/13168487#comments">Android怎样绕开Camera打开手电筒的LED</a>
+    <p style="margin:0px;"><a href="/qq_24671941" class="user_name">qq_24671941</a>:
+额，请问这个写出一个app是只能自己手机用吗
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/13168487#comments">Android怎样绕开Camera打开手电筒的LED</a>
+    <p style="margin:0px;"><a href="/wlwl0071986" class="user_name">wlwl0071986</a>:
+@qq_24671941:你好，这是很久之前的项目了，没有保留源码。但是原理都是一样的，你看其它版本...
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/42672591#comments">earlysuspend、autosleep以及wakeup_count三种休眠机制的分析和比较</a>
+    <p style="margin:0px;"><a href="/alien75" class="user_name">alien75</a>:
+多谢楼主解惑！
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/42672591#comments">earlysuspend、autosleep以及wakeup_count三种休眠机制的分析和比较</a>
+    <p style="margin:0px;"><a href="/wlwl0071986" class="user_name">wlwl0071986</a>:
+@alien75:Opportunistic sleep是一种机制，具体实现有earlysuspen...
+    </p>
+    </li>
+    <li>
+   
+         <a href="/wlwl0071986/article/details/42672591#comments">earlysuspend、autosleep以及wakeup_count三种休眠机制的分析和比较</a>
+    <p style="margin:0px;"><a href="/alien75" class="user_name">alien75</a>:
+楼主：看了你的文章后对于几个关键框架的关系有点迷糊，按照我的理解是：Opportunistic sl...
+    </p>
+    </li>
+</ul>
+</div>
+    </div>
+    <div class="clear">
+    </div>
+ </div>   
+            <div class="clear">
+            </div>
+        </div>
+
+        
+
+<script type="text/javascript" src="http://c.csdnimg.cn/rabbit/cnick/cnick.js"></script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/newblog.min.js"></script>
+
+
+<script type="text/javascript" src="http://medal.blog.csdn.net/showblogmedal.ashx?blogid=1268557"></script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/JavaScript1.js"></script>
+
+    <script type="text/javascript" src="http://passport.csdn.net/content/loginbox/login.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script>
+<script type="text/javascript" src="http://www.csdn.net/ui/scripts/Csdn/counter.js"></script>
+<script type="text/javascript" src="http://ad.csdn.net/scripts/ad-blog.js"></script>
+<script type="text/javascript">
+    $(function () {
+        function __get_code_toolbar(snippet_id) {
+            return $("<span class='tracking-ad' data-mod='popu_167'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "' target='_blank' title='在CODE上查看代码片'  style='text-indent:0;'><img src='https://code.csdn.net/assets/CODE_ico.png' width=12 height=12 alt='在CODE上查看代码片' style='position:relative;top:1px;left:2px;'/></a></span>"
+                    + "<span class='tracking-ad' data-mod='popu_170'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "/fork' target='_blank' title='派生到我的代码片' style='text-indent:0;'><img src='https://code.csdn.net/assets/ico_fork.svg' width=12 height=12 alt='派生到我的代码片' style='position:relative;top:2px;left:2px;'/></a></span>");
+        }
+        
+        $("[code_snippet_id]").each(function () {
+            __s_id = $(this).attr("code_snippet_id");
+            if (__s_id != null && __s_id != "" && __s_id != 0 && parseInt(__s_id) > 70020) {
+                __code_tool = __get_code_toolbar(__s_id);
+                $(this).prev().find(".tools").append(__code_tool);
+            }
+        });
+
+        $(".bar").show();
+    });
+</script>
+
+
+
+
+    </div>
+      <!--new top-->
+    
+    <script id="csdn-toolbar-id" btnId="header_notice_num" wrapId="note1" count="5" subCount="5" type="text/javascript" src="http://c.csdnimg.cn/public/common/toolbar/js/toolbar.js"></script>     <!--new top-->
+   
+    <link href="http://c.csdnimg.cn/comm_ask/css/ask_float_block.css" type="text/css" rel="stylesheet" />
+    <script language='JavaScript' type='text/javascript' src='http://c.csdnimg.cn/comm_ask/js/libs/wmd.js'></script>
+    <script language='JavaScript' type='text/javascript' src='http://c.csdnimg.cn/comm_ask/js/libs/showdown.js'></script>
+    <script language='JavaScript' type='text/javascript' src='http://c.csdnimg.cn/comm_ask/js/libs/prettify.js'></script>
+    <script language='JavaScript' type='text/javascript' src='http://c.csdnimg.cn/comm_ask/js/apps/ask_float_block.js'></script>
+   
+
+  <div id="a52b5334d" style="width: 1px; height: 1px; display: none;">
+                    <script id="adJs52b5334"></script>
+                    <script>document.getElementById("adJs52b5334").src = "http://ads.csdn.net/js/opt/52b5334.js?t=" + Math.random();</script>
+   </div>
+
+</body>
+</html>   
+ 

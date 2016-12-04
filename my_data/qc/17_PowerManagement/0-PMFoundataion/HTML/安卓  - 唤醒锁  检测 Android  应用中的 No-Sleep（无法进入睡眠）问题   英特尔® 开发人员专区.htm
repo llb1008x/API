@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7]><html class="iem7"  lang="zh-hans" dir="ltr"><![endif]-->
+<!--[if lte IE 6]><html class="lt-ie9 lt-ie8 lt-ie7"  lang="zh-hans" dir="ltr"><![endif]-->
+<!--[if (IE 7)&(!IEMobile)]><html class="lt-ie9 lt-ie8"  lang="zh-hans" dir="ltr"><![endif]-->
+<!--[if IE 8]><html class="lt-ie9"  lang="zh-hans" dir="ltr"><![endif]-->
+<!--[if IE 9]><html class="lt-ie10"  lang="zh-hans" dir="ltr" prefix="content: http://purl.org/rss/1.0/modules/content/ dc: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ og: http://ogp.me/ns# rdfs: http://www.w3.org/2000/01/rdf-schema# sioc: http://rdfs.org/sioc/ns# sioct: http://rdfs.org/sioc/types# skos: http://www.w3.org/2004/02/skos/core# xsd: http://www.w3.org/2001/XMLSchema#"><![endif]-->
+<!--[if (gte IE 10)|(gt IEMobile 7)]><!--><html  lang="zh-hans" dir="ltr" prefix="content: http://purl.org/rss/1.0/modules/content/ dc: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ og: http://ogp.me/ns# rdfs: http://www.w3.org/2000/01/rdf-schema# sioc: http://rdfs.org/sioc/ns# sioct: http://rdfs.org/sioc/types# skos: http://www.w3.org/2004/02/skos/core# xsd: http://www.w3.org/2001/XMLSchema#"><!--<![endif]-->
+
+<head>
+  <!--[if IE]><![endif]-->
+<meta charset="utf-8" /><script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={xpid:"VQIOVFNRGwAEXVBWAgE="};window.NREUM||(NREUM={}),__nr_require=function(t,e,n){function r(n){if(!e[n]){var o=e[n]={exports:{}};t[n][0].call(o.exports,function(e){var o=t[n][1][e];return r(o||e)},o,o.exports)}return e[n].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<n.length;o++)r(n[o]);return r}({1:[function(t,e,n){function r(t){try{s.console&&console.log(t)}catch(e){}}var o,i=t("ee"),a=t(15),s={};try{o=localStorage.getItem("__nr_flags").split(","),console&&"function"==typeof console.log&&(s.console=!0,-1!==o.indexOf("dev")&&(s.dev=!0),-1!==o.indexOf("nr_dev")&&(s.nrDev=!0))}catch(c){}s.nrDev&&i.on("internal-error",function(t){r(t.stack)}),s.dev&&i.on("fn-err",function(t,e,n){r(n.stack)}),s.dev&&(r("NR AGENT IN DEVELOPMENT MODE"),r("flags: "+a(s,function(t,e){return t}).join(", ")))},{}],2:[function(t,e,n){function r(t,e,n,r,o){try{d?d-=1:i("err",[o||new UncaughtException(t,e,n)])}catch(s){try{i("ierr",[s,(new Date).getTime(),!0])}catch(c){}}return"function"==typeof f?f.apply(this,a(arguments)):!1}function UncaughtException(t,e,n){this.message=t||"Uncaught error with no additional information",this.sourceURL=e,this.line=n}function o(t){i("err",[t,(new Date).getTime()])}var i=t("handle"),a=t(16),s=t("ee"),c=t("loader"),f=window.onerror,u=!1,d=0;c.features.err=!0,t(1),window.onerror=r;try{throw new Error}catch(l){"stack"in l&&(t(8),t(7),"addEventListener"in window&&t(5),c.xhrWrappable&&t(9),u=!0)}s.on("fn-start",function(t,e,n){u&&(d+=1)}),s.on("fn-err",function(t,e,n){u&&(this.thrown=!0,o(n))}),s.on("fn-end",function(){u&&!this.thrown&&d>0&&(d-=1)}),s.on("internal-error",function(t){i("ierr",[t,(new Date).getTime(),!0])})},{}],3:[function(t,e,n){t("loader").features.ins=!0},{}],4:[function(t,e,n){function r(t){}if(window.performance&&window.performance.timing&&window.performance.getEntriesByType){var o=t("ee"),i=t("handle"),a=t(8),s=t(7),c="learResourceTimings",f="addEventListener",u="resourcetimingbufferfull",d="bstResource",l="resource",p="-start",h="-end",m="fn"+p,w="fn"+h,v="bstTimer",y="pushState";t("loader").features.stn=!0,t(6);var g=NREUM.o.EV;o.on(m,function(t,e){var n=t[0];n instanceof g&&(this.bstStart=Date.now())}),o.on(w,function(t,e){var n=t[0];n instanceof g&&i("bst",[n,e,this.bstStart,Date.now()])}),a.on(m,function(t,e,n){this.bstStart=Date.now(),this.bstType=n}),a.on(w,function(t,e){i(v,[e,this.bstStart,Date.now(),this.bstType])}),s.on(m,function(){this.bstStart=Date.now()}),s.on(w,function(t,e){i(v,[e,this.bstStart,Date.now(),"requestAnimationFrame"])}),o.on(y+p,function(t){this.time=Date.now(),this.startPath=location.pathname+location.hash}),o.on(y+h,function(t){i("bstHist",[location.pathname+location.hash,this.startPath,this.time])}),f in window.performance&&(window.performance["c"+c]?window.performance[f](u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["c"+c]()},!1):window.performance[f]("webkit"+u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["webkitC"+c]()},!1)),document[f]("scroll",r,!1),document[f]("keypress",r,!1),document[f]("click",r,!1)}},{}],5:[function(t,e,n){function r(t){for(var e=t;e&&!e.hasOwnProperty(u);)e=Object.getPrototypeOf(e);e&&o(e)}function o(t){s.inPlace(t,[u,d],"-",i)}function i(t,e){return t[1]}var a=t("ee").get("events"),s=t(17)(a),c=t("gos"),f=XMLHttpRequest,u="addEventListener",d="removeEventListener";e.exports=a,"getPrototypeOf"in Object?(r(document),r(window),r(f.prototype)):f.prototype.hasOwnProperty(u)&&(o(window),o(f.prototype)),a.on(u+"-start",function(t,e){if(t[1]){var n=t[1];if("function"==typeof n){var r=c(n,"nr@wrapped",function(){return s(n,"fn-",null,n.name||"anonymous")});this.wrapped=t[1]=r}else"function"==typeof n.handleEvent&&s.inPlace(n,["handleEvent"],"fn-")}}),a.on(d+"-start",function(t){var e=this.wrapped;e&&(t[1]=e)})},{}],6:[function(t,e,n){var r=t("ee").get("history"),o=t(17)(r);e.exports=r,o.inPlace(window.history,["pushState","replaceState"],"-")},{}],7:[function(t,e,n){var r=t("ee").get("raf"),o=t(17)(r),i="equestAnimationFrame";e.exports=r,o.inPlace(window,["r"+i,"mozR"+i,"webkitR"+i,"msR"+i],"raf-"),r.on("raf-start",function(t){t[0]=o(t[0],"fn-")})},{}],8:[function(t,e,n){function r(t,e,n){t[0]=a(t[0],"fn-",null,n)}function o(t,e,n){this.method=n,this.timerDuration="number"==typeof t[1]?t[1]:0,t[0]=a(t[0],"fn-",this,n)}var i=t("ee").get("timer"),a=t(17)(i),s="setTimeout",c="setInterval",f="clearTimeout",u="-start",d="-";e.exports=i,a.inPlace(window,[s,"setImmediate"],s+d),a.inPlace(window,[c],c+d),a.inPlace(window,[f,"clearImmediate"],f+d),i.on(c+u,r),i.on(s+u,o)},{}],9:[function(t,e,n){function r(t,e){d.inPlace(e,["onreadystatechange"],"fn-",s)}function o(){var t=this,e=u.context(t);t.readyState>3&&!e.resolved&&(e.resolved=!0,u.emit("xhr-resolved",[],t)),d.inPlace(t,w,"fn-",s)}function i(t){v.push(t),h&&(g=-g,b.data=g)}function a(){for(var t=0;t<v.length;t++)r([],v[t]);v.length&&(v=[])}function s(t,e){return e}function c(t,e){for(var n in t)e[n]=t[n];return e}t(5);var f=t("ee"),u=f.get("xhr"),d=t(17)(u),l=NREUM.o,p=l.XHR,h=l.MO,m="readystatechange",w=["onload","onerror","onabort","onloadstart","onloadend","onprogress","ontimeout"],v=[];e.exports=u;var y=window.XMLHttpRequest=function(t){var e=new p(t);try{u.emit("new-xhr",[e],e),e.addEventListener(m,o,!1)}catch(n){try{u.emit("internal-error",[n])}catch(r){}}return e};if(c(p,y),y.prototype=p.prototype,d.inPlace(y.prototype,["open","send"],"-xhr-",s),u.on("send-xhr-start",function(t,e){r(t,e),i(e)}),u.on("open-xhr-start",r),h){var g=1,b=document.createTextNode(g);new h(a).observe(b,{characterData:!0})}else f.on("fn-end",function(t){t[0]&&t[0].type===m||a()})},{}],10:[function(t,e,n){function r(t){var e=this.params,n=this.metrics;if(!this.ended){this.ended=!0;for(var r=0;d>r;r++)t.removeEventListener(u[r],this.listener,!1);if(!e.aborted){if(n.duration=(new Date).getTime()-this.startTime,4===t.readyState){e.status=t.status;var i=o(t,this.lastSize);if(i&&(n.rxSize=i),this.sameOrigin){var a=t.getResponseHeader("X-NewRelic-App-Data");a&&(e.cat=a.split(", ").pop())}}else e.status=0;n.cbTime=this.cbTime,f.emit("xhr-done",[t],t),s("xhr",[e,n,this.startTime])}}}function o(t,e){var n=t.responseType;if("json"===n&&null!==e)return e;var r="arraybuffer"===n||"blob"===n||"json"===n?t.response:t.responseText;return h(r)}function i(t,e){var n=c(e),r=t.params;r.host=n.hostname+":"+n.port,r.pathname=n.pathname,t.sameOrigin=n.sameOrigin}var a=t("loader");if(a.xhrWrappable){var s=t("handle"),c=t(11),f=t("ee"),u=["load","error","abort","timeout"],d=u.length,l=t("id"),p=t(14),h=t(13),m=window.XMLHttpRequest;a.features.xhr=!0,t(9),f.on("new-xhr",function(t){var e=this;e.totalCbs=0,e.called=0,e.cbTime=0,e.end=r,e.ended=!1,e.xhrGuids={},e.lastSize=null,p&&(p>34||10>p)||window.opera||t.addEventListener("progress",function(t){e.lastSize=t.loaded},!1)}),f.on("open-xhr-start",function(t){this.params={method:t[0]},i(this,t[1]),this.metrics={}}),f.on("open-xhr-end",function(t,e){"loader_config"in NREUM&&"xpid"in NREUM.loader_config&&this.sameOrigin&&e.setRequestHeader("X-NewRelic-ID",NREUM.loader_config.xpid)}),f.on("send-xhr-start",function(t,e){var n=this.metrics,r=t[0],o=this;if(n&&r){var i=h(r);i&&(n.txSize=i)}this.startTime=(new Date).getTime(),this.listener=function(t){try{"abort"===t.type&&(o.params.aborted=!0),("load"!==t.type||o.called===o.totalCbs&&(o.onloadCalled||"function"!=typeof e.onload))&&o.end(e)}catch(n){try{f.emit("internal-error",[n])}catch(r){}}};for(var a=0;d>a;a++)e.addEventListener(u[a],this.listener,!1)}),f.on("xhr-cb-time",function(t,e,n){this.cbTime+=t,e?this.onloadCalled=!0:this.called+=1,this.called!==this.totalCbs||!this.onloadCalled&&"function"==typeof n.onload||this.end(n)}),f.on("xhr-load-added",function(t,e){var n=""+l(t)+!!e;this.xhrGuids&&!this.xhrGuids[n]&&(this.xhrGuids[n]=!0,this.totalCbs+=1)}),f.on("xhr-load-removed",function(t,e){var n=""+l(t)+!!e;this.xhrGuids&&this.xhrGuids[n]&&(delete this.xhrGuids[n],this.totalCbs-=1)}),f.on("addEventListener-end",function(t,e){e instanceof m&&"load"===t[0]&&f.emit("xhr-load-added",[t[1],t[2]],e)}),f.on("removeEventListener-end",function(t,e){e instanceof m&&"load"===t[0]&&f.emit("xhr-load-removed",[t[1],t[2]],e)}),f.on("fn-start",function(t,e,n){e instanceof m&&("onload"===n&&(this.onload=!0),("load"===(t[0]&&t[0].type)||this.onload)&&(this.xhrCbStart=(new Date).getTime()))}),f.on("fn-end",function(t,e){this.xhrCbStart&&f.emit("xhr-cb-time",[(new Date).getTime()-this.xhrCbStart,this.onload,e],e)})}},{}],11:[function(t,e,n){e.exports=function(t){var e=document.createElement("a"),n=window.location,r={};e.href=t,r.port=e.port;var o=e.href.split("://");!r.port&&o[1]&&(r.port=o[1].split("/")[0].split("@").pop().split(":")[1]),r.port&&"0"!==r.port||(r.port="https"===o[0]?"443":"80"),r.hostname=e.hostname||n.hostname,r.pathname=e.pathname,r.protocol=o[0],"/"!==r.pathname.charAt(0)&&(r.pathname="/"+r.pathname);var i=!e.protocol||":"===e.protocol||e.protocol===n.protocol,a=e.hostname===document.domain&&e.port===n.port;return r.sameOrigin=i&&(!e.hostname||a),r}},{}],12:[function(t,e,n){function r(t,e){return function(){o(t,[(new Date).getTime()].concat(a(arguments)),null,e)}}var o=t("handle"),i=t(15),a=t(16);"undefined"==typeof window.newrelic&&(newrelic=NREUM);var s=["setPageViewName","setCustomAttribute","finished","addToTrace","inlineHit"],c=["addPageAction"],f="api-";i(s,function(t,e){newrelic[e]=r(f+e,"api")}),i(c,function(t,e){newrelic[e]=r(f+e)}),e.exports=newrelic,newrelic.noticeError=function(t){"string"==typeof t&&(t=new Error(t)),o("err",[t,(new Date).getTime()])}},{}],13:[function(t,e,n){e.exports=function(t){if("string"==typeof t&&t.length)return t.length;if("object"==typeof t){if("undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer&&t.byteLength)return t.byteLength;if("undefined"!=typeof Blob&&t instanceof Blob&&t.size)return t.size;if(!("undefined"!=typeof FormData&&t instanceof FormData))try{return JSON.stringify(t).length}catch(e){return}}}},{}],14:[function(t,e,n){var r=0,o=navigator.userAgent.match(/Firefox[\/\s](\d+\.\d+)/);o&&(r=+o[1]),e.exports=r},{}],15:[function(t,e,n){function r(t,e){var n=[],r="",i=0;for(r in t)o.call(t,r)&&(n[i]=e(r,t[r]),i+=1);return n}var o=Object.prototype.hasOwnProperty;e.exports=r},{}],16:[function(t,e,n){function r(t,e,n){e||(e=0),"undefined"==typeof n&&(n=t?t.length:0);for(var r=-1,o=n-e||0,i=Array(0>o?0:o);++r<o;)i[r]=t[e+r];return i}e.exports=r},{}],17:[function(t,e,n){function r(t){return!(t&&"function"==typeof t&&t.apply&&!t[a])}var o=t("ee"),i=t(16),a="nr@original",s=Object.prototype.hasOwnProperty,c=!1;e.exports=function(t){function e(t,e,n,o){function nrWrapper(){var r,a,s,c;try{a=this,r=i(arguments),s="function"==typeof n?n(r,a):n||{}}catch(u){d([u,"",[r,a,o],s])}f(e+"start",[r,a,o],s);try{return c=t.apply(a,r)}catch(l){throw f(e+"err",[r,a,l],s),l}finally{f(e+"end",[r,a,c],s)}}return r(t)?t:(e||(e=""),nrWrapper[a]=t,u(t,nrWrapper),nrWrapper)}function n(t,n,o,i){o||(o="");var a,s,c,f="-"===o.charAt(0);for(c=0;c<n.length;c++)s=n[c],a=t[s],r(a)||(t[s]=e(a,f?s+o:o,i,s))}function f(e,n,r){if(!c){c=!0;try{t.emit(e,n,r)}catch(o){d([o,e,n,r])}c=!1}}function u(t,e){if(Object.defineProperty&&Object.keys)try{var n=Object.keys(t);return n.forEach(function(n){Object.defineProperty(e,n,{get:function(){return t[n]},set:function(e){return t[n]=e,e}})}),e}catch(r){d([r])}for(var o in t)s.call(t,o)&&(e[o]=t[o]);return e}function d(e){try{t.emit("internal-error",e)}catch(n){}}return t||(t=o),e.inPlace=n,e.flag=a,e}},{}],ee:[function(t,e,n){function r(){}function o(t){function e(t){return t&&t instanceof r?t:t?s(t,a,i):i()}function n(n,r,o){t&&t(n,r,o);for(var i=e(o),a=l(n),s=a.length,c=0;s>c;c++)a[c].apply(i,r);var u=f[w[n]];return u&&u.push([v,n,r,i]),i}function d(t,e){m[t]=l(t).concat(e)}function l(t){return m[t]||[]}function p(t){return u[t]=u[t]||o(n)}function h(t,e){c(t,function(t,n){e=e||"feature",w[n]=e,e in f||(f[e]=[])})}var m={},w={},v={on:d,emit:n,get:p,listeners:l,context:e,buffer:h};return v}function i(){return new r}var a="nr@context",s=t("gos"),c=t(15),f={},u={},d=e.exports=o();d.backlog=f},{}],gos:[function(t,e,n){function r(t,e,n){if(o.call(t,e))return t[e];var r=n();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(t,e,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return t[e]=r,r}var o=Object.prototype.hasOwnProperty;e.exports=r},{}],handle:[function(t,e,n){function r(t,e,n,r){o.buffer([t],r),o.emit(t,e,n)}var o=t("ee").get("handle");e.exports=r,r.ee=o},{}],id:[function(t,e,n){function r(t){var e=typeof t;return!t||"object"!==e&&"function"!==e?-1:t===window?0:a(t,i,function(){return o++})}var o=1,i="nr@id",a=t("gos");e.exports=r},{}],loader:[function(t,e,n){function r(){if(!g++){var t=y.info=NREUM.info,e=u.getElementsByTagName("script")[0];if(t&&t.licenseKey&&t.applicationID&&e){c(w,function(e,n){t[e]||(t[e]=n)});var n="https"===m.split(":")[0]||t.sslForHttp;y.proto=n?"https://":"http://",s("mark",["onload",a()],null,"api");var r=u.createElement("script");r.src=y.proto+t.agent,e.parentNode.insertBefore(r,e)}}}function o(){"complete"===u.readyState&&i()}function i(){s("mark",["domContent",a()],null,"api")}function a(){return(new Date).getTime()}var s=t("handle"),c=t(15),f=window,u=f.document,d="addEventListener",l="attachEvent",p=f.XMLHttpRequest,h=p&&p.prototype;NREUM.o={ST:setTimeout,CT:clearTimeout,XHR:p,REQ:f.Request,EV:f.Event,PR:f.Promise,MO:f.MutationObserver},t(12);var m=""+location,w={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-952.min.js"},v=p&&h&&h[d]&&!/CriOS/.test(navigator.userAgent),y=e.exports={offset:a(),origin:m,features:{},xhrWrappable:v};u[d]?(u[d]("DOMContentLoaded",i,!1),f[d]("load",r,!1)):(u[l]("onreadystatechange",o),f[l]("onload",r)),s("mark",["firstbyte",a()],null,"api");var g=0},{}]},{},["loader",2,10,4,3]);</script>
+<link rel="shortcut icon" href="https://software.intel.com/sites/all/themes/android/favicon.ico" type="image/vnd.microsoft.icon" />
+<script  type="application/ld+json">{"@context":"http:\/\/schema.org","mainEntityofPage":"https:\/\/software.intel.com","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https:\/\/software.intel.com\/sites\/default\/files\/managed\/01\/a1\/intel_blue.png","name":"thumbnail","width":"86","height":"60"},"name":"Intel"},"@type":"TechArticle","headline":"\u5524\u9192\u9501: \u68c0\u6d4b Android* \u5e94\u7528\u4e2d\u7684 No-Sleep\uff08\u65e0\u6cd5\u8fdb\u5165\u7761\u7720\uff09\u95ee\u9898","name":"\u5524\u9192\u9501: \u68c0\u6d4b Android* \u5e94\u7528\u4e2d\u7684 No-Sleep\uff08\u65e0\u6cd5\u8fdb\u5165\u7761\u7720\uff09\u95ee\u9898","author":{"@type":"Person","name":"philippe-michelon (Intel)"},"datePublished":"2014-02-16 23:39:54","dateModified":"2016-05-06 16:41:42","url":"https:\/\/software.intel.com\/android\/articles\/wakelocks-detect-no-sleep-issues-in-android-applications","image":{"@type":"ImageObject","url":"https:\/\/software.intel.com\/sites\/default\/files\/d9\/e4\/search_publish_icon.jpeg","name":"thumbnail","width":54,"height":54},"inLanguage":"zh-hans","description":"","thumbnailURL":"https:\/\/software.intel.com\/sites\/default\/files\/d9\/e4\/search_publish_icon.jpeg","uploadDate":"","operatingSystem":"","applicationCategory":"","audience":"","genre":"20797,Android*","keywords":"20797,Android*,20785,Android* OS,42646,Phone"}</script>
+<script type="text/javascript">
+//configure analytics
+var wa_ssg_data=
+{"wa_ssg_type_macro":"article","wa_ssg_title":"\u5524\u9192\u9501: \u68c0\u6d4b Android* \u5e94\u7528\u4e2d\u7684 No-Sleep\uff08\u65e0\u6cd5\u8fdb\u5165\u7761\u7720\uff09\u95ee\u9898","wa_ssg_nid":"505559","wa_ssg_local_code":"zh_CN","wa_ssg_audience":"","wa_ssg_zone":"20797,Android*","wa_ssg_operating_system":"20785,Android* OS","wa_ssg_form_factor":"42646,Phone","wa_ssg_pubstatus":"published"}</script>
+<script>dataLayer = [{"timestamp":1466583798,"entityType":"node","entityBundle":"article","entityId":"505559","entityLabel":"\u5524\u9192\u9501: \u68c0\u6d4b Android* \u5e94\u7528\u4e2d\u7684 No-Sleep\uff08\u65e0\u6cd5\u8fdb\u5165\u7761\u7720\uff09\u95ee\u9898","entityLanguage":"zh-hans","entityTnid":"393570","entityVid":"3902748","entityUid":"336250","entityCreated":"1392622794","entityStatus":"1","entityUuid":"f3588dc8-bb78-4bca-9332-95e03ff20395","userUuid":"8290f23b-39c1-4a2b-aea5-651d6a8b12ce","userInit":"1","drupalLanguage":"zh-hans","userUid":0,"systemId":"1","systemName":"idzDrupal"}];</script>
+<link href="https://software.intel.com/en-us/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" rel="alternate" hreflang="en-us" />
+<meta name="description" content="摘要 如果 Android* 应用使用唤醒锁不当，将会显著增加电池耗电量。 在本文中，我们将介绍一些提示和技巧，帮助您了解如何确认与误用唤醒锁有关的 No Sleep 漏洞。" />
+<meta name="generator" content="Drupal 7 (http://drupal.org)" />
+<link rel="canonical" href="https://software.intel.com/zh-cn/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" />
+<link rel="shortlink" href="https://software.intel.com/zh-cn/node/505559" />
+  <title>安卓* -  唤醒锁: 检测 Android* 应用中的 No-Sleep（无法进入睡眠）问题 | 英特尔® 开发人员专区</title>
+
+      <meta name="MobileOptimized" content="width">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="cleartype" content="on">
+
+  <link type="text/css" rel="stylesheet" href="//software.intel.com/sites/default/files/advagg_css/css__ubktg7oN09x2fu-U2HIpuFhzNI36uez_cqlvvmZtUOU__UwLpAg7mqogMXpl5TIYUTF-gP8WYIuzdNLLHWU8rfcY__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.css" media="all" />
+<link type="text/css" rel="stylesheet" href="//software.intel.com/sites/default/files/advagg_css/css__V68YPylwx7S9scG2uwnfUBxBKlE9euO4N2G5CJJrR7g__DlT-V5_IoOiavneXECRQA8YRLVZ_9E6IERCKjI26Iyg__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.css" media="all" />
+<link type="text/css" rel="stylesheet" href="//software.intel.com/sites/default/files/advagg_css/css__XacPcD04dP9D-To6N-IGnxjhPYclLJRP1uuZFZFDxrU__EonO6JJPz7wj4ED-knaoKZhhvYUqWezpsvtdbN9YKvA__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.css" media="all" />
+<link type="text/css" rel="stylesheet" href="//software.intel.com/sites/default/files/advagg_css/css__VDERjmym5WYJl7PTRS0YbiTFJmyJ7fRlrw_r7iTd_ow__g_RfQ9prkqxgWKHLZNCC6SEZnQ6zxB0JbrvgP4f_8kU__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.css" media="all" />
+<link type="text/css" rel="stylesheet" href="//software.intel.com/sites/default/files/advagg_css/css__K3MA8Ghk7iVuQ2K0hdCOS25yfPjLeWPbnHbfOkkMQWU__9vhMYrVt_X9ek2Q7izTE-sGFYOHoo9UIOWbWiZxM_aQ__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.css" media="all" />
+<link type="text/css" rel="stylesheet" href="//software.intel.com/sites/default/files/advagg_css/css__x_XdNSPqQfRqwYFBC4KPHD523Nsy6_CMycu9g8fcrMA__b3CtFjKhvH6uNDtEncAvslpQsnKtxqu5jhy58vZ1P9Q__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.css" media="all" />
+<link type="text/css" rel="stylesheet" href="//software.intel.com/sites/default/files/advagg_css/css__MSLusRxbEziXMboS5_pxdouYtvkfWN-E2zhXE02ocGA__27X4i-i2BZB3nijRqw3DxAQa8rZ4kw3y8HiiTrVCtp4__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.css" media="all" />
+<link type="text/css" rel="stylesheet" href="//software.intel.com/sites/default/files/advagg_css/css__gyB2xyrJ9XMeniqKMu26e0XQNjYdGWuti-Hkl2Fl4KI__H4YiqtAQARuio43JLBapyjzXP9gk6jBCHCpgagwPrgM__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.css" media="all" />
+  <script src="//software.intel.com/sites/default/files/advagg_js/js__61JxszWilX8I3LO98teLjJHFuRkWVEVCDWd3JMHs3dI__Hbsr3LfHjx9Ll9F1NyKDE306bo-907ULNN-1QLjztn8__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.js"></script>
+<script src="//sadmin.brightcove.com/js/BrightcoveExperiences.js"></script>
+<script src="//software.intel.com/sites/default/files/advagg_js/js__MHam2Dha-2_c2NCvFcaT7FqYbp7qQ_GjyH_up2x7Mho__RUIWGve2bmUSnJxxfOsNwTTQYSEvgIfi4bm6Tqmc_aM__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.js"></script>
+<script>var _gaq = _gaq || [];_gaq.push(["_setAccount", "UA-17890616-1"]);var pluginUrl = 
+ '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+_gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+_gaq.push(["_setDomainName", ".intel.com"]);
+_gaq.push(["_setAllowLinker", true]);_gaq.push(['_setCustomVar', 1, "locale-code", "zh-hans", 3]);_gaq.push(['_setCustomVar', 2, "content", "\u6587\u7ae0||Android*|Android* OS", 3]);_gaq.push(['_setCustomVar', 3, "content-aud", "Phone|||", 3]);_gaq.push(['_setCustomVar', 4, "content-meta", "||", 3]);_gaq.push(['_setCustomVar', 5, "member", "8290f23b-39c1-4a2b-aea5-651d6a8b12ce|||", 3]);_gaq.push(['_setCustomVar', 6, "idz-node", "505559", 3]);_gaq.push(['_setCustomVar', 7, "idz-uuid", "8290f23b-39c1-4a2b-aea5-651d6a8b12ce", 3]);_gaq.push(['_setCustomVar', 8, "export-who", "|0|profile_id||", 3]);_gaq.push(['_setCustomVar', 9, "export-what", "||1|node|505559|", 3]);_gaq.push(['_setCustomVar', 10, "export-when", "|1466583797|", 3]);_gaq.push(["_trackPageview"]);(function() {var ga = document.createElement("script");ga.type = "text/javascript";ga.async = true;ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";var s = document.getElementsByTagName("script")[0];s.parentNode.insertBefore(ga, s);})();</script>
+<script src="//software.intel.com/sites/default/files/advagg_js/js__WGQcMaMHANyHwSLdIxN1GUWwCoHUBEo3hPFmSJfhwdI__IZT3pPRP41-KnaZnTCsdnORsvBN0Xe83XU2SFvj1p60__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.js"></script>
+<script>jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"zh-cn\/","ajaxPageState":{"theme":"android","theme_token":"zjjovChl5mKpwUTzm_UpScwVo8kmQI4TvQSU_GQ6-I4","css":{"modules\/system\/system.base.css":1,"modules\/system\/system.menus.css":1,"modules\/system\/system.messages.css":1,"modules\/system\/system.theme.css":1,"misc\/ui\/jquery.ui.core.css":1,"misc\/ui\/jquery.ui.theme.css":1,"misc\/ui\/jquery.ui.autocomplete.css":1,"sites\/all\/modules\/custom\/bds\/bds.css":1,"modules\/book\/book.css":1,"sites\/all\/modules\/contrib\/calendar\/css\/calendar_multiday.css":1,"modules\/comment\/comment.css":1,"sites\/all\/modules\/contrib\/date\/date_api\/date.css":1,"sites\/all\/modules\/contrib\/date\/date_popup\/themes\/datepicker.1.7.css":1,"modules\/field\/theme\/field.css":1,"sites\/all\/modules\/custom\/intel_advanced_forum_style\/styles\/idz\/advanced-forum.idz.images.css":1,"sites\/all\/modules\/custom\/intel_advanced_forum_style\/styles\/idz\/advanced-forum.idz.structure.css":1,"sites\/all\/modules\/contrib\/mollom\/mollom.css":1,"modules\/node\/node.css":1,"sites\/all\/modules\/custom\/node_attachments_block\/node-attachments-block.less.css":1,"modules\/search\/search.css":1,"sites\/all\/modules\/custom\/social_block\/social-block.less.css":1,"modules\/user\/user.css":1,"modules\/forum\/forum.css":1,"sites\/all\/modules\/contrib\/views\/css\/views.css":1,"sites\/all\/modules\/contrib\/ctools\/css\/ctools.css":1,"sites\/all\/modules\/contrib\/dhtml_menu\/dhtml_menu.css":1,"sites\/all\/modules\/contrib\/panels\/css\/panels.css":1,"sites\/all\/modules\/contrib\/quote\/quote.css":1,"sites\/all\/modules\/custom\/idz_beans\/css\/collapse-list.css":1,"modules\/contextual\/contextual.css":1,"modules\/locale\/locale.css":1,"sites\/all\/modules\/custom\/idz_zero\/css\/idz_zero.css":1,"sites\/all\/modules\/contrib\/hide_submit\/hide_submit.css":1,"sites\/all\/themes\/idzen\/system.menus.css":1,"sites\/all\/themes\/idzen\/system.messages.css":1,"sites\/all\/themes\/idzen\/system.theme.css":1,"sites\/all\/themes\/idzen\/css\/export.css":1,"sites\/all\/themes\/android\/css\/styles.css":1,"sites\/all\/themes\/idzen\/css\/components\/images.css":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/styles\/shCore.css":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/styles\/shThemeIntel.css":1,"sites\/all\/themes\/idzen\/sass\/global\/zurb-responsive-tables.css":1},"js":{"sites\/all\/themes\/zero\/js\/jquery.equalheights.min.js":1,"sites\/all\/modules\/custom\/idz_beans\/js\/collapse-list.min.js":1,"sites\/all\/modules\/custom\/idz_search\/js\/idz_search_block.min.js":1,"sites\/all\/themes\/idzen\/js\/breakpoints.min.js":1,"sites\/all\/themes\/idzen\/js\/utils\/redraw-siblings.min.js":1,"sites\/all\/themes\/idzen\/js\/responsive\/language-selector.min.js":1,"sites\/all\/themes\/idzen\/js\/responsive\/look-for-intel-widget.min.js":1,"sites\/all\/themes\/idzen\/js\/responsive\/user-login-widget.min.js":1,"sites\/all\/themes\/idzen\/js\/responsive\/comments.min.js":1,"sites\/all\/themes\/idzen\/js\/selectric-runner.min.js":1,"sites\/all\/themes\/idzen\/js\/tabs.min.js":1,"sites\/all\/themes\/idzen\/js\/zurb-responsive-tables.min.js":1,"sites\/all\/themes\/idzen\/js\/google-track.min.js":1,"sites\/all\/themes\/idzen\/js\/faq.min.js":1,"sites\/all\/themes\/idzen\/js\/multi-filter-view.min.js":1,"sites\/all\/themes\/idzen\/js\/comparison-tables.min.js":1,"sites\/all\/themes\/idzen\/js\/responsive-block-grid.min.js":1,"sites\/all\/themes\/idzen\/js\/anchor-dropdown.min.js":1,"sites\/all\/themes\/idzen\/js\/collapsible.min.js":1,"sites\/all\/themes\/idzen\/js\/news-ticker.min.js":1,"sites\/all\/themes\/idzen\/js\/collapse-list.min.js":1,"sites\/all\/themes\/idzen\/js\/search_responsive.min.js":1,"sites\/all\/themes\/idzen\/js\/projects.min.js":1,"sites\/all\/themes\/idzen\/js\/idzen-view-filter-proxy-links.min.js":1,"sites\/all\/themes\/idzen\/js\/gss_search.min.js":1,"sites\/all\/themes\/idzen\/js\/tabgroup.min.js":1,"sites\/all\/themes\/idzen\/js\/rateus.min.js":1,"sites\/all\/themes\/android\/js\/android-mobile-menu.min.js":1,"sites\/all\/themes\/android\/js\/mobile-icon-button-widget.min.js":1,"sites\/all\/modules\/custom\/idz_zero\/js\/idz_zero.min.js":1,"misc\/jquery.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1,"misc\/ui\/jquery.ui.core.min.js":1,"misc\/ui\/jquery.ui.widget.min.js":1,"misc\/ui\/jquery.ui.position.min.js":1,"misc\/ui\/jquery.ui.autocomplete.min.js":1,"sites\/all\/modules\/contrib\/gss\/scripts\/autocomplete.js":1,"sites\/all\/modules\/custom\/intel_belt_rewards\/intel_belt_rewards.js":1,"sites\/all\/modules\/custom\/social_block\/social-block.min.js":1,"public:\/\/languages\/zh-hans_6KIUev-Osz72ocXpM69S-efBhb7T5Y0XvZ2JNtcSjdw.js":1,"https:\/\/sadmin.brightcove.com\/js\/BrightcoveExperiences.js":1,"sites\/all\/modules\/contrib\/dhtml_menu\/dhtml_menu.js":1,"sites\/all\/modules\/contrib\/quote\/quote.js":1,"sites\/all\/modules\/contrib\/google_analytics\/googleanalytics.js":1,"sites\/all\/modules\/custom\/cmswithtms\/js\/config.js":1,"sites\/all\/modules\/contrib\/datalayer\/js\/getCanonical.js":1,"sites\/all\/modules\/contrib\/hide_submit\/hide_submit.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shCore.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushBash.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushCpp.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushCSharp.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushCss.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushFortran.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushJava.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushJScript.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushPerl.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushPhp.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushPlain.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushPython.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushR.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushRuby.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushSql.min.js":1,"sites\/all\/themes\/idzen\/js\/syntaxhighlighter\/scripts\/shBrushXml.min.js":1,"sites\/all\/themes\/idzen\/js\/intel-filter.min.js":1,"sites\/all\/themes\/idzen\/js\/vendors\/jquery\/jquery-1.10.2.min.js":1,"sites\/all\/themes\/idzen\/js\/plugins\/jquery.breakpoint.min.js":1,"sites\/all\/themes\/idzen\/js\/plugins\/jquery.selectric.min.js":1,"sites\/all\/themes\/idzen\/js\/jquery-noconflict.min.js":1,"sites\/all\/themes\/idzen\/js\/idzen-init.min.js":1}},"dhtmlMenu":{"nav":"bullet","animation":{"effects":{"height":"height","opacity":"opacity","width":0},"speed":"500"},"effects":{"siblings":"close-same-tree","children":"none","remember":""},"filter":{"type":"blacklist","list":{"menu-android-main-menu":"menu-android-main-menu","menu-developer-zone-index":"menu-developer-zone-index","menu-game-dev":"menu-game-dev","menu-game-dev-second-footer":"menu-game-dev-second-footer","menu-html5-second-footer-menu":"menu-html5-second-footer-menu","menu-iot-main-menu":"menu-iot-main-menu","menu-machine-learning":"menu-machine-learning","menu-machine-learning-second-foo":"menu-machine-learning-second-foo","menu-modern-code":"menu-modern-code","menu-modern-code-second-footer":"menu-modern-code-second-footer","menu-realsense-main-menu":"menu-realsense-main-menu","menu-windows-zone":"menu-windows-zone","book-toc-401277":0,"book-toc-429910":0,"book-toc-429928":0,"book-toc-429954":0,"book-toc-430006":0,"book-toc-430036":0,"book-toc-430068":0,"book-toc-430100":0,"book-toc-430130":0,"book-toc-430162":0,"book-toc-430192":0,"book-toc-438058":0,"book-toc-467678":0,"book-toc-468328":0,"book-toc-471718":0,"book-toc-471794":0,"book-toc-471828":0,"book-toc-471868":0,"book-toc-471898":0,"book-toc-471930":0,"book-toc-471960":0,"book-toc-471994":0,"book-toc-472026":0,"book-toc-473525":0,"book-toc-473527":0,"book-toc-473607":0,"book-toc-473611":0,"book-toc-473613":0,"book-toc-473615":0,"book-toc-473617":0,"book-toc-473619":0,"book-toc-473621":0,"book-toc-473623":0,"book-toc-473627":0,"book-toc-473631":0,"book-toc-473633":0,"book-toc-473637":0,"book-toc-473695":0,"book-toc-474337":0,"book-toc-474339":0,"book-toc-485531":0,"book-toc-486977":0,"book-toc-486980":0,"book-toc-487631":0,"book-toc-487847":0,"book-toc-488036":0,"book-toc-489046":0,"book-toc-489070":0,"book-toc-489073":0,"book-toc-489076":0,"book-toc-489079":0,"book-toc-489154":0,"book-toc-489157":0,"book-toc-489160":0,"book-toc-489166":0,"book-toc-489184":0,"book-toc-489187":0,"book-toc-492826":0,"book-toc-497450":0,"book-toc-498033":0,"book-toc-498423":0,"book-toc-498595":0,"book-toc-498812":0,"book-toc-499113":0,"book-toc-499114":0,"book-toc-499820":0,"book-toc-500859":0,"book-toc-500860":0,"book-toc-500938":0,"book-toc-500964":0,"book-toc-501556":0,"book-toc-501560":0,"book-toc-501565":0,"book-toc-501640":0,"book-toc-501977":0,"book-toc-501979":0,"book-toc-501980":0,"book-toc-501994":0,"book-toc-502685":0,"book-toc-502751":0,"book-toc-503337":0,"book-toc-503864":0,"book-toc-503882":0,"book-toc-504206":0,"book-toc-504522":0,"book-toc-504824":0,"book-toc-505087":0,"book-toc-505467":0,"book-toc-505470":0,"book-toc-505471":0,"book-toc-505525":0,"book-toc-505610":0,"book-toc-505615":0,"book-toc-506039":0,"book-toc-507032":0,"book-toc-507536":0,"book-toc-508652":0,"book-toc-510029":0,"book-toc-510030":0,"book-toc-510031":0,"book-toc-510032":0,"book-toc-510034":0,"book-toc-512418":0,"book-toc-514749":0,"book-toc-515148":0,"book-toc-515758":0,"book-toc-515904":0,"book-toc-517027":0,"book-toc-517028":0,"book-toc-517055":0,"book-toc-517075":0,"book-toc-517597":0,"book-toc-517758":0,"book-toc-517901":0,"book-toc-519946":0,"book-toc-520075":0,"book-toc-520076":0,"book-toc-520268":0,"book-toc-520269":0,"book-toc-520277":0,"book-toc-520666":0,"book-toc-520667":0,"book-toc-520699":0,"book-toc-522347":0,"book-toc-524566":0,"book-toc-526931":0,"book-toc-527334":0,"book-toc-527729":0,"book-toc-528017":0,"book-toc-528316":0,"book-toc-528318":0,"book-toc-528490":0,"book-toc-528650":0,"book-toc-528760":0,"book-toc-528852":0,"book-toc-529109":0,"book-toc-529110":0,"book-toc-529130":0,"book-toc-529136":0,"book-toc-529150":0,"book-toc-529180":0,"book-toc-529197":0,"book-toc-529730":0,"book-toc-529739":0,"book-toc-529753":0,"book-toc-529755":0,"book-toc-529763":0,"book-toc-530297":0,"book-toc-530299":0,"book-toc-530300":0,"book-toc-530304":0,"book-toc-530307":0,"book-toc-530308":0,"book-toc-530309":0,"book-toc-530310":0,"book-toc-530311":0,"book-toc-530312":0,"book-toc-530352":0,"book-toc-530403":0,"book-toc-530406":0,"book-toc-530407":0,"book-toc-530409":0,"book-toc-530410":0,"book-toc-530757":0,"book-toc-530758":0,"book-toc-531234":0,"book-toc-531508":0,"book-toc-531605":0,"book-toc-531606":0,"book-toc-531607":0,"book-toc-532310":0,"book-toc-532734":0,"book-toc-532750":0,"book-toc-532766":0,"book-toc-532787":0,"book-toc-532806":0,"book-toc-532823":0,"book-toc-532836":0,"book-toc-532853":0,"book-toc-533570":0,"book-toc-533572":0,"book-toc-533615":0,"book-toc-533929":0,"book-toc-534016":0,"book-toc-534019":0,"book-toc-534409":0,"book-toc-534410":0,"book-toc-534443":0,"book-toc-534449":0,"book-toc-534451":0,"book-toc-534454":0,"book-toc-534455":0,"book-toc-534542":0,"book-toc-534543":0,"book-toc-534547":0,"book-toc-534548":0,"book-toc-534755":0,"book-toc-535200":0,"book-toc-535201":0,"book-toc-535202":0,"book-toc-535203":0,"book-toc-535292":0,"book-toc-535475":0,"book-toc-535476":0,"book-toc-535477":0,"book-toc-535478":0,"book-toc-535479":0,"book-toc-535480":0,"book-toc-535481":0,"book-toc-535490":0,"book-toc-535491":0,"book-toc-535494":0,"book-toc-535500":0,"book-toc-535501":0,"book-toc-535512":0,"book-toc-535564":0,"book-toc-538742":0,"book-toc-539278":0,"book-toc-539279":0,"book-toc-539570":0,"book-toc-539571":0,"book-toc-539988":0,"book-toc-540373":0,"book-toc-540374":0,"book-toc-540375":0,"book-toc-540376":0,"book-toc-540377":0,"book-toc-540416":0,"book-toc-540499":0,"book-toc-540565":0,"book-toc-540917":0,"book-toc-541291":0,"book-toc-541704":0,"book-toc-541735":0,"book-toc-541738":0,"book-toc-542152":0,"book-toc-542173":0,"book-toc-543094":0,"book-toc-543885":0,"book-toc-543995":0,"book-toc-544575":0,"book-toc-544972":0,"book-toc-545277":0,"book-toc-549719":0,"book-toc-550755":0,"book-toc-550883":0,"book-toc-550884":0,"book-toc-550889":0,"book-toc-551014":0,"book-toc-551034":0,"book-toc-551404":0,"book-toc-551423":0,"book-toc-551433":0,"book-toc-551436":0,"book-toc-551449":0,"book-toc-551454":0,"book-toc-551472":0,"book-toc-551473":0,"book-toc-556953":0,"book-toc-557537":0,"book-toc-559913":0,"book-toc-559914":0,"book-toc-560853":0,"book-toc-560854":0,"book-toc-560855":0,"book-toc-560858":0,"book-toc-560859":0,"book-toc-560860":0,"book-toc-561188":0,"book-toc-561203":0,"book-toc-561212":0,"book-toc-561218":0,"book-toc-561269":0,"book-toc-561457":0,"book-toc-561587":0,"book-toc-561592":0,"book-toc-561790":0,"book-toc-561791":0,"book-toc-561823":0,"book-toc-561824":0,"book-toc-561825":0,"book-toc-561831":0,"book-toc-561846":0,"book-toc-561866":0,"book-toc-561885":0,"book-toc-562016":0,"book-toc-562017":0,"book-toc-562019":0,"book-toc-562383":0,"book-toc-564482":0,"book-toc-564572":0,"book-toc-564573":0,"book-toc-564889":0,"book-toc-564998":0,"book-toc-564999":0,"book-toc-565000":0,"book-toc-565519":0,"book-toc-565530":0,"book-toc-566133":0,"book-toc-566144":0,"book-toc-566726":0,"book-toc-566739":0,"book-toc-567641":0,"book-toc-567642":0,"book-toc-567643":0,"book-toc-567645":0,"book-toc-567646":0,"book-toc-569961":0,"book-toc-569963":0,"book-toc-579191":0,"book-toc-581602":0,"book-toc-583849":0,"book-toc-584009":0,"book-toc-584011":0,"book-toc-584012":0,"book-toc-584013":0,"book-toc-584138":0,"book-toc-584151":0,"book-toc-584152":0,"book-toc-584153":0,"book-toc-584154":0,"book-toc-584155":0,"book-toc-584156":0,"book-toc-584159":0,"book-toc-584160":0,"book-toc-584162":0,"book-toc-584170":0,"book-toc-584172":0,"book-toc-584182":0,"book-toc-584183":0,"book-toc-584185":0,"book-toc-584250":0,"book-toc-584251":0,"book-toc-584273":0,"book-toc-585194":0,"book-toc-585207":0,"book-toc-585224":0,"book-toc-586153":0,"book-toc-586154":0,"book-toc-586166":0,"book-toc-587354":0,"book-toc-587355":0,"book-toc-588538":0,"book-toc-590004":0,"book-toc-590005":0,"book-toc-590006":0,"book-toc-590007":0,"book-toc-590008":0,"book-toc-590010":0,"book-toc-590011":0,"book-toc-590013":0,"book-toc-590159":0,"book-toc-590160":0,"book-toc-590162":0,"book-toc-590168":0,"book-toc-590173":0,"book-toc-590184":0,"book-toc-590352":0,"book-toc-590353":0,"book-toc-590454":0,"book-toc-590459":0,"book-toc-590488":0,"book-toc-590489":0,"book-toc-590523":0,"book-toc-590533":0,"book-toc-590555":0,"book-toc-590620":0,"book-toc-590623":0,"book-toc-591240":0,"book-toc-591704":0,"book-toc-591721":0,"book-toc-591736":0,"book-toc-591753":0,"book-toc-591768":0,"book-toc-591785":0,"book-toc-591802":0,"book-toc-591819":0,"book-toc-591966":0,"book-toc-591972":0,"book-toc-592009":0,"book-toc-592052":0,"book-toc-592054":0,"book-toc-592055":0,"book-toc-592056":0,"book-toc-592060":0,"book-toc-592389":0,"book-toc-592401":0,"book-toc-592415":0,"book-toc-592429":0,"book-toc-592442":0,"book-toc-592462":0,"book-toc-592487":0,"book-toc-592526":0,"book-toc-592919":0,"book-toc-593280":0,"book-toc-593589":0,"book-toc-594189":0,"book-toc-594272":0,"book-toc-594324":0,"book-toc-594555":0,"book-toc-594816":0,"book-toc-594843":0,"book-toc-595378":0,"book-toc-595381":0,"book-toc-595665":0,"book-toc-596103":0,"book-toc-596253":0,"book-toc-596404":0,"book-toc-596468":0,"book-toc-597167":0,"book-toc-597690":0,"book-toc-598097":0,"book-toc-599846":0,"book-toc-600044":0,"book-toc-600055":0,"book-toc-600381":0,"book-toc-600525":0,"book-toc-600526":0,"book-toc-600787":0,"book-toc-600940":0,"book-toc-600957":0,"book-toc-600976":0,"book-toc-600990":0,"book-toc-601493":0,"book-toc-602161":0,"book-toc-603207":0,"book-toc-603214":0,"book-toc-603220":0,"book-toc-603644":0,"book-toc-603755":0,"book-toc-603786":0,"book-toc-604202":0,"book-toc-604281":0,"book-toc-604282":0,"book-toc-604531":0,"book-toc-604532":0,"book-toc-604665":0,"book-toc-604835":0,"book-toc-605203":0,"book-toc-605227":0,"book-toc-605341":0,"book-toc-606711":0,"book-toc-606794":0,"book-toc-607226":0,"book-toc-607310":0,"book-toc-607323":0,"book-toc-607353":0,"book-toc-608014":0,"book-toc-608324":0,"book-toc-609793":0,"book-toc-610391":0,"book-toc-610445":0,"book-toc-610465":0,"book-toc-610591":0,"book-toc-610914":0,"book-toc-611407":0,"book-toc-611541":0,"book-toc-611630":0,"book-toc-611646":0,"book-toc-611853":0,"book-toc-611859":0,"book-toc-611888":0,"book-toc-622240":0,"book-toc-622387":0,"book-toc-622642":0,"book-toc-622915":0,"book-toc-622961":0,"book-toc-623003":0,"book-toc-623535":0,"book-toc-623566":0,"book-toc-623572":0,"book-toc-623578":0,"book-toc-623628":0,"book-toc-624002":0,"book-toc-624127":0,"book-toc-624403":0,"book-toc-624456":0,"book-toc-624472":0,"book-toc-624481":0,"book-toc-624554":0,"book-toc-624556":0,"book-toc-624971":0,"book-toc-624984":0,"book-toc-625343":0,"book-toc-628212":0,"book-toc-628252":0,"book-toc-628408":0,"book-toc-628730":0,"book-toc-628866":0,"book-toc-628966":0,"book-toc-629026":0,"book-toc-629083":0,"book-toc-629122":0,"book-toc-629161":0,"book-toc-630393":0,"book-toc-630396":0,"book-toc-632244":0,"book-toc-632760":0,"book-toc-632996":0,"book-toc-633223":0,"book-toc-633281":0,"book-toc-633446":0,"book-toc-634420":0,"book-toc-634912":0,"book-toc-635063":0,"book-toc-635081":0,"book-toc-635091":0,"book-toc-635097":0,"book-toc-635289":0,"book-toc-635459":0,"book-toc-635723":0,"main-menu":0,"management":0,"navigation":0,"shortcut-set-1":0,"user-menu":0}}},"gss":{"key":"017112334782586706075:axbmndd0alq"},"jcarousel":{"ajaxPath":"\/zh-cn\/jcarousel\/ajax\/views"},"quote_nest":"2","language":{"language":"zh-hans","name":"Chinese, Simplified","native":"\u7b80\u4f53\u4e2d\u6587","direction":"0","enabled":"1","plurals":"0","formula":"","domain":"","prefix":"zh-cn","weight":"-9","javascript":"6KIUev-Osz72ocXpM69S-efBhb7T5Y0XvZ2JNtcSjdw","provider":"locale-url"},"googleanalytics":{"trackOutbound":1,"trackMailto":1,"trackDownload":1,"trackDownloadExtensions":"7z|aac|arc|arj|asf|asx|avi|bin|bz2|csv|doc|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mp(2|3|4|e?g)|mov(ie)?|msi|msp|pdf|phps|pkg|png|ppt|pptx|qtm?|ra(m|r)?|sea|sit|tar|tgz|torrent|txt|wav|wma|wmv|wpd|xls|xml|z|zip","trackDomainMode":"1"},"hide_submit":{"hide_submit_status":true,"hide_submit_method":"disable","hide_submit_css":"hide-submit-disable","hide_submit_abtext":"","hide_submit_atext":"","hide_submit_hide_css":"hide-submit-processing","hide_submit_hide_text":"","hide_submit_hide_fx":0,"hide_submit_reset_time":5000},"urlIsAjaxTrusted":{"\/zh-cn\/android\/articles\/wakelocks-detect-no-sleep-issues-in-android-applications":true}});</script>
+      <!--[if lt IE 9]>
+    <script src="/sites/all/themes/zen/js/html5-respond.js"></script>
+    <![endif]-->
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="icon" type="image/png" href="/favicon-196x196.png" sizes="196x196">
+  <link rel="icon" type="image/png" href="/favicon-160x160.png" sizes="160x160">
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <meta property="fb:pages" content="94251532337" />
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <meta name="microsoft" content="notranslateclasses header l-main-menu comments-wrapper l-footer-first l-footer-second l-language-footer message-wrapper region-navigation l-sidebar-second admin-menu-siteintel-com admin-menu-processed rate-txt"/>
+  <script type="text/javascript" src="https://creda-prod.wdg.infra-host.com/CredaScript.1463618558.js"></script>
+</head>
+<body class="html not-front not-logged-in one-sidebar sidebar-second page-node page-node- page-node-505559 node-type-article theme-android i18n-zh-hans section-android section-android path-android-articles-wakelocks-detect-no-sleep-issues-in-android-applications" >
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-PZRG3F" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script type="text/javascript">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0];var j=d.createElement(s);var dl=l!='dataLayer'?'&l='+l:'';j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;j.type='text/javascript';j.async=true;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-PZRG3F');</script>
+<!-- End Google Tag Manager -->
+  <p id="skip-link">
+    <a href="#main-menu" class="element-invisible element-focusable">Jump to navigation</a>
+  </p>
+
+<div id="page">
+
+<header class="header" id="header" role="banner">
+        <section class="logo-container">
+        <a href="/zh-cn" title="首页" rel="home" class="header__logo" id="logo">
+          <div class="logo icon-logo-intel"><span>Intel&reg; </span>英特尔® 开发人员专区</div></a>
+          <div class="section-title desktop"><a href="/zh-cn/android" title="首页 - 安卓*">安卓*</a></div>
+      </section>
+    <div class="header__region">
+  <span class="mobile-icon-button user icon-user"></span>
+   <section class="l-user-area">
+     <div id="header-user-display" class="user-display">
+      <div class="login">
+      <a href="https://software.intel.com/registration?lang=zh-cn" class="register-link">立即加入</a>      <a href="https://software.intel.com/zh-cn/user/login?destination=node/505559" class="login-link">登录</a>    </div>
+  </div>
+   </section>
+  <span class="mobile-icon-button search icon-search"></span>
+    <section class="l-search">
+      <form class="gss" action="/zh-cn/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" method="post" id="search-block-form--2" accept-charset="UTF-8"><div><div class="container-inline">
+      <h2 class="element-invisible">搜索表单</h2>
+    <div class="form-item form-type-textfield form-item-search-block-form">
+  <label class="element-invisible" for="edit-search-block-form--4">搜索 </label>
+ <input title="请输入您想搜索的关键词。" type="text" id="edit-search-block-form--4" name="search_block_form" value="" size="15" maxlength="128" class="form-text" />
+</div>
+<div class="form-actions form-wrapper" id="edit-actions--2"><input type="submit" id="edit-submit--2" name="op" value="" class="form-submit btn dropdown-toggle" /><button class="form-submit" type="submit" id="edit-submit" value="Search"></button></div><input type="hidden" name="form_build_id" value="form-XsLiWHFEdVIzbqt0NxRrb_RMR_xM2sY84hHVdiZ-czg" />
+<input type="hidden" name="form_id" value="search_block_form" />
+</div>
+</div></form>    </section>
+    </div>
+</header>
+    <div id="main" class="l-content-area">
+    <div class="message-wrapper">
+          </div>
+    <div id="content" class="column" role="main">
+            <a id="main-content"></a>
+                    <h1 class="page__title title" id="page-title">唤醒锁: 检测 Android* 应用中的 No-Sleep（无法进入睡眠）问题</h1>
+                        
+      <section class="l-content-body">
+        
+
+
+<article class="node-505559 node node-article view-mode-full clearfix" about="/zh-cn/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" typeof="sioc:Item foaf:Document">
+
+      <header>
+                  <span property="dc:title" content="唤醒锁: 检测 Android* 应用中的 No-Sleep（无法进入睡眠）问题" class="rdf-meta element-hidden"></span><span property="sioc:num_replies" content="0" datatype="xsd:integer" class="rdf-meta element-hidden"></span>            <div class="submitted-and-translation clearfix">
+                          <p class="submitted">
+                  <span class="user-picture">
+    <a href="/zh-cn/user/336250" title="查看用户资料"><img typeof="foaf:Image" src="https://software.intel.com/sites/all/themes/zero/images/defaultUserIcon.png" alt="philippe-michelon (Intel)的头像" title="philippe-michelon (Intel)的头像" /></a>  </span>
+                <span property="dc:date dc:created" content="2014-02-16T23:39:54-08:00" datatype="xsd:dateTime" rel="sioc:has_creator"><a href="https://software.intel.com/zh-cn/user/336250" title="查看用户简况" class="username">philippe-michelon (Intel)</a> 于 <time pubdate datetime="2014 年 2 月 16 日">2014 年 2 月 16 日</time> 提交</span>              </p>
+                                      <div id="translation_button"><span id="translation_progress" class="notranslate">Translating...</span><select id="bing-language-list" class="notranslate select-fancy bing-translate-style"><option value="0">翻译</option><option value="zh-chs">Chinese Simplified</option><option value="zh-cht">Chinese Traditional</option><option value="en">English(英语)</option><option value="fr">French(法语)</option><option value="de">German(德语)</option><option value="it">Italian(意大利语)</option><option value="pt">Portuguese</option><option value="ru">Russian(俄语)</option><option value="es">Spanish(西班牙语)</option><option value="tr">Turkish(土耳其语)</option></select><script type='text/javascript'>setTimeout(function(){{var s=document.createElement('script');s.type='text/javascript';s.charset='UTF-8';s.src=((location && location.href && location.href.indexOf('https') == 0)?'https://ssl.microsofttranslator.com':'http://www.microsofttranslator.com')+'/ajax/v3/WidgetV3.ashx?siteData=ueOIGRSKkd965FeEGM5JtQ**&ctf=False&ui=true&category=70adf6fd-a86d-4c27-af86-11655f788400_TECH&settings=Manual&ui=false&languages=es,pt,fr,it,tr,zh-CHS,zh-CHT,ru,de,en';var p=document.getElementsByTagName('head')[0]||document.documentElement;p.insertBefore(s,p.firstChild); }},0);</script></div>
+        <div class='disclaimer'>
+        <div id='disclaimer-text'>这是原始内容的机器翻译版本。其提供仅用于信息目的，不应将其视为或用作完整或精确的信息。</div>
+        </div>          </div>
+        <div class="social-share notranslate">
+        <div class="item-list"><ul><li class="sina first"><a href="http://weibo.com/isnprc" class="icon-logo-weibo" target="_blank">新浪</a></li>
+<li class="tencent last"><a href="http://t.qq.com/isnprc" class="icon-logo-tencentweibo" target="_blank">腾讯</a></li>
+</ul></div>  </div>
+
+
+          </header>
+  
+  <div class="field field-name-body field-type-text-with-summary field-label-hidden"><div class="field-items"><div class="field-item even" property="content:encoded"><h2>摘要</h2>
+
+<p>如果 Android* 应用使用唤醒锁不当，将会显著增加电池耗电量。 在本文中，我们将介绍一些提示和技巧，帮助您了解如何确认与误用唤醒锁有关的 No Sleep 漏洞。</p>
+
+<p><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278560" rel="nofollow">1. 介绍</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278561" rel="nofollow">2. 唤醒锁</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278562" rel="nofollow">2.1. 唤醒锁简介</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278563" rel="nofollow">2.2. Android 用户唤醒锁</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278564" rel="nofollow">2.3. Android 内核唤醒锁</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278565" rel="nofollow">2.4. No-Sleep 漏洞</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278566" rel="nofollow">3. 找出 No Sleep 漏洞</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278567" rel="nofollow">3.1. 使用 adb</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278568" rel="nofollow">3.2. 使用 BetterBatteryStats 应用</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278569" rel="nofollow">4. 测试案例</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278570" rel="nofollow">5. 结论</a><br /><a href="/zh-cn/articles/wakelocks-detect-no-sleep-issues-in-android-applications/#_Toc358278571" rel="nofollow">6. 参考文献</a></p>
+
+<h2><a name="_Toc358278560" id="_Toc358278560"></a>1. 介绍</h2>
+
+<p>限制电池耗电量对智能手机非常有必要。 为了获得最大的自主性，Android 的操作系统设计可在检测到系统上无用户活动时进入睡眠模式。 一些应用需要设备保持开启状态 — 即使长时间无用户操作。 比如，看视频、听音乐、使用 GPS 以及玩游戏。 Android 可为操作系统或应用提供了这样的机制，以确保设备保持唤醒状态。 该机制称为唤醒锁。 如欲了解其他信息，请阅读 Christopher Bird 的文章： “<a href="/zh-cn/articles/wakelocks-for-android" rel="nofollow">适用于 Android 的唤醒锁</a>”。</p>
+
+<p>这种机制的出现让管理组件活动的责任落到应用开发人员的身上。 如果使用错误，应用可能会大量消耗电池电量 — 即使应用并未在前台运行。</p>
+
+<h2><a name="_Toc358278561" id="_Toc358278561"></a>2. 唤醒锁</h2>
+
+<h2><a name="_Toc358278562" id="_Toc358278562"></a>2.1.唤醒锁简介</h2>
+
+<p>唤醒锁是一种控制主机设备电源状态的软件机制。 操作系统可导出明确的电源管理句柄和 API，以指定某个组件何时需要保持开启或唤醒状态，直至其从任务中被明确释放。</p>
+
+<p>唤醒锁机制可在两个层面上实施： 用户和内核。 下图展示了 Android 唤醒锁实施的内部设计。 用户唤醒锁可被高层面的操作系统服务或应用采用，并通过电源管理服务提供。 它支持应用控制设备的电源状态。 内核唤醒锁由操作系统内核或驱动程序控制。 用户唤醒锁被映射至内核唤醒锁。 任何活动的内核层面唤醒锁都可阻止系统在 ACPI S3 状态挂起（在 RAM 挂起）— 它是移动设备最节能的状态。</p>
+
+<p align="center"><img src="/sites/default/files/wakelocks01.jpg" /></p>
+
+<h2><a name="_Toc358278563" id="_Toc358278563"></a>2.2. Android 用户唤醒锁</h2>
+
+<p>Android 架构通过 PowerManager 导出唤醒锁机制。唤醒锁可划分为并识别四种用户唤醒锁：</p>
+
+<table><thead><tr><th>标记值</th>
+			<th>CPU</th>
+			<th>屏幕</th>
+			<th>键盘</th>
+		</tr></thead><tbody><tr><td>
+				<p><a href="http://developer.android.com/reference/android/os/PowerManager.html" rel="nofollow" target="_blank">PARTIAL_WAKE_LOCK</a></p>
+			</td>
+			<td>
+				<p>开启</p>
+			</td>
+			<td>
+				<p>关闭</p>
+			</td>
+			<td>
+				<p>关闭</p>
+			</td>
+		</tr><tr><td>
+				<p><a href="http://developer.android.com/reference/android/os/PowerManager.html" rel="nofollow" target="_blank">SCREEN_DIM_WAKE_LOCK</a></p>
+			</td>
+			<td>
+				<p>开启</p>
+			</td>
+			<td>
+				<p>变暗</p>
+			</td>
+			<td>
+				<p>关闭</p>
+			</td>
+		</tr><tr><td>
+				<p><a href="http://developer.android.com/reference/android/os/PowerManager.html" rel="nofollow" target="_blank">SCREEN_BRIGHT_WAKE_LOCK</a></p>
+			</td>
+			<td>
+				<p>开启</p>
+			</td>
+			<td>
+				<p>变亮</p>
+			</td>
+			<td>
+				<p>关闭</p>
+			</td>
+		</tr><tr><td>
+				<p><a href="http://developer.android.com/reference/android/os/PowerManager.html" rel="nofollow" target="_blank">FULL_WAKE_LOCK</a></p>
+			</td>
+			<td>
+				<p>开启</p>
+			</td>
+			<td>
+				<p>变亮</p>
+			</td>
+			<td>
+				<p>变亮</p>
+			</td>
+		</tr></tbody></table><p>请注意，自 API 等级 17 开始，FULL_WAKE_LOCK 将被弃用。 应用应使用 FLAG_KEEP_SCREEN_ON。</p>
+
+<p>可以使用唤醒锁强迫一些组件（CPU、屏幕和键盘）保持唤醒状态。</p>
+
+<p>请了解有关 PARTIAL_WAKE_LOCK 的特别提醒：无论任何显示器超时或屏幕处于任何状态，CPU 都将继续运行 — 即使用户按下电源按钮。 这可能会导致出现静默耗电，即手机看上去处于待机模式（屏幕关闭），但是实际上处于完全唤醒状态。</p>
+
+<p>在其他唤醒锁中，用户仍可使用电源按钮让设备进入睡眠状态。 按下电源按钮后，除局部唤醒锁外所有唤醒锁均将完全释放。</p>
+
+<p>上述即为应用控制唤醒锁的方法。 基本而言，它是一个获取/释放机制。 当应用需要让一些组件保持开启状态时，它便会获取唤醒锁。 当不再需要这些组件处于开启状态时，则需要将唤醒锁释放。</p>
+
+<p><code>PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);<br />
+	PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");<br />
+	wl.acquire();<br />
+	..screen will stay on during this section..<br />
+	wl.release();</code></p>
+
+<h2><a name="_Toc358278564" id="_Toc358278564"></a>2.3. Android 内核唤醒锁</h2>
+
+<p>内核唤醒锁是由内核控制的低级唤醒锁。 它们可从内核内部获取/释放。 就此而言，应用开发人员对它们的直接控制更少，但是应用的运行状况可以间接触发这些唤醒锁并在无意中增加电池的耗电量。</p>
+
+<p>下面是内核唤醒锁的示例。</p>
+
+<p><b>Wlan_rx：</b> 当通过 Wi-Fi* 发送或接收数据时由内核控制。</p>
+
+<p><b>PowerManagerService： </b>是适用于所有局部唤醒锁的容器。</p>
+
+<p><b>Sync</b>： 在同步流程运行时启用。</p>
+
+<p><b>Alarm_rtc</b>： 控制告警（当应用或流程执行定期检查时使用）。</p>
+
+<p><b>Main</b>： 保持内核处于唤醒状态。 系统进入挂起模式时，这是最后一个被释放的唤醒锁。</p>
+
+<h2><a name="_Toc358278565" id="_Toc358278565"></a>2.4. No-Sleep 漏洞</h2>
+
+<p>应用必须在某一时刻释放它需要的每个唤醒锁，以便允许系统返回深睡眠模式。 如果该唤醒锁一直未被释放，则该获取/释放机制可能会导致出现漏洞。 即使启用了唤醒锁的应用停止在前台运行，唤醒锁仍在使用中。 当使用释放调用明确释放唤醒锁或应用被终止（强制关闭）时，唤醒锁才可被释放。 让一些唤醒锁处于启用状态将阻止系统进入深睡眠模式 — 即使没有活动大量增加耗电量和静默减少电池的自主性。 这就是 No-Sleep 漏洞。 由于 Android 的事件驱动特性，开发人员可能无法想到其应用获取并需要关闭的唤醒锁的所有代码路径。 这种漏洞类型称为 No-Sleep 漏洞代码路径。</p>
+
+<p>发生这种类型的漏洞的另一种情况是，唤醒锁未有效获取而被释放。 在不同的线程中获取和释放唤醒锁的多线程代码中可能会出现这种情况。 这就是 No-Sleep 漏洞竞态条件。</p>
+
+<p>最后一个问题是 No-sleep 扩张，其中获取唤醒锁的时间比实际所需的时间长。</p>
+
+<p>为何重点指出这些问题？ 根据 P. Vekris 的研究： “328 个使用唤醒锁的应用中，55% 的应用未遵循我们针对 no-sleep 漏洞提供的策略”[2012]。 一些主要的应用在出现 No-Sleep 漏洞时被释放。 因此，开发人员需要意识到这一点，以便以最优的方式运行其应用。</p>
+
+<h2><a name="_Toc358278566" id="_Toc358278566"></a>3. 找出 No-Sleep 漏洞</h2>
+
+<p>您可以通过两种方式解决 no sleep 漏洞： 静态的代码路径扫描分析和动态的运行时分析。 在本文中，我们主要介绍运行时分析。</p>
+
+<p>这种方法无法保证您找到应用中所有的唤醒锁漏洞。 但是，它可以帮助您找到在运行时期间出现的唤醒锁问题。 如要找出唤醒锁问题，您需要按照未释放唤醒锁的代码路径执行。 测试一个应用是否解决了 no sleep 漏洞包括在应用的不同位置操作应用，尝试以不同的方式从应用中退出，以确认唤醒锁是否仍然存在。</p>
+
+<p>在某些情况下，有必要阻止系统进入深睡眠状态 — 即使应用停止在前台运行。 应用可能需要在后台执行一项任务。 此时即为这种情况，例如，如果应用需要长时间下载： 视频或游戏数据集。 在进行下载时，用户可能让应用在后台运行，但是在下载完成前，手机应保持唤醒状态。 在这种情况下，在下载完成前，应用应一直启用唤醒锁。 当然，您需要确保在某个点释放唤醒锁。 例如，当手机在下载期间断开网络，如果无法再执行操作，手机则无需保持唤醒状态。</p>
+
+<p>总之，找出 No Sleep 漏洞与所在的环境关系密切。 没有预定义的标准可让您轻松找出该问题。 只能依靠常识找到上述的漏洞。</p>
+
+<h2><a name="_Toc358278567" id="_Toc358278567"></a>3.1. 使用 adb</h2>
+
+<p>shell 命令是查看唤醒锁最简单的工具。</p>
+
+<p>如要完整了解内核唤醒锁，请输入：</p>
+
+<p>adb shell cat /proc/wakelocks</p>
+
+<table><tbody><tr><td><code>name</code></td>
+			<td><code>count</code></td>
+			<td><code>expire_count</code></td>
+			<td><code>wake_count</code></td>
+			<td><code>active_since</code></td>
+			<td><code>total_time</code></td>
+		</tr><tr><td><code>"PowerManagerService"</code></td>
+			<td><code>1502</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>337817677431</code></td>
+		</tr><tr><td><code>"main"</code></td>
+			<td><code>15</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>984265842688</code></td>
+		</tr><tr><td><code>"alarm"</code></td>
+			<td><code>1512</code></td>
+			<td><code>0</code></td>
+			<td><code>792</code></td>
+			<td><code>0</code></td>
+			<td><code>217778251643</code></td>
+		</tr><tr><td><code>"radio-interface"</code></td>
+			<td><code>16</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>16676538930</code></td>
+		</tr><tr><td><code>"alarm_rtc"</code></td>
+			<td><code>804</code></td>
+			<td><code>4</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>1204136324759</code></td>
+		</tr><tr><td><code>"gps-lock"</code></td>
+			<td><code>1</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>0</code></td>
+			<td><code>10753659786</code></td>
+		</tr></tbody></table><table><tbody><tr><td><code>name</code></td>
+			<td><code>sleep_time</code></td>
+			<td><code>max_time</code></td>
+			<td><code>last_change</code></td>
+		</tr><tr><td><code>"PowerManagerService"</code></td>
+			<td><code>95729409122</code></td>
+			<td><code>140921663667</code></td>
+			<td><code>9723417252748</code></td>
+		</tr><tr><td><code>"main"</code></td>
+			<td><code>0</code></td>
+			<td><code>212424732355</code></td>
+			<td><code>9498127170228</code></td>
+		</tr><tr><td><code>"alarm"</code></td>
+			<td><code>217617362047</code></td>
+			<td><code>357976941</code></td>
+			<td><code>9723371461242</code></td>
+		</tr><tr><td><code>"radio-interface"</code></td>
+			<td><code>0</code></td>
+			<td><code>1659328496</code></td>
+			<td><code>9486387144974</code></td>
+		</tr><tr><td><code>"alarm_rtc"</code></td>
+			<td><code>1200253446201</code></td>
+			<td><code>66082936501</code></td>
+			<td><code>9483176054624</code></td>
+		</tr><tr><td><code>"gps-lock"</code></td>
+			<td><code>0</code></td>
+			<td><code>10753659786</code></td>
+			<td><code>37632803440</code></td>
+		</tr></tbody></table><p>对于使用内核 3.4 或更高版本的映像，请使用“adb shell cat /sys/kernel/debug/wakeup_sources”。 虽然该格式可提供全部信息，但是不太适合用户使用。 我们在下面介绍的工具更方便。</p>
+
+<p>使用“adb shell dumpsys power”可以轻松查看特定的应用。 以下是该命令典型的输出方式。 您可以看到，在命令发布后，用户唤醒锁将以红色呈现。 该命令可以查看系统中呈现的用户唤醒锁。</p>
+
+<p><code>Power Manager State:<br />
+	mIsPowered=true mPowerState=3 mScreenOffTime=1618305 ms<br />
+	mPartialCount=3<br />
+	mWakeLockState=SCREEN_ON_BIT<br />
+	mUserState=SCREEN_BRIGHT_BIT SCREEN_ON_BIT<br />
+	mPowerState=SCREEN_BRIGHT_BIT SCREEN_ON_BIT<br />
+	mLocks.gather=SCREEN_ON_BIT<br />
+	mNextTimeout=2382037 now=2378097 3s from now<br />
+	mDimScreen=true mStayOnConditions=3 mPreparingForScreenOn=false mSkippedScreenOn=false<br />
+	mScreenOffReason=0 mUserState=3<br />
+	mBroadcastQueue={-1,-1,-1}<br />
+	mBroadcastWhy={0,0,0}<br />
+	mPokey=0 mPokeAwakeonSet=false<br />
+	mKeyboardVisible=false mUserActivityAllowed=true<br />
+	mKeylightDelay=6000 mDimDelay=587000 mScreenOffDelay=7000<br />
+	mPreventScreenOn=false mScreenBrightnessOverride=-1 mButtonBrightnessOverride=-1<br />
+	mScreenOffTimeoutSetting=600000 mMaximumScreenOffTimeout=2147483647<br />
+	mLastScreenOnTime=27380<br />
+	mBroadcastWakeLock=UnsynchronizedWakeLock(mFlags=0x1 mCount=0 mHeld=false)<br />
+	mStayOnWhilePluggedInScreenDimLock=UnsynchronizedWakeLock(mFlags=0x6 mCount=0 mHeld=true)<br />
+	mStayOnWhilePluggedInPartialLock=UnsynchronizedWakeLock(mFlags=0x1 mCount=0 mHeld=true)<br />
+	mPreventScreenOnPartialLock=UnsynchronizedWakeLock(mFlags=0x1 mCount=0 mHeld=false)<br />
+	mProximityPartialLock=UnsynchronizedWakeLock(mFlags=0x1 mCount=0 mHeld=false)<br />
+	mProximityWakeLockCount=0<br />
+	mProximitySensorEnabled=false<br />
+	mProximitySensorActive=false<br />
+	mProximityPendingValue=-1<br />
+	mLastProximityEventTime=0<br />
+	mLightSensorEnabled=true mLightSensorAdjustSetting=0.0<br />
+	mLightSensorValue=11.0 mLightSensorPendingValue=10.0<br />
+	mHighestLightSensorValue=47 mWaitingForFirstLightSensor=false<br />
+	mLightSensorPendingDecrease=false mLightSensorPendingIncrease=false<br />
+	mLightSensorScreenBrightness=42 mLightSensorButtonBrightness=0 mLightSensorKeyboardBrightness=0<br />
+	mUseSoftwareAutoBrightness=true<br />
+	mAutoBrightessEnabled=true<br />
+	creenBrightnessAnimator:<br />
+	animating: start:42, end:42, duration:480, current:42<br />
+	startSensorValue:47 endSensorValue:11<br />
+	startTimeMillis:2361638 now:2378092<br />
+	currentMask:SCREEN_BRIGHT_BIT<br />
+	mLocks.size=4:<br />
+	SCREEN_DIM_WAKE_LOCK          'StayOnWhilePluggedIn_Screen_Dim' activated (minState=1, uid=1000, pid=388)<br />
+	PARTIAL_WAKE_LOCK             'StayOnWhilePluggedIn_Partial' activated (minState=0, uid=1000, pid=388)<br />
+	PARTIAL_WAKE_LOCK             'HDA_PARTIAL_WAKE_LOCK' activated (minState=0, uid=10046, pid=4690)<br />
+	PARTIAL_WAKE_LOCK             'AudioOut_2' activated (minState=0, uid=1013, pid=157)<br />
+	mPokeLocks.size=0:</code></p>
+
+<p>如要确认应用进入后台后是否还有唤醒锁启用，您可以按照下列流程操作：</p>
+
+<table><tbody><tr><td>1. 将设备连接至 USB。<br />
+				2. 启用应用并在该应用上操作。<br />
+				3. 按电源按钮进入睡眠模式或以某种方式退出应用。<br />
+				4. 等待 20 秒钟。<br />
+				5. 以命令行的方式输入下列指令：<br /><code>&gt; adb shell dumpsys power</code><br />
+				6. 查看是否有 PARTIAL_WAKE_LOCKs 与此相同，例如：<br /><code>PARTIAL_WAKE_LOCK       ‘AudioOut_2’ activated(minState=0, uid=1013, pid=157)</code><br />
+				7.每隔 15 秒钟重复一次第 5 步，共重复 3 至 5 次。 如果结果相同，可能出现了问题。</td>
+		</tr></tbody></table><h2><a name="_Toc358278568" id="_Toc358278568"></a>3.2. 使用 BetterBatteryStats 应用</h2>
+
+<p>BetterBatteryStats* (<a href="https://play.google.com/store/apps/details?id=com.asksven.betterbatterystats&amp;hl=en" rel="nofollow" target="_blank">https://play.google.com/store/apps/details?id=com.asksven.betterbatterystats&amp;hl=en</a>) 是 Sven Knispel 开发的一款 Android 应用，可在 Google Play 上购买。 它可以收集信息，帮助您发现耗电问题，尤其是唤醒锁问题。</p>
+
+<p>首先，通过选择 “Other”条目，您可以查看深睡眠和唤醒模式与总时间。 理想状态下，大多数情况，如果手机未使用则应处于深睡眠状态。</p>
+
+<p>此外，您还可对比唤醒时间与屏幕开启时间，以了解何时为实际活动状态。 正常情况下，屏幕开启时间和唤醒时间应处于关闭状态。</p>
+
+<p align="center"><img src="/sites/default/files/wakelocks02.png" /></p>
+
+<p>您可以查看各时间的电池充电评估和唤醒、屏幕开启和 Wi-Fi* 状态。</p>
+
+<p align="center"><img src="/sites/default/files/wakelocks03.png" /></p>
+
+<p>然后，您可以查看内核唤醒锁。 您可以查看每种内核唤醒锁花费的时间及数量。 时间长或数量多可能代表出现了问题。 在该报告中，您无法找出是哪一应用或流程导致热点出现，但是可以发现特定应用触发的运行状况。</p>
+
+<p>在内核唤醒锁报告中，“PowerManagerService”可汇总用户唤醒锁中花费的时间。 如果该命令行显示了热点，您可以通过查看局部唤醒锁报告找出。</p>
+
+<p align="center"><img src="/sites/default/files/wakelocks04.png" /></p>
+
+<p>大多数情况下，局部唤醒锁可指出控制它的应用。 找到导致问题出现的元凶会有很大的帮助。 但是，有时，一些活动可能通过其他应用启动。 例如，游戏可能会通过分配给 Android 媒体库的 AudioOut 声道播放声音。 如果未正确编码，您可能会认为未关闭声道是由于游戏出现问题， 而不会认为是 Android Gallery 出现问题。</p>
+
+<p>AlarmManager 可能会提示告警导致唤醒出现，或某个应用做了大量的告警修改。 您可能希望查看“告警”部分，但是只有在拥有根权限的映像上才能进行查看。</p>
+
+<p>此外，网络接入也仅支持有根权限的映像。 如果您察觉到网络上出现较高的流量可能会有帮助。 multipdp/svnet-dormancy 内核唤醒锁可能指示您还有一些较高的网络使用率。</p>
+
+<p align="center"><img src="/sites/default/files/wakelocks05.png" /></p>
+
+<h2><a name="_Toc358278569" id="_Toc358278569"></a>4. 测试案例</h2>
+
+<p>让我们看一个使用游戏的真实案例。 启动游戏，玩 5 分钟左右，然后以非常规的方式从游戏中退出。 在我们的案例中，我们通过按主页键强制退出。 音乐停止，主页界面出现。 用户看来，一切都正常。 停止活动几分钟后，屏幕正常变黑。 让手机保持该状态约半个小时的时间，然后使用 BestBatteryStats 来检查它。 在“Other”界面上，您可以看到，虽然屏幕未开启，但是手机仍然处于唤醒状态。 此外，您还可以看到电池耗电率为 8.5%/小时。 因此在这种状态下，充满电的手机持续使用时间也不会超过 12 个小时。</p>
+
+<p align="center"><img src="/sites/default/files/wakelocks06.png" /></p>
+
+<p>现在，我们来看一下内核唤醒锁。 我们可以看到，虽然没有活动，但是两个内核唤醒锁仍然保持唤醒状态。 其中一个是 PowerManagerService，这意味着有用户局部唤醒锁开启；另一个是 AudioOutLock 等待锁。 我们来看一下局部唤醒锁界面。</p>
+
+<p align="center"><img src="/sites/default/files/wakelocks07.jpg" /></p>
+
+<p>在局部唤醒锁界面上，我们可以看到媒体库应用中的音频通道仍然打开。 这很奇怪，因为用户未明确使用媒体库应用。 实际上，游戏启动了媒体库，以便播放游戏的音乐。 开发人员忘记了在主页按钮中断应用时关闭音频通道。 开发人员应将这种情况考虑在内，并相应地对应用进行修改。</p>
+
+<p align="center"><img src="/sites/default/files/wakelocks08.png" /></p>
+
+<h2><a name="_Toc358278570" id="_Toc358278570"></a>5. 结论</h2>
+
+<p>唤醒锁是非常有用且强大的工具。 但是如果使用不当，它们可能会对设备的电池寿命产生非常不好的影响，从而极大地影响用户体验。 对于开发人员来讲，应确保在 QA 过程中其代码未导致任何 No Sleep 漏洞出现。 他们应考虑使用可用的工具对实际使用中其应用对电池的影响进行分析，并尽量降低其对用户设备的影响。</p>
+
+<h2><a name="_Toc358278571" id="_Toc358278571"></a>6. 参考文献</h2>
+
+<ul><li>A. Pathak, et al., “<a href="http://reviews.mobisys2012.rice.edu/r/papers/comments/1n/what_is_keeping_my_phone_awake_characterizing_and/" rel="nofollow" target="_blank">什么导致我的手机一直处于唤醒状态？: 描述和检测智能手机应用中的 no-sleep 电源漏洞</a>”, MobiSys， 2012 年。</li>
+	<li>P. Vekris, et al., “<a href="http://mesl.ucsd.edu/yuvraj/docs/Vekris_HotPower12_TowardsVerifyingApps.pdf" rel="nofollow" target="_blank">关于验证 Android 应用不存在 No-Sleep 电源漏洞</a>”, HotPower，2012 年。</li>
+	<li>Android 唤醒锁 <a href="http://developer.android.com/reference/android/os/PowerManager.WakeLock.html" rel="nofollow" target="_blank">http://developer.android.com/reference/android/os/PowerManager.WakeLock.html</a></li>
+	<li>Christopher Bird, “适用于 android 的唤醒锁” <a href="/zh-cn/articles/wakelocks-for-android" rel="nofollow">https://software.intel.com/zh-cn/articles/wakelocks-for-android</a>，Intel Corporation，2012 年。</li>
+	<li>BetterBatteryStats 网站： <a href="http://better.asksven.org/" rel="nofollow" target="_blank">http://better.asksven.org/</a></li>
+</ul></div></div></div><div class="field field-name-field-protected-attachments field-type-file field-label-hidden"><div class="field-items"></div></div>
+</article>
+        
+                   <div id="button-links-wrap" class="clearfix"><div class="item-list"></div></div>
+        
+                  <div id="links-wrap" class="clearfix">
+              <div id="links"></div>
+          </div>
+        
+              </section>
+
+
+                  <aside class="l-sidebar-second">
+          <section class="region region-sidebar-second column sidebar">
+    <div id="block-idz-responsive-blocks-idz-responsive-subnav" class="block block-idz-responsive-blocks first last odd">
+
+      
+  <ul><li><a href="https://software.intel.com/zh-cn/forums/android-applications-on-intel-architecture">论坛</a></li></ul>
+</div>
+  </section>
+      </aside>
+      
+          </div>
+
+    <div id="navigation">
+
+        <div class="region region-navigation">
+    <div id="block-menu-menu-android-main-menu" class="block block-menu first last odd" role="navigation">
+
+        <h2 class="block__title block-title">安卓主菜单</h2>
+    
+  <ul class="menu"><li class="menu__item is-leaf first leaf depth-1 menu-113816"><a href="/zh-cn/android" class="menu__link">主页</a></li>
+<li class="menu__item is-leaf leaf depth-1 menu-113821"><a href="/zh-cn/android/learn" class="menu__link">了解</a></li>
+<li class="menu__item is-leaf leaf depth-1 menu-113828"><a href="/zh-cn/android/get-device" class="menu__link">获取设备</a></li>
+<li class="menu__item is-expanded expanded depth-1 menu-113834"><a href="/zh-cn/android/tools" class="menu__link">工具</a><ul class="menu"><li class="menu__item is-leaf first leaf depth-2 menu-153500"><a href="/zh-cn/android/tools" class="menu__link">软件工具</a></li>
+<li class="menu__item is-leaf last leaf depth-2 menu-153507"><a href="/zh-cn/android/intel-mobile-development-kit-for-android" class="menu__link">英特尔® MDK 安卓*版</a></li>
+</ul></li>
+<li class="menu__item is-leaf last leaf depth-1 menu-113840"><a href="/zh-cn/android/whats-new" class="menu__link">新特性</a></li>
+</ul>
+</div>
+  </div>
+
+    </div>
+
+    <div id="navigation-mobile">
+
+      <nav class="menu tablet-mobile main-menu">
+        <div class="limiter">
+          <div class="section-title tablet-mobile"> <a href="/zh-cn/android" title="首页" rel="home">安卓*</a></div>
+          <span class="mobile-icon-button nav-menu icon-menu"></span>
+        </div>
+
+        <div class="mobile-nav-wrapper">
+            <div class="region region-navigation">
+      <div class="region region-navigation">
+    <div id="block-menu-menu-android-main-menu" class="block block-menu first last odd" role="navigation">
+
+        <h2 class="block__title block-title">安卓主菜单</h2>
+    
+  <ul class="menu"><li class="menu__item is-leaf first leaf depth-1 menu-113816"><a href="/zh-cn/android" class="menu__link">主页</a></li>
+<li class="menu__item is-leaf leaf depth-1 menu-113821"><a href="/zh-cn/android/learn" class="menu__link">了解</a></li>
+<li class="menu__item is-leaf leaf depth-1 menu-113828"><a href="/zh-cn/android/get-device" class="menu__link">获取设备</a></li>
+<li class="menu__item is-expanded expanded depth-1 menu-113834"><a href="/zh-cn/android/tools" class="menu__link">工具</a><ul class="menu"><li class="menu__item is-leaf first leaf depth-2 menu-153500"><a href="/zh-cn/android/tools" class="menu__link">软件工具</a></li>
+<li class="menu__item is-leaf last leaf depth-2 menu-153507"><a href="/zh-cn/android/intel-mobile-development-kit-for-android" class="menu__link">英特尔® MDK 安卓*版</a></li>
+</ul></li>
+<li class="menu__item is-leaf last leaf depth-1 menu-113840"><a href="/zh-cn/android/whats-new" class="menu__link">新特性</a></li>
+</ul>
+</div>
+  </div>
+  </div>
+        </div>
+      </nav>
+
+    </div>
+
+  </div>
+
+  
+ <footer class="l-footer-first">
+    <footer class="l-legal-footer">
+    <nav class="menu">
+        <ul>
+            <li>英特尔公司 京ICP备 14036123号-1</li>            <li><a href="/zh-cn/support">支持</a></li>
+            <li><a href="http://www.intel.cn/content/www/cn/zh/legal/terms-of-use.html">使用条款</a></li>
+            <li><a href="http://www.intel.cn/content/www/cn/zh/legal/trademarks.html">*商标</a></li>
+            <li><a href="http://www.intel.cn/content/www/cn/zh/privacy/intel-privacy-notice.html">隐私条款</a></li>
+            <li><a href="http://www.intel.cn/content/www/cn/zh/privacy/intel-cookie-notice.html">Cookie</a></li>
+            <li class="menu-item drop-up">出版物                <ul>
+                    <li><a href="/zh-cn/newsletter">英特尔® 开发人员专区新闻简讯</a></li>
+                    <li><a href="/zh-cn/intel-parallel-universe-magazine">英特尔® Parallel Universe 杂志</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</footer>
+</footer>
+
+ <footer class="l-footer-second">
+     <footer class="l-language-footer">
+  <div class="limiter">
+    <section class="look-for-intel">
+      <span id="look-for-intel-expander"></span>
+      <span class="blurb">在下列网页上关注我们：</span>
+        <div class="item-list"><ul><li class="sina first"><a href="http://weibo.com/isnprc" target="_blank" class="icon-logo-weibo">新浪</a></li>
+<li class="tencent"><a href="http://t.qq.com/isnprc" target="_blank" class="icon-logo-tencentweibo">腾讯</a></li>
+<li class="linkedin last"><a href="http://www.linkedin.com/groups/Intel-Developer-Zone-3078126" target="_blank" class="icon-logo-linkedin">LinkedIn</a></li>
+</ul></div>    </section>
+    <section class="language-selector">
+      <ul class="language-switcher-locale-url"><li class="en first"><a href="/en-us/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" class="language-link" xml:lang="en" title="Wakelocks: Detect No-Sleep Issues in Android* Applications">English</a></li>
+<li class="zh-hans active"><a href="/zh-cn/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" class="language-link active" xml:lang="zh-hans" title="唤醒锁: 检测 Android* 应用中的 No-Sleep（无法进入睡眠）问题">简体中文</a></li>
+<li class="fr"><a href="/fr-fr/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" class="language-link" xml:lang="fr">Français</a></li>
+<li class="ru"><a href="/ru-ru/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" class="language-link" xml:lang="ru">Русский</a></li>
+<li class="es"><a href="/es-es/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" class="language-link" xml:lang="es">Español</a></li>
+<li class="pt-br"><a href="/pt-br/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" class="language-link" xml:lang="pt-br">Português</a></li>
+<li class="de last"><a href="/de-de/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications" class="language-link" xml:lang="de">Deutsch</a></li>
+</ul>    </section>
+  </div>
+</footer>
+ </footer>
+
+</div>
+
+<div vocab="http://schema.org/" typeof="TechArticle"><span property="headline" content="唤醒锁: 检测 Android* 应用中的 No-Sleep（无法进入睡眠）问题"></span><span property="name" content="唤醒锁: 检测 Android* 应用中的 No-Sleep（无法进入睡眠）问题"></span><div property="author" typeof="Person"><meta property="name" content="philippe-michelon (Intel)"/></div><span property="datePublished" content="2014-02-16 23:39:54"></span><span property="dateModified" content="2016-05-06 16:41:42"></span><span property="url" content="https://software.intel.com/android/articles/wakelocks-detect-no-sleep-issues-in-android-applications"></span><div property="image" typeof="ImageObject"><img class="element-invisible" src="https://software.intel.com/sites/default/files/d9/e4/search_publish_icon.jpeg" property="url" /><meta property="name" content="thumbnail"/><meta property="width" content="54"/><meta property="height" content="54"/></div><span property="inLanguage" content="zh-hans"></span><span property="thumbnailURL" content="https://software.intel.com/sites/default/files/d9/e4/search_publish_icon.jpeg"></span><span property="genre" content="20797,Android*"></span><span property="keywords" content="20797,Android*,20785,Android* OS,42646,Phone"></span>
+    <meta property="mainEntityOfPage" href="https://software.intel.com">
+      <div property="publisher" typeof="Organization">
+      <div property="logo" typeof="ImageObject">
+        <img class="element-invisible" src="https://software.intel.com/sites/default/files/managed/01/a1/intel_blue.png" property="url" />
+        <meta property="name" content="thumbnail">
+        <meta property="width" content="86">
+        <meta property="height" content="60">
+      </div>
+      <meta property="name" content="Intel">
+    </div></div>
+<script src="//software.intel.com/sites/default/files/advagg_js/js__28VO8zsJcDoUXwRnAOiRRQzRDj54T8AltTQPp8Fg93Y__JSlghJljXdNRgluJVSF6AuZcMpiAD5wtQAwIsDWxXlM__Mc_IIJ6Q7kD8n06cEbeD3D6EANaH3DdhQFQTO_2ifFM.js"></script>
+
+<div id='survey_container' style='position: fixed; bottom: 44px; z-index: 2000000000;'>
+  <div id='survey_button' style='top: 0px; left: 304px; position: absolute; z-index: 2000000000; width: 141px; height: 46px; border-width: 0px; border-color: rgb(0, 0, 0); border-style: solid;'>
+    <div style="position: absolute; top: 15px; left: 15px; width: 120px; height: 22px; overflow: hidden;">
+       <span class='rate-txt'>给我们打分 </span>
+       <span class="icon-star-empty"></span><span class="icon-star-empty"></span><span class="icon-star-empty"></span>
+    </div>
+  </div>
+  <div id='survey_frame' style='top: 83px; left: 317px; position: absolute; z-index: 2000000001; width: 427px; height: 486px; background-color: transparent; border-width: 0px; border-color: transparent; border-style: solid;'>
+    <div class='scrollable' style='width:427px; height:486px;'>
+     <iframe id='iframe_survey' width='100%' height='85%' frameborder="0" data-src='https://idz.qualtrics.com/SE/?SID=SV_eai43JosW74IFxz' src='about:blank'></iframe>
+    </div>
+  </div>
+  <div style='top: 54px; left: 725px; position: absolute; z-index: 2000000001; width: 30px; height: 30px; background-color: transparent; border-width: 0px; border-color: rgb(0, 0, 0); border-style: solid; opacity: 0.75; cursor: pointer;'>
+    <div id="close_survey" style='position: absolute; top: 0px; left: 0px; width: 30px; height: 30px; overflow: hidden;'>
+      <img src='/sites/all/themes/idzen/images/bwc_close.png'>
+    </div>
+  </div>
+  <div style='top: 44px; left: 304px; position: absolute; z-index: 2000000000; width: 452px; height: 536px; background-color: rgb(106, 190, 235); border-width: 0px; border-color: rgb(0, 0, 0); border-style: solid;'>
+    <div style='position: absolute; top: 0px; left: 0px; width: 452px; height: 536px; overflow: hidden;'></div>
+  </div>
+</div>
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"aca265f578","applicationID":"3491450","transactionName":"ZlADZEtYCxJQBU0KC18aIFNNUAoPHghWBwFuRQBXXGYTCFQR","queueTime":0,"applicationTime":1079,"atts":"ShcAEgNCGBw=","errorBeacon":"bam.nr-data.net","agent":""}</script></body>
+</html>

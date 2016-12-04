@@ -1,0 +1,1550 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+     
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    
+<head>   
+   
+
+    <script type="text/javascript" src="http://c.csdnimg.cn/pubfooter/js/tracking.js" charset="utf-8"></script>  
+
+    <script type="text/javascript">
+        var protocol = window.location.protocol;
+        document.write('<script type="text/javascript" src="' + protocol + '//csdnimg.cn/pubfooter/js/repoAddr2.js?v=' + Math.random() + '"></' + 'script>');
+    </script>
+
+  
+ <meta http-equiv="Cache-Control" content="no-siteapp" /><link rel="alternate" media="handheld" href="#" />
+
+    <title>linux内核3.4基于wakeup_source的autosleep机制分析 - Focus on the Linux kernel 
+        - 博客频道 - CSDN.NET</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="description" content="正在需要的时候发现了这个大牛的博文，动手实践过后，记录在此。（原文在此）--user表Create Table: CREATE TABLE `user` (  `id` int(11) NOT NULL AUTO_INCREMENT,  `username` varchar(45) DEFAULT NULL,  `userpass` varchar(45) DEFAUL" />
+    <script src="http://static.blog.csdn.net/scripts/jquery.js" type="text/javascript"></script>
+      <script type="text/javascript" src="http://static.blog.csdn.net/scripts/jquery-version.js"></script>
+    <script type="text/javascript" src="http://static.blog.csdn.net/scripts/ad.js?v=1.1"></script>
+        <!--new top-->
+               <link rel="stylesheet" href="http://c.csdnimg.cn/public/common/toolbar/css/index.css">        <!--new top-->
+    
+      <!-- ad begin -->
+         <script language="javascript" type="text/javascript" src="http://ads.csdn.net/js/tracking.js"></script>
+    <!-- ad end-->
+
+    <link rel="Stylesheet" type="text/css" href="http://static.blog.csdn.net/skin/light_blue/css/style.css?v=1.1" />
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="/eqwewr/rss/list" />
+    <link rel="shortcut icon" href="http://c.csdnimg.cn/public/favicon.ico" />
+    <link type="text/css" rel="stylesheet" href="http://static.blog.csdn.net/scripts/SyntaxHighlighter/styles/green.css" />
+ 
+
+
+</head>
+<body>
+    <!-- 广告位开始 -->
+        <ins data-revive-zoneid="149" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+    <!-- 广告位结束 -->
+
+    
+   
+      <!--new top-->
+    <script id="toolbar-tpl-scriptId" fixed="true" prod="blog" skin="black" src="http://c.csdnimg.cn/public/common/toolbar/js/html.js" type="text/javascript"></script>
+     <!--new top-->
+    <div id="container">
+        <div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h2>
+                <a href="http://blog.csdn.net/linux_devices_driver">Focus on the Linux kernel </a></h2>
+            <h3>Experience sharing, benefit oneself and others.技术交流qq:2448383766</h3>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>
+            
+                <li id="btnContents"><a href="http://blog.csdn.net/linux_devices_driver?viewmode=contents"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_mulu'])">
+                    <img src="http://static.blog.csdn.net/images/ico_list.gif">目录视图</span></a></li>
+                <li id="btnView"><a href="http://blog.csdn.net/linux_devices_driver?viewmode=list"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_zhaiyao'])">
+                    <img src="http://static.blog.csdn.net/images/ico_summary.gif">摘要视图</span></a></li>
+                <li id="btnRss"><a href="http://blog.csdn.net/linux_devices_driver/rss/list"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_RSS'])">
+                    <img src="http://static.blog.csdn.net/images/ico_rss.gif">订阅</span></a></li>                
+            
+
+            </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "eqwewr";
+    var _blogger = username;
+    var blog_address = "http://blog.csdn.net/linux_devices_driver";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";  
+</script>
+
+        <div id="body">
+            <div id="main">
+                <div class="main">
+                        <div class="ad_class">
+<div class="notice tracking-ad" data-mod='popu_3' > 
+
+
+<a href="http://ask.csdn.net/subjects/9">
+<font color=blue>【专家问答】韦玮：Python基础编程实战专题</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://lib.csdn.net/base/swift/resource">
+<font color=red>【知识库】Swift资源大集合
+</font></a>
+&nbsp;&nbsp;&nbsp;
+
+<a href="http://blog.csdn.net/csdnproduct/article/details/51668917">
+<font color=blue>【公告】博客新皮肤上线啦</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://blog.csdn.net/robbin2015/article/details/51683764">
+<font color=red>快来领福利：C币、机械键盘
+</font></a>
+&nbsp;&nbsp;&nbsp;
+</font></a>
+</div>                        </div>
+                        
+
+
+
+<!-- 广告位开始 -->
+<ins data-revive-zoneid="72" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+<!-- 广告位结束 -->
+
+  
+<link href="http://static.blog.csdn.net/css/comment1.css" type="text/css" rel="stylesheet" />
+<link href="http://static.blog.csdn.net/css/style1.css" type="text/css" rel="stylesheet" />
+<script language='JavaScript' type='text/javascript' src='http://download.csdn.net/js/jquery.cookie.js'></script>
+<script type="text/javascript" src="http://c.csdnimg.cn/rabbit/search-service/main.js"></script>
+<link rel="stylesheet" href="http://static.blog.csdn.net/public/res-min/markdown_views.css?v=1.0" />
+<link rel="stylesheet" href="http://static.blog.csdn.net/css/category.css?v=1.0" />
+<script type="text/javascript" src="http://static.blog.csdn.net/public/res/bower-libs/MathJax/MathJax.js?config=TeX-AMS_HTML"></script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/web-storage-cache.min.js"></script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/replace.min.js"></script>
+
+<link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_code.css" />
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/saveToCode.js"></script>
+
+
+  <script type="text/ecmascript">
+      window.quickReplyflag = true;
+           
+            var isBole = false;
+            
+          
+    </script>
+<div id="article_details" class="details">
+    <div class="article_title">   
+         <span class="ico ico_type_Original"></span>
+
+
+    <h1>
+        <span class="link_title"><a href="/linux_devices_driver/article/details/41450025">
+        <font color="red">[置顶]</font>
+        linux内核3.4基于wakeup_source的autosleep机制分析            
+        </a></span>
+    </h1>
+</div>
+
+   
+
+        <div class="article_manage clearfix">
+        <div class="article_l">
+            <span class="link_categories">
+            标签：
+              <a href='http://www.csdn.net/tag/%e5%9f%ba%e4%ba%8ewakeup_source%e7%9d%a1%e7%9c%a0%e6%9c%ba%e5%88%b6' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">基于wakeup_source睡眠机制</a><a href='http://www.csdn.net/tag/autosleep' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">autosleep</a><a href='http://www.csdn.net/tag/try_to_suspend' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">try_to_suspend</a><a href='http://www.csdn.net/tag/msm8974' target=_blank onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_tag']);">msm8974</a>
+            </span>
+        </div>
+        <div class="article_r">
+            <span class="link_postdate">2014-11-24 19:25</span>
+            <span class="link_view" title="阅读次数">2008人阅读</span>
+            <span class="link_comments" title="评论次数"> <a href="#comments" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_pinglun'])">评论</a>(0)</span>
+            <span class="link_collect tracking-ad" data-mod="popu_171"> <a href="javascript:void(0);" onclick="javascript:collectArticle('linux内核3.4基于wakeup_source的autosleep机制分析','41450025');return false;" title="收藏">收藏</a></span>
+             <span class="link_report"> <a href="#report" onclick="javascript:report(41450025,2);return false;" title="举报">举报</a></span>
+
+        </div>
+    </div>
+    <div class="embody"  style="display:none" id="embody">
+        <span class="embody_t">本文章已收录于：</span>
+        <div class="embody_c" id="lib" value="{&quot;err&quot;:0,&quot;msg&quot;:&quot;ok&quot;,&quot;data&quot;:[]}"></div>
+    </div>
+    <style type="text/css">        
+            .embody{
+                padding:10px 10px 10px;
+                margin:0 -20px;
+                border-bottom:solid 1px #ededed;                
+            }
+            .embody_b{
+                margin:0 ;
+                padding:10px 0;
+            }
+            .embody .embody_t,.embody .embody_c{
+                display: inline-block;
+                margin-right:10px;
+            }
+            .embody_t{
+                font-size: 12px;
+                color:#999;
+            }
+            .embody_c{
+                font-size: 12px;
+            }
+            .embody_c img,.embody_c em{
+                display: inline-block;
+                vertical-align: middle;               
+            }
+             .embody_c img{               
+                width:30px;
+                height:30px;
+            }
+            .embody_c em{
+                margin: 0 20px 0 10px;
+                color:#333;
+                font-style: normal;
+            }
+    </style>
+    <script  type="text/javascript">
+        $(function () {
+            try
+            {
+                var lib = eval("("+$("#lib").attr("value")+")");
+                var html = "";
+                if (lib.err == 0) {
+                    $.each(lib.data, function (i) {
+                        var obj = lib.data[i];
+                        //html += '<img src="' + obj.logo + '"/>' + obj.name + "&nbsp;&nbsp;";
+                        html += ' <a href="' + obj.url + '" target="_blank">';
+                        html += ' <img src="' + obj.logo + '">';
+                        html += ' <em><b>' + obj.name + '</b></em>';
+                        html += ' </a>';
+                    });
+                    if (html != "") {
+                        setTimeout(function () {
+                            $("#lib").html(html);                      
+                            $("#embody").show();
+                        }, 100);
+                    }
+                }      
+            } catch (err)
+            { }
+            
+        });
+    </script>
+      <div class="category clearfix">
+        <div class="category_l">
+           <img src="http://static.blog.csdn.net/images/category_icon.jpg">
+            <span>分类：</span>
+        </div>
+        <div class="category_r">
+                    <label  onclick="GetCategoryArticles('2665903','eqwewr','top','41450025');">
+                        <span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_fenlei']);">msm8974<em>（1）</em></span>
+                      <img class="arrow-down" src="http://static.blog.csdn.net/images/arrow_triangle _down.jpg" style="display:inline;">
+                      <img class="arrow-up" src="http://static.blog.csdn.net/images/arrow_triangle_up.jpg" style="display:none;">
+                        <div class="subItem">
+                            <div class="subItem_t"><a  href="http://blog.csdn.net/eqwewr/article/category/2665903"  target="_blank">作者同类文章</a><i class="J_close">X</i></div>
+                            <ul class="subItem_l" id="top_2665903">                            
+                            </ul>
+                        </div>
+                    </label>                    
+                    <label  onclick="GetCategoryArticles('1138963','eqwewr','top','41450025');">
+                        <span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_fenlei']);">驱动总结<em>（48）</em></span>
+                      <img class="arrow-down" src="http://static.blog.csdn.net/images/arrow_triangle _down.jpg" style="display:inline;">
+                      <img class="arrow-up" src="http://static.blog.csdn.net/images/arrow_triangle_up.jpg" style="display:none;">
+                        <div class="subItem">
+                            <div class="subItem_t"><a  href="http://blog.csdn.net/eqwewr/article/category/1138963"  target="_blank">作者同类文章</a><i class="J_close">X</i></div>
+                            <ul class="subItem_l" id="top_1138963">                            
+                            </ul>
+                        </div>
+                    </label>                    
+        </div>
+    </div>
+    <script   type="text/javascript" src="http://static.blog.csdn.net/scripts/category.js"></script>  
+        <div   class="bog_copyright">         
+            <p  class="copyright_p" >版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+        </div>
+
+  
+
+  
+  
+     
+
+<div id="article_content" class="article_content">
+
+<p><strong><span style="font-size:18px">一：wakeup_source简介：</span></strong></p>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;linux 3.4内核PM使用了wakeup_source来保持唤醒状态，也就是keep awake。之前android一直是基于Linux加入了wake_lock机制来阻止系统休眠，后来Linux 3.4内核加入了wakeup_source来管理，安卓4.4跟着升级内核也就摒弃了自己的臃肿的wake_lock机制，在对上层接口并不改变，在内核wake_lock实现直接基于wakeup_source来实现的。当然也会带来debug上的一些问题，比如以前的wake_lock自身带有强大的debug信息，那么我们在调试的时候可以自己看见dmesg中默认打印active
+ wake lock XXX，很直观来辨别需要休眠的时候那个wake lock有问题阻止了休眠。这个需要我们自己来完善。个人认为改进很大，现在使用了autosleep机制，只要不存在任何active wakeup_source了，系统自动休眠，当有active wake_source自动block住，个人认为休眠更及时，非休眠时间在减少，同时不会消耗额外的资源。使用基于queue work与进程block来管理suspend。还有这里的wakeup_source个人觉得应该叫keepawake_source或者stayawake_souce，毕竟系统的唤醒也就是cpu的再次运行是由中断唤醒的而不是wakeup_source。同时安卓4.4还有一个重大改变就是去除了early
+ suspend机制改为fb event通知机制。那么现在就只有suspend与resume,runtime suspend与runtime resume了。</span><br>
+<br>
+<br>
+<span style="font-size:14px">/**</span><br>
+<span style="font-size:14px">&nbsp;* struct wakeup_source - Representation of wakeup sources</span><br>
+<span style="font-size:14px">&nbsp;*</span><br>
+<span style="font-size:14px">&nbsp;* @total_time: Total time this wakeup source has been active.</span><br>
+<span style="font-size:14px">&nbsp;* @max_time: Maximum time this wakeup source has been continuously active.</span><br>
+<span style="font-size:14px">&nbsp;* @last_time: Monotonic clock when the wakeup source's was touched last time.</span><br>
+<span style="font-size:14px">&nbsp;* @prevent_sleep_time: Total time this source has been preventing autosleep.</span><br>
+<span style="font-size:14px">&nbsp;* @event_count: Number of signaled wakeup events.</span><br>
+<span style="font-size:14px">&nbsp;* @active_count: Number of times the wakeup sorce was activated.</span><br>
+<span style="font-size:14px">&nbsp;* @relax_count: Number of times the wakeup sorce was deactivated.</span><br>
+<span style="font-size:14px">&nbsp;* @expire_count: Number of times the wakeup source's timeout has expired.</span><br>
+<span style="font-size:14px">&nbsp;* @wakeup_count: Number of times the wakeup source might abort suspend.</span><br>
+<span style="font-size:14px">&nbsp;* @active: Status of the wakeup source.</span><br>
+<span style="font-size:14px">&nbsp;* @has_timeout: The wakeup source has been activated with a timeout.</span><br>
+<span style="font-size:14px">&nbsp;*/</span><br>
+<span style="font-size:14px">struct wakeup_source {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;const char &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;*name;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;struct list_head&nbsp;&nbsp; &nbsp;entry;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;struct list_head&nbsp;&nbsp; &nbsp;list;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;spinlock_t&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;lock;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;struct timer_list&nbsp;&nbsp; &nbsp;timer;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned long&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;timer_expires; //超时时间，也就是wake_lock_timeout()里面的时间参数，超时后会执行deactivate函数</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ktime_t total_time;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ktime_t max_time;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ktime_t last_time;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ktime_t start_prevent_time;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ktime_t prevent_sleep_time;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned long&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;event_count; //event计数</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned long&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;active_count;//active计数</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned long&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;relax_count;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned long&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;expire_count;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned long&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;wakeup_count;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;bool&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;active:1; //用于判断是否是active状态</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;bool&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;autosleep_enabled:1;//这个变量是来标记active等时间的</span><br>
+<span style="font-size:14px">};</span><br>
+<br>
+<br>
+<span style="font-size:14px">//active任何wakeup_source都会执行该函数，标记active为true</span><br>
+<span style="font-size:14px">/**</span><br>
+<span style="font-size:14px">&nbsp;* wakup_source_activate - Mark given wakeup source as active.</span><br>
+<span style="font-size:14px">&nbsp;* @ws: Wakeup source to handle.</span><br>
+<span style="font-size:14px">&nbsp;*</span><br>
+<span style="font-size:14px">&nbsp;* Update the @ws' statistics and, if @ws has just been activated, notify the PM</span><br>
+<span style="font-size:14px">&nbsp;* core of the event by incrementing the counter of of wakeup events being</span><br>
+<span style="font-size:14px">&nbsp;* processed.</span><br>
+<span style="font-size:14px">&nbsp;*/</span><br>
+<span style="font-size:14px">static void wakeup_source_activate(struct wakeup_source *ws)</span><br>
+<span style="font-size:14px">{</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned int cec;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ws-&gt;active = true;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ws-&gt;active_count&#43;&#43;;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ws-&gt;last_time = ktime_get();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (ws-&gt;autosleep_enabled)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;ws-&gt;start_prevent_time = ws-&gt;last_time;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;/* Increment the counter of events in progress. */</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;cec = atomic_inc_return(&amp;combined_event_count);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;trace_wakeup_source_activate(ws-&gt;name, cec);</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<br>
+<span style="font-size:14px">//deactivate任何wakeup_source都会执行该函数，标记active为false</span><br>
+<span style="font-size:14px">/**</span><br>
+<span style="font-size:14px">&nbsp;* wakup_source_deactivate - Mark given wakeup source as inactive.</span><br>
+<span style="font-size:14px">&nbsp;* @ws: Wakeup source to handle.</span><br>
+<span style="font-size:14px">&nbsp;*</span><br>
+<span style="font-size:14px">&nbsp;* Update the @ws' statistics and notify the PM core that the wakeup source has</span><br>
+<span style="font-size:14px">&nbsp;* become inactive by decrementing the counter of wakeup events being processed</span><br>
+<span style="font-size:14px">&nbsp;* and incrementing the counter of registered wakeup events.</span><br>
+<span style="font-size:14px">&nbsp;*/</span><br>
+<span style="font-size:14px">static void wakeup_source_deactivate(struct wakeup_source *ws)</span><br>
+<span style="font-size:14px">{</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned int cnt, inpr, cec;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ktime_t duration;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ktime_t now;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ws-&gt;relax_count&#43;&#43;;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;/*</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * __pm_relax() may be called directly or from a timer function.</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * If it is called directly right after the timer function has been</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * started, but before the timer function calls __pm_relax(), it is</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * possible that __pm_stay_awake() will be called in the meantime and</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * will set ws-&gt;active.&nbsp; Then, ws-&gt;active may be cleared immediately</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * by the __pm_relax() called from the timer function, but in such a</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * case ws-&gt;relax_count will be different from ws-&gt;active_count.</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; */</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (ws-&gt;relax_count != ws-&gt;active_count) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;ws-&gt;relax_count--;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ws-&gt;active = false;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;now = ktime_get();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;duration = ktime_sub(now, ws-&gt;last_time);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ws-&gt;total_time = ktime_add(ws-&gt;total_time, duration);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (ktime_to_ns(duration) &gt; ktime_to_ns(ws-&gt;max_time))</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;ws-&gt;max_time = duration;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ws-&gt;last_time = now;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;del_timer(&amp;ws-&gt;timer);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;ws-&gt;timer_expires = 0;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (ws-&gt;autosleep_enabled)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;update_prevent_sleep_time(ws, now);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;/*</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * Increment the counter of registered wakeup events and decrement the</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * couter of wakeup events in progress simultaneously.</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; */</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;cec = atomic_add_return(MAX_IN_PROGRESS, &amp;combined_event_count);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;trace_wakeup_source_deactivate(ws-&gt;name, cec);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;split_counters(&amp;cnt, &amp;inpr);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (!inpr &amp;&amp; waitqueue_active(&amp;wakeup_count_wait_queue)){</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;wake_up(&amp;wakeup_count_wait_queue); //当不存在任何active wake_up source的时候唤醒try_to_suspend进程。</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<span style="font-size:14px">wakup_source的申请与释放：</span><br>
+<span style="font-size:14px">1：使用安卓的wake_lock接口：wake_lock（），wake_lock_timeout（）,wake_unlock（）;</span><br>
+<span style="font-size:14px">2: 使用wakeup_source自带的接口：pm_stay_awake（）,pm_relax();这里的name就是device name。</span><br>
+<br>
+<strong><span style="font-size:18px">二：autosleep分析：</span></strong><br>
+<p><span style="font-size:14px">sys接口：sys/power/autosleep</span></p>
+<p><span style="font-size:14px">亮屏时libsuspend会写入off,灭屏写入mem</span></p>
+<br>
+<span style="font-size:14px">static ssize_t autosleep_show(struct kobject *kobj,</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; struct kobj_attribute *attr,</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; char *buf)</span><br>
+<span style="font-size:14px">{</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;suspend_state_t state = pm_autosleep_state();</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (state == PM_SUSPEND_ON)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return sprintf(buf, &quot;off\n&quot;);</span><br>
+<br>
+<span style="font-size:14px">#ifdef CONFIG_SUSPEND</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (state &lt; PM_SUSPEND_MAX)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return sprintf(buf, &quot;%s\n&quot;, valid_state(state) ?</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;pm_states[state] : &quot;error&quot;);</span><br>
+<span style="font-size:14px">#endif</span><br>
+<span style="font-size:14px">#ifdef CONFIG_HIBERNATION</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;return sprintf(buf, &quot;disk\n&quot;);</span><br>
+<span style="font-size:14px">#else</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;return sprintf(buf, &quot;error&quot;);</span><br>
+<span style="font-size:14px">#endif</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<span style="font-size:14px">static ssize_t autosleep_store(struct kobject *kobj,</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; struct kobj_attribute *attr,</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const char *buf, size_t n)</span><br>
+<span style="font-size:14px">{</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;suspend_state_t state = decode_state(buf, n);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;int error;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (state == PM_SUSPEND_ON</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &amp;&amp; strcmp(buf, &quot;off&quot;) &amp;&amp; strcmp(buf, &quot;off\n&quot;))</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return -EINVAL;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;error = pm_autosleep_set_state(state);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;return error ? error : n;</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<span style="font-size:14px">power_attr(autosleep);</span><br>
+<br>
+<br>
+<span style="font-size:14px">int pm_autosleep_set_state(suspend_state_t state)</span><br>
+<span style="font-size:14px">{</span><br>
+<br>
+<span style="font-size:14px">#ifndef CONFIG_HIBERNATION</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (state &gt;= PM_SUSPEND_MAX)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return -EINVAL;</span><br>
+<span style="font-size:14px">#endif</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;__pm_stay_awake(autosleep_ws); //防止系统休眠 </span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;mutex_lock(&amp;autosleep_lock);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;autosleep_state = state;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;__pm_relax(autosleep_ws); //释放上面的wake up source</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (state &gt; PM_SUSPEND_ON) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;pm_wakep_autosleep_enabled(true); //设置所有wake up source里面的autosleep_enabled为真，这个变量不会对休眠有影响，但是会标记active的时间,使用debugfs可以看见</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;queue_up_suspend_work();//调度工作队列，会执行try_to_suspend（），其实state mem执行try_to_suspend（），一次就可以了，后面再分析。</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;} else {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;pm_wakep_autosleep_enabled(false);//设置所有wake up source里面的autosleep_enabled为假</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;mutex_unlock(&amp;autosleep_lock);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;return 0;</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<br>
+<span style="font-size:14px">重头戏：try_to_suspend</span><br>
+<br>
+<span style="font-size:14px">static void try_to_suspend(struct work_struct *work)</span><br>
+<span style="font-size:14px">{</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned int initial_count, final_count;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (!pm_get_wakeup_count(&amp;initial_count, true)) //获取initial_count，这个函数会block住，当存在active wakeup source的时候，直到wakeup source为detative状态</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto out;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;mutex_lock(&amp;autosleep_lock);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (!pm_save_wakeup_count(initial_count)) {//保存initial_count，不会block，当然也会检查是否有active wakeup source，当有active存在再次queue work。</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;mutex_unlock(&amp;autosleep_lock);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto out;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (autosleep_state == PM_SUSPEND_ON) {//当为ON状态时，return。//在睡眠期间跟了很久没有遇见过这种情况</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;mutex_unlock(&amp;autosleep_lock);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (autosleep_state &gt;= PM_SUSPEND_MAX)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;hibernate();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //hibernate高通平台目前不支持</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;else</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;pm_suspend(autosleep_state); //进入pm_suspend，dmesg会有PM: suspend entry 与PM: suspend exit来标记，这里面会执行freeze task,suspend与resume，disable cpu的操作。内核PM最重要的函数。</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;mutex_unlock(&amp;autosleep_lock);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (!pm_get_wakeup_count(&amp;final_count, false))//获取final_count，非block,当然也会检查是否有active wakeup source，当有active存在再次queue work</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto out;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;/*</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * If the wakeup occured for an unknown reason, wait to prevent the</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; * system from trying to suspend and waking up in a tight loop.</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp; */</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (final_count == initial_count)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //这里遇见未知原因，initial_count与final_count相等，超时500ms后继续往下执行。这种现象我也是跟了许久没有遇见过。</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;schedule_timeout_uninterruptible(HZ / 2);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;out:</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;queue_up_suspend_work(); //调度queue work会再次执行该函数，实际上只要一次echo mem &gt; sys/power/autosleep后这个进程一直会在auto_sleep cycle。</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<br>
+<span style="font-size:14px">pm_get_wakeup_count原型,个人感觉这个是仿__wait_event_interruptible（）而写的。</span><br>
+<br>
+<span style="font-size:14px">bool pm_get_wakeup_count(unsigned int *count, bool block)</span><br>
+<span style="font-size:14px">{</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;unsigned int cnt, inpr;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (block) { //当block为真时，该进程可能会block住</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;DEFINE_WAIT(wait);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;for (;;) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;prepare_to_wait(&amp;wakeup_count_wait_queue, &amp;wait,</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;TASK_INTERRUPTIBLE);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;split_counters(&amp;cnt, &amp;inpr); //有active的wakeup_source存在就是block住，否则block</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (inpr == 0 || signal_pending(current))</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;break;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;schedule();//在这里面block住，直到最后一个active的wakeup_source deactivate时会唤醒该进程，之后会break出来。</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;finish_wait(&amp;wakeup_count_wait_queue, &amp;wait);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;split_counters(&amp;cnt, &amp;inpr);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;*count = cnt;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;return !inpr;</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<span style="font-size:14px">那么有2个问题，按power键唤醒系统是退出try_to_suspend了吗？</span><br>
+<span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 首先系统是如何被唤醒的？这个是由硬件中断唤醒的，比如我们这里的power键，还有其他的比如alarm等其他硬件中断，只要我们在中断申请时enbale_irq_wake（），</span><span style="font-size:14px">那么睡眠期间，只要触发该中断就可以唤醒系统。那么在try_to_suspend里面唤醒后pm_suspend（）执行完resume后会退出来，接着会获取final_count，在这里是存在active</span>&nbsp;<span style="font-size:14px">wake_up
+ source的（在out之前加添的打印active wakeup_source，下面的dmesg证明了存在的wakeup_source），之后执行out,后调度工作队列，再次进入try_to_suspend（），在第一次获取initial_count后便会遇见active wakeup_source，这里面更多的是系统上层加的wakeup_source，那么try_to_suspend()会一直block在pm_get_wakeup_count()里面直到灭屏和所有wakeup_source deactivate时会再次进入pm_suspend（）休眠。</span><br>
+<span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这里也就解释了为什么只要执行一次ehco mem &gt; sys/power/autosleep后自动可以休眠了的原因。</span><br>
+<br>
+<span style="font-size:14px">看下面的dmesg:</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.536418] CPU0: msm_cpu_pm_enter_sleep mode 000000,00000000,00000000,00000000,00000000,00000020,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.543066] PM: noirq resume of devices complete after 6.020 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.548512] PM: early resume of devices complete after 2.598 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.650793] PM: resume of devices complete after 102.266 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.660290] Restarting tasks ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.681208] PM: suspend exit 1970-01-05 05:23:32.206389881 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.681229] active wake lock KeyEvents</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.681267] active wake lock qpnp_soc_wake</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.681284] active wake lock alarm, time left 486</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.681342] active wake lock KeyEvents</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.681584] active wake lock qpnp_soc_wake</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.681600] active wake lock alarm, time left 486</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.696345] request_suspend_state: wakeup at 928691792356 (1970-01-05 05:23:32.221521704 UTC)</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp; 928.708608] mdss_dsi_panel_power on=1</span><br>
+<br>
+<br>
+<br>
+<span style="font-size:14px">还有一个与wakeup source无关的问题,为什么suspend后就一直停留在那里不动了？</span><br>
+<span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这个是cpu停止运转了，下面再分析下代码。</span><br>
+<span style="font-size:14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 核心函数suspend_devices_and_enter（）：</span><br>
+<br>
+<span style="font-size:14px">/**</span><br>
+<span style="font-size:14px">&nbsp;* suspend_devices_and_enter - Suspend devices and enter system sleep state.</span><br>
+<span style="font-size:14px">&nbsp;* @state: System sleep state to enter.</span><br>
+<span style="font-size:14px">&nbsp;*/</span><br>
+<span style="font-size:14px">int suspend_devices_and_enter(suspend_state_t state)</span><br>
+<span style="font-size:14px">{</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;int error;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;bool wakeup = false;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (!suspend_ops)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return -ENOSYS;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;trace_machine_suspend(state);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_ops-&gt;begin) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;error = suspend_ops-&gt;begin(state);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (error)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto Close;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;suspend_console();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;suspend_test_start();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;error = dpm_suspend_start(PMSG_SUSPEND);//这里会执行所有driver的suspend函数，suspend里面有active wakeup_source或者return 为真的话，suspend会报错</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (error) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;printk(KERN_ERR &quot;PM: Some devices failed to suspend\n&quot;);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto Recover_platform;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;suspend_test_finish(&quot;suspend devices&quot;);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_test(TEST_DEVICES))</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto Recover_platform;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;do {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;error = suspend_enter(state, &amp;wakeup);//这里会diable cpu</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;} while (!error &amp;&amp; !wakeup</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&amp;&amp; suspend_ops-&gt;suspend_again &amp;&amp; suspend_ops-&gt;suspend_again());</span><br>
+<br>
+<span style="font-size:14px">&nbsp;Resume_devices:</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;suspend_test_start();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;dpm_resume_end(PMSG_RESUME);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;suspend_test_finish(&quot;resume devices&quot;);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;resume_console();</span><br>
+<span style="font-size:14px">&nbsp;Close:</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_ops-&gt;end)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;suspend_ops-&gt;end();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;trace_machine_suspend(PWR_EVENT_EXIT);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;return error;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;Recover_platform:</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_ops-&gt;recover)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;suspend_ops-&gt;recover();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;goto Resume_devices;</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<br>
+<span style="font-size:14px">static int suspend_enter(suspend_state_t state, bool *wakeup)</span><br>
+<span style="font-size:14px">{</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;int error;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_ops-&gt;prepare) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;error = suspend_ops-&gt;prepare();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (error)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto Platform_finish;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;error = dpm_suspend_end(PMSG_SUSPEND);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (error) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;printk(KERN_ERR &quot;PM: Some devices failed to power down\n&quot;);</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto Platform_finish;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_ops-&gt;prepare_late) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;error = suspend_ops-&gt;prepare_late();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (error)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto Platform_wake;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_test(TEST_PLATFORM))</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto Platform_wake;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;error = disable_nonboot_cpus();&nbsp; //disable nonboot cpu注意还有cpu需要下面disable的</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (error || suspend_test(TEST_CPUS))</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;goto Enable_cpus;</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;arch_suspend_disable_irqs();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;BUG_ON(!irqs_disabled());</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;error = syscore_suspend();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (!error) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;*wakeup = pm_wakeup_pending();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (!(suspend_test(TEST_CORE) || *wakeup)) {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;error = suspend_ops-&gt;enter(state); //在这里cpu会停止运行，直到中断唤醒</span><br>
+<span style="font-size:14px">//下面的全部是唤醒的操作了</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;events_check_enabled = false;</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;syscore_resume();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;}</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;arch_suspend_enable_irqs();</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;BUG_ON(irqs_disabled());</span><br>
+<br>
+<span style="font-size:14px">&nbsp;Enable_cpus:</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;enable_nonboot_cpus();</span><br>
+<br>
+<span style="font-size:14px">&nbsp;Platform_wake:</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_ops-&gt;wake)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;suspend_ops-&gt;wake();</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;dpm_resume_start(PMSG_RESUME);</span><br>
+<br>
+<span style="font-size:14px">&nbsp;Platform_finish:</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;if (suspend_ops-&gt;finish)</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;suspend_ops-&gt;finish();</span><br>
+<br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;return error;</span><br>
+<span style="font-size:14px">}</span><br>
+<br>
+<span style="font-size:14px">平台赋&#20540;，这里debug平台是基于msm8974的：</span><br>
+<span style="font-size:14px">static const struct platform_suspend_ops lpm_suspend_ops = {</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;.enter = lpm_suspend_enter,//在这里面disbale cpu，停止运行程序</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;.valid = suspend_valid_only_mem,</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;.prepare_late = lpm_suspend_prepare,</span><br>
+<span style="font-size:14px">&nbsp;&nbsp; &nbsp;.wake = lpm_suspend_wake,</span><br>
+<span style="font-size:14px">};</span><br>
+<br>
+<br>
+<span style="font-size:14px">添加显示<span style="color:#000099">wake_lock</span>的dmesg:</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 90.964850] CPU0: msm_cpu_pm_enter_sleep mode 000000,00000000,00000000,00000000,00000000,00000020,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 90.965302] Enabling non-boot CPUs ...</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 90.968303] CPU3 is up</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 90.970699] PM: noirq resume of devices complete after 2.382 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 90.973460] PM: early resume of devices complete after 1.443 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.097369] PM: resume of devices complete after 123.888 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.112858] Restarting tasks ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.141699] PM: suspend exit 1970-01-05 03:59:28.158266979 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.141776] PM: suspend entry 1970-01-05 03:59:28.158347917 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.141801] PM: Syncing filesystems ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.222299] Freezing user space processes ... (elapsed 0.03 seconds) done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.258126] Freezing remaining freezable tasks ... (elapsed 0.02 seconds) done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.278279] Suspending console(s) (use no_console_suspend to debug)</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.384933] PM: suspend of devices complete after 95.062 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.397910] PM: late suspend of devices complete after 12.934 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.413019] PM: noirq suspend of devices complete after 15.064 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.413059] Disabling non-boot CPUs ...</span><br>
+<span style="font-size:14px"><span style="color:#000099">&lt;6&gt;[&nbsp;&nbsp; 91.424477] CPU0: msm_cpu_pm_enter_sleep mode 000000,00000000,00000000,00000000,00000000,00000020,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000//这里cpu停止运行直到中断唤醒</span></span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.425144] Enabling non-boot CPUs ...</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.432354] CPU3 is up</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.444416] PM: noirq resume of devices complete after 11.997 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.460948] PM: early resume of devices complete after 10.458 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.577213] PM: resume of devices complete after 116.231 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.584876] Restarting tasks ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.614571] PM: suspend exit 1970-01-05 03:59:35.550203849 UTC</span><br>
+<span style="font-size:14px"><span style="color:#000099">&lt;6&gt;[&nbsp;&nbsp; 91.614639] active wake lock rmt_storage_-1220268312</span></span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.689912] PM: suspend entry 1970-01-05 03:59:35.625550620 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.689921] PM: Syncing filesystems ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.700706] Freezing user space processes ... </span>
+<br>
+<span style="font-size:14px">&lt;3&gt;[&nbsp;&nbsp; 91.712870] Freezing of user space&nbsp; aborted</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.712898] </span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.712903] Restarting tasks ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.720540] PM: suspend exit 1970-01-05 03:59:35.656175256 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.720574] PM: suspend entry 1970-01-05 03:59:35.656214579 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.720586] PM: Syncing filesystems ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.801097] Freezing user space processes ... </span>
+<br>
+<span style="font-size:14px">&lt;3&gt;[&nbsp;&nbsp; 91.815050] Freezing of user space&nbsp; aborted</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.815075] </span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.815083] Restarting tasks ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.823603] PM: suspend exit 1970-01-05 03:59:35.759241558 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.823633] PM: suspend entry 1970-01-05 03:59:35.759272964 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.823643] PM: Syncing filesystems ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.911985] Freezing user space processes ... (elapsed 0.03 seconds) done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.949378] Freezing remaining freezable tasks ... (elapsed 0.01 seconds) done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 91.969089] Suspending console(s) (use no_console_suspend to debug)</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.085594] PM: suspend of devices complete after 98.499 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.098615] PM: late suspend of devices complete after 12.975 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.113909] PM: noirq suspend of devices complete after 15.249 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.113951] Disabling non-boot CPUs ...</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.147320] CPU0: msm_cpu_pm_enter_sleep mode 000000,00000000,00000000,00000000,00000000,00000020,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.148265] Enabling non-boot CPUs ...</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.155121] CPU1 is up</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.163797] CPU2 is up</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.174144] CPU3 is up</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.186556] PM: noirq resume of devices complete after 12.344 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.199945] PM: early resume of devices complete after 10.020 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.317528] PM: resume of devices complete after 117.548 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.326254] Restarting tasks ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.342025] PM: suspend exit 1970-01-05 04:00:48.122436614 UTC</span><br>
+<span style="color:#000099"><span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.342337] active wake lock qpnp-vadc-f611ac00</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.342357] active wake lock alarm, time left 481</span></span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.411428] PM: suspend entry 1970-01-05 04:00:48.191838905 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.411451] PM: Syncing filesystems ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.419086] Freezing user space processes ... </span>
+<br>
+<span style="font-size:14px">&lt;3&gt;[&nbsp;&nbsp; 92.431173] Freezing of user space&nbsp; aborted</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.431213] </span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.431225] Restarting tasks ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.441575] PM: suspend exit 1970-01-05 04:00:48.221987864 UTC</span><br>
+<span style="font-size:14px"><span style="color:#000099">&lt;6&gt;[&nbsp;&nbsp; 92.441709] active wake lock qpnp-vadc-f611ac00</span></span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.445004] PM: suspend entry 1970-01-05 04:00:48.225417551 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.445026] PM: Syncing filesystems ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.525764] Freezing user space processes ... </span>
+<br>
+<span style="font-size:14px">&lt;3&gt;[&nbsp;&nbsp; 92.541465] Freezing of user space&nbsp; aborted</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.541523] </span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.541545] Restarting tasks ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.558768] PM: suspend exit 1970-01-05 04:00:48.339166145 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.558865] PM: suspend entry 1970-01-05 04:00:48.339268645 UTC</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.558898] PM: Syncing filesystems ... done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.656122] Freezing user space processes ... (elapsed 0.04 seconds) done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.699091] Freezing remaining freezable tasks ... (elapsed 0.01 seconds) done.</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.718891] Suspending console(s) (use no_console_suspend to debug)</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.832084] PM: suspend of devices complete after 97.905 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.845099] PM: late suspend of devices complete after 12.971 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.860407] PM: noirq suspend of devices complete after 15.264 msecs</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.860447] Disabling non-boot CPUs ...</span><br>
+<span style="font-size:14px">&lt;6&gt;[&nbsp;&nbsp; 92.895114] CPU0: msm_cpu_pm_enter_sleep mode 000000,00000000,00000000,00000000,00000000,00000020,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000</span><br>
+<br>
+<br>
+   
+</div>
+
+
+
+
+<!-- Baidu Button BEGIN -->
+
+
+
+
+<div class="bdsharebuttonbox tracking-ad" style="float: right;" data-mod="popu_172">
+<a href="#" class="bds_more" data-cmd="more" style="background-position:0 0 !important; background-image: url(http://bdimg.share.baidu.com/static/api/img/share/icons_0_16.png?v=d754dcc0.png) !important"></a>
+<a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"  style="background-position:0 -52px !important"></a>
+<a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"style="background-position:0 -104px !important"></a>
+<a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"style="background-position:0 -260px !important"></a>
+<a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网"style="background-position:0 -208px !important"></a>
+<a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"style="background-position:0 -1612px !important" ></a>
+</div>
+<script>window._bd_share_config = { "common": { "bdSnsKey": {}, "bdText": "", "bdMini": "1", "bdMiniList": false, "bdPic": "", "bdStyle": "0", "bdSize": "16" }, "share": {} }; with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];</script>
+<!-- Baidu Button END -->
+
+   <link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_detail.css" />
+
+    
+<!--172.16.140.11-->
+
+<!-- Baidu Button BEGIN -->
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=1536434" ></script>
+<script type="text/javascript" id="bdshell_js"></script>
+<script type="text/javascript">
+    document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->
+
+ 
+
+        <div id="digg" ArticleId="41450025" >
+            <dl id="btnDigg" class="digg digg_disable"  onclick="btndigga();">
+               
+                 <dt>顶</dt>
+                <dd>0</dd>
+            </dl>
+           
+              
+            <dl id="btnBury" class="digg digg_disable"  onclick="btnburya();">
+              
+                  <dt>踩</dt>
+                <dd>0</dd>               
+            </dl>
+            
+        </div>
+     <div class="tracking-ad" data-mod="popu_222"><a href="javascript:void(0);" >&nbsp;</a>   </div>
+    <div class="tracking-ad" data-mod="popu_223"> <a href="javascript:void(0);" >&nbsp;</a></div>
+    <script type="text/javascript">
+                function btndigga() {
+                    $(".tracking-ad[data-mod='popu_222'] a").click();
+                }
+                function btnburya() {
+                    $(".tracking-ad[data-mod='popu_223'] a").click();
+                }
+            </script>
+
+   <ul class="article_next_prev">
+                <li class="prev_article"><span  onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_shangyipian']);location.href='/linux_devices_driver/article/details/40793725';">上一篇</span><a href="/linux_devices_driver/article/details/40793725" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_shangyipian'])">Linux音频ALSA机制学习笔记&lt;二&gt;</a></li>
+                <li class="next_article"><span onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_xiayipian']);location.href='/linux_devices_driver/article/details/42921447';">下一篇</span><a href="/linux_devices_driver/article/details/42921447" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_xiayipian'])">linux select与poll实现机制与实例分析</a></li>
+    </ul>
+
+    <div style="clear:both; height:10px;"></div>
+
+
+        <div class="similar_article"  style="display:none">
+                <h4>我的同类文章</h4>
+                <div class="similar_c"style="margin:20px 0px 0px 0px">
+                    <div class="similar_c_t">
+                                <label class="similar_cur">
+                                    <span  style="cursor:pointer"  onclick="GetCategoryArticles('2665903','eqwewr','foot','41450025');">msm8974<em>（1）</em></span>
+                                </label>
+                                <label class="">
+                                    <span  style="cursor:pointer"  onclick="GetCategoryArticles('1138963','eqwewr','foot','41450025');">驱动总结<em>（48）</em></span>
+                                </label>
+                    </div>
+                   
+                    <div class="similar_wrap tracking-ad" data-mod="popu_141"  style="max-height:195px;">
+                        <a href="http://blog.csdn.net" style="display:none">http://blog.csdn.net</a>
+                        <ul class="similar_list fl">                          
+                        </ul>
+
+                        <ul class="similar_list fr">                           
+                        </ul>
+                    </div>
+                </div>
+            </div>    
+    <script  type="text/javascript">
+        $(function () {
+            GetCategoryArticles('2665903', 'eqwewr','foot','41450025');
+        });
+    </script>
+      
+</div>
+<div id="suggest"></div>
+         <script  language="javascript" type='text/javascript'>     
+             $(function(){
+                 $.get("/eqwewr/svc/GetSuggestContent/41450025",function(data){
+                     $("#suggest").html(data);
+                 });     
+             });             
+         </script>  
+
+
+<style>
+.blog-ass-articl dd {
+color: #369;
+width: 99%; /*修改行*/
+float: left;
+overflow: hidden;
+font: normal normal 12px/23px "SimSun";
+height: 23px;
+margin: 0;
+padding: 0 0 0 10px;
+margin-right: 30px;
+background: url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;
+}
+</style>
+
+ <link rel="stylesheet" href="http://static.blog.csdn.net/css/replace.css"/>
+<div id="relate" data-mod="popu_218"  class="tracking-ad">
+        <div class="relate_t">
+            <h3><span>参考知识库</span></h3>
+        </div>
+        <div class="relate_c">
+        </div>
+</div>
+ 
+
+<dl class="blog-ass-articl" id="res-relatived" > 
+    <div class="embody embody_b" id="libkeyparent"  style="display:none">
+            <span class="embody_t">更多资料请参考：</span>
+            <div class="embody_c" id="libkey"></div>
+    </div>
+
+
+     <dt><span>猜你在找</span></dt>    
+
+
+   
+
+
+    <div id="adCollege" style="width: 42%;float: left;"> 
+        <script src="http://csdnimg.cn/jobreco/job_reco.js" type="text/javascript"></script> 
+        <script type="text/javascript">
+            csdn.position.showEdu({
+                sourceType: "blog",
+                searchType: "detail",
+                searchKey: "41450025",
+                username: "",
+                recordcount: "5",
+                containerId: "adCollege" //容器DIV的id。 
+            });
+        </script> 
+    </div>  
+
+    
+     <div id="res"  data-mod="popu_36"  class="tracking-ad" style="width: 42%;float: left;margin-right: 30px;"></div>
+   
+</dl>
+
+
+<script type="text/javascript">
+    $(function () {
+        setTimeout(function () {
+            var searchtitletags = 'linux内核3.4基于wakeup_source的autosleep机制分析' + ',' + $("#tags").html();
+            searchService({
+                index: 'blog',
+                query: searchtitletags,
+                from: 5,
+                size: 5,
+                appendTo: '#res',
+                url: 'recommend',
+                his: 2,
+                client: "blog_cf_enhance",
+                tmpl: '<dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;"><a href="#{ url }" title="#{ title }" strategy="#{ strategy }">#{ title }</a></dd>'
+            });
+        }, 500);
+    });    
+
+ </script>  
+
+    <div id="ad_cen">        
+<!-- 广告位开始 -->
+<ins data-revive-zoneid="71" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+<!-- 广告位结束 -->    </div>  
+
+<div class="comment_class">
+    <div id="comment_title" class="panel_head">
+        <span class="see_comment">查看评论</span><a name="comments"></a></div>
+    <div id="comment_list">
+    </div>
+    <div id="comment_bar">
+    </div>
+    <div id="comment_form">
+    </div>
+    <div class="announce">
+        * 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+</div>
+
+<script type="text/javascript">
+    var fileName = '41450025';
+    var commentscount = 0;
+    var islock = false
+</script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/comment.js"></script>
+    <div id="ad_bot">
+    </div>
+<div id="report_dialog">
+</div>
+
+<div id="d-top"  style="bottom:60px;">
+        <a id="quick-reply" class="btn btn-top q-reply" title="快速回复" style="display:none;">
+            <img src="http://static.blog.csdn.net/images/blog-icon-reply.png" alt="快速回复">
+        </a>    
+
+    <a id="d-top-a" class="btn btn-top backtop"  style="display: none;" title="返回顶部" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_huidaodingbu'])" style="">         
+         <img src="http://static.blog.csdn.net/images/top.png" alt="TOP">
+    </a>
+</div>
+<script type="text/javascript">
+    $(function ()
+    {
+        $("#ad_frm_0").height("90px");
+        
+        setTimeout(function(){
+            $("#ad_frm_2").height("200px");
+        },1000);    
+    });
+  
+</script>
+<style type="text/css">
+    .tag_list
+    {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 1px solid #D7CBC1;
+        color: #000000;
+        font-size: 12px;
+        line-height: 20px;
+        list-style: none outside none;
+        margin: 10px 2% 0 1%;
+        padding: 1px;
+    }
+    .tag_list h5
+    {
+        background: none repeat scroll 0 0 #E0DBD3;
+        color: #47381C;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 5px;
+        margin: 0;
+    }
+    .tag_list h5 a
+    {
+        color: #47381C;
+    }
+    .classify
+    {
+        margin: 10px 0;
+        padding: 4px 12px 8px;
+    }
+    .classify a
+    {
+        margin-right: 20px;
+        white-space: nowrap;
+    }
+</style>
+
+
+<div class="tag_list" style="display:none"></div>
+  <script  language="javascript" type='text/javascript'>     
+      $(function(){
+              setTimeout(function(){
+                  $.get("/eqwewr/svc/GetTagContent",function(data){
+                      $(".tag_list").html(data).show();
+                  });     
+              });
+          },500);                       
+ </script> 
+
+
+<div id="pop_win" style="display:none ;position: absolute; z-index: 10000; border: 1px solid rgb(220, 220, 220); top: 222.5px; left: 630px; opacity: 1; background: none 0px 0px repeat scroll rgb(255, 255, 255);">
+    
+</div>
+<div id="popup_mask"></div>
+<style>
+    #popup_mask
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        left: 0px;
+        top: 0px;
+        opacity: 0.3;
+        filter: alpha(opacity=30);
+        display: none;
+    }
+
+</style>
+
+
+
+
+<script type="text/javascript">
+    $(function(){
+        setTimeout(function(){
+            $(".comment_body:contains('回复')").each(function(index,item){
+                var u=$(this).text().split('：')[0].toString().replace("回复","")
+                var thisComment=$(this);
+                if(u)
+                {
+                    $.getJSON("https://passport.csdn.net/get/nick?callback=?", {users: u}, function(a) {
+                        if(a!=null&&a.data!=null&&a.data.length>0)
+                        {
+                            nick=a.data[0].n; 
+                            if(u!=nick)
+                            {
+                                thisComment.text(thisComment.text().replace(u,nick));  
+                            }
+                        }       
+                    });  
+                }
+            });         
+
+        },200);  
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },5000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },10000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },15000);
+        
+        setTimeout(function(){
+            $("a img[src='http://js.tongji.linezing.com/stats.gif']").parent().css({"position":"absolute","left":"50%"});
+        },300);
+    });
+
+    function loginbox(){
+        var $logpop=$("#pop_win");
+        $logpop.html('<iframe src="https://passport.csdn.net/account/loginbox?service=http://static.blog.csdn.net/callback.htm" frameborder="0" height="600" width="400" scrolling="no"></iframe>');
+
+        $('#popup_mask').css({
+            opacity: 0.5,
+            width: $( document ).width() + 'px',
+            height:  $( document ).height() + 'px'
+        });
+        $('#popup_mask').css("display","block");
+ 
+        $logpop.css( {
+            top: ($( window ).height() - $logpop.height())/ 2  + $( window 
+       ).scrollTop() + 'px',
+            left:($( window ).width() - $logpop.width())/ 2
+        } );
+ 
+        setTimeout( function () {
+            $logpop.show();
+            $logpop.css( {
+                opacity: 1
+            } );
+        }, 200 );
+ 
+        $('#popup_mask').unbind("click");
+        $('#popup_mask').bind("click", function(){
+            $('#popup_mask').hide();
+            var $clopop = $("#pop_win");
+            $("#common_ask_div_sc").css("display","none");
+            $clopop.css( {
+                opacity: 0
+            } );
+            setTimeout( function () {
+                $clopop.hide();
+            }, 350 );
+            return false;
+        });
+    }   
+
+</script>
+ <script language="javascript" type="text/javascript" src="http://ads.csdn.net/js/async_new.js"></script>      
+
+
+                        <div class="clear">
+                        </div>
+                    </div>                   
+                
+            </div>
+                   
+           <div id="side">
+    <div class="side">
+<div id="panel_Profile" class="panel">
+<ul class="panel_head"><span>个人资料</span></ul>
+<ul class="panel_body profile">
+<div id="blog_userface">
+    <a href="http://my.csdn.net/eqwewr" target="_blank">
+    <img src="http://avatar.csdn.net/0/F/D/1_eqwewr.jpg" title="访问我的空间" style="max-width:90%"/>
+    </a>
+    <br />
+    <span><a href="http://my.csdn.net/eqwewr" class="user_name" target="_blank">eqwewr</a></span>
+</div>
+<div class="interact">
+
+    <a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+
+ <a href="javascript:void(0);" class="letter"  title="[发私信]" onclick="window.open('http://msg.csdn.net/letters/model?receiver=eqwewr','_blank','height=350,width=700');_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_sixin'])"></a>  
+</div>
+<div id="blog_medal">
+                <div id="bms_box">
+               </div>
+</div>
+<ul id="blog_rank">
+    <li>访问：<span>317022次</span></li>
+    <li>积分：<span>4069</span> </li>    
+    <li >等级： <span style="position:relative;display:inline-block;z-index:1" >
+            <img src="http://c.csdnimg.cn/jifen/images/xunzhang/jianzhang/blog5.png" alt="" style="vertical-align: middle;" id="leveImg">
+            <div id="smallTittle" style=" position: absolute;  left: -24px;  top: 25px;  text-align: center;  width: 101px;  height: 32px;  background-color: #fff;  line-height: 32px;  border: 2px #DDDDDD solid;  box-shadow: 0px 2px 2px rgba (0,0,0,0.1);  display: none;   z-index: 999;">
+            <div style="left: 42%;  top: -8px;  position: absolute;  width: 0;  height: 0;  border-left: 10px solid transparent;  border-right: 10px solid transparent;  border-bottom: 8px solid #EAEAEA;"></div>
+            积分：4069 </div>
+        </span>  </li>
+    <li>排名：<span>第4966名</span></li>
+</ul>
+<ul id="blog_statistics">
+    <li>原创：<span>76篇</span></li>
+    <li>转载：<span>66篇</span></li>
+    <li>译文：<span>0篇</span></li>
+    <li>评论：<span>120条</span></li>
+</ul>
+</ul>
+</div>
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字" /></span>
+        <input id="btnSubmit" type="button" value="搜索" title="search in blog" />
+        <input type="hidden" name="q" id="inputQ" />
+        <input type="hidden" name="t" value="blog" />
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("#btnSubmit").click(function () {           
+            search();
+        });
+
+        $("#frmSearch").submit(function () {
+            search();
+            return false;
+        });
+
+        function search()
+        {
+            var url = "http://so.csdn.net/so/search/s.do?q=" + encodeURIComponent($("#inputSearch").val()) + "&u=" + username + "&t=blog";
+            window.location.href = url;
+        }   
+    });
+</script><div id="panel_Category" class="panel">
+<ul class="panel_head"><span>文章分类</span></ul>
+<ul class="panel_body">    
+                 <li>
+                    <a href="/eqwewr/article/category/824288" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">内核机制</a><span>(9)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/813051" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">硬件相关</a><span>(5)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/813044" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">内核移植</a><span>(17)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/818709" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">驱动笔试</a><span>(28)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/816682" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">环境搭建</a><span>(8)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/1138963" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">驱动总结</a><span>(49)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/1138964" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">8x60</a><span>(26)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/1138965" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">7x27a</a><span>(24)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/1548227" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">APQ8064</a><span>(16)</span>
+                </li>
+                 <li>
+                    <a href="/eqwewr/article/category/2665903" onclick="_gaq.push(['_trackEvent','function', 'onclick', 'blog_articles_wenzhangfenlei']); ">msm8974</a><span>(2)</span>
+                </li>
+</ul>
+</div><div id="panel_Archive" class="panel">
+<ul class="panel_head"><span>文章存档</span></ul>
+<ul class="panel_body">
+<div id="archive_list">
+<!--归档统计-->
+<li><a href="/eqwewr/article/month/2015/01">2015年01月</a><span>(2)</span></li><li><a href="/eqwewr/article/month/2014/11">2014年11月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2014/10">2014年10月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2014/09">2014年09月</a><span>(9)</span></li><li><a href="/eqwewr/article/month/2014/07">2014年07月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2014/06">2014年06月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2014/04">2014年04月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2014/03">2014年03月</a><span>(4)</span></li><li><a href="/eqwewr/article/month/2014/02">2014年02月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2014/01">2014年01月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2013/12">2013年12月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2013/11">2013年11月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2013/08">2013年08月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2013/05">2013年05月</a><span>(2)</span></li><li><a href="/eqwewr/article/month/2013/04">2013年04月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2013/03">2013年03月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2013/02">2013年02月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2013/01">2013年01月</a><span>(5)</span></li><li><a href="/eqwewr/article/month/2012/12">2012年12月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2012/10">2012年10月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2012/09">2012年09月</a><span>(5)</span></li><li><a href="/eqwewr/article/month/2012/08">2012年08月</a><span>(2)</span></li><li><a href="/eqwewr/article/month/2012/07">2012年07月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2012/06">2012年06月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2012/05">2012年05月</a><span>(2)</span></li><li><a href="/eqwewr/article/month/2012/04">2012年04月</a><span>(8)</span></li><li><a href="/eqwewr/article/month/2012/03">2012年03月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2012/02">2012年02月</a><span>(3)</span></li><li><a href="/eqwewr/article/month/2012/01">2012年01月</a><span>(2)</span></li><li><a href="/eqwewr/article/month/2011/12">2011年12月</a><span>(4)</span></li><li><a href="/eqwewr/article/month/2011/11">2011年11月</a><span>(12)</span></li><li><a href="/eqwewr/article/month/2011/10">2011年10月</a><span>(10)</span></li><li><a href="/eqwewr/article/month/2011/09">2011年09月</a><span>(4)</span></li><li><a href="/eqwewr/article/month/2011/08">2011年08月</a><span>(1)</span></li><li><a href="/eqwewr/article/month/2011/07">2011年07月</a><span>(6)</span></li><li><a href="/eqwewr/article/month/2011/06">2011年06月</a><span>(2)</span></li><li><a href="/eqwewr/article/month/2011/05">2011年05月</a><span>(19)</span></li><li><a href="/eqwewr/article/month/2011/04">2011年04月</a><span>(6)</span></li>
+</div>
+</ul>
+</div>
+<div id="hotarticls" class="panel">
+<ul class="panel_head">
+    <span>       
+阅读排行    </span>
+</ul>
+
+<ul class="panel_body itemlist">
+<li>
+<a href="/linux_devices_driver/article/details/7765160" title="android lcd调试   高通平台lcd调试深入分析总结（mipi和rgb接口）">android lcd调试   高通平台lcd调试深入分析总结（mipi和rgb接口）</a><span>(20418)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7518375" title="Qualcomm eMMC software Download">Qualcomm eMMC software Download</a><span>(15222)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7901309" title="高通平台mipi panel kernel读包方法">高通平台mipi panel kernel读包方法</a><span>(8734)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/6589004" title="linux驱动面试常见题目">linux驱动面试常见题目</a><span>(8234)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7495757" title="android wakelock申请与释放">android wakelock申请与释放</a><span>(7505)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7935729" title="高通平台camera调试">高通平台camera调试</a><span>(6667)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7855682" title="高通平台bootloader里面串口log输出配置方法">高通平台bootloader里面串口log输出配置方法</a><span>(6662)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7513733" title="Android and Linux suspend and resume debug（中文）">Android and Linux suspend and resume debug（中文）</a><span>(5849)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7770556" title="高通平台android kernel 开机logo显示和传统linux一样">高通平台android kernel 开机logo显示和传统linux一样</a><span>(5760)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7028255" title="上海linux驱动面试经历">上海linux驱动面试经历</a><span>(5588)</span>
+</li>
+</ul>
+</div>
+<div id="hotarticls2" class="panel">
+<ul class="panel_head"><span>评论排行</span></ul>
+<ul class="panel_body itemlist">
+<li>
+<a href="/linux_devices_driver/article/details/7765160" title="android lcd调试   高通平台lcd调试深入分析总结（mipi和rgb接口）">android lcd调试   高通平台lcd调试深入分析总结（mipi和rgb接口）</a><span>(34)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7028255" title="上海linux驱动面试经历">上海linux驱动面试经历</a><span>(12)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/8010812" title="高通平台开机logo连续显示调试总结">高通平台开机logo连续显示调试总结</a><span>(12)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7901309" title="高通平台mipi panel kernel读包方法">高通平台mipi panel kernel读包方法</a><span>(11)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/6818244" title="在此分享android源码下载地址 绝对可以下">在此分享android源码下载地址 绝对可以下</a><span>(8)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7518375" title="Qualcomm eMMC software Download">Qualcomm eMMC software Download</a><span>(8)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/40052697" title="做高通平台安卓驱动感言">做高通平台安卓驱动感言</a><span>(7)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7582437" title="atheros wifi芯片ics高通平台  wifi睡眠策略分析">atheros wifi芯片ics高通平台  wifi睡眠策略分析</a><span>(3)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/17928663" title="android restart reason机制">android restart reason机制</a><span>(3)</span>
+</li>
+<li>
+<a href="/linux_devices_driver/article/details/7044099" title="关于头文件定义全局变量等问题">关于头文件定义全局变量等问题</a><span>(2)</span>
+</li>
+</ul>
+</div>
+<div id="homepageArticles" class="panel tracking-ad" data-mod="popu_4">
+<ul class="panel_head"><span>推荐文章</span></ul>
+<ul class="panel_body" id="ad_commend">
+<ul>
+<li><a href="http://blog.csdn.net/u013064109/article/details/51590621" target="_blank">* 浅谈android中异步加载之"取消异步加载"二</a></li>
+<li><a href="http://blog.csdn.net/u012260293/article/details/50395602" 
+target="_blank">*Delta - 轻量级JavaWeb框架使用文档</a></li>
+<li><a href="http://blog.csdn.net/hiyun9/article/details/51602428" 
+target="_blank">*Nginx正反向代理、负载均衡等功能实现配置</a></li>
+<li><a href="http://blog.csdn.net/qianweifeng123/article/details/51555998" target="_blank">* 浅析ZeroMQ工作原理及其特点</a></li>
+<li><a 
+
+href="http://blog.csdn.net/qq_23547831/article/details/51289456"target="_blank">*android源码解析（十九）-->Dialog加载绘制流程</a></li>
+<li><a href="http://blog.csdn.net/mickjoust/article/details/51646658" 
+target="_blank">*Spring Boot 实践折腾记（三）：三板斧，Spring Boot下使用Mybatis</a></li>
+
+
+</ul></ul>
+</div>
+
+
+<div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/8010812#comments">高通平台开机logo连续显示调试总结</a>
+    <p style="margin:0px;"><a href="/combattre" class="user_name">combattre</a>:
+4.4的lk到kernel之间会闪一下屏，也是关闭背光500ms？是在哪呢，没找到
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/20762839#comments">针对高通BMS的研究   高通电量计</a>
+    <p style="margin:0px;"><a href="/pluto1027" class="user_name">pluto1027</a>:
+您好,我也在使用qualcomm的pmic,發現有時候重開機後電量會和上次關機前的電量差異很大,比如...
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/7901309#comments">高通平台mipi panel kernel读包方法</a>
+    <p style="margin:0px;"><a href="/obanaganastar" class="user_name">obanaganastar</a>:
+我问题出在lk读取ID上，能参考你lk读ID的方法吗，谢谢了！！！
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/40052697#comments">做高通平台安卓驱动感言</a>
+    <p style="margin:0px;"><a href="/u011076569" class="user_name">u011076569</a>:
+真是佩服. 调试驱动中怎么运用delay了？另外高通平台用qpst得到的dump文件怎么看死机之类的...
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/17928663#comments">android restart reason机制</a>
+    <p style="margin:0px;"><a href="/bingowap" class="user_name">bingowap</a>:
+原来是高通有寄存器没配置上，没pm8018文档，不知道那寄存器具体干什么用的
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/17928663#comments">android restart reason机制</a>
+    <p style="margin:0px;"><a href="/bingowap" class="user_name">bingowap</a>:
+你好，有个问题想请教下。我现在的项目平台是9x15，里面函数不叫msm_restart而是arch_...
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/17928663#comments">做高通平台安卓驱动感言</a>
+    <p style="margin:0px;"><a href="/xajhsunei" class="user_name">xajhsunei</a>:
+同感
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/17928663#comments">做高通平台安卓驱动感言</a>
+    <p style="margin:0px;"><a href="/qq_27253703" class="user_name">qq_27253703</a>:
+厉害厉害。，毕竟大神，看来我们还差的很远
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/7765160#comments">android lcd调试   高通平台lcd调试深入分析总结（mipi和rgb接口）</a>
+    <p style="margin:0px;"><a href="/fanerg1988" class="user_name">fanerg1988</a>:
+好文章，面面俱到啊
+    </p>
+    </li>
+    <li>
+   
+         <a href="/linux_devices_driver/article/details/7765160#comments">做高通平台安卓驱动感言</a>
+    <p style="margin:0px;"><a href="/eqwewr" class="user_name">eqwewr</a>:
+@u012296694:谢谢。
+    </p>
+    </li>
+</ul>
+</div>
+    </div>
+    <div class="clear">
+    </div>
+ </div>   
+            <div class="clear">
+            </div>
+        </div>
+
+        
+
+<script type="text/javascript" src="http://c.csdnimg.cn/rabbit/cnick/cnick.js"></script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/newblog.min.js"></script>
+
+
+<script type="text/javascript" src="http://medal.blog.csdn.net/showblogmedal.ashx?blogid=1032518"></script>
+<script type="text/javascript" src="http://static.blog.csdn.net/scripts/JavaScript1.js"></script>
+
+    <script type="text/javascript" src="http://passport.csdn.net/content/loginbox/login.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script>
+<script type="text/javascript" src="http://www.csdn.net/ui/scripts/Csdn/counter.js"></script>
+<script type="text/javascript" src="http://ad.csdn.net/scripts/ad-blog.js"></script>
+<script type="text/javascript">
+    $(function () {
+        function __get_code_toolbar(snippet_id) {
+            return $("<span class='tracking-ad' data-mod='popu_167'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "' target='_blank' title='在CODE上查看代码片'  style='text-indent:0;'><img src='https://code.csdn.net/assets/CODE_ico.png' width=12 height=12 alt='在CODE上查看代码片' style='position:relative;top:1px;left:2px;'/></a></span>"
+                    + "<span class='tracking-ad' data-mod='popu_170'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "/fork' target='_blank' title='派生到我的代码片' style='text-indent:0;'><img src='https://code.csdn.net/assets/ico_fork.svg' width=12 height=12 alt='派生到我的代码片' style='position:relative;top:2px;left:2px;'/></a></span>");
+        }
+        
+        $("[code_snippet_id]").each(function () {
+            __s_id = $(this).attr("code_snippet_id");
+            if (__s_id != null && __s_id != "" && __s_id != 0 && parseInt(__s_id) > 70020) {
+                __code_tool = __get_code_toolbar(__s_id);
+                $(this).prev().find(".tools").append(__code_tool);
+            }
+        });
+
+        $(".bar").show();
+    });
+</script>
+
+
+
+
+    </div>
+      <!--new top-->
+    
+    <script id="csdn-toolbar-id" btnId="header_notice_num" wrapId="note1" count="5" subCount="5" type="text/javascript" src="http://c.csdnimg.cn/public/common/toolbar/js/toolbar.js"></script>     <!--new top-->
+   
+    <link href="http://c.csdnimg.cn/comm_ask/css/ask_float_block.css" type="text/css" rel="stylesheet" />
+    <script language='JavaScript' type='text/javascript' src='http://c.csdnimg.cn/comm_ask/js/libs/wmd.js'></script>
+    <script language='JavaScript' type='text/javascript' src='http://c.csdnimg.cn/comm_ask/js/libs/showdown.js'></script>
+    <script language='JavaScript' type='text/javascript' src='http://c.csdnimg.cn/comm_ask/js/libs/prettify.js'></script>
+    <script language='JavaScript' type='text/javascript' src='http://c.csdnimg.cn/comm_ask/js/apps/ask_float_block.js'></script>
+   
+
+  <div id="a52b5334d" style="width: 1px; height: 1px; display: none;">
+                    <script id="adJs52b5334"></script>
+                    <script>document.getElementById("adJs52b5334").src = "http://ads.csdn.net/js/opt/52b5334.js?t=" + Math.random();</script>
+   </div>
+
+</body>
+</html>   
+ 

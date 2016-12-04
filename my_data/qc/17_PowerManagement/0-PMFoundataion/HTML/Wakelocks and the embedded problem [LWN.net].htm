@@ -1,0 +1,855 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+        <html>
+        <head><title>Wakelocks and the embedded problem [LWN.net]</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+        <link rel="icon" href="/images/favicon.png" type="image/png">
+        <link rel="alternate" type="application/rss+xml" title="LWN.net headlines" href="http://lwn.net/headlines/newrss">
+<link rel="alternate" type="application/rss+xml" title="Comments posted to this article" href="http://lwn.net/headlines/318611/">
+        <link rel="stylesheet" href="/CSS/lwn">
+<link rel="stylesheet" href="/CSS/nosub">
+<link rel="stylesheet" href="/CSS/pure-min">
+           <!--[if lte IE 8]>
+             <link rel="stylesheet" href="/CSS/grids-responsive-old-ie-min">
+           <![endif]-->
+           <!--[if gt IE 8]><!-->
+             <link rel="stylesheet" href="/CSS/grids-responsive-min">
+           <!--<![endif]-->
+           <link rel="stylesheet" href="/CSS/pure-lwn">
+           
+        
+<script type="text/javascript">var p="http",d="static";if(document.location.protocol=="https:"){p+="s";d="engine";}var z=document.createElement("script");z.type="text/javascript";z.async=true;z.src=p+"://"+d+".adzerk.net/ados.js";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(z,s);</script>
+<script type="text/javascript">
+var ados_keywords = ados_keywords || [];
+if( location.protocol=='https:' ) {
+        ados_keywords.push('T:SSL');
+} else {
+        ados_keywords.push('T:HTTP');
+}
+
+var ados = ados || {};
+ados.run = ados.run || [];
+ados.run.push(function() {
+
+ados_add_placement(4669, 20979, "azk13321_leaderboard", 4).setZone(16026);
+
+ados_add_placement(4669, 20979, "azk93271_right_zone", [5,10,6]).setZone(16027);
+
+ados_add_placement(4669, 20979, "azk31017_tracking", 20).setZone(20995);
+
+
+
+ados_setKeywords(ados_keywords.join(', ')); 
+ados_load();
+});</script>
+
+        </head>
+        <body bgcolor="#ffffff" link="Blue" VLINK="Green" alink="Green">
+        <a name="t"></a>
+<div id="menu"><a href="/"><img src="http://static.lwn.net/images/logo/barepenguin-70.png" class="logo"
+                 border="0" alt="LWN.net Logo">
+           <font class="logo">LWN<br>.net</font>
+           <font class="logobl">News from the source</font></a>
+           <a href="/"><img src="http://static.lwn.net/images/lcorner-ss.png" class="sslogo"
+                 border="0" alt="LWN"></a><div class="navmenu-container">
+           <ul class="navmenu">
+        <li><a class="navmenu" href="#t"><b>Content</b></a><ul><li><a href="/current/">Weekly Edition</a></li><li><a href="/Archives/">Archives</a></li><li><a href="/Search/">Search</a></li><li><a href="/Kernel/">Kernel</a></li><li><a href="/Security/">Security</a></li><li><a href="/Distributions/">Distributions</a></li><li><a href="/Calendar/">Events calendar</a></li><li><a href="/Comments/unread">Unread comments</a></li><li><hr></li><li><a href="/op/FAQ.lwn">LWN FAQ</a></li><li><a href="/op/AuthorGuide.lwn">Write for us</a></li></ul></li>
+<li><a class="navmenu" href="#t"><b>Edition</b></a><ul><li><a href="/Articles/318157/">Return to the Kernel page</a></li></ul></li>
+</ul></div>
+</div> <!-- menu -->
+<div class="pure-g not-handset" style="margin-left: 10.5em">
+           <div class="not-print">
+             <div id="azk13321_leaderboard"></div>
+           </div>
+           </div>
+        <div class="topnav-container">
+<div class="not-handset"><form action="https://lwn.net/login" method="post" name="loginform"
+                 class="loginform"">
+        <b>User:</b> <input type="text" name="Username" value="" size="8" /> <b>Password:</b> <input type="password" name="Password" size="8" /> <input type="submit" name="submit" value="Log in" /></form> |
+           <form action="https://lwn.net/newaccount" method="post" class="loginform">
+           <input type="submit" name="submit" value="Register" />
+           </form>
+        </div>
+               <div class="handset-only">
+               <a href="/login"><b>Log in</b> / <b>New account</b></a>
+               </div>
+               </div><div class="pure-grid maincolumn">
+<div class="lwn-u-1 pure-u-md-19-24">
+<div class="PageHeadline">
+<h1>Wakelocks and the embedded problem</h1>
+</div>
+<div class="ArticleText">
+<div class="FeatureByline">
+           By <b>Jonathan Corbet</b><br>February 10, 2009
+           </div>
+The relationship between embedded system developers and the kernel
+community is known for being rough, at best.  Kernel developers complain
+about low-quality work and a lack of contributions from the embedded side;
+the embedded developers, when they say anything at all, express
+frustrations that the kernel development process does not really keep their
+needs in mind.  A current discussion involving developers from the Android
+project gives some insight into where this disconnect comes from.
+<p>
+
+Android, of course, is Google's platform for mobile telephones.  The
+initial Android stack was developed behind closed doors; the code only made
+it out into the world when the first deployments were already in the
+works.  The Android developers have done a lot of kernel work, but very
+little code has made made the journey into the mainline.  The code which
+<i>has</i> been merged all went into the staging tree without a whole lot
+of initiative from the Android side.  Now, though, Android developer Arve
+Hj&oslash;nnev&aring;g is making an effort to merge a piece of that
+project's infrastructure through the normal process.  It is not proving to
+be an easy ride.
+<p>
+
+The most controversial bit of code is a feature known as "wakelocks."  In
+Android-speak, a "wakelock" is a mechanism which can prevent the system
+from going into a low-power state.  In brief, kernel code can set up a
+wakelock with something like this:
+<p>
+<pre>
+    #include &lt;linux/wakelock.h&gt;
+
+    wake_lock_init(struct wakelock *lock, int type, const char *name);
+</pre>
+<p>
+The <tt>type</tt> value describes what kind of wakelock this is;
+<tt>name</tt> gives it a name which can be seen in
+<tt>/proc/wakelocks</tt>.  There are 
+two possibilities for the type: <tt>WAKE_LOCK_SUSPEND</tt> prevents the system from
+suspending, while <tt>WAKE_LOCK_IDLE</tt> prevents going into a low-power
+idle state which may increase response times.  The API for acquiring and
+releasing these locks is:
+<p>
+<pre>
+    void wake_lock(struct wake_lock *lock);
+    void wake_lock_timeout(struct wake_lock *lock, long timeout);
+    void wake_unlock(struct wake_lock *lock);
+</pre>
+<p>
+There is also a user-space interface.  Writing a name to
+<tt>/sys/power/wake_lock</tt> establishes a lock with that name, which
+can then be written to <tt>/sys/power/wake_unlock</tt> to release the
+lock.  The <a href="http://lwn.net/Articles/318588/">current patch set</a>
+only allows suspend locks to be taken from user space.
+<p>
+This submission has not been received particularly well.  It has, instead,
+drawn comments like <a href="/Articles/318612/">this from Ben Herrenschmidt</a>:
+<p>
+<div class="BigQuote">
+	looks to me like some people hacked up some ad-hoc trick for
+	their own local need without instead trying to figure out how to fit
+	things with the existing infrastructure (or possibly propose changes to
+	the existing infrastructure to fit their needs).
+</div>
+<p>
+or <a href="/Articles/318613/">this one from Pavel Machek</a>:
+<p>
+<div class="BigQuote">
+	Ok, I think that this wakelock stuff is in "can't be used properly"
+	area on Rusty's scale of nasty interfaces.
+</div>
+<p>
+There's no end of reasons to dislike this interface.  Much of it duplicates
+the existing pm_qos (quality of service) API; it seems that <a
+href="/Articles/318614/">pm_qos does not meet Android's needs</a>, but it
+also seems that no effort was made to fix the problems.  The scheme seems
+over-engineered when all that is really needed is a "do not suspend" flag -
+or, at most, a counter.  The patches disable the existing
+<tt>/sys/power/state</tt> interface, which does not play well with
+wakelocks.  There is no way to recover if a user-space process exits
+while holding a wakelock.  The default behavior for the system is to
+suspend, even if a process is running; keeping a system awake may involve a
+chain of wakelocks obtained by various software components.  And so on.
+<p>
+The end result is that this code will not make it into the mainline
+kernel.  But it has been shipped on large numbers of G1 phones, with many
+more yet to go.  So users of all those phones will be using out-of-tree
+code which will not be merged, at least not in anything like its current
+form.  Any applications which depend on the wakelock sysfs interface will
+break if that interface is brought up to proper standards.  It's a bit of a
+mess, but it is a very typical mess for the embedded systems community.
+Embedded developers operate under a set of constraints which makes proper
+kernel development hard.  For example:
+<p>
+<ul>
+<li> One of the core rules of kernel development is "post early and often."  
+     Code which is developed behind closed doors gets no feedback from the
+     development community, so it can easily follow a blind path for a long
+     time.  But embedded system vendors rarely want to let the world know
+     about what they are doing before the product is ready to ship; they
+     hope, instead, to keep their competitors in the dark for as long as
+     possible.  So posting early is rarely seen as an option.
+<p>
+<li> Another fundamental rule is "upstream first": code goes into the
+     mainline before being shipped to customers.  Once again, even if an
+     embedded vendor wants to send code into the mainline, they rarely want
+     to begin that process before the product ships.  So embedded kernels
+     are shipped containing out-of-tree code which almost certainly has a number of
+     problems, unsupportable APIs, and more.
+<p>
+<li> Kernel developers are expected to work with the goal of improving the
+     kernel for everybody.  Embedded developers, instead, are generally
+     solving a highly-specific problem under tight time constraints.  So
+     they do not think about, for example, extending the existing
+     quality-of-service API to meet their needs; instead, they bash out
+     something which is quick, dirty, and not subject to upstream review.
+</ul>
+<p>
+One could argue that Google has the time, resources, and in-house kernel
+development knowledge to avoid all of these problems and do things right.
+Instead, we have been treated to a fairly classic example of how things can
+go wrong.
+<p>
+The good news is that Google developers are now engaging with the community
+and trying to get their code into the mainline.  This process could well be
+long, and require a fair amount of adjustment on the Android side.  Even if
+the idea of wakelocks as a way to prevent the system from suspending is
+accepted - which is far from certain - the interface will require
+significant changes.  The associated "early suspend" API - essentially a
+notification mechanism for system state changes - will need to be
+generalized beyond the specific needs of the G1 phone.  It could well be a
+lot of work.
+<p>
+But if that work gets done, the kernel will be much better placed to handle
+the power-management needs of handheld devices.  That, in turn, can only
+benefit anybody else working on embedded Linux deployments.  And,
+crucially, it will help the Android developers as they port their code to
+other devices with differing needs.  As the number of Android-based phones
+grows, the cost of carrying out-of-tree code to support each of them will
+also grow.  It would be far better to generalize that support and get it
+into the mainline, where it can be maintained and improved by the
+community.
+<p>
+Most embedded systems vendors, it seems, would be unwilling to do that
+work; they are too busy trying to put together their next product.  So this
+sort of code tends to languish out of the mainline, and the quality of
+embedded Linux suffers accordingly.  Perhaps this case will be different,
+though; maybe Google will put the resources into getting its specialized
+code into shape and merged into the mainline.  That effort could help to
+establish Android as a solid, well-supported platform for mobile use, and
+that should be good for business.  Your editor, ever the optimist, hopes
+that things will work out this way; it would be a good demonstration of how
+embedded community can work better with the kernel community, getting a
+better kernel in return.<hr width="60%" align="left">
+           (<a href="https://lwn.net/login?target=/Articles/318611/">Log in</a> to post comments)
+           <p>
+           
+</div> <!-- ArticleText -->
+<p><a name="Comments"></a>
+
+<a name="CommAnchor318715"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">This does not count for all embedded developers</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 10:40 UTC (Wed) by <b>wsa</b> (guest, #52415)
+       [<a href="/Articles/318715/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+<p>
+I would have liked if you wrote "a lot of embedded developers" instead of "embedded developers" at times. We at Pengutronix, for example, are working hard on getting our patches upstream and advertising this to our customers, and I know a few others who do, too. "Embedded" is not just the usual suspects and their mobile phones, there are numerous devices solving industrial tasks which want to be supported. Quality is definately needed here.<br>
+<p>
+In my book, the time constraint problem is the biggest one. Customers do want results whilst the mainline review process needs time, so you often end up working with a customer-version and a mainline-version, porting fixes back and forth. Also, one can see that the hardware developers face the same time constraints (be it processor manufacturers or board designers), which makes producing kernel quality code an even bigger challenge because of sloppy hardware.<br>
+<p>
+I am just now working on a generic SPI-driver for the i.MX-platforms for mainline. Everyone who wants to get an idea what difficulties an embedded kernel developer may face is invited to join me. This one is a prime example.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318715/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor318721"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">This does not count for all embedded developers</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 13:59 UTC (Wed) by <b>corbet</b> (editor, #1)
+       [<a href="/Articles/318721/">Link</a>]
+    </p>
+    You are right, I should not have used quite such a broad brush.  There are quite a few embedded developers who make a point of working with the upstream kernel, and the number seems to be growing.  My apologies.
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318721/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+</div>
+
+<a name="CommAnchor318718"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 11:47 UTC (Wed) by <b>russell</b> (guest, #10458)
+       [<a href="/Articles/318718/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+A little off topic. But instead of a wakelock. I'd like to see a poweroff timer that powered down regardless of what user space is doing.  After doing who knows what damage cooking my laptop of several occasions.  I no longer trust user space to get it right and power off.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318718/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+
+<a name="CommAnchor318720"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 13:01 UTC (Wed) by <b>Kluge</b> (guest, #2881)
+       [<a href="/Articles/318720/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+'Another fundamental rule is "upstream first": code goes into the mainline before being shipped to <br>
+customers.'<br>
+<p>
+I thought that the kernel hackers disliked adding new features unless they were already in use (and <br>
+hence proven useful) by someone.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318720/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor318736"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 15:53 UTC (Wed) by <b>knan</b> (subscriber, #3940)
+       [<a href="/Articles/318736/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+"In use by some other piece of code" is the usual criteria. I.e. a driver using your added shared infrastructure, a userspace program talking to the interface added, etc.<br>
+<p>
+The actual hardware being more than dreams in a simulator also helps, of course.<br>
+<p>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318736/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor319336"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 14, 2009 0:34 UTC (Sat) by <b>giraffedata</b> (subscriber, #1954)
+       [<a href="/Articles/319336/">Link</a>]
+    </p>
+    I can remember various LWN articles about some proposed feature where kernel developers argued that it needed to be used out of tree and shipped with distributions for a while to prove its worthiness before joining the kernel.org major league.  I believe these were major functions, though.
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/319336/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+</div>
+</div>
+
+<a name="CommAnchor318740"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 16:20 UTC (Wed) by <b>michaeljt</b> (subscriber, #39183)
+       [<a href="/Articles/318740/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+Perhaps unsurprisingly, LWN articles on this subject tend to come to the point of view that embedded developers should adjust to fit the kernel developers' model.  Perhaps the kernel developers would be able to move towards the embedded developers to some extent without compromising their own positions though?<br>
+<p>
+Just going from the example above (and I realise that this may already be happening without my knowing), the main problem seems to be the interfaces, not the code.  So if the embedded developers were able to discuss the interfaces with the relevant kernel developers on private mailing lists, to get an idea of what was likely to wash and what not then everyone would be much further on, even without the embedded people releasing their code.<br>
+<p>
+Of course, once they did get to the stage of releasing code, there would still be the long integration process, but a lot of the heat would be taken off by the fact that the interfaces were likely to get through without too much discussion.  The embedded people would be able to ship without the integration being complete, but safe in the knowledge that at some point their stuff would run on a generic kernel, with all the resulting benefits, as long as they showed a reasonable amount of good will.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318740/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor318744"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 16:38 UTC (Wed) by <b>droundy</b> (subscriber, #4559)
+       [<a href="/Articles/318744/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+I imagine the problem with this idea is that usually interfaces are trickier than implementations, and it's very hard to know if an interface is "right" without also having a decent implementation.  e.g. presumably the problem with pm_qos that made it inadequate for android's needs probably wasn't obvious when that code was reviewed (and is still not clear to me).<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318744/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor318779"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 18:19 UTC (Wed) by <b>michaeljt</b> (subscriber, #39183)
+       [<a href="/Articles/318779/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+They could still explain though, why the existing interfaces did not suit them and what they proposed to/were in the process of creating instead.  That would at least give some valuable feedback as to how likely the changes are to get in.  The embedded people do create implementations.  Even that limited feedback as they went along might make everyone's life easier.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318779/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+</div>
+
+<a name="CommAnchor318812"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 21:13 UTC (Wed) by <b>gouyou</b> (subscriber, #30290)
+       [<a href="/Articles/318812/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+<font class="QuotedText">&gt; if the embedded developers were able to discuss the interfaces with the</font><br>
+<font class="QuotedText">&gt; relevant kernel developers on private mailing lists</font><br>
+<p>
+Yeah, like most of them would be interested to have discussion like that under NDA, helping for-profit companies produce better products ...<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318812/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor318823"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 21:45 UTC (Wed) by <b>michaeljt</b> (subscriber, #39183)
+       [<a href="/Articles/318823/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+I am supposing of course that they think the embedded people will contribute interesting code in the long run.  If they don't think that then this is moot anyway :)<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318823/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor318824"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 11, 2009 22:00 UTC (Wed) by <b>gouyou</b> (subscriber, #30290)
+       [<a href="/Articles/318824/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+But even if they contribute interesting code, most kernel developer do not work on Linux only for glory, they get paid to do it. I'm not sure company like RedHat, Novell, IBM or Oracle would be terribly happy to have their people spend time reviewing embedded API.<br>
+<p>
+(For the top empoyer you can take a look here: <a href="http://lwn.net/Articles/312074/">http://lwn.net/Articles/312074/</a>)<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318824/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+</div>
+</div>
+
+<a name="CommAnchor318851"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 12, 2009 0:10 UTC (Thu) by <b>dlang</b> (<b>&#x272D; supporter &#x272D;</b>, #313)
+       [<a href="/Articles/318851/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+most kernel developers will respond to private e-mails about new developments.<br>
+<p>
+there isn't a list for this, in part because there are so many kernel developers that such a list would hardly be limited.<br>
+<p>
+the kernel folks have included drivers for hardware that's not shipping yet.<br>
+<p>
+so, the kernel developers have shown that they are willing to work with embedded developers, but they can't be proactive about it because they don't have any way of knowing that they need to contact someone. the embedded developers know they are working on something, and can easily find out who to contact for advice. for the most part they don't choose to do so.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318851/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+
+<a name="CommAnchor318862"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 12, 2009 3:03 UTC (Thu) by <b>jamesh</b> (guest, #1159)
+       [<a href="/Articles/318862/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+The private mailing list thing seems like it would be problematic.  Are you thinking of a single private mailing list, or one for each embeded developer?<br>
+<p>
+If it is just a single mailing list, then the developer's competitors will likely also be on the list, which they might consider just as bad as a public list.<br>
+<p>
+If it is separate lists, that is a lot of effort for the kernel developers.  Also, what should they do if two embedded developers propose interfaces that achieve similar or identical aims?  Do they break confidentiality and try to get the two to cooperate, or do they have to pretend that they don't know about the other use case?<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318862/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor318883"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 12, 2009 9:04 UTC (Thu) by <b>michaeljt</b> (subscriber, #39183)
+       [<a href="/Articles/318883/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+Actually I was thinking that the embedded developers would not be on the list at all, but CCed when appropriate.  And if handled delicately, they might even welcome a limited co-ordination with competitors on kernel interfaces - those are likely not to be the most valuable "IP" which they wish to keep to their breast for all times.  If the kernel developers thought that the resulting contributions were likely to be of sufficient value (to themselves or their employers :) ) they could even play intermediaries without actually dropping names.  This "if" is of course the hinging point for everything I have posted up until now.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318883/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor318886"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 12, 2009 9:53 UTC (Thu) by <b>johill</b> (subscriber, #25196)
+       [<a href="/Articles/318886/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+You're also assuming that no kernel developer (for lack of more specification) are competition, something which cannot possibly be true. If you think this through, the list might as well be public, and then you might as well use linux-kernel or a more appropriate subsystem list.<br>
+<p>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318886/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+</div>
+</div>
+
+<a name="CommAnchor318911"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 12, 2009 12:09 UTC (Thu) by <b>mjg59</b> (subscriber, #23239)
+       [<a href="/Articles/318911/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+Google had all of this code in a public git repository long before they shipped anything running it, so absence of discussion before now isn't down to wanting to keep it secret.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/318911/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+</div>
+
+<a name="CommAnchor319022"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded PM</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 12, 2009 18:00 UTC (Thu) by <b>mgross</b> (subscriber, #38112)
+       [<a href="/Articles/319022/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+As I look more and more closely at the wakelock structure I'm struck by how similar it is to some ideas we tossed around on the CELF PM working group a few years back.  Ideas that fizzled a little at that time.<br>
+<p>
+The high level notion of having a "fall-line" to low power states subject to constraints keeping components from "falling' to a lower power state is still quite interesting.  FWIW at the time we worked on this concept in CELF things got complex around the dependency and notification networks that needed to be managed to make things work.<br>
+<p>
+Wakelock implements a type of constraint method.  I think the API has problems but the general idea of of constraint based steepest descent PM still has appeal.  To me anyway.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/319022/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor319086"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded PM</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 13, 2009 0:53 UTC (Fri) by <b>mjg59</b> (subscriber, #23239)
+       [<a href="/Articles/319086/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+I think the real question is over how constraints should be exposed. I'm very much on the side of inferring constraints from the behaviour of userland - if they have a device open then we should assume that they want to use it, so should avoid shutting it down. We're nowhere near providing that level of functionality in the kernel yet, but doing so helps the embedded, desktop and server worlds.<br>
+<p>
+I'm not sold on the idea of providing explicit constraints in most cases. If you're going to provide that constraint explicitly, why not allow the kernel to infer it? The code to say "Nothing needs access to input devices now" is not significantly differently complicated to the code that closes the input device when it doesn't need it. But that's the kind of case that the Android code deals with now.<br>
+<p>
+Stuff like the pm_qos framework deals with a different case, where you're supplying additional functional constraints to the kernel above and beyond those that can be inferred. I think we should be focusing on what those constraints might be rather than thinking about the wakelock and early suspend code from Android.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/319086/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+</div>
+
+<a name="CommAnchor319080"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Feb 13, 2009 0:44 UTC (Fri) by <b>jd</b> (guest, #26381)
+       [<a href="/Articles/319080/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+The level of interaction by embedded developers can be roughly modeled by Brownian motion. Sometimes it is there, sometimes it isn't. For example, when working on the FOLK kernel patch set of obscure drivers, I encountered drivers for embedded hardware that would be there one week and vanish the next.<br>
+<p>
+(I had a devil of a time trying to find VME or Fieldbus drivers that would sit still. The drivers would appear without warning - the companies rarely advertised them - and then vanished without warning.)<br>
+<p>
+Sometimes, I would get all kinds of odd reactions to questions. The COMEDI developers were dead set against merging their code with the baseline, although I could never get them to give me a reason that made sense. I could never get much of a coherent answer from RTAI, either. I'm sure both groups had excellent reasons, and mean no offense to either, but I would have preferred to know what that reason was.<br>
+<p>
+The Transputer drivers never made it into the mainstream, either, and I only discovered them on a series of barely-recognized FTP sites that didn't appear on most search engines. True, not many people used Transputers by the time the patch came out, but then not many people used the CBM64 when drivers for Commodore peripherals started circulating. There was zero documentation for the Transputer drivers, including any indication of who wrote them, and they'd clearly been abandoned a long time by the time I found them.<br>
+<p>
+One of the reasons I developed FOLK was to stop this kind of nonsense from happening - people would have a better idea of what was out there, whether the developers liked it or not. (I got into a few tangles with GRSecurity over that. I can understand their reasoning of wanting to make sure security code hasn't been tampered with, but they have no control over what someone installing it does and they're now near-death from lack of exposure. They wouldn't depend as much on a single revenue stream if their work was better-known, better-circulated and better-understood. I can understand their position, but I can still resent the fact that Linux will be a poorer place when GRSecurity goes the way of the Dodo.)<br>
+<p>
+I found many, many other embedded projects out there, and expect to find many many more such projects should I ever go looking again. These projects don't suffer from a lack of releases, a lack of open-sourceness or a lack of highly imaginative solutions. What they lack is an existence within the visible spectrum. What you don't see, you can't use. Sure, there are some "secret" projects out there, but if the published projects were getting some eyeballs, there'd be less need for "secret" APIs (as the problems with the mainstream APIs would be fixed or replacements would already be incorporated).<br>
+<p>
+Sure, if more of these projects got discussed and more got included into the mainstream, it wouldn't fix all the problems in the world, or even in the embedded world. What it would do is reduce the number of opportunities for problems and misunderstandings to develop. Isn't that in the interests of both embedded and non-embedded developers?<br>
+<p>
+I can even understand embedded (and non-embedded) developers being wary of the extra overheads involved in collecting together the various bits of work, documenting meaningfully the APIs and other such non-fundamental work that needs to get done. I'd even be willing to do some of this, if there was some chance it would make a difference.<br>
+<p>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/319080/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor473854"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Dec 31, 2011 11:55 UTC (Sat) by <b>ErikEngerd</b> (guest, #82043)
+       [<a href="/Articles/473854/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+It is now almost 2012 and I still regularly find myself tracing wake lock issues on a recent Android phone. I think that whatever the solution to this problem is, the kernel should be in control over wake locks. In particular, when a process exits, all its wake locks should be released. <br>
+<p>
+In addition, I am wondering why wake locks are even needed. Shouldn't the cpu go to a low power state whenever possible automatically? What exactly is the problem that a wake lock is intended to solve? Is it just scheduling of background tasks?<br>
+<p>
+Perhaps it would also be good to have something like policies in linux defining how often/when certain processes may run (perhaps an extension to selinux?).<br>
+<p>
+Anyway, I think the current implementation with putting the responsibility for wake locks in user space is really fragile. Many users are experiencing poor battery life because of this and are not technical enough to find the cause. Having a solution where the kernel is in control would be a big step in the right direction, I think.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/473854/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor473869"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Dec 31, 2011 19:30 UTC (Sat) by <b>dlang</b> (<b>&#x272D; supporter &#x272D;</b>, #313)
+       [<a href="/Articles/473869/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+this is the heart of the disagreement over wakelocks being _the_ solution to the power problem.<br>
+<p>
+there are problems with switching the system into low power mode<br>
+<p>
+1. some things don't work in some low power modes<br>
+<p>
+2. it takes time to switch out of low power modes<br>
+<p>
+linux systems have been switching to low power modes automatically for quite a few years, but they only switch to modes that are going to be transparent to the user (unless they are watching for it).<br>
+<p>
+In addition to these power saving modes, there are the 'suspend' and 'hibernate' modes where they system stops all processing. Traditional systems try to determine that the system is idle for a long enough time period before going into suspend.<br>
+<p>
+the idea behind the userspace wakelocks can be paraphrased into having an extremely short (approaching zero) timer for going into suspend, but only if nothing is holding a wakelock to keep the system awake.<br>
+<p>
+In my opinion, this idea is mostly defeated by the fact that they don't trust regular programs to take the wakelock, and instead have a central power management daemon that does things like hold the wakelock the entire time the screen is lit.<br>
+<p>
+now, something similar to the wakelock was needed in the kernel to keep the system from going to sleep at the same time that a new event was happening that would cause the system to wake up (to prevent a race condition), and a mechanism to do this was added to the kernel a year or so ago (but is not yet used by Android)<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/473869/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+<div class="Comment">
+
+<a name="CommAnchor488669"></a>
+<div class="CommentBox">
+  <p class="CommentTitle">Wakelocks and the embedded problem</p>
+  <div class="CommentBody">
+    <p class="CommentPoster">Posted Mar 26, 2012 17:07 UTC (Mon) by <b>bgat</b> (guest, #20709)
+       [<a href="/Articles/488669/">Link</a>]
+    </p>
+    <div class="FormattedComment">
+I think that runtime-pm is very, very close to being a complete replacement for wakelocks. At least for platforms with drivers that fully support it.<br>
+<p>
+The nice thing about runtime-pm is that it is fully aware of the kernel's Device Model, and can therefore make better decisions about system state than wakelocks can. The downside is that it looks nothing like existing wakelocks, so it requires movement from Android.<br>
+</div>
+
+  </div>
+  <p>
+  <div class="CommentReplyButton">
+    <form action="/Articles/488669/comment" method="post">
+      <input type="submit" value="Reply to this comment">
+    </form>
+  </div>
+  
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="lwn-u-1 pure-u-md-1-6 not-print">
+<div id="azk93271_right_zone"></div>
+</div>
+</div> <!-- pure-grid -->
+
+        <br clear="all">
+        <center>
+        <P>
+        <font size="-2">
+        Copyright &copy; 2009, Eklektix, Inc.<BR>
+        This article may be redistributed under the terms of the
+              <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+              Commons CC BY-SA 4.0</a> license<br>
+        Comments and public postings are copyrighted by their creators.<br>
+        Linux  is a registered trademark of Linus Torvalds<br>
+        </font>
+        </center>
+        
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+            </script>
+            <script type="text/javascript">
+            try {
+            var pageTracker = _gat._getTracker("UA-2039382-1");
+            pageTracker._trackPageview();
+            } catch(err) {}</script>
+            
+        </body></html>
+        

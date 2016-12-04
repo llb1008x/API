@@ -1,0 +1,1215 @@
+ 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Linux电源管理(9)_wakelocks</title>
+<meta name="keywords" content="Linux 嵌入式 ARM RTOS Technology 享受 C语言,Linux,电源管理,wakelock,Android" />
+<meta name="description" content="1. 前言  wakelocks是一个有故事的功能。  wakelocks最初出现在Android为linux kernel打的一个补丁集上，该补丁集实现了一个名称为“wakelo..." />
+<meta name="generator" content="emlog" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.wowotech.net/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.wowotech.net/wlwmanifest.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS"  href="http://www.wowotech.net/rss.php" />
+<link href="http://www.wowotech.net/content/templates/default/main.css" rel="stylesheet" type="text/css" />
+<link href="http://www.wowotech.net/admin/editor/plugins/code/prettify.css" rel="stylesheet" type="text/css" />
+<script src="http://www.wowotech.net/admin/editor/plugins/code/prettify.js" type="text/javascript"></script>
+<script src="http://www.wowotech.net/include/lib/js/common_tpl.js" type="text/javascript"></script>
+<!--[if IE 6]>
+<script src="http://www.wowotech.net/content/templates/default/iefix.js" type="text/javascript"></script>
+<![endif]-->
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <h1><a href="http://www.wowotech.net/">蜗窝科技</a></h1>
+    <h3>慢下来，享受技术。</h3>
+  </div>
+    <div id="banner"><a href="http://www.wowotech.net/"><img src="http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg" height="134" width="960" /></a></div>
+    <div id="nav">	<ul class="bar">
+			<li class="item common">
+			<a href="http://www.wowotech.net/" >博客</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/sort/project" >项目</a>
+			            <ul class="sub-nav">
+                <li><a href="http://www.wowotech.net/sort/x_project">X Project</a></li>			</ul>
+            		</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/forum" target="_blank">讨论区</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/about.html" >关于蜗窝</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/contact_us.html" >联系我们</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/support_us.html" >支持我们</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/admin" >登录</a>
+					</li>
+		</ul>
+</div>﻿<div id="content">
+<div id="contentleft">
+	<h2>Linux电源管理(9)_wakelocks</h2>
+	<p class="date">作者：<a href="http://www.wowotech.net/author/2" title=" runangaozhong@163.com">wowo</a> 发布于：2014-9-14 23:17 
+			分类：<a href="http://www.wowotech.net/sort/pm_subsystem">电源管理子系统</a>
+	 	</p>
+	<h4>1. 前言</h4>  <p>wakelocks是一个有故事的功能。</p>  <p>wakelocks最初出现在Android为linux kernel打的一个补丁集上，该补丁集实现了一个名称为“wakelocks”的系统调用，该系统调用允许调用者阻止系统进入低功耗模式（如idle、suspend等）。同时，该补丁集更改了Linux kernel原生的电源管理执行过程（kernel/power/main.c中的state_show和state_store），转而执行自定义的state_show、state_store。</p>  <p>这种做法是相当不规范的，它是典型的只求实现功能，不择手段。就像国内很多的Linux开发团队，要实现某个功能，都不去弄清楚kernel现有的机制、框架，牛逼哄哄的猛干一番。最后功能是实现了，可都不知道重复造了多少轮子，浪费了多少资源。到此打住，Android的开发者不会这么草率，他们推出wakelocks机制一定有一些苦衷，我们就不评论了。</p>  <p>但是，虽然有苦衷，kernel的开发者可是有原则的，死活不让这种机制合并到kernel分支（换谁也不让啊），直到kernel自身的wakeup events framework成熟后，这种僵局才被打破。因为Android开发者想到了一个坏点子：不让合并就不让合并呗，我用你的机制（wakeup source），再实现一个就是了。至此，全新的wakelocks出现了。</p>  <p>所以wakelocks有两个，早期Android版本的wakelocks几乎已经销声匿迹了，不仔细找还真找不到它的source code（这里有一个链接，但愿读者看到时还有效，<a href="https://www.codeaurora.org/cgit/quic/la/kernel/common/tree/drivers/android/power.c?h=android-2.6.25">drivers/android/power.c</a>）。本文不打算翻那本旧黄历，所以就focus在新的wakelocks上（drivers/power/wakelock.c，较新的kernel都支持）。</p>  <h4>2. Android wakelocks</h4>  <p>虽说不翻旧黄历了，还是要提一下Android wakelocks的功能，这样才能知道kernel wakelocks要做什么。总的来说，Android wakelocks提供的功能包括：</p>  <p>1）一个sysfs文件：/sys/power/wake_lock，用户程序向文件写入一个字符串，即可创建一个wakelock，该字符串就是wakelock的名字。该wakelock可以阻止系统进入低功耗模式。</p>  <p>2）一个sysfs文件：：/sys/power/wake_unlock，用户程序向文件写入相同的字符串，即可注销一个wakelock。</p>  <p>3）当系统中所有的wakelock都注销后，系统可以自动进入低功耗状态。</p>  <p>4）向内核其它driver也提供了wakelock的创建和注销接口，允许driver创建wakelock以阻止睡眠、注销wakelock以允许睡眠。</p>  <p>有关Android wakelocks更为详细的描述，可以参考下面的一个链接：</p>  <p><a title="http://elinux.org/Android_Power_Management" href="http://elinux.org/Android_Power_Management">http://elinux.org/Android_Power_Management</a></p>  <h4>3. Kernel wakelocks</h4>  <h5>3.1 Kernel wakelocks的功能</h5>  <p>对比Android wakelocks要实现的功能，Linux kernel的方案是：</p>  <p>1）允许driver创建wakelock以阻止睡眠、注销wakelock以允许睡眠：已经由“<a href="http://www.wowotech.net/linux_kenrel/wakeup_events_framework.html">Linux电源管理(7)_Wakeup events framework</a>”所描述的wakeup source取代。</p>  <p>2）当系统中所有的wakelock都注销后，系统可以自动进入低功耗状态：由autosleep实现（下一篇文章会分析）。</p>  <p>3）wake_lock和wake_unlock功能：由本文所描述的kernel wakelocks实现，其本质就是将wakeup source开发到用户空间访问。</p>  <h5>3.2 Kernel wakelocks在电源管理中的位置</h5>  <p>相比Android wakelocks，Kernel wakelocks的实现非常简单（简单的才是最好的），就是在PM core中增加一个wakelock模块（kernel/power/wakelock.c），该模块依赖wakeup events framework提供的wakeup source机制，实现用户空间的wakeup source（就是wakelocks），并通过PM core main模块，向用户空间提供两个同名的sysfs文件，wake_lock和wake_unlock。</p>  <p><a href="http://www.wowotech.net/content/uploadfile/201409/ead051b9d07758f3758e7c5f98148dc720140914151722.gif"><img title="kernel wakelocks architecture" style="border-left-width: 0px; border-right-width: 0px; border-bottom-width: 0px; float: none; margin-left: auto; display: block; border-top-width: 0px; margin-right: auto" border="0" alt="kernel wakelocks architecture" src="http://www.wowotech.net/content/uploadfile/201409/af1df09d987a9e72353c8f1dbf90e53b20140914151724.gif" width="640" height="431" /></a> </p>  <h5>3.3 /sys/power/wake_lock & /sys/power/wake_unlock</h5>  <p>从字面意思上，新版的wake_lock和wake_unlock和旧版的一样，都是用于创建和注销wakelock。从应用开发者的角度，确实可以这样理解。但从底层实现的角度，却完全不是一回事。</p>  <p>Android的wakelock，真是一个lock，用户程序创建一个wakelock，就是在系统suspend的路径上加了一把锁，注销就是解开这把锁。直到suspend路径上所有的锁都解开时，系统才可以suspend。</p>  <p>而Kernel的wakelock，是基于wakeup source实现的，因此创建wakelock的本质是在指定的wakeup source上activate一个wakeup event，注销wakelock的本质是deactivate wakeup event。因此，/sys/power/wake_lock和/sys/power/wake_unlock两个sysfs文件的的功能就是：</p>  <p>写wake_lock（以wakelock name和timeout时间<可选>为参数），相当于以wakeup source为参数调用__pm_stay_awake（或者__pm_wakeup_event），即activate wakeup event；</p>  <p>写wake_unlock（以wakelock name为参数），相当于以wakeup source为参数，调用__pm_relax；</p>  <p>读wake_lock，获取系统中所有的处于active状态的wakelock列表（也即wakeup source列表）</p>  <p>读wake_unlock，返回系统中所有的处于非active状态的wakelock信息（也即wakeup source列表）。</p>  <p><font color="#0000ff">注1：上面有关wakeup source的操作接口，可参考“</font><a href="http://www.wowotech.net/linux_kenrel/wakeup_events_framework.html"><font color="#0000ff">Linux电源管理(7)_Wakeup events framework</font></a><font color="#0000ff">”。</font></p>  <p>这两个sysfs文件在kernel/power/main.c中实现，如下：</p>  <div id="codeSnippetWrapper" style="overflow: auto; cursor: text; font-size: 8pt; border-top: silver 1px solid; font-family: &#39;Courier New&#39;, courier, monospace; border-right: silver 1px solid; width: 97.5%; border-bottom: silver 1px solid; padding-bottom: 4px; direction: ltr; text-align: left; padding-top: 4px; padding-left: 4px; margin: 20px 0px 10px; border-left: silver 1px solid; line-height: 12pt; padding-right: 4px; max-height: 200px; background-color: #f4f4f4">   <div id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4">     <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum1" style="color: #606060">   1:</span> <span style="color: #cc6633">#ifdef</span> CONFIG_PM_WAKELOCKS</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum2" style="color: #606060">   2:</span> <span style="color: #0000ff">static</span> ssize_t wake_lock_show(<span style="color: #0000ff">struct</span> kobject *kobj,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum3" style="color: #606060">   3:</span>                               <span style="color: #0000ff">struct</span> kobj_attribute *attr,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum4" style="color: #606060">   4:</span>                               <span style="color: #0000ff">char</span> *buf)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum5" style="color: #606060">   5:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum6" style="color: #606060">   6:</span>         <span style="color: #0000ff">return</span> pm_show_wakelocks(buf, true);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum7" style="color: #606060">   7:</span> }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum8" style="color: #606060">   8:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum9" style="color: #606060">   9:</span> <span style="color: #0000ff">static</span> ssize_t wake_lock_store(<span style="color: #0000ff">struct</span> kobject *kobj,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum10" style="color: #606060">  10:</span>                                <span style="color: #0000ff">struct</span> kobj_attribute *attr,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum11" style="color: #606060">  11:</span>                                <span style="color: #0000ff">const</span> <span style="color: #0000ff">char</span> *buf, size_t n)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum12" style="color: #606060">  12:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum13" style="color: #606060">  13:</span>         <span style="color: #0000ff">int</span> error = pm_wake_lock(buf);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum14" style="color: #606060">  14:</span>         <span style="color: #0000ff">return</span> error ? error : n;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum15" style="color: #606060">  15:</span> }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum16" style="color: #606060">  16:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum17" style="color: #606060">  17:</span> power_attr(wake_lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum18" style="color: #606060">  18:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum19" style="color: #606060">  19:</span> <span style="color: #0000ff">static</span> ssize_t wake_unlock_show(<span style="color: #0000ff">struct</span> kobject *kobj,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum20" style="color: #606060">  20:</span>                                 <span style="color: #0000ff">struct</span> kobj_attribute *attr,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum21" style="color: #606060">  21:</span>                                 <span style="color: #0000ff">char</span> *buf)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum22" style="color: #606060">  22:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum23" style="color: #606060">  23:</span>         <span style="color: #0000ff">return</span> pm_show_wakelocks(buf, false);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum24" style="color: #606060">  24:</span> }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum25" style="color: #606060">  25:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum26" style="color: #606060">  26:</span> <span style="color: #0000ff">static</span> ssize_t wake_unlock_store(<span style="color: #0000ff">struct</span> kobject *kobj,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum27" style="color: #606060">  27:</span>                                  <span style="color: #0000ff">struct</span> kobj_attribute *attr,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum28" style="color: #606060">  28:</span>                                  <span style="color: #0000ff">const</span> <span style="color: #0000ff">char</span> *buf, size_t n)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum29" style="color: #606060">  29:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum30" style="color: #606060">  30:</span>         <span style="color: #0000ff">int</span> error = pm_wake_unlock(buf);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum31" style="color: #606060">  31:</span>         <span style="color: #0000ff">return</span> error ? error : n;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum32" style="color: #606060">  32:</span> }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum33" style="color: #606060">  33:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum34" style="color: #606060">  34:</span> power_attr(wake_unlock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum35" style="color: #606060">  35:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum36" style="color: #606060">  36:</span> <span style="color: #cc6633">#endif</span> <span style="color: #008000">/* CONFIG_PM_WAKELOCKS */</span></pre>
+<!--CRLF--></div>
+</div>
+
+<blockquote>
+  <p>1）wakelocks功能不是linux kernel的必选功能，可以通过CONFIG_PM_WAKELOCKS开关。</p>
+
+  <p>2）wake_lock的写接口，直接调用pm_wake_lock；wake_unlock的写接口，直接调用pm_wake_unlock；它们的读接口，直接调用pm_show_wakelocks接口（参数不同）。这三个接口均在kernel/power/wakelock.c中实现。</p>
+</blockquote>
+
+<h5>3.4 pm_wake_lock</h5>
+
+<p>pm_wake_lock位于kernel\power\wakelock.c中，用于上报一个wakeup event（从另一个角度，就是阻止系统suspend），代码如下：</p>
+
+<div id="codeSnippetWrapper" style="overflow: auto; cursor: text; font-size: 8pt; border-top: silver 1px solid; font-family: &#39;Courier New&#39;, courier, monospace; border-right: silver 1px solid; width: 97.5%; border-bottom: silver 1px solid; padding-bottom: 4px; direction: ltr; text-align: left; padding-top: 4px; padding-left: 4px; margin: 20px 0px 10px; border-left: silver 1px solid; line-height: 12pt; padding-right: 4px; max-height: 200px; background-color: #f4f4f4">
+  <div id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4">
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum1" style="color: #606060">   1:</span> <span style="color: #0000ff">int</span> pm_wake_lock(<span style="color: #0000ff">const</span> <span style="color: #0000ff">char</span> *buf)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum2" style="color: #606060">   2:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum3" style="color: #606060">   3:</span>         <span style="color: #0000ff">const</span> <span style="color: #0000ff">char</span> *str = buf;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum4" style="color: #606060">   4:</span>         <span style="color: #0000ff">struct</span> wakelock *wl;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum5" style="color: #606060">   5:</span>         u64 timeout_ns = 0;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum6" style="color: #606060">   6:</span>         size_t len;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum7" style="color: #606060">   7:</span>         <span style="color: #0000ff">int</span> ret = 0;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum8" style="color: #606060">   8:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum9" style="color: #606060">   9:</span>         <span style="color: #0000ff">if</span> (!capable(CAP_BLOCK_SUSPEND))</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum10" style="color: #606060">  10:</span>                 <span style="color: #0000ff">return</span> -EPERM;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum11" style="color: #606060">  11:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum12" style="color: #606060">  12:</span>         <span style="color: #0000ff">while</span> (*str && !isspace(*str))</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum13" style="color: #606060">  13:</span>                 str++;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum14" style="color: #606060">  14:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum15" style="color: #606060">  15:</span>         len = str - buf;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum16" style="color: #606060">  16:</span>         <span style="color: #0000ff">if</span> (!len)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum17" style="color: #606060">  17:</span>                 <span style="color: #0000ff">return</span> -EINVAL;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum18" style="color: #606060">  18:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum19" style="color: #606060">  19:</span>         <span style="color: #0000ff">if</span> (*str && *str != <span style="color: #006080">'\n'</span>) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum20" style="color: #606060">  20:</span>                 <span style="color: #008000">/* Find out if there's a valid timeout string appended. */</span></pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum21" style="color: #606060">  21:</span>                 ret = kstrtou64(skip_spaces(str), 10, &timeout_ns);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum22" style="color: #606060">  22:</span>                 <span style="color: #0000ff">if</span> (ret)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum23" style="color: #606060">  23:</span>                         <span style="color: #0000ff">return</span> -EINVAL;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum24" style="color: #606060">  24:</span>         }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum25" style="color: #606060">  25:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum26" style="color: #606060">  26:</span>         mutex_lock(&wakelocks_lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum27" style="color: #606060">  27:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum28" style="color: #606060">  28:</span>         wl = wakelock_lookup_add(buf, len, true);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum29" style="color: #606060">  29:</span>         <span style="color: #0000ff">if</span> (IS_ERR(wl)) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum30" style="color: #606060">  30:</span>                 ret = PTR_ERR(wl);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum31" style="color: #606060">  31:</span>                 <span style="color: #0000ff">goto</span> out;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum32" style="color: #606060">  32:</span>         }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum33" style="color: #606060">  33:</span>         <span style="color: #0000ff">if</span> (timeout_ns) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum34" style="color: #606060">  34:</span>                 u64 timeout_ms = timeout_ns + NSEC_PER_MSEC - 1;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum35" style="color: #606060">  35:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum36" style="color: #606060">  36:</span>                 do_div(timeout_ms, NSEC_PER_MSEC);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum37" style="color: #606060">  37:</span>                 __pm_wakeup_event(&wl->ws, timeout_ms);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum38" style="color: #606060">  38:</span>         } <span style="color: #0000ff">else</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum39" style="color: #606060">  39:</span>                 __pm_stay_awake(&wl->ws);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum40" style="color: #606060">  40:</span>         }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum41" style="color: #606060">  41:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum42" style="color: #606060">  42:</span>         wakelocks_lru_most_recent(wl);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum43" style="color: #606060">  43:</span> out:</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum44" style="color: #606060">  44:</span>        mutex_unlock(&wakelocks_lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum45" style="color: #606060">  45:</span>        <span style="color: #0000ff">return</span> ret;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum46" style="color: #606060">  46:</span> }</pre>
+<!--CRLF--></div>
+</div>
+
+<blockquote>
+  <p>a）输入参数为一个字符串，如"wake_lock_test 1000”，该字符串指定上报wakeup event的wakelock name，可以在name后用空格隔开，添加一个时间值（单位为ns），表示该event的timeout值。</p>
+
+  <p>b）调用capable，检查当前进程是否具备阻止系统suspend的权限。 
+    <br /><font color="#0000ff">注2：capable是Linux security子系统提供的一个接口，用于权限判断。我们说过，power是系统的核心资源，理应由OS全权管理，但wakelock违反了这一原则，将阻止系统睡眠的权利给了用户空间。这样一来，用户空间程序将可以随心所欲的占用power资源，特别是用户态的程序员，天生对资源占用不敏感（这是对的），就导致该接口有被滥用的风险。不过还好，通过系统的权限管理机制，可以改善这种状态（其实不是改善，而是矛盾转移，很有可能把最终的裁决权交给用户，太糟糕了！）。</font></p>
+
+  <p>c）解析字符串，将timeout值（有的话）保存在timeout_ns中，解析name长度（len），并将name保存在原来的buf中。</p>
+
+  <p>d）调用wakelock_lookup_add接口，查找是否有相同name的wakelock。如果有，直接返回wakelock的指针；如果没有，分配一个wakelock，同时调用wakeup events framework提供的接口，创建该wakelock对应的wakeup source结构。</p>
+
+  <p>e）如果指定timeout值，以wakelock的wakeup source指针为参数，调用__pm_wakeup_event接口，上报一个具有时限的wakeup events；否则，调用__pm_stay_awake，上报一个没有时限的wakeup event。有关这两个接口的详细说明，可参考“<a href="http://www.wowotech.net/linux_kenrel/wakeup_events_framework.html">Linux电源管理(7)_Wakeup events framework</a>”。 
+
+    <br /></p>
+</blockquote>
+
+<p>wakelock_lookup_add是内部接口，代码如下：</p>
+
+<div id="codeSnippetWrapper" style="overflow: auto; cursor: text; font-size: 8pt; border-top: silver 1px solid; font-family: &#39;Courier New&#39;, courier, monospace; border-right: silver 1px solid; width: 97.5%; border-bottom: silver 1px solid; padding-bottom: 4px; direction: ltr; text-align: left; padding-top: 4px; padding-left: 4px; margin: 20px 0px 10px; border-left: silver 1px solid; line-height: 12pt; padding-right: 4px; max-height: 200px; background-color: #f4f4f4">
+  <div id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4">
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum1" style="color: #606060">   1:</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">struct</span> wakelock *wakelock_lookup_add(<span style="color: #0000ff">const</span> <span style="color: #0000ff">char</span> *name, size_t len,</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum2" style="color: #606060">   2:</span>                                             <span style="color: #0000ff">bool</span> add_if_not_found)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum3" style="color: #606060">   3:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum4" style="color: #606060">   4:</span>         <span style="color: #0000ff">struct</span> rb_node **node = &wakelocks_tree.rb_node;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum5" style="color: #606060">   5:</span>         <span style="color: #0000ff">struct</span> rb_node *parent = *node;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum6" style="color: #606060">   6:</span>         <span style="color: #0000ff">struct</span> wakelock *wl;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum7" style="color: #606060">   7:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum8" style="color: #606060">   8:</span>         <span style="color: #0000ff">while</span> (*node) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum9" style="color: #606060">   9:</span>                 <span style="color: #0000ff">int</span> diff;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum10" style="color: #606060">  10:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum11" style="color: #606060">  11:</span>                 parent = *node;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum12" style="color: #606060">  12:</span>                 wl = rb_entry(*node, <span style="color: #0000ff">struct</span> wakelock, node);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum13" style="color: #606060">  13:</span>                 diff = strncmp(name, wl->name, len);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum14" style="color: #606060">  14:</span>                 <span style="color: #0000ff">if</span> (diff == 0) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum15" style="color: #606060">  15:</span>                         <span style="color: #0000ff">if</span> (wl->name[len])</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum16" style="color: #606060">  16:</span>                                 diff = -1;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum17" style="color: #606060">  17:</span>                         <span style="color: #0000ff">else</span></pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum18" style="color: #606060">  18:</span>                                 <span style="color: #0000ff">return</span> wl;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum19" style="color: #606060">  19:</span>                 }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum20" style="color: #606060">  20:</span>                 <span style="color: #0000ff">if</span> (diff < 0)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum21" style="color: #606060">  21:</span>                         node = &(*node)->rb_left;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum22" style="color: #606060">  22:</span>                 <span style="color: #0000ff">else</span></pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum23" style="color: #606060">  23:</span>                         node = &(*node)->rb_right;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum24" style="color: #606060">  24:</span>         }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum25" style="color: #606060">  25:</span>         <span style="color: #0000ff">if</span> (!add_if_not_found)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum26" style="color: #606060">  26:</span>                 <span style="color: #0000ff">return</span> ERR_PTR(-EINVAL);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum27" style="color: #606060">  27:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum28" style="color: #606060">  28:</span>         <span style="color: #0000ff">if</span> (wakelocks_limit_exceeded())</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum29" style="color: #606060">  29:</span>                 <span style="color: #0000ff">return</span> ERR_PTR(-ENOSPC);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum30" style="color: #606060">  30:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum31" style="color: #606060">  31:</span>         <span style="color: #008000">/* Not found, we have to add a new one. */</span></pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum32" style="color: #606060">  32:</span>         wl = kzalloc(<span style="color: #0000ff">sizeof</span>(*wl), GFP_KERNEL);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum33" style="color: #606060">  33:</span>         <span style="color: #0000ff">if</span> (!wl)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum34" style="color: #606060">  34:</span>                 <span style="color: #0000ff">return</span> ERR_PTR(-ENOMEM);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum35" style="color: #606060">  35:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum36" style="color: #606060">  36:</span>         wl->name = kstrndup(name, len, GFP_KERNEL);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum37" style="color: #606060">  37:</span>         <span style="color: #0000ff">if</span> (!wl->name) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum38" style="color: #606060">  38:</span>                 kfree(wl);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum39" style="color: #606060">  39:</span>                 <span style="color: #0000ff">return</span> ERR_PTR(-ENOMEM);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum40" style="color: #606060">  40:</span>         }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum41" style="color: #606060">  41:</span>         wl->ws.name = wl->name;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum42" style="color: #606060">  42:</span>         wakeup_source_add(&wl->ws);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum43" style="color: #606060">  43:</span>         rb_link_node(&wl->node, parent, node);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum44" style="color: #606060">  44:</span>         rb_insert_color(&wl->node, &wakelocks_tree);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum45" style="color: #606060">  45:</span>         wakelocks_lru_add(wl);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum46" style="color: #606060">  46:</span>         increment_wakelocks_number();</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum47" style="color: #606060">  47:</span>         <span style="color: #0000ff">return</span> wl;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum48" style="color: #606060">  48:</span> }</pre>
+<!--CRLF--></div>
+</div>
+
+<blockquote>
+  <p>在wakelock.c中，维护一个名称为wakelocks_tree的红黑树（红黑树都用上了，可以想象wakelocks曾经使用多么频繁！），所有的wakelock都保存在该tree上。因此该接口的动作是：</p>
+
+  <p>a）查找红黑树，如果找到name相同的wakelock，返回wakelock指针。</p>
+
+  <p>b）如果没找到，且add_if_not_found为false，返回错误。</p>
+
+  <p>c）如果add_if_not_found为true，分配一个struct wakelock变量，并初始化它的名称、它的wakeup source的名称。调用wakeup_source_add接口，将wakeup source添加到wakeup events framework中。</p>
+
+  <p>d）将该wakelock添加到红黑树。</p>
+
+  <p>e）最后调用wakelocks_lru_add接口，将新分配的wakeup添加到一个名称为wakelocks_lru_list的链表前端（该功能和wakelock的垃圾回收机制有关，后面会单独描述）。</p>
+</blockquote>
+
+<p>再看一下struct wakelock结构：</p>
+
+<div id="codeSnippetWrapper" style="overflow: auto; cursor: text; font-size: 8pt; border-top: silver 1px solid; font-family: &#39;Courier New&#39;, courier, monospace; border-right: silver 1px solid; width: 97.5%; border-bottom: silver 1px solid; padding-bottom: 4px; direction: ltr; text-align: left; padding-top: 4px; padding-left: 4px; margin: 20px 0px 10px; border-left: silver 1px solid; line-height: 12pt; padding-right: 4px; max-height: 200px; background-color: #f4f4f4">
+  <div id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4">
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum1" style="color: #606060">   1:</span> <span style="color: #0000ff">struct</span> wakelock {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum2" style="color: #606060">   2:</span>         <span style="color: #0000ff">char</span>                    *name;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum3" style="color: #606060">   3:</span>         <span style="color: #0000ff">struct</span> rb_node          node;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum4" style="color: #606060">   4:</span>         <span style="color: #0000ff">struct</span> wakeup_source    ws;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum5" style="color: #606060">   5:</span> <span style="color: #cc6633">#ifdef</span> CONFIG_PM_WAKELOCKS_GC</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum6" style="color: #606060">   6:</span>         <span style="color: #0000ff">struct</span> list_head        lru;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum7" style="color: #606060">   7:</span> <span style="color: #cc6633">#endif</span></pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum8" style="color: #606060">   8:</span> };</pre>
+<!--CRLF--></div>
+</div>
+
+<p>非常简单：一个name指针，保存wakelock的名称；一个rb node节点，用于组成红黑树；一个wakeup source变量；如果开启了wakelocks垃圾回收功能，一个用于GC的list head。</p>
+
+<h5>3.5 pm_wake_unlock</h5>
+
+<p>pm_wake_unlock和pm_wake_lock类似，如下：</p>
+
+<div id="codeSnippetWrapper" style="overflow: auto; cursor: text; font-size: 8pt; border-top: silver 1px solid; font-family: &#39;Courier New&#39;, courier, monospace; border-right: silver 1px solid; width: 97.5%; border-bottom: silver 1px solid; padding-bottom: 4px; direction: ltr; text-align: left; padding-top: 4px; padding-left: 4px; margin: 20px 0px 10px; border-left: silver 1px solid; line-height: 12pt; padding-right: 4px; max-height: 200px; background-color: #f4f4f4">
+  <div id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4">
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum1" style="color: #606060">   1:</span> <span style="color: #0000ff">int</span> pm_wake_unlock(<span style="color: #0000ff">const</span> <span style="color: #0000ff">char</span> *buf)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum2" style="color: #606060">   2:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum3" style="color: #606060">   3:</span>         <span style="color: #0000ff">struct</span> wakelock *wl;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum4" style="color: #606060">   4:</span>         size_t len;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum5" style="color: #606060">   5:</span>         <span style="color: #0000ff">int</span> ret = 0;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum6" style="color: #606060">   6:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum7" style="color: #606060">   7:</span>         <span style="color: #0000ff">if</span> (!capable(CAP_BLOCK_SUSPEND))</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum8" style="color: #606060">   8:</span>                 <span style="color: #0000ff">return</span> -EPERM;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum9" style="color: #606060">   9:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum10" style="color: #606060">  10:</span>         len = strlen(buf);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum11" style="color: #606060">  11:</span>         <span style="color: #0000ff">if</span> (!len)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum12" style="color: #606060">  12:</span>                 <span style="color: #0000ff">return</span> -EINVAL;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum13" style="color: #606060">  13:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum14" style="color: #606060">  14:</span>         <span style="color: #0000ff">if</span> (buf[len-1] == <span style="color: #006080">'\n'</span>)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum15" style="color: #606060">  15:</span>                 len--;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum16" style="color: #606060">  16:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum17" style="color: #606060">  17:</span>         <span style="color: #0000ff">if</span> (!len)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum18" style="color: #606060">  18:</span>                 <span style="color: #0000ff">return</span> -EINVAL;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum19" style="color: #606060">  19:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum20" style="color: #606060">  20:</span>         mutex_lock(&wakelocks_lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum21" style="color: #606060">  21:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum22" style="color: #606060">  22:</span>         wl = wakelock_lookup_add(buf, len, false);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum23" style="color: #606060">  23:</span>         <span style="color: #0000ff">if</span> (IS_ERR(wl)) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum24" style="color: #606060">  24:</span>                 ret = PTR_ERR(wl);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum25" style="color: #606060">  25:</span>                 <span style="color: #0000ff">goto</span> out;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum26" style="color: #606060">  26:</span>         }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum27" style="color: #606060">  27:</span>         __pm_relax(&wl->ws);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum28" style="color: #606060">  28:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum29" style="color: #606060">  29:</span>         wakelocks_lru_most_recent(wl);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum30" style="color: #606060">  30:</span>         wakelocks_gc();</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum31" style="color: #606060">  31:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum32" style="color: #606060">  32:</span>  out:</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum33" style="color: #606060">  33:</span>         mutex_unlock(&wakelocks_lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum34" style="color: #606060">  34:</span>         <span style="color: #0000ff">return</span> ret;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum35" style="color: #606060">  35:</span> }</pre>
+<!--CRLF--></div>
+</div>
+
+<blockquote>
+  <p>a）输入参数为一个字符串，如"wake_lock_test”，该字符串指定一个wakelock name。</p>
+
+  <p>b）调用capable，检查当前进程是否具备阻止系统suspend的权限。</p>
+
+  <p>c）解析字符串</p>
+
+  <p>d）调用wakelock_lookup_add接口，查找是否有相同name的wakelock。如果有，直接返回wakelock的指针；如果没有，退出。</p>
+
+  <p>e）调用__pm_relax接口，deactive wakelock对应的wakeup source。</p>
+
+  <p>f）调用wakelocks_lru_most_recent接口，将盖wakelock移到wakelocks_lru_list链表的前端（表示它是最近一个被访问到的，和GC有关，后面重点描述）。</p>
+
+  <p>g）调用wakelocks_gc，执行wakelock的垃圾回收动作。</p>
+</blockquote>
+
+<h5>3.6 pm_show_wakelocks</h5>
+
+<p>该接口很简单，查询红黑树，返回处于acvtive或者deactive状态的wakelock，如下：</p>
+
+<div id="codeSnippetWrapper" style="overflow: auto; cursor: text; font-size: 8pt; border-top: silver 1px solid; font-family: &#39;Courier New&#39;, courier, monospace; border-right: silver 1px solid; width: 97.5%; border-bottom: silver 1px solid; padding-bottom: 4px; direction: ltr; text-align: left; padding-top: 4px; padding-left: 4px; margin: 20px 0px 10px; border-left: silver 1px solid; line-height: 12pt; padding-right: 4px; max-height: 200px; background-color: #f4f4f4">
+  <div id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4">
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum1" style="color: #606060">   1:</span> ssize_t pm_show_wakelocks(<span style="color: #0000ff">char</span> *buf, <span style="color: #0000ff">bool</span> show_active)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum2" style="color: #606060">   2:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum3" style="color: #606060">   3:</span>         <span style="color: #0000ff">struct</span> rb_node *node;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum4" style="color: #606060">   4:</span>         <span style="color: #0000ff">struct</span> wakelock *wl;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum5" style="color: #606060">   5:</span>         <span style="color: #0000ff">char</span> *str = buf;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum6" style="color: #606060">   6:</span>         <span style="color: #0000ff">char</span> *end = buf + PAGE_SIZE;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum7" style="color: #606060">   7:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum8" style="color: #606060">   8:</span>         mutex_lock(&wakelocks_lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum9" style="color: #606060">   9:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum10" style="color: #606060">  10:</span>         <span style="color: #0000ff">for</span> (node = rb_first(&wakelocks_tree); node; node = rb_next(node)) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum11" style="color: #606060">  11:</span>                 wl = rb_entry(node, <span style="color: #0000ff">struct</span> wakelock, node);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum12" style="color: #606060">  12:</span>                 <span style="color: #0000ff">if</span> (wl->ws.active == show_active)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum13" style="color: #606060">  13:</span>                         str += scnprintf(str, end - str, <span style="color: #006080">"%s "</span>, wl->name);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum14" style="color: #606060">  14:</span>         }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum15" style="color: #606060">  15:</span>         <span style="color: #0000ff">if</span> (str > buf)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum16" style="color: #606060">  16:</span>                 str--;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum17" style="color: #606060">  17:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum18" style="color: #606060">  18:</span>         str += scnprintf(str, end - str, <span style="color: #006080">"\n"</span>);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum19" style="color: #606060">  19:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum20" style="color: #606060">  20:</span>         mutex_unlock(&wakelocks_lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum21" style="color: #606060">  21:</span>         <span style="color: #0000ff">return</span> (str - buf);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum22" style="color: #606060">  22:</span> }</pre>
+<!--CRLF--></div>
+</div>
+
+<blockquote>
+  <p>1）遍历红黑树，拿到wakelock指针，判断其中的wakeup source的active变量，如果和输入变量（show_active)相符，将该wakelock的名字添加在buf中。</p>
+
+  <p>2）调整buf的长度和结束符，返回长度值。</p>
+</blockquote>
+
+<h5>3.7 wakelocks的垃圾回收机制</h5>
+
+<p>由上面的逻辑可知，一个wakelock的生命周期，应只存在于wakeup event的avtive时期内，因此如果它的wakeup source状态为deactive，应该销毁该wakelock。但销毁后，如果又产生wakeup events，就得重新建立。如果这种建立->销毁->建立的过程太频繁，效率就会降低。</p>
+
+<p>因此，最好不销毁，保留系统所有的wakelocks（同时可以完整的保留wakelock信息），但如果wakelocks太多（特别是不活动的），将会占用很多内存，也不合理。</p>
+
+<p>折衷方案，保留一些非active状态的wakelock，到一定的时机时，再销毁，这就是wakelocks的垃圾回收（GC）机制。</p>
+
+<p>wakelocks GC功能可以开关（由CONFIG_PM_WAKELOCKS_GC控制），如果关闭，系统会保留所有的wakelocks，如果打开，它的处理逻辑也很简单：</p>
+
+<p>1）定义一个list head，保存所有的wakelock指针，如下：</p>
+
+<div id="codeSnippetWrapper" style="overflow: auto; cursor: text; font-size: 8pt; border-top: silver 1px solid; font-family: &#39;Courier New&#39;, courier, monospace; border-right: silver 1px solid; width: 97.5%; border-bottom: silver 1px solid; padding-bottom: 4px; direction: ltr; text-align: left; padding-top: 4px; padding-left: 4px; margin: 20px 0px 10px; border-left: silver 1px solid; line-height: 12pt; padding-right: 4px; max-height: 200px; background-color: #f4f4f4">
+  <div id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4">
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum1" style="color: #606060">   1:</span> <span style="color: #0000ff">static</span> LIST_HEAD(wakelocks_lru_list);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum2" style="color: #606060">   2:</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">unsigned</span> <span style="color: #0000ff">int</span> wakelocks_gc_count;</pre>
+<!--CRLF--></div>
+</div>
+
+<p>&#160;</p>
+
+<p>2）在wakelock结构中，嵌入一个list head（lru），用于挂入wakelocks_lru_list。可参考3.4小节的描述。</p>
+
+<p>3）wakelocks_lru_list中的wakelock是按访问顺序排列的，最近访问的，靠近head位置。这是由3种操作保证的：</p>
+
+<blockquote>
+  <p>a）wakelock创建时（见3.4小节），调用wakelocks_lru_add接口，将改wakelock挂到wakelocks_lru_list的head处（利用list_add接口），表示它是最近被访问的。</p>
+
+  <p>b）pm_wake_lock或者pm_wake_unlock时，调用wakelocks_lru_most_recent接口，将该wakelcok移到链表的head处，表示最近访问。</p>
+
+  <p>c）每当pm_wake_unlock时，调用wakelocks_gc，执行wakelock的垃圾回收动作。wakelocks_gc的实现如下：</p>
+</blockquote>
+
+<div id="codeSnippetWrapper" style="overflow: auto; cursor: text; font-size: 8pt; border-top: silver 1px solid; font-family: &#39;Courier New&#39;, courier, monospace; border-right: silver 1px solid; width: 97.5%; border-bottom: silver 1px solid; padding-bottom: 4px; direction: ltr; text-align: left; padding-top: 4px; padding-left: 4px; margin: 20px 0px 10px; border-left: silver 1px solid; line-height: 12pt; padding-right: 4px; max-height: 200px; background-color: #f4f4f4">
+  <div id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4">
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum1" style="color: #606060">   1:</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span> wakelocks_gc(<span style="color: #0000ff">void</span>)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum2" style="color: #606060">   2:</span> {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum3" style="color: #606060">   3:</span>         <span style="color: #0000ff">struct</span> wakelock *wl, *aux;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum4" style="color: #606060">   4:</span>         ktime_t now;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum5" style="color: #606060">   5:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum6" style="color: #606060">   6:</span>         <span style="color: #0000ff">if</span> (++wakelocks_gc_count <= WL_GC_COUNT_MAX)</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum7" style="color: #606060">   7:</span>                 <span style="color: #0000ff">return</span>;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum8" style="color: #606060">   8:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum9" style="color: #606060">   9:</span>         now = ktime_get();</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum10" style="color: #606060">  10:</span>         list_for_each_entry_safe_reverse(wl, aux, &wakelocks_lru_list, lru) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum11" style="color: #606060">  11:</span>                 u64 idle_time_ns;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum12" style="color: #606060">  12:</span>                 <span style="color: #0000ff">bool</span> active;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum13" style="color: #606060">  13:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum14" style="color: #606060">  14:</span>                 spin_lock_irq(&wl->ws.lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum15" style="color: #606060">  15:</span>                 idle_time_ns = ktime_to_ns(ktime_sub(now, wl->ws.last_time));</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum16" style="color: #606060">  16:</span>                 active = wl->ws.active;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum17" style="color: #606060">  17:</span>                 spin_unlock_irq(&wl->ws.lock);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum18" style="color: #606060">  18:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum19" style="color: #606060">  19:</span>                 <span style="color: #0000ff">if</span> (idle_time_ns < ((u64)WL_GC_TIME_SEC * NSEC_PER_SEC))</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum20" style="color: #606060">  20:</span>                         <span style="color: #0000ff">break</span>;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum21" style="color: #606060">  21:</span>&#160; </pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum22" style="color: #606060">  22:</span>                 <span style="color: #0000ff">if</span> (!active) {</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum23" style="color: #606060">  23:</span>                         wakeup_source_remove(&wl->ws);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum24" style="color: #606060">  24:</span>                         rb_erase(&wl->node, &wakelocks_tree);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum25" style="color: #606060">  25:</span>                         list_del(&wl->lru);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum26" style="color: #606060">  26:</span>                         kfree(wl->name);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum27" style="color: #606060">  27:</span>                         kfree(wl);</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum28" style="color: #606060">  28:</span>                         decrement_wakelocks_number();</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum29" style="color: #606060">  29:</span>                 }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum30" style="color: #606060">  30:</span>         }</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: white"><span id="lnum31" style="color: #606060">  31:</span>         wakelocks_gc_count = 0;</pre>
+<!--CRLF-->
+
+    <pre style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &#39;Courier New&#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"><span id="lnum32" style="color: #606060">  32:</span> }</pre>
+<!--CRLF--></div>
+</div>
+
+<blockquote>
+  <p>1）如果当前wakelocks的数目小于最大值（由WL_GC_COUNT_MAX配置，当前代码为100），不回收，直接返回。</p>
+
+  <p>2）否则，从wakelocks_lru_most_recent的尾部（最不活跃的），依次取出wakelock，判断它的idle时间（通过wakeup source lst_time和当前时间计算）是否超出预设值（由WL_GC_TIME_SEC指定，当前为300s，好长），如果超出且处于deactive状态，调用wakeup_source_remove，注销wakeup source，同时把它从红黑树、GC list中去掉，并释放memory资源。</p>
+</blockquote>
+
+<p>&#160;</p>
+
+<p><em>原创文章，转发请注明出处。蜗窝科技，<a href="http://www.wowotech.net/linux_kenrel/wakelocks.html">www.wowotech.net</a>。</em></p>	<p class="tag">标签:	<a href="http://www.wowotech.net/tag/Linux">Linux</a>	<a href="http://www.wowotech.net/tag/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86">电源管理</a>	<a href="http://www.wowotech.net/tag/wakelock">wakelock</a>	<a href="http://www.wowotech.net/tag/Android">Android</a></p>
+		<a href="http://www.wowotech.net/support_us.html" style="display:block;text-align:center;">
+		<img src="http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png" align="middle" width="86" height="40"/>
+	</a>
+	<div class="nextlog">		&laquo; <a href="http://www.wowotech.net/pm_subsystem/autosleep.html">Linux电源管理(10)_autosleep</a>
+				|
+				 <a href="http://www.wowotech.net/pm_subsystem/wakeup_count.html">Linux电源管理(8)_Wakeup count功能</a>&raquo;
+	</div>
+		<a name="comments"></a>
+	<p class="comment-header"><b>评论：</b></p>
+			<div class="comment" id="comment-3914">
+		<a name="3914"></a>
+				<div class="comment-info">
+			<b>le </b><br /><span class="comment-time">2016-05-11 15:55</span>
+			<div class="comment-content">请教一下，/sys/power/wake_unlock中有很多节点，但是wake_lock是空的，这是什么意思呀？<br /> # cat wake_unlock<br />HVDCPD_WL KeyEvents PowerManagerService.Broadcasts PowerManagerService.Display PowerManagerService.WakeLocks qcril qcril_pre_client_init radio-interface rmt_storage_548401050688 sensor_ind tftp_server_wakelock</div>
+			<div class="comment-reply"><a href="#comment-3914" onclick="commentReply(3914,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-3915">
+		<a name="3915"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2016-05-11 16:12</span>
+			<div class="comment-content">@le：意思是这些lock都是处于unlock状态。<br />wake_unlock中看到的是unlock状态的东西，wake_lock中看到的是lock状态的东西。</div>
+			<div class="comment-reply"><a href="#comment-3915" onclick="commentReply(3915,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-3917">
+		<a name="3917"></a>
+				<div class="comment-info">
+			<b>le </b><br /><span class="comment-time">2016-05-11 16:35</span>
+			<div class="comment-content">@wowo：unlock是怎么添加的？<br />比如：<br /># echo test &gt; wake_unlock<br /># cat wake_unlock<br />HVDCPD_WL KeyEvents PowerManagerService.Broadcasts PowerManagerService.Display PowerManagerService.WakeLocks qcril qcril_pre_client_init radio-interface rmt_storage_548401050688 rmt_storage_548408828992 sensor_ind tftp_server_wakelock<br /><br />里边没有test</div>
+			<div class="comment-reply"><a href="#comment-3917" onclick="commentReply(3917,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-3918">
+		<a name="3918"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2016-05-11 16:49</span>
+			<div class="comment-content">@le：要先lock，才能unlock。</div>
+			<div class="comment-reply"><a href="#comment-3918" onclick="commentReply(3918,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		</div>
+		</div>
+		<div class="comment" id="comment-2906">
+		<a name="2906"></a>
+				<div class="comment-info">
+			<b>稻草人 </b><br /><span class="comment-time">2015-10-30 20:07</span>
+			<div class="comment-content">hi, wowo,<br />关于android acquire wakelock有一点不明白的地方，就是framework层在申请acquire wakelock的时候在最后逐层的调用到JNI层的时候我看到他往kernel申请的wakelock只有一种PARTIAL_WAKE_LOCK类型：<br />static void nativeAcquireSuspendBlocker(JNIEnv *env, jclass clazz, jstring nameStr) {<br />&nbsp;&nbsp;&nbsp;&nbsp;ScopedUtfChars name(env, nameStr);<br />&nbsp;&nbsp;&nbsp;&nbsp;acquire_wake_lock(PARTIAL_WAKE_LOCK, name.c_str());<br />}<br />百思不得其解，因为我看到framework层有申请其他类型的wakelock的（比如FULL_WAKE_LOCK），为什么一层层的调用下来最后就变成了只申请PARTIAL_WAKE_LOCK了，麻烦帮忙解惑呀！<br />Ps:上面是android JNI层的一个函数，他调用的acquire_wake_lock是HAL层的一个函数：<br />acquire_wake_lock(int lock, const char* id)<br />{<br />&nbsp;&nbsp;&nbsp;&nbsp;initialize_fds();<br /><br />//&nbsp;&nbsp;&nbsp;&nbsp;ALOGI(&quot;acquire_wake_lock lock=%d id=&#039;%s&#039;\n&quot;, lock, id);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;if (g_error) return -g_error;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;int fd;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;if (lock == PARTIAL_WAKE_LOCK) {<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fd = g_fds[ACQUIRE_PARTIAL_WAKE_LOCK];<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;else {<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return -EINVAL;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;return write(fd, id, strlen(id));<br />}<br />这个函数最后write的文件节点就是这篇文章开始说的/sys/power/wake_lock节点，写完之后就调用了 wake_lock_store函数，往这篇文章所写的往下面走了。<br />想问的就是为什么上层下来的wakelock只能申请PARTIAL_WAKE_LOCK类型的partial wake。</div>
+			<div class="comment-reply"><a href="#comment-2906" onclick="commentReply(2906,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-2909">
+		<a name="2909"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-10-30 21:42</span>
+			<div class="comment-content">@稻草人：我没有读过Android的这段代码，猜测如下：<br />这里的代码应该是Android为了兼容几种不同Wakelock机制的实现，就像本文开头所说的那样。<br />g_fds数组应该保存了这几种机制所对应的不同的文件句柄，当然，现在最正宗的wakelock机制，就对应了[ACQUIRE_PARTIAL_WAKE_LOCK]，也即“/sys/power/wake_lock”。<br />你可以看看数组中的其它fd对应什么。<br />至于jni中为什么只使用了ACQUIRE_PARTIAL_WAKE_LOCK，估计得问问作者了，也许是不想再节外生枝，尽量往linux原生上靠拢吧。</div>
+			<div class="comment-reply"><a href="#comment-2909" onclick="commentReply(2909,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2983">
+		<a name="2983"></a>
+				<div class="comment-info">
+			<b>稻草人 </b><br /><span class="comment-time">2015-11-02 10:00</span>
+			<div class="comment-content">@wowo：@wowo:<br />在HAL层g_fds数组中还有一个RELEASE_WAKE_LOCK成员这个对应的是“/sys/power/wake_unlock“。<br />device在屏幕点亮唤醒的时候申请的应该是full wakelock，而且是上往下来申请的，所以很纳闷，为啥到下面就变成partial wakelock了，今天再加log看看~</div>
+			<div class="comment-reply"><a href="#comment-2983" onclick="commentReply(2983,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		</div>
+		<div class="comment" id="comment-2787">
+		<a name="2787"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">dumb</a> </b><br /><span class="comment-time">2015-10-17 11:08</span>
+			<div class="comment-content">Hi @wowo<br /><br />对于wake_lock有点没太明白,就是它如何阻止系统休眠呢?<br /><br />从你之前的文章和代码中看好像只有在pm_wakeup_pending()中检查是否有wake source event正在处理(或者save_count和当你是的count不等用来做同步),有的话休眠就不进行下去; 但是该函数中有一个events_check_enabled变量控制, 该变量只有在wake_count的store接口中才会被设置为true, 也就是说没有wake_count的操作,这个变量为false, 那平时wake_lock是如何组织系统休眠的?<br /><br />Thanks.</div>
+			<div class="comment-reply"><a href="#comment-2787" onclick="commentReply(2787,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-2788">
+		<a name="2788"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-10-17 19:11</span>
+			<div class="comment-content">@dumb：wake_lock必须在wake_count的配合下，才有作用。<br />pm_wakeup_pending中，如果events_check_enabled为false，该接口会直接返回false，也即无论如何，系统都会休眠，此时wake_lock就没有意义了。<br />你可以自己做个试验，随便写一个什么值到/sys/power/wake_lock，然后“echo mem &gt; /sys/power/state”，看看系统会不会直接睡下去。</div>
+			<div class="comment-reply"><a href="#comment-2788" onclick="commentReply(2788,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2791">
+		<a name="2791"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">dumb</a> </b><br /><span class="comment-time">2015-10-19 09:11</span>
+			<div class="comment-content">@wowo：嗯, 多谢热心的回复;<br /><br />1. 我现在看的是android代码, 手机启动之后第一次的亮屏期间 events_check_enabled 会是0, 但是熄屏(休眠)之后会变为1, 应该是andriod 库里面有写这个wake_count这个节点; 我还需要再查查代码.<br /><br />2. 接着您的回答,wake lock必须在wake_count配合下才有作用; 但是kernel中在wakelock.h中提供了wake_lock等系统调用(调用的是__pm_stay_awake),也就是说wake_lock机制其实在内核中可以单独使用, 看驱动代码也有它们调用用来阻止系统休眠, 那按照您的意思内核中的wake_lock调用也必须依赖wake_count吗, 而wake_count是提供给用户空间调用的? 总感觉没有理解到位呢...<br /><br />Thanks.</div>
+			<div class="comment-reply"><a href="#comment-2791" onclick="commentReply(2791,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2795">
+		<a name="2795"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-10-19 11:23</span>
+			<div class="comment-content">@dumb：wake_count是给用户空间调用的，但是suspend的发起人是谁的呢？也是用户空间。<br /><br />而wakeup event（无论是用户空间的wake_lock，还是内核空间的wakeup source）的终极目标是什么呢？是阻止suspend（用户空间发起的）。<br /><br />好了，如果用户空间程序不使用wake_count配合suspend过程，它在用户空间层面的同步都无法保证，那么Kernel的机制生效也是没有意义的。<br /><br />因此，不配合wake_count，kenrel的wakeup source也是没有意义的。</div>
+			<div class="comment-reply"><a href="#comment-2795" onclick="commentReply(2795,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2800">
+		<a name="2800"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">dumb</a> </b><br /><span class="comment-time">2015-10-19 18:19</span>
+			<div class="comment-content">@wowo：哦,原来是这样啊. 多谢耐心的解答!</div>
+			<div class="comment-reply"><a href="#comment-2800" onclick="commentReply(2800,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		</div>
+		</div>
+		</div>
+		<div class="comment" id="comment-450">
+		<a name="450"></a>
+				<div class="comment-info">
+			<b>海 </b><br /><span class="comment-time">2014-09-16 16:58</span>
+			<div class="comment-content">挺长时间没来了，过来看看。wake lock最初掀起了一场大讨论，不过wakelock破坏了内核空间和用户空间的独立性。其实我倒是觉得只要是解决了睡眠和唤醒事件的同步关系就行了。后来安卓也使用了wakeup source后，这不又是一家人了。<br />2）一个sysfs文件：：/sys/power/wake_lock这里是wake_unlock</div>
+			<div class="comment-reply"><a href="#comment-450" onclick="commentReply(450,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-451">
+		<a name="451"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">蜗蜗</a> </b><br /><span class="comment-time">2014-09-16 22:35</span>
+			<div class="comment-content">@海：欢迎回来。谢谢提醒，已经改正。<br />从软件架构上讲，wakelock确实不是一个好的设计。但是在Android诞生之初，Linux kernel还没有提供有效的、可被移动终端使用的动态电源管理机制，wakelock确实帮了很大的忙，甚至Android的盛行，它也有很大的功劳。</div>
+			<div class="comment-reply"><a href="#comment-451" onclick="commentReply(451,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		<div class="comment" id="comment-447">
+		<a name="447"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">linuxer</a> </b><br /><span class="comment-time">2014-09-15 09:09</span>
+			<div class="comment-content">打鸡血了吗，最近接连发力啊。注意细水长流哦～～～～</div>
+			<div class="comment-reply"><a href="#comment-447" onclick="commentReply(447,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-449">
+		<a name="449"></a>
+				<div class="comment-info">
+			<b>wowo </b><br /><span class="comment-time">2014-09-15 18:23</span>
+			<div class="comment-content">@linuxer：哪有，这几篇内容不多，比较好写。呵呵</div>
+			<div class="comment-reply"><a href="#comment-449" onclick="commentReply(449,this)">回复</a></div>		</div>
+			</div>
+		</div>
+	    <div id="pagenavi">
+	        </div>
+		<div id="comment-place">
+	<div class="comment-post" id="comment-post">
+		<div class="cancel-reply" id="cancel-reply" style="display:none"><a href="javascript:void(0);" onclick="cancelReply()">取消回复</a></div>
+		<p class="comment-header"><b>发表评论：</b><a name="respond"></a></p>
+		<form method="post" name="commentform" action="http://www.wowotech.net/index.php?action=addcom" id="commentform">
+			<input type="hidden" name="gid" value="89" />
+						<p>
+				<input type="text" name="comname" maxlength="49" value="" size="22" tabindex="1">
+				<label for="author"><small>昵称</small></label>
+			</p>
+			<p>
+				<input type="text" name="commail"  maxlength="128"  value="" size="22" tabindex="2">
+				<label for="email"><small>邮件地址 (选填)</small></label>
+			</p>
+			<p>
+				<input type="text" name="comurl" maxlength="128"  value="" size="22" tabindex="3">
+				<label for="url"><small>个人主页 (选填)</small></label>
+			</p>
+						<p><textarea name="comment" id="comment" rows="10" tabindex="4"></textarea></p>
+			<p><img src="http://www.wowotech.net/include/lib/checkcode.php" align="absmiddle" /><input name="imgcode" type="text" class="input" size="5" tabindex="5" /> <input type="submit" id="comment_submit" value="发表评论" tabindex="6" /></p>
+			<input type="hidden" name="pid" id="comment-pid" value="0" size="22" tabindex="1"/>
+		</form>
+	</div>
+	</div>
+		<div style="clear:both;"></div>
+</div><!--end #contentleft-->
+<ul id="sidebar">
+	<li>
+	<h3><span>站内搜索</span></h3>
+	<ul>
+	<script type="text/javascript">document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E%3Cscript charset="utf-8" src="http://znsv.baidu.com/customer_search/api/js?sid=16798210514584749375') + '&plate_url=' + (encodeURIComponent(window.location.href)) + '&t=' + (Math.ceil(new Date()/3600000)) + unescape('"%3E%3C/script%3E'));</script>	</ul>
+	</li>
+	<li>
+	<h3><span>功能</span></h3>
+	<ul>
+	<a href="http://www.wowotech.net/message_board.html">留言板<br></a>
+<a href="http://www.wowotech.net/?plugin=commentlist">评论列表<br></a>	</ul>
+	</li>
+	<li>
+	<h3><span>随机文章</span></h3>
+	<ul id="randlog">
+		<li><a href="http://www.wowotech.net/device_model/314.html">sysfs分析</a></li>
+		<li><a href="http://www.wowotech.net/bluetooth/ipv6_over_ble_intro.html">蓝牙协议分析(4)_IPv6 Over BLE介绍</a></li>
+		<li><a href="http://www.wowotech.net/timer_subsystem/periodic-tick.html">Linux时间子系统之（十二）：periodic tick</a></li>
+		<li><a href="http://www.wowotech.net/irq_subsystem/irq-domain.html">Linux kernel的中断子系统之（二）：IRQ Domain介绍</a></li>
+		<li><a href="http://www.wowotech.net/linux_kenrel/create_page_tables.html">ARM64的启动过程之（二）：创建启动阶段的页表</a></li>
+		</ul>
+	</li>
+	<li>
+	<h3><span>最新评论</span></h3>
+	<ul id="newcomment">
+		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/alloc_workqueue.html#4134">@zcjfish：修正下第二个问题：&nbsp;&nbsp;第二个问题是假设有4...</a></li>
+		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/alloc_workqueue.html#4133">现在的ARM core都有hotplug功能，就是说如果lo...</a></li>
+		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/gic_driver.html#4132">你好，请问PPI 中断的使用场景都有哪些？ 或者说什么样的中...</a></li>
+		<li id="comment">XXX	<br /><a href="http://www.wowotech.net/gpio_subsystem/pin-controller-driver.html#4131">膜拜~</a></li>
+		<li id="comment">wowo	<br /><a href="http://www.wowotech.net/device_model/dt-code-analysis.html#4130">@js_wawayu：应该不能吧？</a></li>
+		</ul>
+	</li>
+	<li>
+	<h3><span>文章分类</span></h3>
+	<ul id="blogsort">
+		<li>
+	<a href="http://www.wowotech.net/sort/linux_kenrel">Linux内核分析(10)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=4"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<ul>
+				<li>
+			<a href="http://www.wowotech.net/sort/device_model">统一设备模型(14)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=12"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/pm_subsystem">电源管理子系统(40)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=13"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/irq_subsystem">中断子系统(14)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=14"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/process_management">进程管理(5)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=15"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/kernel_synchronization">内核同步机制(17)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=16"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/gpio_subsystem">GPIO子系统(3)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=17"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/timer_subsystem">时间子系统(13)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=18"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/comm">通信类协议(4)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=20"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/memory_management">内存管理(5)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=21"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/graphic_subsystem">图形子系统(1)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=23"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/filesystem">文件系统(0)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=26"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				</ul>
+			<li>
+	<a href="http://www.wowotech.net/sort/u-boot">u-boot分析(2)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=25"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/linux_application">Linux应用技巧(11)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=3"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/soft">软件开发(6)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=1"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/basic_tech">基础技术(4)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=6"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<ul>
+				<li>
+			<a href="http://www.wowotech.net/sort/bluetooth">蓝牙(9)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=10"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/armv8a_arch">ARMv8A Arch(7)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=19"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/display">显示(3)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=22"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				</ul>
+			<li>
+	<a href="http://www.wowotech.net/sort/basic_subject">基础学科(9)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=7"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/tech_discuss">技术漫谈(10)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=8"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/project">项目专区(0)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=9"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<ul>
+				<li>
+			<a href="http://www.wowotech.net/sort/x_project">X Project(5)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=24"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				</ul>
+			</ul>
+	</li>
+	<li>
+	<h3><span>文章存档</span></h3>
+	<ul id="record">
+		<li><a href="http://www.wowotech.net/record/201606">2016年6月(8)</a></li>
+		<li><a href="http://www.wowotech.net/record/201605">2016年5月(8)</a></li>
+		<li><a href="http://www.wowotech.net/record/201604">2016年4月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201603">2016年3月(5)</a></li>
+		<li><a href="http://www.wowotech.net/record/201602">2016年2月(5)</a></li>
+		<li><a href="http://www.wowotech.net/record/201601">2016年1月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201512">2015年12月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201511">2015年11月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201510">2015年10月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201509">2015年9月(4)</a></li>
+		<li><a href="http://www.wowotech.net/record/201508">2015年8月(3)</a></li>
+		<li><a href="http://www.wowotech.net/record/201507">2015年7月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201506">2015年6月(3)</a></li>
+		<li><a href="http://www.wowotech.net/record/201505">2015年5月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201504">2015年4月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201503">2015年3月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201502">2015年2月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201501">2015年1月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201412">2014年12月(17)</a></li>
+		<li><a href="http://www.wowotech.net/record/201411">2014年11月(8)</a></li>
+		<li><a href="http://www.wowotech.net/record/201410">2014年10月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201409">2014年9月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201408">2014年8月(12)</a></li>
+		<li><a href="http://www.wowotech.net/record/201407">2014年7月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201406">2014年6月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201405">2014年5月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201404">2014年4月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201403">2014年3月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201402">2014年2月(3)</a></li>
+		<li><a href="http://www.wowotech.net/record/201401">2014年1月(4)</a></li>
+		</ul>
+	</li>
+<div class="rss">
+<a href="http://www.wowotech.net/rss.php" title="RSS订阅"><img src="http://www.wowotech.net/content/templates/default/images/rss.gif" alt="订阅Rss"/></a>
+</div>
+</ul><!--end #siderbar-->
+</div><!--end #content-->
+<div style="clear:both;"></div>
+<div id="footerbar">
+	Copyright @ 2013-2015 <a href="http://www.wowotech.net" title="wowotech">蜗窝科技</a> All rights reserved.
+	Powered by <a href="http://www.emlog.net" title="采用emlog系统">emlog</a>
+	<a href="http://www.miibeian.gov.cn" target="_blank"></a> <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?9d3da49d9cb9a5eaca161fc2905551df";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>	</div><!--end #footerbar-->
+</div><!--end #wrap-->
+<script>prettyPrint();</script>
+</body>
+</html>

@@ -16,3 +16,6 @@ http://blog.chinaunix.net/uid-20321537-id-4049149.html
 
 ubuntu下配置git和github初体验 "
 http://blog.chinaunix.net/uid-24782829-id-3183604.html
+
+ubuntu完美搭建git服务器：
+http://blog.csdn.net/tommy_wxie/article/details/38779667

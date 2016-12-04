@@ -1,0 +1,1106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>功耗优化方法_辛朝磊_新浪博客</title>
+<meta name="keywords" content="功耗优化方法_辛朝磊_新浪博客,辛朝磊,android,功耗,高通平台" />
+<meta name="description" content="功耗优化方法_辛朝磊_新浪博客,辛朝磊," />
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+<meta http-equiv="mobile-agent" content="format=html5; url=http://blog.sina.cn/dpool/blog/s/blog_40d475e90102vnh0.html?vt=4">
+<meta http-equiv="mobile-agent" content="format=wml; url=http://blog.sina.cn/dpool/blog/ArtRead.php?nid=40d475e90102vnh0&vt=1">
+<!–[if lte IE 6]>
+<script type="text/javascript">
+try{
+document.execCommand("BackgroundImageCache", false, true);
+}catch(e){}
+</script>
+<![endif]–>
+<script type="text/javascript">
+window.staticTime=new Date().getTime();
+</script>
+<link rel="pingback" href="http://upload.move.blog.sina.com.cn/blog_rebuild/blog/xmlrpc.php" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://upload.move.blog.sina.com.cn/blog_rebuild/blog/xmlrpc.php?rsd" />
+<link href="http://blog.sina.com.cn/blog_rebuild/blog/wlwmanifest.xml" type="application/wlwmanifest+xml" rel="wlwmanifest" />
+<link rel="alternate" type="application/rss+xml" href="http://blog.sina.com.cn/rss/1087665641.xml" title="RSS" />
+<link href="http://simg.sinajs.cn/blog7style/css/conf/blog/article.css" type="text/css" rel="stylesheet" /><link href="http://simg.sinajs.cn/blog7style/css/common/common.css" type="text/css" rel="stylesheet" /><link href="http://simg.sinajs.cn/blog7style/css/blog/blog.css" type="text/css" rel="stylesheet" /><link href="http://simg.sinajs.cn/blog7style/css/module/common/blog.css" type="text/css" rel="stylesheet" /><style id="tplstyle" type="text/css">@charset "utf-8";@import url("http://simg.sinajs.cn/blog7newtpl/css/30/30_1/t.css");
+</style>
+<style id="positionstyle"  type="text/css">
+</style>
+<style id="bgtyle"  type="text/css">
+</style>
+<style id="headtyle"  type="text/css">
+</style>
+<style id="navtyle"  type="text/css">
+</style>
+<script type="text/javascript" src="http://d1.sina.com.cn/litong/zhitou/sspnew.js"></script></head>
+<body>
+<!--$sinatopbar-->
+<div style="z-index:512;" class="nsinatopbar">
+  <div style="position:absolute;left:0;top:0;" id="trayFlashConnetion"></div>
+  <div class="ntopbar_main"> 
+    <a id="login_bar_logo_link_350" href="http://blog.sina.com.cn" target="_blank"><img class="ntopbar_logo" src="http://simg.sinajs.cn/blog7style/images/common/topbar/topbar_logo.gif" width="100" alt="新浪博客"></a>
+    <div class="ntopbar_floatL">
+      <div class="ntopbar_search" id="traySearchBar"></div>
+	  <div class="ntopbar_ad" id="loginBarActivity" style="display:none;"></div>
+    </div>
+    <div class="ntopbar_loading"><img src="http://simg.sinajs.cn/blog7style/images/common/loading.gif">加载中…</div>
+  </div>
+</div>
+<!--$end sinatopbar-->
+
+<div class="sinabloga" id="sinabloga">
+	<div id="sinablogb" class="sinablogb">
+
+	   
+ <div id="sinablogHead" class="sinabloghead">
+     <div style="display: none;" id="headflash" class="headflash"></div>
+	   <div id="headarea" class="headarea">
+      <div id="blogTitle" class="blogtoparea">
+      <h1 id="blogname" class="blogtitle"><a href="http://blog.sina.com.cn/xinzhaolei"><span id="blognamespan">加载中...</span></a></h1>
+	  		
+					<div id="bloglink" class="bloglink"><a href="http://blog.sina.com.cn/xinzhaolei">http://blog.sina.com.cn/xinzhaolei</a>  <a onclick="return false;" class="CP_a_fuc" href="#" id="SubscribeNewRss">[<cite>订阅</cite>]</a><a class="CP_a_fuc" href="javascript:void(scope.pa_add.add('1087665641'));">[<cite>手机订阅</cite>]</a></div>
+      </div>
+      <div class="blognav" id="blognav">
+      			  <div id="blognavBg" class="blognavBg"></div> <div class="blognavInfo"> 
+		<span><a   href="http://blog.sina.com.cn/xinzhaolei">首页</a></span>
+      <span><a class="on" href="http://blog.sina.com.cn/s/articlelist_1087665641_0_1.html">博文目录</a></span>
+      <span><a href="http://photo.blog.sina.com.cn/xinzhaolei">图片</a></span>
+      <span class="last"><a  href="http://blog.sina.com.cn/s/profile_1087665641.html">关于我</a></span></div>
+      </div>      		      		 	
+      
+             <div class="autoskin" id="auto_skin">
+       </div>
+
+<div class="adsarea">
+     <a href="#"><div id="template_clone_pic" class="pic"></div></a>
+     <div id="template_clone_link" class="link wdc_HInf"></div>
+     <div id="template_clone_other" class="other"></div>        
+</div>
+    </div>
+    </div>
+    
+    <!--主题内容开始 -->
+    <div class="sinablogbody" id="sinablogbody">
+		
+	<!--第一列start-->
+    <div id="column_1" class="SG_colW21 SG_colFirst"><div class="SG_conn" id="module_901">
+    <div class="SG_connHead">
+            <span class="title" comp_title="个人资料">个人资料</span>
+            <span class="edit">
+                        </span>
+    </div>
+    <div class="SG_connBody">
+        <div class="info">
+                         
+            <div class="info_img" id="comp_901_head"><img src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" real_src ="http://p2.sinaimg.cn/1087665641/180/02301341970386" id="comp_901_head_image" width="180" height="180" alt="辛朝磊" title="辛朝磊" /></div>
+            
+            <div class="info_txt">
+              <div class="info_nm">
+                <img id="comp_901_online_icon" style="display:none;" class="SG_icon SG_icon1" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" width="15" height="15" align="absmiddle" />
+                <span class="SG_txtb"><strong id="ownernick">辛朝磊                                </strong></span>
+                
+                <div class="clearit"></div>
+              </div>
+              <div class="info_btn1">
+                <a target="_blank" href="http://weibo.com/u/1087665641?source=blog" class="SG_aBtn SG_aBtn_ico"><cite><img class="SG_icon SG_icon51" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" width="15" height="15" align="absmiddle" />微博</cite></a>
+                <div class="clearit"></div>
+              </div>
+    <div class="SG_j_linedot"></div>        <div class="info_locate" id = "info_locate_id">
+<div class="SG_j_linedot"></div>
+<div class="info_btn2">
+    <p>
+    <a href="javascript:void(0);" class="SG_aBtn " id="comp901_btn_invite"><cite >加好友</cite></a>
+    <a href="javascript:void(0);" class="SG_aBtn" id="comp901_btn_sendpaper"><cite >发纸条</cite></a>
+    </p>
+    <p>
+    <a href="http://blog.sina.com.cn/s/profile_1087665641.html#write" class="SG_aBtn"   id="comp901_btn_msninfo"><cite>写留言</cite></a>
+    <a href="#" onclick="return false;" class="SG_aBtn"  id="comp901_btn_follow"><cite onclick="Module.SeeState.add()">加关注</cite></a>
+    </p>
+    <div class="clearit"></div>
+</div>
+<div class="SG_j_linedot"></div>
+</div>
+                  <div class="info_list">     
+                                   <ul class="info_list1">
+                    <li><span class="SG_txtc">博客等级：</span><span id="comp_901_grade"><img src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" real_src="http://simg.sinajs.cn/blog7style/images/common/number/1.gif"  /><img src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" real_src="http://simg.sinajs.cn/blog7style/images/common/number/4.gif"  /></span></li>
+                    <li><span class="SG_txtc">博客积分：</span><span id="comp_901_score"><strong>0</strong></span></li>
+                    </ul>
+                    <ul class="info_list2">
+                    <li><span class="SG_txtc">博客访问：</span><span id="comp_901_pv"><strong>40,823</strong></span></li>
+                    <li><span class="SG_txtc">关注人气：</span><span id="comp_901_attention"><strong>10</strong></span></li>
+                    <li><span class="SG_txtc">获赠金笔：</span><strong id="comp_901_d_goldpen">0支</strong></li>
+                    <li><span class="SG_txtc">赠出金笔：</span><strong id="comp_901_r_goldpen">0支</strong></li>
+					<li class="lisp" id="comp_901_badge"><span class="SG_txtc">荣誉徽章：</span></li>
+                    </ul>
+                  </div>
+<div class="clearit"></div>
+    </div>
+    <div class="clearit"></div>
+</div>
+            </div>       
+            <div class="SG_connFoot"></div>
+</div>
+<div id="module_903" class="SG_conn ">
+    <div class="SG_connHead">
+    <span comp_title="相关博文" class="title">相关博文</span>
+    <span class="edit"> </span>
+    </div>
+    <div class="SG_connBody">
+    <div class="atcTitList relaList">        <ul class="">
+
+                <li class="SG_j_linedot1" style="display:none;">
+            <p id="atcTitLi_SLOT_41" class="atcTitCell_tit SG_dot" style="display:none">
+        </p>
+        </li>
+        <li class="SG_j_linedot1" style="display:none;">
+            <p id="atcTitLi_SLOT_42"  class="atcTitCell_tit SG_dot" style="display:none">
+        </p>
+        </li>
+        
+                	</ul>
+    <div class="atcTit_more"><span class="SG_more"><a href="http://blog.sina.com.cn/" target="_blank">更多&gt;&gt;</a></span></div></div>    </div>
+    <div class="SG_connFoot"></div>
+  </div>
+<div class="SG_conn " id="module_904">
+<div class="SG_connHead">
+<span class="title">推荐博文</span>
+</div>
+<div class="SG_connBody ">
+	<div class="atcTitList relaList">		<ul class="">
+			<li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="情侣大理街头拍裸照合适吗" target="_blank" href="http://blog.sina.com.cn/s/blog_60a2885b0102woqk.html?tj=2?tj=2">情侣大理街头拍裸照合适吗</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1621264475" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="猪肝污染大，吃多会中毒？有关动" target="_blank" href="http://blog.sina.com.cn/s/blog_83e058b10102wc6w.html?tj=2?tj=2">猪肝污染大，吃多会中毒？有关动</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/2212518065" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="人民币不要面子改要里子" target="_blank" href="http://blog.sina.com.cn/s/blog_49818dcb0102wpok.html?tj=2?tj=2">人民币不要面子改要里子</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1233227211" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="毒杀日本教授的中国矿泉水" target="_blank" href="http://blog.sina.com.cn/s/blog_476745f60102wdyv.html?tj=2?tj=2">毒杀日本教授的中国矿泉水</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1197950454" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="为什么美国人可以终身不退休？" target="_blank" href="http://blog.sina.com.cn/s/blog_4928fb8a0102wegy.html?tj=2?tj=2">为什么美国人可以终身不退休？</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1227422602" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="&#8203;彩虹抓捕图背后的" target="_blank" href="http://blog.sina.com.cn/s/blog_684ebae30102wd1f.html?tj=2?tj=2">&#8203;彩虹抓捕图背后的</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1749990115" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="责骂解决不了“悬崖村庄”的问题" target="_blank" href="http://blog.sina.com.cn/s/blog_3f5edcfb0102wa96.html?tj=2?tj=2">责骂解决不了“悬崖村庄”的问题</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1063181563" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="潘绥铭：嫖到底是为谁禁的" target="_blank" href="http://blog.sina.com.cn/s/blog_4dd47e5a0102wbw9.html?tj=2?tj=2">潘绥铭：嫖到底是为谁禁的</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1305771610" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="纪念杨绛先生" target="_blank" href="http://blog.sina.com.cn/s/blog_47383f2d0102wjx0.html?tj=2?tj=2">纪念杨绛先生</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1194868525" class="SG_linkb"></a></p>
+		</li><li class="SG_j_linedot1"><p class="atcTitCell_tit SG_dot"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" title="治理校园欺凌的日本实践" target="_blank" href="http://blog.sina.com.cn/s/blog_4b759c4f0102wii3.html?tj=2?tj=2">治理校园欺凌的日本实践</a></p>
+        <p class="atcTitCell_nm"><a suda-uatrack="key=blog_tjblog&value=h_tjblog" target="_blank" href="http://blog.sina.com.cn/u/1265998927" class="SG_linkb"></a></p>
+		</li>		</ul>
+		<div id="atcPicList">
+		</div>
+	<div class="atcTit_more"><span class="SG_more"><a target="_blank" href="http://blog.sina.com.cn/">查看更多</a>&gt;&gt;</span></div></div></div>
+<div class="SG_connFoot"></div>
+</div>
+        <div class="SG_conn" id="module_47"><div class="SG_connHead">
+                <span class="title" comp_title="谁看过这篇博文">谁看过这篇博文</span>
+                                <span class="edit"></span>
+            </div>
+            <div class="SG_connBody">
+            	<div class="wdtLoading"><img src="http://simg.sinajs.cn/blog7style/images/common/loading.gif" />加载中…</div>            </div>
+            <div class="SG_connFoot"></div>
+                  </div></div>
+	<!--第一列end-->
+	
+	<!--第二列start-->
+	<div id="column_2" class="SG_colW73">	
+<div id="module_920" class="SG_conn">
+	<div class="SG_connHead">
+	    <span comp_title="正文" class="title">正文</span>
+	    <span class="edit"><span id="articleFontManage" class="fontSize">字体大小：<a href="javascript:;" onclick="changeFontSize(2);return false;">大</a> <strong>中</strong> <a href="javascript:;" onclick="changeFontSize(0);return false;">小</a></span></span>
+	</div>
+    <div class="SG_connBody">
+<!--博文正文 begin -->
+	<div id="articlebody" class="artical" favMD5='{"40d475e90102vnh0":"a7fb23d1b744b66912b676dc5dc6fd8c"}'>
+		<div class="articalTitle"> 
+			
+								<h2 id="t_40d475e90102vnh0" class="titName SG_txta">功耗优化方法</h2>
+			
+					<span class="time SG_txtc">(2015-03-18 17:32:13)</span><div class="turnBoxzz"><a href="javascript:;" class="SG_aBtn SG_aBtn_ico SG_turn"  action-type="reblog" action-data="{srcBlog:1, blogId:'40d475e90102vnh0'}"><cite><img class="SG_icon SG_icon111" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" width="15" height="15" align="absmiddle">转载<em class="arrow">▼</em></cite></a></div>		</div>
+		<div class="articalTag" id="sina_keyword_ad_area">
+			<table>
+				<tr>
+					<td class="blog_tag">
+					<script>
+					var $tag='android,功耗,高通平台';
+					var $tag_code='f36add8b592c5ce63169f78841813e32';
+					var $r_quote_bligid='40d475e90102vnh0';
+					var $worldcup='0';
+					var $worldcupball='0';
+					</script>
+											<span class="SG_txtb">标签：</span>
+																				<h3><a href="http://search.sina.com.cn/?c=blog&q=android&by=tag" target="_blank">android</a></h3>
+																				<h3><a href="http://search.sina.com.cn/?c=blog&q=%B9%A6%BA%C4&by=tag" target="_blank">功耗</a></h3>
+																				<h3><a href="http://search.sina.com.cn/?c=blog&q=%B8%DF%CD%A8%C6%BD%CC%A8&by=tag" target="_blank">高通平台</a></h3>
+																</td>
+					<td class="blog_class">
+											<span class="SG_txtb">分类：</span>
+						<a target="_blank" href="http://blog.sina.com.cn/s/articlelist_1087665641_8_1.html">功耗</a>
+										</td>
+				</tr>
+			</table>
+		</div>
+						<!-- 正文开始 -->
+		<div id="sina_keyword_ad_area2" class="articalContent   newfont_family">
+			<div>
+<p><strong>1<span STYLE="font-family:宋体;">、底电流调试（</SPAN><span STYLE="font-family:Times new roman;">Rock&nbsp;<wbr>Bottom&nbsp;<wbr>Current&nbsp;<wbr>Optimization</SPAN><span STYLE="font-family:宋体;">）</SPAN></STRONG></P>
+<p>底电流在手机飞行模式下调试。每个平台的底电流数据可能不一样，具体可以参考<span STYLE="font-family:Times new roman;">release</SPAN><span STYLE="font-family:宋体;">出来的</SPAN><span STYLE="font-family:Times new roman;">Current&nbsp;<wbr>Consumption&nbsp;<wbr>Data</SPAN><span STYLE="font-family:宋体;">文档或者</SPAN><span STYLE="font-family:Times new roman;">release&nbsp;<wbr>note</SPAN><span STYLE="font-family:宋体;">。一般情况下的底电流参考数据上限是：</SPAN></P>
+<p>
+512M&nbsp;<wbr>RAM&nbsp;<wbr>&lt;&nbsp;<wbr>1.5mA;&nbsp;<wbr>1G&nbsp;<wbr>RAM&nbsp;<wbr>&lt;&nbsp;<wbr>2mA;&nbsp;<wbr>2G&nbsp;<wbr>RAM&nbsp;<wbr>&lt;&nbsp;<wbr>2.6mA</P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.1<span STYLE="font-family:宋体;">校准</SPAN><span STYLE="font-family:Times new roman;">RF</SPAN></STRONG></P>
+<p>保证<span STYLE="font-family:Times new roman;">RF</SPAN><span STYLE="font-family:宋体;">的</SPAN><span STYLE="font-family:Times new roman;">PA</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">Antenna&nbsp;<wbr>switch</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">Tuner</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">APT</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">工作在正常状态</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.2<span STYLE="font-family:宋体;">飞行模式</SPAN></STRONG></P>
+<p>开启飞行模式、关闭<span STYLE="font-family:Times new roman;">GPS</SPAN><span STYLE="font-family:宋体;">、关闭自动旋转屏幕、关闭自动亮度调节、关闭其他特效效果设置</SPAN></P>
+<p>开启飞行模式，可以基本避免蓝牙、<span STYLE="font-family:Times new roman;">wifi</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">NFC</SPAN><span STYLE="font-family:宋体;">、网络、</SPAN><span STYLE="font-family:Times new roman;">FM</SPAN><span STYLE="font-family:宋体;">等的一般影响；</SPAN></P>
+<p>关闭<span STYLE="font-family:Times new roman;">GPS</SPAN><span STYLE="font-family:宋体;">，可以基本排除开启</SPAN><span STYLE="font-family:Times new roman;">GPS</SPAN><span STYLE="font-family:宋体;">对底电流的影响；</SPAN></P>
+<p>关闭自动旋转屏幕，可以基本排除<span STYLE="font-family:Times new roman;">sensor</SPAN><span STYLE="font-family:宋体;">的影响；</SPAN></P>
+<p>关闭自动亮度调节，可以基本排除距离感应到的影响；</P>
+<p>关闭其他特效效果设置，如指纹识别、黑屏手势、智能体感、手势隔空操作。。。。。。</P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.3<span STYLE="font-family:宋体;">使用</SPAN><span STYLE="font-family:Times new roman;">perf_defconfig</SPAN></STRONG></P>
+<p>修改<span STYLE="font-family:Times new roman;">device/qcom//AndroidBoard.mk</SPAN><span STYLE="font-family:宋体;">。如果</SPAN><span STYLE="font-family:Times new roman;">KERNEL_DEFCONFIG&nbsp;<wbr>:=&nbsp;<wbr>_defconfig</SPAN><span STYLE="font-family:宋体;">，那么改成</SPAN><span STYLE="font-family:Times new roman;">KERNEL_DEFCONFIG&nbsp;<wbr>:=&nbsp;<wbr>-perf_defconfig</SPAN></P>
+<p>同时，<span STYLE="font-family:Times new roman;">kernel</SPAN><span STYLE="font-family:宋体;">代码改用</SPAN><span STYLE="font-family:Times new roman;">/kernel/arch/arm/configs/-perf_defconfig</SPAN></P>
+<p><span STYLE="font-family:宋体;">是平台名称或者项目名称</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.4<span STYLE="font-family:宋体;">移除</SPAN><span STYLE="font-family:Times new roman;">debugging&nbsp;<wbr>APKs</SPAN></STRONG></P>
+<p>/system/app/Logkit.apk</P>
+<p>/system/app/com.qualcomm.qlogcat.apk</P>
+<p>/system/xbin/qlogd</P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.5<span STYLE="font-family:宋体;">把应用</SPAN>尽量删除</STRONG></P>
+<p>在设置<span STYLE="font-family:'Times new roman';">--&gt;</SPAN><span STYLE="font-family:宋体;">应用，禁用正在运行的应用</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.6<span STYLE="font-family:宋体;">去掉</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">占用高的进程</SPAN></STRONG></P>
+<p>adb&nbsp;<wbr>shell</P>
+<p>top</P>
+<p>查看<span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">占用，去掉在休眠模式下</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">占用大于</SPAN><span STYLE="font-family:Times new roman;">0</SPAN><span STYLE="font-family:宋体;">的进程。</SPAN><span STYLE="font-family:Times new roman;">kill</SPAN><span STYLE="font-family:宋体;">掉该进程，若</SPAN><span STYLE="font-family:Times new roman;">kill</SPAN><span STYLE="font-family:宋体;">不掉则</SPAN><span STYLE="font-family:Times new roman;">rm</SPAN><span STYLE="font-family:宋体;">掉相关应用。对于占用</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">高的</SPAN><span STYLE="font-family:Times new roman;">kwork</SPAN><span STYLE="font-family:宋体;">，需要查找驱动原因。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.7<span STYLE="font-family:宋体;">手动移除所有可以移除的外设</SPAN></STRONG></P>
+<p>手机连上安捷伦电源，手机开机，然后让手机进入待机状态。手动移除<span STYLE="font-family:Times new roman;">TP</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">LCM</SPAN><span STYLE="font-family:宋体;">、前</SPAN><span STYLE="font-family:Times new roman;">camera</SPAN><span STYLE="font-family:宋体;">、后</SPAN><span STYLE="font-family:Times new roman;">camera</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">sensor</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">SD</SPAN><span STYLE="font-family:宋体;">卡、</SPAN><span STYLE="font-family:Times new roman;">SIM</SPAN><span STYLE="font-family:宋体;">卡等可以手动移除的外围器件，同时观察并记录底电流变化。</SPAN></P>
+<p>直接移除<span STYLE="font-family:Times new roman;">WLAN</SPAN><span STYLE="font-family:宋体;">芯片可能会导致开不了机，所以在移除</SPAN><span STYLE="font-family:Times new roman;">WLAN</SPAN><span STYLE="font-family:宋体;">之前，先对软件做如下处理：</SPAN></P>
+<p>
+#&nbsp;<wbr>mount&nbsp;<wbr>-o&nbsp;<wbr>rw,remount&nbsp;<wbr>-t&nbsp;<wbr>vfat&nbsp;<wbr>/dev/block/bootdevice/by-name/modem&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>cd&nbsp;<wbr>/firmware/image&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>rm&nbsp;<wbr>wcnss.*&nbsp;<wbr></P>
+<p>#&nbsp;<wbr>reboot&nbsp;<wbr></P>
+<p>或者</P>
+<p>#lsmod</P>
+<p>#rmmod&nbsp;<wbr>WLAN</P>
+<p>移除其他可以移除的芯片（<span STYLE="font-family:Times new roman;">sensor</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">NFC</SPAN><span STYLE="font-family:宋体;">。。。）</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.8<span STYLE="font-family:宋体;">移除驱动模块</SPAN></STRONG></P>
+<p>在<span STYLE="font-family:Times new roman;">/kernel/arch/arm/configs/-perf_defconfig</SPAN><span STYLE="font-family:宋体;">中把</SPAN><span STYLE="font-family:Times new roman;">sensor</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">TP</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">LCM</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">camera</SPAN><span STYLE="font-family:宋体;">等的驱动模块移除；</SPAN></P>
+<p>或者在对应驱动的<span STYLE="font-family:Times new roman;">Makefile</SPAN><span STYLE="font-family:宋体;">里面，移除驱动代码</SPAN></P>
+<p>然后编译<span STYLE="font-family:Times new roman;">bootimage</SPAN><span STYLE="font-family:宋体;">，烧入手机观察底电流变化</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.9<span STYLE="font-family:宋体;">配置不用的</SPAN><span STYLE="font-family:Times new roman;">GPIO</SPAN></STRONG></P>
+<p>将不用的<span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">置为输入、拉低；配置成</SPAN><span STYLE="font-family:Times new roman;">SPI</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">I2C</SPAN><span STYLE="font-family:宋体;">的</SPAN><span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">，若不用，置为悬空</SPAN></P>
+<p>在<span STYLE="font-family:Times new roman;">boot_images/core/systemdrivers/tlmm/config/platform/TLMMChipset.xml</SPAN><span STYLE="font-family:宋体;">，修改</SPAN><span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">配置。该处配置</SPAN><span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">的初始状态，驱动有可能会修改</SPAN><span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">。</SPAN></P>
+<p>对比项目原理图与平台参考原理图，项目原理图中多出的<span STYLE="font-family:Times new roman;">NC&nbsp;<wbr>GPIO</SPAN><span STYLE="font-family:宋体;">要处理掉。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.10<span STYLE="font-family:宋体;">检查</SPAN><span STYLE="font-family:Times new roman;">power</SPAN><span STYLE="font-family:宋体;">相关的</SPAN><span STYLE="font-family:Times new roman;">NV&nbsp;<wbr>items</SPAN></STRONG></P>
+<p>需要跟<span STYLE="font-family:Times new roman;">CE</SPAN><span STYLE="font-family:宋体;">确认。一般如下：</SPAN></P>
+<p>1027&nbsp;<wbr>=&nbsp;<wbr>0</P>
+<p>1895&nbsp;<wbr>=&nbsp;<wbr>0</P>
+<p>1892&nbsp;<wbr>=&nbsp;<wbr>0</P>
+<p>1962&nbsp;<wbr>=&nbsp;<wbr>0</P>
+<p>4679&nbsp;<wbr>=&nbsp;<wbr>16</P>
+<p>4201&nbsp;<wbr>=&nbsp;<wbr>0</P>
+<p>3851&nbsp;<wbr>=&nbsp;<wbr>0</P>
+<p>3852&nbsp;<wbr>=&nbsp;<wbr>6</P>
+<p>7157&nbsp;<wbr>=&nbsp;<wbr>1</P>
+<p>
+69745&nbsp;<wbr>rxd_enable&nbsp;<wbr>=&nbsp;<wbr>0</P>
+<p>WCDMA&nbsp;<wbr>NV:</P>
+<p>NV3581&nbsp;<wbr>=&nbsp;<wbr>0</P>
+<p>NV3852&nbsp;<wbr>=&nbsp;<wbr>6</P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.11<span STYLE="font-family:宋体;">排查</SPAN><span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">LDO</SPAN><span STYLE="font-family:宋体;">、总线</SPAN></STRONG></P>
+<p>对比项目原理图与平台参考原理图，排查硬件不一样的<span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">LDO</SPAN><span STYLE="font-family:宋体;">、总线配置。</SPAN></P>
+<p>量测各<span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">LDO</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">I2C</SPAN><span STYLE="font-family:宋体;">在休眠时候的电压，需用万用表准确测量。</SPAN></P>
+<p>休眠时各路<span STYLE="font-family:Times new roman;">I2C&nbsp;<wbr>GPIO</SPAN><span STYLE="font-family:宋体;">的电压是多少</SPAN><span STYLE="font-family:Times new roman;">v</SPAN><span STYLE="font-family:宋体;">，用万用表准确测量。</SPAN></P>
+<p>如果条件允许，测量所有<span STYLE="font-family:Times new roman;">LDO</SPAN><span STYLE="font-family:宋体;">在休眠前和休眠后的准确电压。</SPAN></P>
+<p>对于<span STYLE="font-family:Times new roman;">LDO</SPAN><span STYLE="font-family:宋体;">，调试方法如下：</SPAN></P>
+<p>（<span STYLE="font-family:Times new roman;">1</SPAN><span STYLE="font-family:宋体;">）</SPAN><span STYLE="font-family:Times new roman;">adb&nbsp;<wbr>shell</SPAN><span STYLE="font-family:宋体;">关闭</SPAN><span STYLE="font-family:Times new roman;">LDO</SPAN></P>
+<p>如关闭<span STYLE="font-family:Times new roman;">L3</SPAN><span STYLE="font-family:宋体;">：</SPAN></P>
+<p>cd&nbsp;<wbr>/sys/kernel/debug/regulator/8916_l3/</P>
+<p>
+echo&nbsp;<wbr>0&nbsp;<wbr>&gt;&nbsp;<wbr>enable</P>
+<p>（<span STYLE="font-family:Times new roman;">2</SPAN><span STYLE="font-family:宋体;">）</SPAN><span STYLE="font-family:Times new roman;">LDO</SPAN><span STYLE="font-family:宋体;">太多设备用到，不适合用</SPAN><span STYLE="font-family:Times new roman;">adb&nbsp;<wbr>shell</SPAN><span STYLE="font-family:宋体;">来关。可以这样调试：</SPAN></P>
+<p>
+cat&nbsp;<wbr>/sys/kernel/debug/regulator/8916_l6/consumers&nbsp;<wbr></P>
+<p>
+shell@msm8916_32:/sys/kernel/debug/regulator/8916_l6&nbsp;<wbr>$&nbsp;<wbr>cat&nbsp;<wbr>consumers&nbsp;<wbr></P>
+<p>
+Device-Supply&nbsp;<wbr>EN&nbsp;<wbr>Min_uV&nbsp;<wbr>Max_uV&nbsp;<wbr>load_uA&nbsp;<wbr></P>
+<p>
+0-000c-vio&nbsp;<wbr>Y&nbsp;<wbr>1800000&nbsp;<wbr>1800000&nbsp;<wbr>0&nbsp;<wbr></P>
+<p>
+0-0068-vi2c&nbsp;<wbr>N&nbsp;<wbr>1800000&nbsp;<wbr>1800000&nbsp;<wbr>0&nbsp;<wbr></P>
+<p>
+5-0038-vcc_i2c&nbsp;<wbr>Y&nbsp;<wbr>1800000&nbsp;<wbr>1800000&nbsp;<wbr>0&nbsp;<wbr></P>
+<p>
+1a98000.qcom,mdss_dsi-vddio&nbsp;<wbr>N&nbsp;<wbr>1800000&nbsp;<wbr>1800000&nbsp;<wbr>100&nbsp;<wbr></P>
+<p>
+1a98300.qcom,mdss_dsi_pll-vddio&nbsp;<wbr>N&nbsp;<wbr>1800000&nbsp;<wbr>1800000&nbsp;<wbr>100&nbsp;<wbr></P>
+<p>
+8916_l6&nbsp;<wbr>N&nbsp;<wbr>0&nbsp;<wbr>0&nbsp;<wbr>0&nbsp;<wbr></P>
+<p>这样就可以看到是哪些设备请求了<span STYLE="font-family:Times new roman;">LDO6</SPAN><span STYLE="font-family:宋体;">。然后&nbsp;<wbr>找到对应的代码，在休眠时关掉</SPAN><span STYLE="font-family:Times new roman;">LDO</SPAN><span STYLE="font-family:宋体;">，唤醒时再打开。&nbsp;<wbr></SPAN></P>
+<p>0-000c:&nbsp;<wbr><span STYLE="font-family:宋体;">挂在</SPAN><span STYLE="font-family:Times new roman;">I2C0</SPAN><span STYLE="font-family:宋体;">上地址为</SPAN><span STYLE="font-family:Times new roman;">0xc&nbsp;<wbr></SPAN></P>
+<p>5-0038:&nbsp;<wbr><span STYLE="font-family:宋体;">挂在</SPAN><span STYLE="font-family:Times new roman;">I2C0</SPAN><span STYLE="font-family:宋体;">上地址为</SPAN><span STYLE="font-family:Times new roman;">0x38&nbsp;<wbr></SPAN></P>
+<p>查看这两个设备的驱动代码是否有执行<span STYLE="font-family:Times new roman;">regulator_enable</SPAN><span STYLE="font-family:宋体;">。</SPAN></P>
+<p>（<span STYLE="font-family:Times new roman;">3</SPAN><span STYLE="font-family:宋体;">）通过寄存器地址关闭</SPAN><span STYLE="font-family:Times new roman;">LDO</SPAN></P>
+<p>如<span STYLE="font-family:Times new roman;">LDO6</SPAN><span STYLE="font-family:宋体;">的地址是</SPAN><span STYLE="font-family:Times new roman;">0x14546</SPAN><span STYLE="font-family:宋体;">，则关闭方法是：</SPAN></P>
+<p>
+#&nbsp;<wbr>cd&nbsp;<wbr>/sys/kernel/debug/spmi/spmi-0&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>echo&nbsp;<wbr>0x14546&nbsp;<wbr>&gt;&nbsp;<wbr>address&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>count&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>cat&nbsp;<wbr>data&nbsp;<wbr><span STYLE="font-family:宋体;">可以读寄存器&nbsp;<wbr></SPAN></P>
+<p>
+#&nbsp;<wbr>echo&nbsp;<wbr>0x00&nbsp;<wbr>&gt;&nbsp;<wbr>data&nbsp;<wbr><span STYLE="font-family:宋体;">关</SPAN><span STYLE="font-family:Times new roman;">LDO6</SPAN></P>
+<p>（<span STYLE="font-family:Times new roman;">4</SPAN><span STYLE="font-family:宋体;">）关闭</SPAN><span STYLE="font-family:Times new roman;">MPP</SPAN></P>
+<p>在休眠前关闭<span STYLE="font-family:Times new roman;">MPP1</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">MPP2</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">MPP3</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">MPP4&nbsp;<wbr></SPAN></P>
+<p>如<span STYLE="font-family:Times new roman;">PM8916</SPAN><span STYLE="font-family:宋体;">的寄存器地址分别是</SPAN><span STYLE="font-family:Times new roman;">0xA046</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">0xA146</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">0xA246</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">0xA346&nbsp;<wbr></SPAN></P>
+<p>在关闭前先<span STYLE="font-family:Times new roman;">cat&nbsp;<wbr>data</SPAN><span STYLE="font-family:宋体;">以查看原来的值。&nbsp;<wbr></SPAN></P>
+<p>&nbsp;<wbr></P>
+<p>GPIO<span STYLE="font-family:宋体;">状态读取的方法如下：</SPAN></P>
+<p>（<span STYLE="font-family:Times new roman;">1</SPAN><span STYLE="font-family:宋体;">）</SPAN><span STYLE="font-family:Times new roman;">GPIO&nbsp;<wbr>dump</SPAN></P>
+<p>为了得到休眠时的<span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">状态，增加下面的打印</SPAN><span STYLE="font-family:Times new roman;">:&nbsp;<wbr></SPAN></P>
+<p>
+rpm_proc/core/power/sleep/src/lpr_definition_uber.c&nbsp;<wbr></P>
+<p>#include&nbsp;<wbr>"tlmm_hwio.h"&nbsp;<wbr></P>
+<p>
+void&nbsp;<wbr>deep_sleep_enter(void)&nbsp;<wbr></P>
+<p>{&nbsp;<wbr></P>
+<p>uint64&nbsp;<wbr>sleep_duration;&nbsp;<wbr></P>
+<p>...&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+SWEVENT(SLEEP_DEEP_SLEEP_ENTER_COMPLETE,&nbsp;<wbr>sleep_mode.deep_sleep_mode,&nbsp;<wbr>sleep_duration);&nbsp;<wbr></P>
+<p>
+//&nbsp;<wbr>For&nbsp;<wbr>test&nbsp;<wbr></P>
+<p>{&nbsp;<wbr></P>
+<p>int&nbsp;<wbr>num;&nbsp;<wbr></P>
+<p>int&nbsp;<wbr>i=11;&nbsp;<wbr></P>
+<p>
+volatile&nbsp;<wbr>uint32&nbsp;<wbr>cfg&nbsp;<wbr>,inout,&nbsp;<wbr>val;&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+num&nbsp;<wbr>=&nbsp;<wbr>122;&nbsp;<wbr>//8916&nbsp;<wbr>only.&nbsp;<wbr>Need&nbsp;<wbr>modify&nbsp;<wbr>for&nbsp;<wbr>8974/8x10/8x26&nbsp;<wbr>etc.&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+cfg&nbsp;<wbr>=&nbsp;<wbr>*(volatile&nbsp;<wbr>uint32*)HWIO_TLMM_GPIO_CFGn_ADDR(i);&nbsp;<wbr>//(0x61000000&nbsp;<wbr>+&nbsp;<wbr>i&nbsp;<wbr>*&nbsp;<wbr>0x1000)&nbsp;<wbr></P>
+<p>
+inout&nbsp;<wbr>=&nbsp;<wbr>*(volatile&nbsp;<wbr>uint32*)HWIO_TLMM_GPIO_IN_OUTn_ADDR(i);//(0x61000004&nbsp;<wbr>+&nbsp;<wbr>i&nbsp;<wbr>*&nbsp;<wbr>0x1000)&nbsp;<wbr></P>
+<p>
+val&nbsp;<wbr>=&nbsp;<wbr>((cfg&nbsp;<wbr>&lt;&lt;&nbsp;<wbr>16)&amp;0xffff0000)&nbsp;<wbr>|&nbsp;<wbr>(inout&amp;0xffff);&nbsp;<wbr></P>
+<p>
+SWEVENT(SLEEP_GPIO_DUMP,&nbsp;<wbr>i,&nbsp;<wbr>val);&nbsp;<wbr></P>
+<p>}&nbsp;<wbr></P>
+<p>
+mpm_sw_done(sleep_mode.deep_sleep_mode,&nbsp;<wbr>sleep_duration);&nbsp;<wbr></P>
+<p>}&nbsp;<wbr>while(FALSE);&nbsp;<wbr></P>
+<p>}&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>增加<span STYLE="font-family:Times new roman;">for&nbsp;<wbr>test</SPAN><span STYLE="font-family:宋体;">下面这一段代码。</SPAN></P>
+<p>然后再修改<span STYLE="font-family:Times new roman;">:&nbsp;<wbr></SPAN></P>
+<p>rpm_proc\core\power\sleep\build\SConscript&nbsp;<wbr></P>
+<p>
+if&nbsp;<wbr>'USES_QDSS_SWE'&nbsp;<wbr>in&nbsp;<wbr>env:&nbsp;<wbr></P>
+<p>
+QDSS_IMG&nbsp;<wbr>=&nbsp;<wbr>['QDSS_EN_IMG']&nbsp;<wbr></P>
+<p>
+events&nbsp;<wbr>=&nbsp;<wbr>[['SLEEP_DEEP_SLEEP_ENTER=320','deep&nbsp;<wbr>sleep&nbsp;<wbr>enter.&nbsp;<wbr>(sleep&nbsp;<wbr>mode:&nbsp;<wbr>%d)&nbsp;<wbr>(count:&nbsp;<wbr>%d)'],&nbsp;<wbr></P>
+<p>
+['SLEEP_DEEP_SLEEP_EXIT','deep&nbsp;<wbr>sleep&nbsp;<wbr>exit&nbsp;<wbr>(sleep&nbsp;<wbr>mode:&nbsp;<wbr>%d)'],&nbsp;<wbr></P>
+<p>
+['SLEEP_NO_DEEP_SLEEP','bail&nbsp;<wbr>early&nbsp;<wbr>from&nbsp;<wbr>deep&nbsp;<wbr>sleep.&nbsp;<wbr>(sleep&nbsp;<wbr>mode:&nbsp;<wbr>%d)&nbsp;<wbr>(reason:&nbsp;<wbr>%d)'],&nbsp;<wbr></P>
+<p>
+['SLEEP_RPM_HALT_ENTER','rpm&nbsp;<wbr>halt&nbsp;<wbr>enter'],&nbsp;<wbr></P>
+<p>
+['SLEEP_RPM_HALT_EXIT','rpm&nbsp;<wbr>halt&nbsp;<wbr>exit'],&nbsp;<wbr></P>
+<p>
+['SLEEP_MPM_INTS','pending&nbsp;<wbr>mpm&nbsp;<wbr>interrupts&nbsp;<wbr>at&nbsp;<wbr>wakeup:&nbsp;<wbr>(interrupt_status_1&nbsp;<wbr>%d),&nbsp;<wbr>(interrupt_status_2&nbsp;<wbr>%d)'],&nbsp;<wbr></P>
+<p>
+['SLEEP_DEEP_SLEEP_ENTER_COMPLETE','deep&nbsp;<wbr>sleep&nbsp;<wbr>exit&nbsp;<wbr>complete&nbsp;<wbr>(sleep&nbsp;<wbr>mode:&nbsp;<wbr>%d)'],&nbsp;<wbr></P>
+<p>
+['SLEEP_DEEP_SLEEP_EXIT_COMPLETE','deep&nbsp;<wbr>sleep&nbsp;<wbr>exit&nbsp;<wbr>(sleep&nbsp;<wbr>mode:&nbsp;<wbr>%d)'],&nbsp;<wbr></P>
+<p>
+['SLEEP_MPM_WAKEUP_TIME','mpm&nbsp;<wbr>wake&nbsp;<wbr>up&nbsp;<wbr>time&nbsp;<wbr>(wakeup&nbsp;<wbr>time:&nbsp;<wbr>0x%0.8x%0.8x)'],&nbsp;<wbr></P>
+<p>
+['SLEEP_GPIO_DUMP','gpio&nbsp;<wbr>[%d]&nbsp;<wbr>configuration&nbsp;<wbr>is&nbsp;<wbr>%d'],</P>
+<p>
+['SLEEP_EVENT_LAST=383','sleep&nbsp;<wbr>last&nbsp;<wbr>event&nbsp;<wbr>placeholder']&nbsp;<wbr></P>
+<p>增加<span STYLE="font-family:Times new roman;">SLEEP_GPIO_DUMP</SPAN><span STYLE="font-family:宋体;">这一项。&nbsp;<wbr></SPAN></P>
+<p>编译烧写<span STYLE="font-family:Times new roman;">rpm.mbn</SPAN><span STYLE="font-family:宋体;">。</SPAN></P>
+<p>让机器休眠，进入<span STYLE="font-family:Times new roman;">download</SPAN><span STYLE="font-family:宋体;">，抓</SPAN><span STYLE="font-family:Times new roman;">dump</SPAN><span STYLE="font-family:宋体;">，然后将如下日志发给平台技术支持分析。&nbsp;<wbr></SPAN></P>
+<p>CODERAM.bin&nbsp;<wbr></P>
+<p>MSGRAM.bin&nbsp;<wbr></P>
+<p>DATARAM.bin&nbsp;<wbr></P>
+<p>以及新编译出来的<span STYLE="font-family:Times new roman;">RPM_AAAAANAZR.elf</SPAN><span STYLE="font-family:宋体;">。&nbsp;<wbr>&nbsp;<wbr></SPAN></P>
+<p>（<span STYLE="font-family:Times new roman;">2</SPAN><span STYLE="font-family:宋体;">）</SPAN><span STYLE="font-family:Times new roman;">GPIO</SPAN><span STYLE="font-family:宋体;">寄存器读取</SPAN></P>
+<p>在<span STYLE="font-family:Times new roman;">RPM</SPAN><span STYLE="font-family:宋体;">可能不是很方便，也可以用</SPAN><span STYLE="font-family:Times new roman;">busybox</SPAN><span STYLE="font-family:宋体;">来读取寄存器，例如读</SPAN><span STYLE="font-family:Times new roman;">GPIO11</SPAN><span STYLE="font-family:宋体;">：&nbsp;<wbr></SPAN></P>
+<p>
+Physical&nbsp;<wbr>Address&nbsp;<wbr>for&nbsp;<wbr>GPIO_CFG11&nbsp;<wbr>=&nbsp;<wbr>0x100B000&nbsp;<wbr></P>
+<p>
+root@android:/data/busybox&nbsp;<wbr>#&nbsp;<wbr>./busybox&nbsp;<wbr>devmem&nbsp;<wbr>0x100B000&nbsp;<wbr>32&nbsp;<wbr></P>
+<p>
+./busybox&nbsp;<wbr>devmem&nbsp;<wbr>0x100B000&nbsp;<wbr>32&nbsp;<wbr></P>
+<p>0x00000203&nbsp;<wbr></P>
+<p>
+GPIO_PULL&nbsp;<wbr>=&nbsp;<wbr>"11"&nbsp;<wbr>PULL_UP&nbsp;<wbr></P>
+<p>
+FUNC_SEL&nbsp;<wbr>=&nbsp;<wbr>"0000"&nbsp;<wbr>FUNCTION&nbsp;<wbr>GPIO&nbsp;<wbr></P>
+<p>
+DRV_STRENGTH&nbsp;<wbr>=&nbsp;<wbr>"000"&nbsp;<wbr>DRV_2_MA&nbsp;<wbr></P>
+<p>
+GPIO_OE&nbsp;<wbr>=&nbsp;<wbr>"1"&nbsp;<wbr>Output&nbsp;<wbr>Enable&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>1.12&nbsp;<wbr>rpm&nbsp;<wbr>dump</STRONG></P>
+<p>抓<span STYLE="font-family:Times new roman;">rpm&nbsp;<wbr>dump</SPAN><span STYLE="font-family:宋体;">，然后把</SPAN><span STYLE="font-family:Times new roman;">log</SPAN><span STYLE="font-family:宋体;">提供给平台技术支持。</SPAN></P>
+<p>方法如下：&nbsp;<wbr></P>
+<p>（<span STYLE="font-family:Times new roman;">1</SPAN><span STYLE="font-family:宋体;">）</SPAN><span STYLE="font-family:Times new roman;">ps_hold</SPAN><span STYLE="font-family:宋体;">接地</SPAN></P>
+<p>在休眠状态下，接<span STYLE="font-family:Times new roman;">ps_hold</SPAN><span STYLE="font-family:宋体;">到地少于</SPAN><span STYLE="font-family:Times new roman;">200mS</SPAN><span STYLE="font-family:宋体;">，机器会进入紧急下载状态，插入</SPAN><span STYLE="font-family:Times new roman;">USB</SPAN><span STYLE="font-family:宋体;">，</SPAN><span STYLE="font-family:Times new roman;">QPST</SPAN><span STYLE="font-family:宋体;">会自动得到</SPAN><span STYLE="font-family:Times new roman;">memory&nbsp;<wbr>dump</SPAN><span STYLE="font-family:宋体;">，然后上传以下几个文件：&nbsp;<wbr></SPAN></P>
+<p>CODERAM.bin&nbsp;<wbr></P>
+<p>MSGRAM.bin</P>
+<p>DATARAM.bin&nbsp;<wbr></P>
+<p>以及<span STYLE="font-family:Times new roman;">RPM_AAAAANAZR.elf</SPAN><span STYLE="font-family:宋体;">（必须与机器的编译时间一致匹配的</SPAN><span STYLE="font-family:Times new roman;">elf)&nbsp;<wbr></SPAN></P>
+<p>（<span STYLE="font-family:Times new roman;">2</SPAN><span STYLE="font-family:宋体;">）改</SPAN><span STYLE="font-family:Times new roman;">reset</SPAN><span STYLE="font-family:宋体;">为</SPAN><span STYLE="font-family:Times new roman;">download&nbsp;<wbr>key</SPAN></P>
+<p>发这些命令改<span STYLE="font-family:Times new roman;">reset</SPAN><span STYLE="font-family:宋体;">为</SPAN><span STYLE="font-family:Times new roman;">download&nbsp;<wbr>key:&nbsp;<wbr></SPAN></P>
+<p>
+#&nbsp;<wbr>cd&nbsp;<wbr>/sys/kernel/debug/spmi/spmi-0&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>echo&nbsp;<wbr>0x844&nbsp;<wbr>&gt;&nbsp;<wbr>address&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>echo&nbsp;<wbr>4&nbsp;<wbr>&gt;&nbsp;<wbr>count&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>cat&nbsp;<wbr>data&nbsp;<wbr></P>
+<p>
+00840&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>0F&nbsp;<wbr>07&nbsp;<wbr>04&nbsp;<wbr>00&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>echo&nbsp;<wbr>0x00&nbsp;<wbr>0x00&nbsp;<wbr>0x01&nbsp;<wbr>0x00&nbsp;<wbr>&gt;&nbsp;<wbr>data&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>cat&nbsp;<wbr>data&nbsp;<wbr></P>
+<p>
+00840&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>00&nbsp;<wbr>00&nbsp;<wbr>01&nbsp;<wbr>00&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>echo&nbsp;<wbr>0x00&nbsp;<wbr>0x00&nbsp;<wbr>0x01&nbsp;<wbr>0x80&nbsp;<wbr>&gt;&nbsp;<wbr>data&nbsp;<wbr></P>
+<p>
+#&nbsp;<wbr>cat&nbsp;<wbr>data&nbsp;<wbr></P>
+<p>
+00840&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>--&nbsp;<wbr>00&nbsp;<wbr>00&nbsp;<wbr>01&nbsp;<wbr>80&nbsp;<wbr></P>
+<p>然后长按下键，会进入<span STYLE="font-family:Times new roman;">download</SPAN><span STYLE="font-family:宋体;">。之后抓取</SPAN><span STYLE="font-family:Times new roman;">log</SPAN><span STYLE="font-family:宋体;">方法同上。</SPAN></P>
+<p>如果进不了<span STYLE="font-family:Times new roman;">download</SPAN><span STYLE="font-family:宋体;">，需要确认：&nbsp;<wbr></SPAN></P>
+<p>CONFIG_MSM_DLOAD_MODE=y&nbsp;<wbr></P>
+<p>另外也有可能与<span STYLE="font-family:Times new roman;">nv&nbsp;<wbr>4399</SPAN><span STYLE="font-family:宋体;">和</SPAN><span STYLE="font-family:Times new roman;">905</SPAN><span STYLE="font-family:宋体;">有关系。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.13<span STYLE="font-family:宋体;">检查</SPAN><span STYLE="font-family:Times new roman;">rpm_stats</SPAN></STRONG></P>
+<p>检查<span STYLE="font-family:Times new roman;">rpm_stats</SPAN><span STYLE="font-family:宋体;">是否进入</SPAN><span STYLE="font-family:Times new roman;">vdd&nbsp;<wbr>min</SPAN><span STYLE="font-family:宋体;">或者</SPAN><span STYLE="font-family:Times new roman;">xo/no&nbsp;<wbr>shutdown</SPAN><span STYLE="font-family:宋体;">。使用下面的命令检查</SPAN><span STYLE="font-family:Times new roman;">rpm&nbsp;<wbr>lower&nbsp;<wbr>power&nbsp;<wbr>mode&nbsp;<wbr>count:</SPAN></P>
+<p>cat&nbsp;<wbr>/sys/kernel/debug/rpm_stats</P>
+<p>如果<span STYLE="font-family:Times new roman;">vmin</SPAN><span STYLE="font-family:宋体;">的</SPAN><span STYLE="font-family:Times new roman;">count</SPAN><span STYLE="font-family:宋体;">是</SPAN><span STYLE="font-family:Times new roman;">0</SPAN><span STYLE="font-family:宋体;">，则表明设备从来没有进入</SPAN><span STYLE="font-family:Times new roman;">vdd&nbsp;<wbr>min</SPAN><span STYLE="font-family:宋体;">；</SPAN><span STYLE="font-family:Times new roman;">non-zero</SPAN><span STYLE="font-family:宋体;">则说明设备进入过</SPAN><span STYLE="font-family:Times new roman;">vdd_min</SPAN><span STYLE="font-family:宋体;">。</SPAN></P>
+<p>RPM&nbsp;<wbr>Mode:&nbsp;<wbr>xosd</P>
+<p>count:0</P>
+<p>
+time&nbsp;<wbr>in&nbsp;<wbr>last&nbsp;<wbr>mode(msec):0</P>
+<p>
+time&nbsp;<wbr>since&nbsp;<wbr>last&nbsp;<wbr>mode(sec):794</P>
+<p>actual&nbsp;<wbr>last&nbsp;<wbr>sleep(msec):0</P>
+<p>RPM&nbsp;<wbr>Mode:vmin</P>
+<p>count:11</P>
+<p>
+time&nbsp;<wbr>in&nbsp;<wbr>last&nbsp;<wbr>mode(msec):0</P>
+<p>
+time&nbsp;<wbr>since&nbsp;<wbr>last&nbsp;<wbr>mode(sec):359</P>
+<p>
+actual&nbsp;<wbr>last&nbsp;<wbr>sleep(msec):110000</P>
+<p>&nbsp;<wbr></P>
+<p><strong>1.14<span STYLE="font-family:宋体;">使用</SPAN><span STYLE="font-family:Times new roman;">Trace32</SPAN></STRONG></P>
+<p>可以<span STYLE="font-family:Times new roman;">dump</SPAN><span STYLE="font-family:宋体;">出来完整详细的</SPAN><span STYLE="font-family:Times new roman;">gpio/clk/pmic</SPAN><span STYLE="font-family:宋体;">信息，排除休眠时候的状态异常。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p><strong>2<span STYLE="font-family:宋体;">、待机电流优化（</SPAN><span STYLE="font-family:Times new roman;">Standby&nbsp;<wbr>Current&nbsp;<wbr>Optimization</SPAN><span STYLE="font-family:宋体;">）</SPAN></STRONG></P>
+<p><strong>2.1<span STYLE="font-family:宋体;">通过</SPAN><span STYLE="font-family:Times new roman;">adb&nbsp;<wbr>log</SPAN><span STYLE="font-family:宋体;">排查</SPAN></STRONG></P>
+<p>
+adb&nbsp;<wbr>logcat&nbsp;<wbr>-v&nbsp;<wbr>time&nbsp;<wbr>&gt;&nbsp;<wbr>YearMounthDayHourMinute_logcat.txt&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>//main&nbsp;<wbr>log</P>
+<p>
+adb&nbsp;<wbr>logcat&nbsp;<wbr>-v&nbsp;<wbr>time&nbsp;<wbr>-b&nbsp;<wbr>events&nbsp;<wbr>&gt;&nbsp;<wbr>YearMounthDayHourMinute_logcat_event.txt&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>//event&nbsp;<wbr>log</P>
+<p>
+adb&nbsp;<wbr>logcat&nbsp;<wbr>-v&nbsp;<wbr>time&nbsp;<wbr>-b&nbsp;<wbr>radio&nbsp;<wbr>&gt;&nbsp;<wbr>YearMounthDayHourMinute_logcat_radio.txt&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>//radio&nbsp;<wbr>log</P>
+<p>
+adb&nbsp;<wbr>shell&nbsp;<wbr>dmesg&nbsp;<wbr>&gt;&nbsp;<wbr>YearMounthDayHourMinute_dmesg.txt&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>&nbsp;<wbr>//kernel&nbsp;<wbr>log</P>
+<p>可以采用功耗问题时间追踪表来精确追踪功耗异常。</P>
+<p>可以使用如下命令来打开指定文件的<span STYLE="font-family:Times new roman;">kernel&nbsp;<wbr>log</SPAN><span STYLE="font-family:宋体;">（以</SPAN><span STYLE="font-family:Times new roman;">qpnp-adc-tm.c</SPAN><span STYLE="font-family:宋体;">和</SPAN><span STYLE="font-family:Times new roman;">qpnp-adc-common.c</SPAN><span STYLE="font-family:宋体;">为例）：</SPAN></P>
+<p>
+adb&nbsp;<wbr>shell&nbsp;<wbr>mount&nbsp;<wbr>-t&nbsp;<wbr>debugfs&nbsp;<wbr>none&nbsp;<wbr>/sys/kernel/debug</P>
+<p>
+adb&nbsp;<wbr>shell&nbsp;<wbr>"echo&nbsp;<wbr>8&nbsp;<wbr>&gt;&nbsp;<wbr>/proc/sys/kernel/printk"&nbsp;<wbr></P>
+<p>
+adb&nbsp;<wbr>shell&nbsp;<wbr>"echo&nbsp;<wbr>'file&nbsp;<wbr>qpnp-adc-tm.c&nbsp;<wbr>+p'&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/kernel/debug/dynamic_debug/control"</P>
+<p>
+adb&nbsp;<wbr>shell&nbsp;<wbr>"echo&nbsp;<wbr>'file&nbsp;<wbr>qpnp-adc-common.c&nbsp;<wbr>+p'&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/kernel/debug/dynamic_debug/control"</P>
+<p>
+adb&nbsp;<wbr>shell&nbsp;<wbr>"echo&nbsp;<wbr>8&nbsp;<wbr>&gt;&nbsp;<wbr>/proc/sys/kernel/printk"</P>
+<p>&nbsp;<wbr></P>
+<p>为指定的函数开启<span STYLE="font-family:Times new roman;">log</SPAN><span STYLE="font-family:宋体;">，以</SPAN><span STYLE="font-family:Times new roman;">qpnpint_handle_irq</SPAN><span STYLE="font-family:宋体;">为例：</SPAN></P>
+<p>
+adb&nbsp;<wbr>shell&nbsp;<wbr>"echo&nbsp;<wbr>'func&nbsp;<wbr>qpnpint_handle_irq&nbsp;<wbr>+p'&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/kernel/debug/dynamic_debug/control"&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>*#logkit#*<span STYLE="font-family:宋体;">调出</SPAN><span STYLE="font-family:Times new roman;">logkit&nbsp;<wbr>apk</SPAN><span STYLE="font-family:宋体;">，可以保存</SPAN><span STYLE="font-family:Times new roman;">logcat</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">dmesg</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">crash</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">QXDM</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">GPU&nbsp;<wbr>log</SPAN><span STYLE="font-family:宋体;">等日志信息到手机里面。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>2.2&nbsp;<wbr>top</STRONG></P>
+<p>通过<span STYLE="font-family:Times new roman;">top</SPAN><span STYLE="font-family:宋体;">命令，可以查询到</SPAN><span STYLE="font-family:Times new roman;">cpu</SPAN><span STYLE="font-family:宋体;">占用较高的应用。如果一个应用一直在占用</SPAN><span STYLE="font-family:Times new roman;">cpu</SPAN><span STYLE="font-family:宋体;">，而此时并没有打开该应用，那么该应用很可能会导致待机异常。</SPAN></P>
+<p>adb&nbsp;<wbr>shell</P>
+<p>top</P>
+<p>“该场景下<span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">使用率”是</SPAN><span STYLE="font-family:Times new roman;">User+System+IOW+IRQ</SPAN></P>
+<p>“模块相关的<span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">占用率”是模块相关进程占用</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">使用率的总和</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>2.3<span STYLE="font-family:宋体;">正在运行</SPAN></STRONG></P>
+<p>设置<span STYLE="font-family:Times new roman;">--&gt;</SPAN><span STYLE="font-family:宋体;">应用</SPAN><span STYLE="font-family:Times new roman;">--&gt;</SPAN><span STYLE="font-family:宋体;">正在运行，可以看到正在运行的应用或者服务。禁止掉应用或者服务，观察待机电流变化。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>2.4&nbsp;<wbr>wakeup&nbsp;<wbr>debug&nbsp;<wbr>mask</STRONG></P>
+<p>调试<span STYLE="font-family:Times new roman;">wakeup</SPAN><span STYLE="font-family:宋体;">问题，可以使能</SPAN><span STYLE="font-family:Times new roman;">debug</SPAN><span STYLE="font-family:宋体;">功能，然后抓取</SPAN><span STYLE="font-family:Times new roman;">log</SPAN><span STYLE="font-family:宋体;">。</SPAN><span STYLE="font-family:Times new roman;">Log</SPAN><span STYLE="font-family:宋体;">中会增加一些</SPAN><span STYLE="font-family:Times new roman;">debug</SPAN><span STYLE="font-family:宋体;">信息。</SPAN></P>
+<p>
+mount&nbsp;<wbr>-t&nbsp;<wbr>debugfs&nbsp;<wbr>none&nbsp;<wbr>/sys/kernel/debug&nbsp;<wbr>&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/kernel/debug/clk/debug_suspend&nbsp;<wbr>&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/msm_show_resume_irq/parameters/debug_mask&nbsp;<wbr>&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>4&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/wakelock/parameters/debug_mask&nbsp;<wbr>&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/lpm_levels/parameters/debug_mask&nbsp;<wbr>&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>0x16&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/smd/parameters/debug_mask&nbsp;<wbr>&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>2.5&nbsp;<wbr>wakelock&nbsp;<wbr>&nbsp;<wbr></STRONG></P>
+<p>1<span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">wakeup_sources&nbsp;<wbr>&nbsp;<wbr></SPAN></P>
+<p>kernel&nbsp;<wbr>wakelock<span STYLE="font-family:宋体;">和</SPAN><span STYLE="font-family:Times new roman;">userspace&nbsp;<wbr>wakelock</SPAN><span STYLE="font-family:宋体;">都有可能阻止系统睡眠。所有的</SPAN><span STYLE="font-family:Times new roman;">wakeup_sources</SPAN><span STYLE="font-family:宋体;">均保存在</SPAN><span STYLE="font-family:Times new roman;">sys</SPAN><span STYLE="font-family:宋体;">节点</SPAN><span STYLE="font-family:Times new roman;">/sys/kernel/debug/wakeup_sources</SPAN><span STYLE="font-family:宋体;">里面。&nbsp;<wbr></SPAN></P>
+<p>该文件包含了如下信息：</P>
+<p>（<span STYLE="font-family:Times new roman;">1</SPAN><span STYLE="font-family:宋体;">）</SPAN><span STYLE="font-family:Times new roman;">the&nbsp;<wbr>total&nbsp;<wbr>amount&nbsp;<wbr>of&nbsp;<wbr>time&nbsp;<wbr>a&nbsp;<wbr>wakeup&nbsp;<wbr>source&nbsp;<wbr>has&nbsp;<wbr>prevented&nbsp;<wbr>suspend&nbsp;<wbr>&nbsp;<wbr></SPAN></P>
+<p>（<span STYLE="font-family:Times new roman;">2</SPAN><span STYLE="font-family:宋体;">）</SPAN><span STYLE="font-family:Times new roman;">the&nbsp;<wbr>amount&nbsp;<wbr>of&nbsp;<wbr>time&nbsp;<wbr>a&nbsp;<wbr>wakelock&nbsp;<wbr>has&nbsp;<wbr>been&nbsp;<wbr>active&nbsp;<wbr>since&nbsp;<wbr>the&nbsp;<wbr>last&nbsp;<wbr>activation&nbsp;<wbr>etc.&nbsp;<wbr>The&nbsp;<wbr>unit&nbsp;<wbr>of&nbsp;<wbr>time&nbsp;<wbr>is&nbsp;<wbr>milliseconds.&nbsp;<wbr></SPAN></P>
+<p>&nbsp;<wbr></P>
+<p>2<span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">active_since</SPAN></P>
+<p>active_since<span STYLE="font-family:宋体;">值可以用来确认</SPAN><span STYLE="font-family:Times new roman;">wakelock</SPAN><span STYLE="font-family:宋体;">是否正在阻止休眠。如果该值不是零，那么这个</SPAN><span STYLE="font-family:Times new roman;">wakelock</SPAN><span STYLE="font-family:宋体;">正在工作并且阻止休眠。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p>3<span STYLE="font-family:宋体;">、获取</SPAN><span STYLE="font-family:Times new roman;">wakeup_sources</SPAN><span STYLE="font-family:宋体;">的命令</SPAN></P>
+<p>adb&nbsp;<wbr>root&nbsp;<wbr>67754400</P>
+<p>adb&nbsp;<wbr>remount</P>
+<p>adb&nbsp;<wbr>shell&nbsp;<wbr></P>
+<p>
+cat&nbsp;<wbr>/sys/kernel/debug/wakeup_sources&nbsp;<wbr>&gt;&nbsp;<wbr>/data/wakeup_sources.txt</P>
+<p>
+adb&nbsp;<wbr>pull&nbsp;<wbr>/data/wakeup_sources.txt</P>
+<p>获得<span STYLE="font-family:Times new roman;">wakeup_sources.txt</SPAN><span STYLE="font-family:宋体;">以后，通过</SPAN><span STYLE="font-family:Times new roman;">Excel</SPAN><span STYLE="font-family:宋体;">打开，</SPAN><span STYLE="font-family:Times new roman;">active_since</SPAN><span STYLE="font-family:宋体;">不为</SPAN><span STYLE="font-family:Times new roman;">0</SPAN><span STYLE="font-family:宋体;">的项为</SPAN><span STYLE="font-family:Times new roman;">wakeup&nbsp;<wbr>source</SPAN><span STYLE="font-family:宋体;">。以表</SPAN><span STYLE="font-family:Times new roman;">2</SPAN><span STYLE="font-family:宋体;">为例，</SPAN><span STYLE="font-family:Times new roman;">msm_dwc3</SPAN><span STYLE="font-family:宋体;">对应的</SPAN><span STYLE="font-family:Times new roman;">active-since</SPAN><span STYLE="font-family:宋体;">值</SPAN><span STYLE="font-family:Times new roman;">481756&gt;0</SPAN><span STYLE="font-family:宋体;">，这意味着</SPAN><span STYLE="font-family:Times new roman;">msm_dwc3</SPAN><span STYLE="font-family:宋体;">驱动在阻止系统睡眠，下一步需要检查</SPAN><span STYLE="font-family:Times new roman;">msm_dwc3</SPAN><span STYLE="font-family:宋体;">驱动代码及相关</SPAN><span STYLE="font-family:Times new roman;">log</SPAN><span STYLE="font-family:宋体;">。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p>表格&nbsp;<wbr><span STYLE="font-family:Times new roman;">2&nbsp;<wbr>Wakeup&nbsp;<wbr>source&nbsp;<wbr>opened&nbsp;<wbr>in&nbsp;<wbr>Excel</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p>4<span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">power:wakeup_source_activate&nbsp;<wbr>and&nbsp;<wbr>power:wakeup_source_deactivate&nbsp;<wbr>events</SPAN></P>
+<p>当一个<span STYLE="font-family:Times new roman;">wakeup&nbsp;<wbr>source</SPAN><span STYLE="font-family:宋体;">被</SPAN><span STYLE="font-family:Times new roman;">acquire</SPAN><span STYLE="font-family:宋体;">或者</SPAN><span STYLE="font-family:Times new roman;">release</SPAN><span STYLE="font-family:宋体;">时候，</SPAN><span STYLE="font-family:Times new roman;">power:wakeup_source_activate</SPAN><span STYLE="font-family:宋体;">和</SPAN><span STYLE="font-family:Times new roman;">power:wakeup_source_deactivate&nbsp;<wbr>event</SPAN><span STYLE="font-family:宋体;">将随即被写到</SPAN><span STYLE="font-family:Times new roman;">trace&nbsp;<wbr>buffer</SPAN><span STYLE="font-family:宋体;">里面，这样可以记录</SPAN><span STYLE="font-family:Times new roman;">wakeup&nbsp;<wbr>source</SPAN><span STYLE="font-family:宋体;">被</SPAN><span STYLE="font-family:Times new roman;">driver</SPAN><span STYLE="font-family:宋体;">使用的频率。</SPAN></P>
+<p>开启该功能的方法：</P>
+<p>
+echo&nbsp;<wbr>"power:wakeup_source_activate&nbsp;<wbr>power:wakeup_source_deactivate"&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/kernel/debug/tracing/set_event</P>
+<p>&nbsp;<wbr></P>
+<p>
+The&nbsp;<wbr>power:wakeup_source_activate&nbsp;<wbr>and&nbsp;<wbr>power:wakeup_source_deactivate&nbsp;<wbr>events&nbsp;<wbr>are&nbsp;<wbr>written&nbsp;<wbr>to&nbsp;<wbr>the&nbsp;<wbr>trace&nbsp;<wbr>buffer&nbsp;<wbr>any&nbsp;<wbr>time&nbsp;<wbr>a&nbsp;<wbr>wakeup&nbsp;<wbr>source&nbsp;<wbr>is&nbsp;<wbr>acquired&nbsp;<wbr>or&nbsp;<wbr>released&nbsp;<wbr>and&nbsp;<wbr>it&nbsp;<wbr>can&nbsp;<wbr>provide&nbsp;<wbr>information&nbsp;<wbr>on&nbsp;<wbr>how&nbsp;<wbr>often&nbsp;<wbr>a&nbsp;<wbr>wakeup&nbsp;<wbr>source&nbsp;<wbr>is&nbsp;<wbr>being&nbsp;<wbr>used&nbsp;<wbr>by&nbsp;<wbr>a&nbsp;<wbr>driver.&nbsp;<wbr>&nbsp;<wbr></P>
+<p>
+To&nbsp;<wbr>enable&nbsp;<wbr>these&nbsp;<wbr>events,&nbsp;<wbr>you&nbsp;<wbr>can&nbsp;<wbr>enable&nbsp;<wbr>following:&nbsp;<wbr>&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>"power:wakeup_source_activate&nbsp;<wbr>power:wakeup_source_deactivate"&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/kernel/debug/tracing/set_event&nbsp;<wbr></P>
+<p>
+Once&nbsp;<wbr>the&nbsp;<wbr>above&nbsp;<wbr>done,&nbsp;<wbr>the&nbsp;<wbr>traces&nbsp;<wbr>will&nbsp;<wbr>be&nbsp;<wbr>present&nbsp;<wbr>in&nbsp;<wbr>/sys/kernel/debug/tracing/trace.&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p><strong>2.6&nbsp;<wbr>powertop</STRONG></P>
+<p>powertop<span STYLE="font-family:宋体;">用来看</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">的运行统计以协助调试</SPAN><span STYLE="font-family:Times new roman;">power</SPAN><span STYLE="font-family:宋体;">问题。</SPAN><span STYLE="font-family:Times new roman;">powertop</SPAN><span STYLE="font-family:宋体;">的用法如下：</SPAN></P>
+<p>powertop&nbsp;<wbr>--h</P>
+<p>
+Usage:&nbsp;<wbr>powertop&nbsp;<wbr>[OPTION...]</P>
+<p>
+n&nbsp;<wbr>-d,&nbsp;<wbr>--dump&nbsp;<wbr>read&nbsp;<wbr>wakeups&nbsp;<wbr>once&nbsp;<wbr>and&nbsp;<wbr>print&nbsp;<wbr>list&nbsp;<wbr>of&nbsp;<wbr>top&nbsp;<wbr>offenders</P>
+<p>
+n&nbsp;<wbr>-t,&nbsp;<wbr>--time=DOUBLE&nbsp;<wbr>default&nbsp;<wbr>time&nbsp;<wbr>to&nbsp;<wbr>gather&nbsp;<wbr>data&nbsp;<wbr>in&nbsp;<wbr>seconds</P>
+<p>
+n&nbsp;<wbr>-r,&nbsp;<wbr>--reset&nbsp;<wbr>Reset&nbsp;<wbr>PM&nbsp;<wbr>stats&nbsp;<wbr>data</P>
+<p>
+n&nbsp;<wbr>-h,&nbsp;<wbr>--help&nbsp;<wbr>Show&nbsp;<wbr>this&nbsp;<wbr>help&nbsp;<wbr>message</P>
+<p>
+n&nbsp;<wbr>-v,&nbsp;<wbr>--version&nbsp;<wbr>Show&nbsp;<wbr>version&nbsp;<wbr>information&nbsp;<wbr>and&nbsp;<wbr>exit</P>
+<p>获取<span STYLE="font-family:Times new roman;">powertop&nbsp;<wbr>log</SPAN><span STYLE="font-family:宋体;">的方法：</SPAN></P>
+<p>1.&nbsp;<wbr><span STYLE="font-family:宋体;">通过</SPAN><span STYLE="font-family:Times new roman;">USB</SPAN><span STYLE="font-family:宋体;">连接手机到电脑</SPAN></P>
+<p>2.&nbsp;<wbr>adb&nbsp;<wbr>shell<span STYLE="font-family:宋体;">，然后执行如下命令：</SPAN></P>
+<p>
+sleep&nbsp;<wbr>10&nbsp;<wbr>&amp;&amp;&nbsp;<wbr>/data/powertop&nbsp;<wbr>[-r]&nbsp;<wbr>-d&nbsp;<wbr>-t&nbsp;<wbr>30&nbsp;<wbr>&gt;&nbsp;<wbr>/data/powertop.log&nbsp;<wbr>&amp;&nbsp;<wbr></P>
+<p>3.&nbsp;<wbr><span STYLE="font-family:宋体;">拔掉</SPAN><span STYLE="font-family:Times new roman;">USB</SPAN><span STYLE="font-family:宋体;">线，等待</SPAN><span STYLE="font-family:Times new roman;">10</SPAN><span STYLE="font-family:宋体;">秒后开始功耗测试</SPAN></P>
+<p>4.&nbsp;<wbr><span STYLE="font-family:宋体;">插上</SPAN><span STYLE="font-family:Times new roman;">USB&nbsp;<wbr>&nbsp;<wbr></SPAN></P>
+<p>
+5.&nbsp;<wbr>adb&nbsp;<wbr>pull&nbsp;<wbr>/data/powertop.log&nbsp;<wbr>&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>2.7&nbsp;<wbr>CPU&nbsp;<wbr>freq&nbsp;<wbr>log&nbsp;<wbr></STRONG></P>
+<p>打开<span STYLE="font-family:Times new roman;">CPU&nbsp;<wbr>freq&nbsp;<wbr>change&nbsp;<wbr>log</SPAN><span STYLE="font-family:宋体;">：</SPAN></P>
+<p>
+mount&nbsp;<wbr>-t&nbsp;<wbr>debugfs&nbsp;<wbr>none&nbsp;<wbr>/sys/kernel/debug&nbsp;<wbr>&nbsp;<wbr></P>
+<p>cd&nbsp;<wbr>/sys/kernel/debug&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>-n&nbsp;<wbr>'file&nbsp;<wbr>acpuclock-8x60.c&nbsp;<wbr>+p'&nbsp;<wbr>&gt;&nbsp;<wbr>dynamic_debug/control&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>-n&nbsp;<wbr>'file&nbsp;<wbr>acpuclock-krait.c&nbsp;<wbr>+p'&nbsp;<wbr>&gt;&nbsp;<wbr>dynamic_debug/control</P>
+<p>&nbsp;<wbr></P>
+<p>查看<span STYLE="font-family:Times new roman;">cpu&nbsp;<wbr>freq&nbsp;<wbr>stats:&nbsp;<wbr></SPAN></P>
+<p>
+cat&nbsp;<wbr>/sys/devices/system/cpu/cpu0/cpufreq/stats&nbsp;<wbr></P>
+<p>
+cat&nbsp;<wbr>/sys/devices/system/cpu/cpu1/cpufreq/stats&nbsp;<wbr></P>
+<p>
+cat&nbsp;<wbr>/sys/devices/system/cpu/cpu2/cpufreq/stats&nbsp;<wbr></P>
+<p>
+cat&nbsp;<wbr>/sys/devices/system/cpu/cpu3/cpufreq/stats&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+To&nbsp;<wbr>lock&nbsp;<wbr>cpu&nbsp;<wbr>freg:&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>the&nbsp;<wbr>same&nbsp;<wbr>freq&nbsp;<wbr>to&nbsp;<wbr>following&nbsp;<wbr>sys&nbsp;<wbr>mode&nbsp;<wbr>will&nbsp;<wbr>lock&nbsp;<wbr>cpu&nbsp;<wbr>freq&nbsp;<wbr>to&nbsp;<wbr>the&nbsp;<wbr>setting&nbsp;<wbr>freq.&nbsp;<wbr></P>
+<p>
+/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq&nbsp;<wbr></P>
+<p>/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq</P>
+<p>&nbsp;<wbr></P>
+<p>
+To&nbsp;<wbr>enable/disable&nbsp;<wbr>specific&nbsp;<wbr>freq&nbsp;<wbr>for&nbsp;<wbr>ACPU&nbsp;<wbr></P>
+<p>
+ACPU&nbsp;<wbr>freq&nbsp;<wbr>table&nbsp;<wbr>is&nbsp;<wbr>defined&nbsp;<wbr>in&nbsp;<wbr>acpu_freq_tbl_*&nbsp;<wbr>structure&nbsp;<wbr>of&nbsp;<wbr>specific&nbsp;<wbr>platform.&nbsp;<wbr></P>
+<p>arch/arm/mach-msm/acpuclock-.c&nbsp;<wbr></P>
+<p>
+For&nbsp;<wbr>8974,&nbsp;<wbr>it&nbsp;<wbr>is&nbsp;<wbr>defined&nbsp;<wbr>in&nbsp;<wbr>arch/arm/mach-msm/acpuclock-8974.c.&nbsp;<wbr>the&nbsp;<wbr>first&nbsp;<wbr>column&nbsp;<wbr>of&nbsp;<wbr>following&nbsp;<wbr>table&nbsp;<wbr>used&nbsp;<wbr>to&nbsp;<wbr>enable/disable&nbsp;<wbr>freq&nbsp;<wbr>in&nbsp;<wbr>the&nbsp;<wbr>row:&nbsp;<wbr>1:enable,&nbsp;<wbr>0:disable&nbsp;<wbr>&nbsp;<wbr></P>
+<p>
+static&nbsp;<wbr>struct&nbsp;<wbr>acpu_level&nbsp;<wbr>acpu_freq_tbl_2p3g_pvs0[]&nbsp;<wbr>__initdata&nbsp;<wbr>=&nbsp;<wbr>{&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>300000,&nbsp;<wbr>PLL_0,&nbsp;<wbr>0,&nbsp;<wbr>0&nbsp;<wbr>},&nbsp;<wbr>L2(0),&nbsp;<wbr>800000,&nbsp;<wbr>72&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>345600,&nbsp;<wbr>HFPLL,&nbsp;<wbr>2,&nbsp;<wbr>36&nbsp;<wbr>},&nbsp;<wbr>L2(1),&nbsp;<wbr>800000,&nbsp;<wbr>83&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>422400,&nbsp;<wbr>HFPLL,&nbsp;<wbr>2,&nbsp;<wbr>44&nbsp;<wbr>},&nbsp;<wbr>L2(2),&nbsp;<wbr>800000,&nbsp;<wbr>101&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>499200,&nbsp;<wbr>HFPLL,&nbsp;<wbr>2,&nbsp;<wbr>52&nbsp;<wbr>},&nbsp;<wbr>L2(2),&nbsp;<wbr>805000,&nbsp;<wbr>120&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>576000,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>30&nbsp;<wbr>},&nbsp;<wbr>L2(3),&nbsp;<wbr>815000,&nbsp;<wbr>139&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>652800,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>34&nbsp;<wbr>},&nbsp;<wbr>L2(3),&nbsp;<wbr>825000,&nbsp;<wbr>159&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>729600,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>38&nbsp;<wbr>},&nbsp;<wbr>L2(4),&nbsp;<wbr>835000,&nbsp;<wbr>180&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>806400,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>42&nbsp;<wbr>},&nbsp;<wbr>L2(4),&nbsp;<wbr>845000,&nbsp;<wbr>200&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>883200,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>46&nbsp;<wbr>},&nbsp;<wbr>L2(4),&nbsp;<wbr>855000,&nbsp;<wbr>221&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>960000,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>50&nbsp;<wbr>},&nbsp;<wbr>L2(9),&nbsp;<wbr>865000,&nbsp;<wbr>242&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>1036800,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>54&nbsp;<wbr>},&nbsp;<wbr>L2(10),&nbsp;<wbr>875000,&nbsp;<wbr>264&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>1113600,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>58&nbsp;<wbr>},&nbsp;<wbr>L2(10),&nbsp;<wbr>890000,&nbsp;<wbr>287&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>1190400,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>62&nbsp;<wbr>},&nbsp;<wbr>L2(10),&nbsp;<wbr>900000,&nbsp;<wbr>308&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>…&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>1958400,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>102&nbsp;<wbr>},&nbsp;<wbr>L2(19),&nbsp;<wbr>1040000,&nbsp;<wbr>565&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>2035200,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>106&nbsp;<wbr>},&nbsp;<wbr>L2(19),&nbsp;<wbr>1055000,&nbsp;<wbr>596&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>2112000,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>110&nbsp;<wbr>},&nbsp;<wbr>L2(19),&nbsp;<wbr>1070000,&nbsp;<wbr>627&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>2188800,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>114&nbsp;<wbr>},&nbsp;<wbr>L2(19),&nbsp;<wbr>1085000,&nbsp;<wbr>659&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>1,&nbsp;<wbr>{&nbsp;<wbr>2265600,&nbsp;<wbr>HFPLL,&nbsp;<wbr>1,&nbsp;<wbr>118&nbsp;<wbr>},&nbsp;<wbr>L2(19),&nbsp;<wbr>1100000,&nbsp;<wbr>691&nbsp;<wbr>},&nbsp;<wbr></P>
+<p>
+{&nbsp;<wbr>0,&nbsp;<wbr>{&nbsp;<wbr>0&nbsp;<wbr>}&nbsp;<wbr>}&nbsp;<wbr></P>
+<p>};&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>2.8&nbsp;<wbr>Hoplug&nbsp;<wbr>cores&nbsp;<wbr></STRONG></P>
+<p>Core&nbsp;<wbr>0&nbsp;<wbr>can<span STYLE="font-family:宋体;">’</SPAN><span STYLE="font-family:Times new roman;">t&nbsp;<wbr>be&nbsp;<wbr>hotplugged,&nbsp;<wbr>Core&nbsp;<wbr>1/2/3&nbsp;<wbr>can&nbsp;<wbr>be&nbsp;<wbr>hotplugged,&nbsp;<wbr></SPAN></P>
+<p>
+To&nbsp;<wbr>remove&nbsp;<wbr>core&nbsp;<wbr>:&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>0&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu1/online&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>0&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu2/online&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>0&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu3/online&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+To&nbsp;<wbr>add&nbsp;<wbr>back&nbsp;<wbr>core:&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu1/online</P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu2/online</P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu3/online</P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>2.9&nbsp;<wbr>Scaling&nbsp;<wbr>governor</STRONG></P>
+<p>
+To&nbsp;<wbr>check&nbsp;<wbr>scaling&nbsp;<wbr>governor<span STYLE="font-family:宋体;">：</SPAN></P>
+<p>
+cat&nbsp;<wbr>/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor</P>
+<p>&nbsp;<wbr></P>
+<p>
+To&nbsp;<wbr>set&nbsp;<wbr>new&nbsp;<wbr>governor<span STYLE="font-family:宋体;">：</SPAN></P>
+<p>
+echo&nbsp;<wbr>&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor</P>
+<p>比如：</P>
+<p>
+echo&nbsp;<wbr>ondemand&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor</P>
+<p>&nbsp;<wbr></P>
+<p><strong>2.10&nbsp;<wbr>Mpdecision</STRONG></P>
+<p>
+Use&nbsp;<wbr>Mpdecison&nbsp;<wbr>daemon&nbsp;<wbr>to&nbsp;<wbr>start/stop/enable&nbsp;<wbr>debug&nbsp;<wbr>with&nbsp;<wbr>commands&nbsp;<wbr>below:&nbsp;<wbr></P>
+<p>Start&nbsp;<wbr>mpdecison<span STYLE="font-family:宋体;">：&nbsp;<wbr></SPAN></P>
+<p>start&nbsp;<wbr>mpdecision&nbsp;<wbr></P>
+<p>n&nbsp;<wbr></P>
+<p>Stop&nbsp;<wbr>mpdecison<span STYLE="font-family:宋体;">：</SPAN></P>
+<p>stop&nbsp;<wbr>mpdecision</P>
+<p>&nbsp;<wbr></P>
+<p>
+Enable&nbsp;<wbr>mpdecision&nbsp;<wbr>debug&nbsp;<wbr><span STYLE="font-family:宋体;">：</SPAN></P>
+<p>
+start&nbsp;<wbr>mpdecision&nbsp;<wbr>--debug&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>2.11&nbsp;<wbr>Power&nbsp;<wbr>feature&nbsp;<wbr>enable/disable&nbsp;<wbr></STRONG></P>
+<p>
+Following&nbsp;<wbr>sys&nbsp;<wbr>node&nbsp;<wbr>can&nbsp;<wbr>be&nbsp;<wbr>used&nbsp;<wbr>to&nbsp;<wbr>enable&nbsp;<wbr>the&nbsp;<wbr>lower&nbsp;<wbr>resource,&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>2&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/lpm_resources/enable_low_power/l2&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/lpm_resources/enable_low_power/pxo&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/lpm_resources/enable_low_power/vdd_dig&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/lpm_resources/enable_low_power/vdd_mem&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu0/power_collapse/suspend_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu1/power_collapse/suspend_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu2/power_collapse/suspend_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu3/power_collapse/suspend_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu0/power_collapse/idle_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/suspend_enabled</P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu1/standalone_power_collapse/suspend_enabled</P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu2/standalone_power_collapse/suspend_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu3/standalone_power_collapse/suspend_enabled</P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/idle_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu1/standalone_power_collapse/idle_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu2/standalone_power_collapse/idle_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/module/pm_8x60/modes/cpu3/standalone_power_collapse/idle_enabled&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>0&nbsp;<wbr>to&nbsp;<wbr>above&nbsp;<wbr>sys&nbsp;<wbr>node&nbsp;<wbr>will&nbsp;<wbr>disable&nbsp;<wbr>related&nbsp;<wbr>low&nbsp;<wbr>power&nbsp;<wbr>mode.&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>2.12&nbsp;<wbr>Check&nbsp;<wbr>system&nbsp;<wbr>alarm&nbsp;<wbr>&nbsp;<wbr></STRONG></P>
+<p>
+get&nbsp;<wbr>android&nbsp;<wbr>alarms&nbsp;<wbr>and&nbsp;<wbr>statistics:&nbsp;<wbr></P>
+<p>
+adb&nbsp;<wbr>dumpsys&nbsp;<wbr>alarm&nbsp;<wbr>&gt;&nbsp;<wbr>alarms.txt</P>
+<p>&nbsp;<wbr></P>
+<p>
+enable&nbsp;<wbr>android&nbsp;<wbr>debug&nbsp;<wbr>message&nbsp;<wbr>in&nbsp;<wbr>logcat<span STYLE="font-family:宋体;">：&nbsp;<wbr></SPAN></P>
+<p>
+setprop&nbsp;<wbr>persist.alarm.debug&nbsp;<wbr>1</P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>2.13&nbsp;<wbr>Kernel&nbsp;<wbr>timer&nbsp;<wbr>check</STRONG></P>
+<p>
+Sys&nbsp;<wbr>node&nbsp;<wbr>/proc/timer_stats&nbsp;<wbr>can&nbsp;<wbr>be&nbsp;<wbr>used&nbsp;<wbr>to&nbsp;<wbr>check&nbsp;<wbr>kernel&nbsp;<wbr>timer&nbsp;<wbr>stastics,&nbsp;<wbr>customer&nbsp;<wbr>can&nbsp;<wbr>use&nbsp;<wbr>following&nbsp;<wbr>command&nbsp;<wbr>to&nbsp;<wbr>get&nbsp;<wbr>timer&nbsp;<wbr>statics&nbsp;<wbr>in&nbsp;<wbr>specific&nbsp;<wbr>scenario:&nbsp;<wbr></P>
+<p>
+echo&nbsp;<wbr>0&nbsp;<wbr>&gt;&nbsp;<wbr>/proc/timer_stats&nbsp;<wbr>&amp;&amp;&nbsp;<wbr>sleep&nbsp;<wbr>10&nbsp;<wbr>&amp;&amp;&nbsp;<wbr>echo&nbsp;<wbr>1&nbsp;<wbr>&gt;&nbsp;<wbr>/proc/timer_stats&nbsp;<wbr>&amp;&amp;&nbsp;<wbr>sleep&nbsp;<wbr>30&nbsp;<wbr>&amp;&amp;&nbsp;<wbr>cat&nbsp;<wbr>/proc/timer_stats&nbsp;<wbr>&gt;&nbsp;<wbr>/data/timer_stats&nbsp;<wbr>&amp;&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>
+OEMs&nbsp;<wbr>need&nbsp;<wbr>to&nbsp;<wbr>provide&nbsp;<wbr>file&nbsp;<wbr>/data/timer_stats&nbsp;<wbr>to&nbsp;<wbr>salesforce&nbsp;<wbr>case&nbsp;<wbr>for&nbsp;<wbr>check.&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p><strong>3<span STYLE="font-family:宋体;">、其他功耗</SPAN>项的优化</STRONG></P>
+<p><strong>3.1<span STYLE="font-family:宋体;">屏幕对功耗的影响</SPAN></STRONG></P>
+<p>
+屏幕亮度等级不同，功耗不同。亮度越低，功耗越低。调低屏幕默认背光亮度等级和屏幕最高亮度设置时候的背光亮度等级，可以优化手机整体功耗表现。</P>
+<p>LCD<span STYLE="font-family:宋体;">背光等级的设备节点：</SPAN></P>
+<p>/sys/class/leds/lcd-backlight/brightness</P>
+<p>默认背光等级和最高亮度背光等级需要同时考虑到用户体验和功耗表现，需要一起评估。</P>
+<p>另外，调试<span STYLE="font-family:Times new roman;">LCD</SPAN><span STYLE="font-family:宋体;">的</SPAN><span STYLE="font-family:Times new roman;">fps</SPAN><span STYLE="font-family:宋体;">帧率，也可以优化功耗。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p>
+<strong>3.2&nbsp;<wbr>CPU/GPU&nbsp;<wbr>DVFS</STRONG></P>
+<p>CPU/GPU<span STYLE="font-family:宋体;">的动态调频调压可以优化手机的功耗表现。该影响是整体性的，系统性的。</SPAN></P>
+<p>CPU<span STYLE="font-family:宋体;">降频主要通过两种方式实现，都可以达到降频的目标。</SPAN></P>
+<p>1<span STYLE="font-family:宋体;">、设置</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">工作在</SPAN><span STYLE="font-family:Times new roman;">powersave</SPAN><span STYLE="font-family:宋体;">模式。设置该模式后，</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">将一直工作在最低频率（</SPAN><span STYLE="font-family:Times new roman;">300000hz</SPAN><span STYLE="font-family:宋体;">）。此时手机最省电，但是有可能会出现手机运行变卡顿。</SPAN></P>
+<p>例如：将<span STYLE="font-family:Times new roman;">CPU0</SPAN><span STYLE="font-family:宋体;">置为</SPAN><span STYLE="font-family:Times new roman;">powersave</SPAN><span STYLE="font-family:宋体;">模式，命令为：</SPAN></P>
+<p>
+echo&nbsp;<wbr>"powersave"&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor</P>
+<p>例如：将<span STYLE="font-family:Times new roman;">CPU1</SPAN><span STYLE="font-family:宋体;">置为</SPAN><span STYLE="font-family:Times new roman;">powersave</SPAN><span STYLE="font-family:宋体;">模式，命令为：</SPAN></P>
+<p>
+echo&nbsp;<wbr>"powersave"&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor</P>
+<p>ex780<span STYLE="font-family:宋体;">共有</SPAN><span STYLE="font-family:Times new roman;">4</SPAN><span STYLE="font-family:宋体;">个</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">（</SPAN><span STYLE="font-family:Times new roman;">CPU0~CPU3</SPAN><span STYLE="font-family:宋体;">），都可以这样处理</SPAN></P>
+<p>2<span STYLE="font-family:宋体;">、限制</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">最高频率，以限制</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">的运行频率上限</SPAN></P>
+<p>CPU<span STYLE="font-family:宋体;">（</SPAN><span STYLE="font-family:Times new roman;">CPU0~CPU3</SPAN><span STYLE="font-family:宋体;">）可以选择的频率值如下所列，即这些数值都可以用作</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">的频率上限。选择的频率上限可以根据实际场景需要来设置。在超级省电模式下，</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">工作的宗旨是：</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">工作频率低</SPAN><span STYLE="font-family:Times new roman;">+</SPAN><span STYLE="font-family:宋体;">运行不卡，两项都要保障。</SPAN></P>
+<p>CPU<span STYLE="font-family:宋体;">可以选择的频率：</SPAN></P>
+<p>
+300000&nbsp;<wbr>422400&nbsp;<wbr>652800&nbsp;<wbr>729600&nbsp;<wbr>883200&nbsp;<wbr>960000&nbsp;<wbr>1036800&nbsp;<wbr>1190400&nbsp;<wbr>1267200&nbsp;<wbr>1497600&nbsp;<wbr>1574400&nbsp;<wbr>1728000&nbsp;<wbr>1958400&nbsp;<wbr>2265600&nbsp;<wbr>2457600</P>
+<p>例如：将<span STYLE="font-family:Times new roman;">CPU0</SPAN><span STYLE="font-family:宋体;">的频率上限设置为</SPAN><span STYLE="font-family:Times new roman;">960000</SPAN></P>
+<p>
+echo&nbsp;<wbr>960000&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq</P>
+<p>例如：将<span STYLE="font-family:Times new roman;">CPU0</SPAN><span STYLE="font-family:宋体;">的频率上限设置为</SPAN><span STYLE="font-family:Times new roman;">422400</SPAN></P>
+<p>
+echo&nbsp;<wbr>422400&nbsp;<wbr>&gt;&nbsp;<wbr>/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq</P>
+<p>&nbsp;<wbr></P>
+<p>GPU<span STYLE="font-family:宋体;">相关调试与</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">类似，设备节点路径</SPAN><span STYLE="font-family:Times new roman;">/sys/devices/fdb00000.qcom,kgsl-3d0/kgsl/kgsl-3d0</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>3.3&nbsp;<wbr>CPU<span STYLE="font-family:宋体;">占用率</SPAN></STRONG></P>
+<p>应用对<span STYLE="font-family:Times new roman;">cpu</SPAN><span STYLE="font-family:宋体;">的占有率，如果占有率过高，则该应用一般会导致功耗较大。</SPAN></P>
+<p>adb&nbsp;<wbr>shell</P>
+<p>top&nbsp;<wbr>-m&nbsp;<wbr>6&nbsp;<wbr></P>
+<p>&nbsp;<wbr></P>
+<p><strong>3.4<span STYLE="font-family:宋体;">游戏功耗</SPAN></STRONG></P>
+<p>可以从下面几个方面优化：</P>
+<p>降低屏幕背光亮度等级；</P>
+<p>采用<span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">GPU</SPAN><span STYLE="font-family:宋体;">动态调频调压，并调低</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">GPU</SPAN><span STYLE="font-family:宋体;">频率下限；</SPAN></P>
+<p>采用<span STYLE="font-family:Times new roman;">thermal-engine.conf&nbsp;<wbr></SPAN><span STYLE="font-family:宋体;">。</SPAN></P>
+<p>&nbsp;<wbr></P>
+<p><strong>3.5&nbsp;<wbr>Camera<span STYLE="font-family:宋体;">功耗偏大</SPAN></STRONG></P>
+<p>降低<span STYLE="font-family:Times new roman;">camera</SPAN><span STYLE="font-family:宋体;">帧率；</SPAN></P>
+<p>降低屏幕背光亮度等级；</P>
+<p>采用<span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">GPU</SPAN><span STYLE="font-family:宋体;">动态调频调压，并调低</SPAN><span STYLE="font-family:Times new roman;">CPU</SPAN><span STYLE="font-family:宋体;">、</SPAN><span STYLE="font-family:Times new roman;">GPU</SPAN><span STYLE="font-family:宋体;">频率下限；</SPAN></P>
+<p>采用<span STYLE="font-family:Times new roman;">thermal-engine.conf&nbsp;<wbr></SPAN><span STYLE="font-family:宋体;">。</SPAN></P>
+</DIV>							
+		</div>
+						<!-- 正文结束 -->
+		<div id='share' class="shareUp">
+        	<div class="share SG_txtb">
+			分享： 
+			<div class="bshare-custom" style="display:inline;margin-left:5px;"><a title="分享到新浪微博" class="bshare-sinaminiblog" href="javascript:void(0);"></a><a title="分享到微信" class="bshare-weixin" href="javascript:void(0);"></a><a title="分享到QQ空间" class="bshare-qzone" href="javascript:void(0);"></a><a title="分享到豆瓣" class="bshare-douban" href="javascript:void(0);"></a><a title="更多平台" class="bshare-more bshare-more-icon more-style-addthis"></a>
+			</div>
+			</div>
+            <div class="up">
+	        	<div title="喜欢后让更多人看到" id="dbox_40d475e90102vnh0" class="upBox upBox_click" style="cursor: pointer;">
+	            	<p ti_title="功耗优化方法" id="dbox2_40d475e90102vnh0" class="count" ></p>
+	                <p class="link"><img width="15" height="15" align="absmiddle" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" class="SG_icon SG_icon34">喜欢</p>
+	            </div>
+<!--
+                <div class="upBox upBox_add">
+                    <p class="count">0</p>
+                    <p class="link"><img width="20" height="16" align="absmiddle" title="推荐" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" class="SG_icon SG_icon214">赠金笔</p>
+                </div>
+-->
+                                <div class="upBox upBox_add">
+                    <p class="count" id="goldPan-num">0</p>
+                    <p class="link" id="goldPan-give"><img class="SG_icon SG_icon214" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" width="20" height="16" title="赠金笔" align="absmiddle">赠金笔</p>
+                </div>
+                
+	        </div>
+            <div class="clearit"></div>
+		</div>
+		<div class="articalInfo">
+			<!-- 分享到微博 {$t_blog} -->
+			<div class="IL">
+				阅读<span id="r_40d475e90102vnh0" class="SG_txtb"></span><em class="SG_txtb">┊</em> 
+				<a href="#commonComment">评论</a> <span id="c_40d475e90102vnh0" class="SG_txtb"></span><em class="SG_txtb">┊</em>				<a href="javascript:;" onclick="$articleManage('40d475e90102vnh0',5);return false;">收藏</a><span id="f_40d475e90102vnh0"  class="SG_txtb"></span>
+				<em class="SG_txtb">┊</em><a href="#" id="quote_set_sign" onclick="return false ;">转载</a><a  href="#" id="z_40d475e90102vnh0" onclick="return false ;" class="zznum"></a>				<span id="fn_功耗优化方法" class="SG_txtb"></span><em class="SG_txtb">┊</em>
+				<a onclick="return false;" href="javascript:;" ><cite id="d1_digg_40d475e90102vnh0">喜欢</cite></a><a id="d1_digg_down_40d475e90102vnh0" href="javascript:;" ><b>▼</b></a>
+									<em class="SG_txtb">┊</em><a href="http://blog.sina.com.cn/main_v5/ria/print.html?blog_id=blog_40d475e90102vnh0" target="_blank">打印</a><em class="SG_txtb">┊</em><a id="q_40d475e90102vnh0" onclick="report('40d475e90102vnh0');return false;" href="#">举报</a>
+											</div>
+			<div class="IR">
+				<table>
+					<tr>
+											<th class="SG_txtb" scope="row">已投稿到：</th>
+						<td>
+							<div class="IR_list">
+								<span><img class="SG_icon SG_icon36" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" width="15" height="15" title="排行榜" align="absmiddle" /> <a href="http://blog.sina.com.cn/lm/114/117/day.html" class="SG_linkb" target="_blank">排行榜</a></span>							</div>
+						</td>
+										</tr>
+									</table>
+			</div>
+		</div>
+		<div class="clearit"></div>
+		<div class="blogzz_zzlist borderc" id="blog_quote" style="display:none">加载中，请稍候......</div>
+		<div class="articalfrontback SG_j_linedot1 clearfix" id="new_nextprev_40d475e90102vnh0">
+							<div><span class="SG_txtb">前一篇：</span><a href="http://blog.sina.com.cn/s/blog_40d475e90101gkij.html">Android中的一些实用工具</a></div>
+										<div><span class="SG_txtb">后一篇：</span><a href="http://blog.sina.com.cn/s/blog_40d475e90102vnh2.html">遍历Map的四种方法</a></div>
+					</div>
+		<div class="clearit"></div>
+							
+		<div id="loginFollow"></div>
+				<div class="allComm">
+			<div  class="allCommTit" >
+				<div class="SG_floatL">
+				    <strong>评论</strong>
+				    <span id="commAd_1" style="display:none;">
+				        <span style="margin-left:15px; width:220px; display:inline-block;"><a target="_blank" href="http://blog.sina.com.cn/lm/8/2009/0325/105340.html">重要提示：警惕虚假中奖信息</a></span>
+				    </span>
+				</div>
+				<div class="SG_floatR"><a class="CP_a_fuc" href="#post">[<cite>发评论</cite>]</a></div>
+			</div>
+			<ul id="article_comment_list" class="SG_cmp_revert"><!-- 循环始 --><li>评论加载中，请稍候...</li><!-- 循环终  --></ul>
+			<div class="clearit"></div>
+			<div class="myCommPages SG_j_linedot1">
+				<div class="SG_page" id="commentPaging" style="display:none;">
+					<ul class="SG_pages">
+					</ul>
+				</div>
+				<div class="clearit"></div>
+			</div>
+			<a name="post"></a>
+			<div class="writeComm">
+				<div class="allCommTit">
+					<div class="SG_floatL">
+					    <strong>发评论</strong>
+					    <span></span>
+					</div>
+					<div class="SG_floatR"></div>
+				</div>
+				<div class="wrCommTit">
+					<div class="SG_floatL" id="commentNick" style="display:none;"></div>
+				</div>
+				<div class="formTextarea">
+					<div style="float:left;" id="commonComment">
+					<iframe id="postCommentIframe"  frameborder="0" style="border:1px solid #C7C7C7;
+		height:158px;width:448px;maring-top:1px;background-color:white;" src="http://blog.sina.com.cn/main_v5/ria/blank2.html"></iframe>
+					<textarea id="commentArea" tabindex="1" style="display:none;"></textarea>
+					</div>
+					<div id="mobileComment" style="float:left;display:none;">
+						<textarea id="mbCommentTa" style="width:438px;height:150px;border:1px solid #C7C7C7;line-height:18px;padding:5px;"></textarea>
+					</div>
+					<div class="faceblk" id="faceWrap">
+						<div id="smilesSortShow" class="faceline1">
+						</div>
+						<ul id="smilesRecommended" class="faceline01"></ul>
+					</div>
+					<div class="clearit"></div>
+				</div>
+				<div class="formLogin">
+					<div class="SG_floatL"> 
+					<p id="commentlogin" style="display:none;"><span>登录名：</span><input type="text" style="width: 115px;" id="login_name" tabindex="2"/>   <span>密码：</span><input type="password" style="width: 115px;" id="login_pass" tabindex="3"/>   <a href="http://login.sina.com.cn/getpass.html" target="_blank">找回密码</a>   <a href="http://login.sina.com.cn/signup/signup.php?entry=blog&src=blogicp&srcuid=1087665641" target="_blank">注册</a>	<input type="checkbox" id="login_remember"/><label for="login_remember" style="display:inline-block;" title="建议在网吧/公用电脑上取消该选项">记住登录状态</label></p><p id="commentloginM" style="display:none;"><span>昵&nbsp;&nbsp;&nbsp;称：</span><input type="text" style="width: 115px;" id="comment_anonyous"  value="新浪网友"/ tabindex="2" disabled></p><p id="quote_comment_p"><input type="checkbox" id="bb"> <label for="bb"><img height="18" align="absmiddle" width="18" title="" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" class="SG_icon SG_icon110">分享到微博 <img height="15" align="absmiddle" width="15" title="新" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" class="SG_icon SG_icon11"></label>&nbsp;&nbsp;&nbsp;<input type="checkbox" id="cbCommentQuote" /><label for="cbCommentQuote">评论并转载此博文</label><img class="SG_icon SG_icon11" src="http://simg.sinajs.cn/blog7style/images/common/sg_trans.gif" width="15" height="15" title="新" align="absmiddle" /></p>
+					<p id="geetest-box" ></p>
+					</div>
+
+					<span style="display: none; color: rgb(153, 153, 153); margin-left: 10px;" id="login_remember_caution"></span>
+
+											<div class="SG_floatR" id="anonymity_cont"><input type="checkbox" id="anonymity"/><label for="anonymity">匿名评论</label></div>
+									</div>
+				<div class="formBtn">
+					<a href="javascript:;" onclick="return false;" class="SG_aBtn" tabindex="5"><cite id="postcommentid">发评论</cite></a>
+					<p class="SG_txtc">以上网友发言只代表其个人观点，不代表新浪网的观点或立场。</p>
+				</div>
+			</div>
+		</div>
+				<div class="clearit"></div>
+		
+				<div class="articalfrontback articalfrontback2 clearfix">
+						  <div class="SG_floatL"><span class="SG_txtb">&lt;&nbsp;前一篇</span><a href="http://blog.sina.com.cn/s/blog_40d475e90101gkij.html">Android中的一些实用工具</a></div>
+									  <div class="SG_floatR"><span class="SG_txtb">后一篇&nbsp;&gt;</span><a href="http://blog.sina.com.cn/s/blog_40d475e90102vnh2.html">遍历Map的四种方法</a></div>
+					</div>
+		<div class="clearit"></div>
+				
+	</div>
+	<!--博文正文 end -->
+		<script type="text/javascript">
+			var voteid="";
+		</script>
+
+            </div>       
+            <div class="SG_connFoot"></div>
+          </div>
+</div>
+	<!--第二列start-->
+	
+	<!--第三列start-->
+	<div id="column_3" class="SG_colWnone"><div style="width:0px;height:0.1px;margin:0px;">&nbsp;&nbsp;</div></div>
+	<!--第三列end-->
+
+	
+    </div>
+   <!--主题内容结束 -->
+  
+
+	<div id="diggerFla" style="position:absolute;left:0px;top:0px;width:0px"></div>
+    <div class="sinablogfooter" id="sinablogfooter"  style="position:relative;">
+      
+      <p class="SG_linka"><a href="http://help.sina.com.cn/index.php?s=askquestion&a=view" target="_blank">新浪BLOG意见反馈留言板</a>　<a href="javascript:;" onclick="window.open ('http://control.blog.sina.com.cn/admin/advice/impeach.php?url=http%3A//blog.sina.com.cn/s/blog_4cf7b4ec0100eudp.html%3Ftj%3D1', '','height=495, width=510, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=n o, status=no');">不良信息反馈</a>　电话：4006900000 提示音后按1键（按当地市话标准计费）　欢迎批评指正</p>
+   
+      <p class="SG_linka"><a href="http://corp.sina.com.cn/chn/" target="_blank">新浪简介</a> | <a href="http://corp.sina.com.cn/eng/" target="_blank">About Sina</a> | <a href="http://emarketing.sina.com.cn/" target="_blank">广告服务</a> | <a href="http://www.sina.com.cn/contactus.html" target="_blank">联系我们</a> | <a href="http://corp.sina.com.cn/chn/sina_job.html" target="_blank">招聘信息</a> | <a href="http://www.sina.com.cn/intro/lawfirm.shtml" target="_blank">网站律师</a> | <a href="http://english.sina.com" target="_blank">SINA English</a> | <a href="http://members.sina.com.cn/apply/" target="_blank">会员注册</a> | <a href="http://help.sina.com.cn/" target="_blank">产品答疑</a> </p>
+      <p class="copyright SG_linka"> Copyright &copy; 1996 - 2016 SINA Corporation,  All Rights Reserved</p>
+      <p class="SG_linka"> 新浪公司 <a href="http://www.sina.com.cn/intro/copyright.shtml" target="_blank">版权所有</a></p>
+	  <a href="http://www.bj.cyberpolice.cn/index.jsp"  target="_blank" class="gab_link"></a>
+    </div>
+  </div>
+</div>
+<div id="swfbox"></div>
+<script id="PVCOUNTER_FORIE" type="text/javascript"></script>
+</body>
+<script type="text/javascript">
+var scope = {
+    $newTray : 1,
+    $setDomain : true,
+    $uid : "1087665641",
+    $PRODUCT_NAME : "blog7",      //blog7photo,blog7icp
+    $pageid : "article",
+    $key :  "62811bdc1854eeeac8a81ea9de3dc5b7",
+    $uhost : "xinzhaolei",
+    $ownerWTtype :"",
+    $private: {"pageset":0,"tj":0,"adver":0,"sms":0,"ad":0,"blogsize":0,"cms":0,"hidecms":0,"top":0,"invitationset":0,"p4p":0,"spamcms":0,"init7":0,"quote":0,"foot":0,"isprivate":0,"headpic":1,"t_sina":"1087665641","daRenState":"2","medal7":1,"oauth_token":1,"oauth_token_secret":1,"uname":"","p_push_t":"1","p_get_t":"1","articleclass":"117"},
+    $summary: " 1、底电流调试（Rock Bottom Current Optimization） 底电流在手机飞行模式下调试。每个平台的底电流数据可能不一样，具体可以参考r...  (来自 @头条博客)",
+    $is_photo_vip:0,
+		 $nClass:0,
+		 $articleid:"40d475e90102vnh0",
+		 $sort_id:117,
+		 $cate_id:173,
+		 $isCommentAllow:0,
+		 $album_pic:"",
+		 $pn_x_rank:0,
+		 $x_quote_c:"1",
+		 $flag2008:"",
+		     component_lists:{"2":{"size":730,"list":[920]},"1":{"size":210,"list":[901,903,904,47]}},
+    formatInfo:1,
+    UserPic:[{"pid":null,"repeat":null,"align-h":null,"align-v":null,"apply":null},{"pid":null,"repeat":null,"align-h":null,"align-v":null,"apply":null},{"pid":null,"repeat":null,"align-h":null,"align-v":null,"apply":null}],
+    UserBabyPic:{"photoX":0,"photoY":0,"photoURL":null,"angle":0,"zoom":0,"maskX":0,"maskY":0,"maskURL":null,"frameURL":null},
+    UserColor:"",
+    backgroundcolor:"",
+    tpl:"30_1",
+    reclist:0    };
+var $encrypt_code = "a892574880d544d30269c59f36065dad";
+</script>
+
+<script type="text/javascript" src="http://sjs.sinajs.cn/blog7common/js/boot.js"></script>
+<script type="text/javascript">__load_js();</script>
+<script type="text/javascript">__render_page();</script>
+
+
+<script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/buttonLite.js#style=-1&amp;uuid=b436f96b-ce3c-469f-93ca-9c0c406fcf10&amp;pophcol=2&amp;lang=zh"></script><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/bshareC0.js"></script>
+<script type="text/javascript" charset="utf-8">
+        bShare.addEntry({pic: "", title:"分享自辛朝磊  《功耗优化方法》", summary:" 1、底电流调试（Rock Bottom Current Optimization） 底电流在手机飞行模式下调试。每个平台的底电流数据可能不一样，具体可以参考r...  (来自 @头条博客)"});
+     </script>
+<script type="text/javascript" src="http://sjs.sinajs.cn/xblogtheme/js/blog680-min.js"></script>
+<script type="text/javascript">
+        var slotArr = ['atcTitLi_SLOT_41', 'atcTitLi_SLOT_42','loginBarActivity']; //广告位id
+        var sourceArr = ['SLOT_41','SLOT_42','SLOT_43,SLOT_47,SLOT_48'];  //广告资源id
+        SinaBlog680.staticBox(slotArr, sourceArr);
+</script>
+</html>

@@ -1,0 +1,1106 @@
+ 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Linux电源管理(6)_Generic PM之Suspend功能</title>
+<meta name="keywords" content="Linux 嵌入式 ARM RTOS Technology 享受 C语言,Linux,内核,suspend,电源管理,resume" />
+<meta name="description" content="1. 前言   Linux内核提供了三种Suspend: Freeze、Standby和STR(Suspend to RAM)，在用户空间向”/sys/power/state”文件..." />
+<meta name="generator" content="emlog" />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.wowotech.net/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.wowotech.net/wlwmanifest.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS"  href="http://www.wowotech.net/rss.php" />
+<link href="http://www.wowotech.net/content/templates/default/main.css" rel="stylesheet" type="text/css" />
+<link href="http://www.wowotech.net/admin/editor/plugins/code/prettify.css" rel="stylesheet" type="text/css" />
+<script src="http://www.wowotech.net/admin/editor/plugins/code/prettify.js" type="text/javascript"></script>
+<script src="http://www.wowotech.net/include/lib/js/common_tpl.js" type="text/javascript"></script>
+<!--[if IE 6]>
+<script src="http://www.wowotech.net/content/templates/default/iefix.js" type="text/javascript"></script>
+<![endif]-->
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <h1><a href="http://www.wowotech.net/">蜗窝科技</a></h1>
+    <h3>慢下来，享受技术。</h3>
+  </div>
+    <div id="banner"><a href="http://www.wowotech.net/"><img src="http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg" height="134" width="960" /></a></div>
+    <div id="nav">	<ul class="bar">
+			<li class="item common">
+			<a href="http://www.wowotech.net/" >博客</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/sort/project" >项目</a>
+			            <ul class="sub-nav">
+                <li><a href="http://www.wowotech.net/sort/x_project">X Project</a></li>			</ul>
+            		</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/forum" target="_blank">讨论区</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/about.html" >关于蜗窝</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/contact_us.html" >联系我们</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/support_us.html" >支持我们</a>
+					</li>
+			<li class="item common">
+			<a href="http://www.wowotech.net/admin" >登录</a>
+					</li>
+		</ul>
+</div>﻿<div id="content">
+<div id="contentleft">
+	<h2>Linux电源管理(6)_Generic PM之Suspend功能</h2>
+	<p class="date">作者：<a href="http://www.wowotech.net/author/2" title=" runangaozhong@163.com">wowo</a> 发布于：2014-8-22 21:40 
+			分类：<a href="http://www.wowotech.net/sort/pm_subsystem">电源管理子系统</a>
+	 	</p>
+	<h2>1. 前言 </h2>  <p>Linux内核提供了三种Suspend: Freeze、Standby和STR(Suspend to RAM)，在用户空间向”/sys/power/state”文件分别写入”freeze”、”standby”和”mem”，即可触发它们。 </p>  <p>内核中，Suspend及Resume过程涉及到PM Core、Device PM、各个设备的驱动、Platform dependent PM、CPU control等多个模块，涉及了console switch、process freeze、CPU hotplug、wakeup处理等过个知识点。就让我们跟着内核代码，一一见识它们吧。 </p>  <h2>2. Suspend功能有关的代码分布 </h2>  <p>内核中Suspend功能有关的代码包括PM core、Device PM、Platform PM等几大块，具体如下： </p>  <p>1）PM Core </p>  <blockquote>   <p>kernel/power/main.c----提供用户空间接口(/sys/power/state) </p>    <p>kernel/power/suspend.c----Suspend功能的主逻辑 </p>    <p>kernel/power/suspend_test.c----Suspend功能的测试逻辑 </p>    <p>kernel/power/console.c----Suspend过程中对控制台的处理逻辑 </p>    <p>kernel/power/process.c----Suspend过程中对进程的处理逻辑 </p> </blockquote>  <p>2）Device PM </p>  <blockquote>   <p>drivers/base/power/*----具体可参考“<a href="http://www.wowotech.net/linux_kenrel/pm_interface.html">Linux电源管理(4)_Power Management Interface</a>”的描述。 </p>    <p>设备驱动----具体设备驱动的位置，不再涉及。 </p> </blockquote>  <p>3）Platform dependent PM </p>  <blockquote>   <p>include/linux/suspend.h----定义platform dependent PM有关的操作函数集 </p>    <p>arch/xxx/mach-xxx/xxx.c或者 </p>    <p>arch/xxx/plat-xxx/xxx.c----平台相关的电源管理操作 </p> </blockquote>  <h2>3. suspend&resume过程概述 </h2>  <p>下面图片对Linux suspend&resume过程做了一个概述，读者可以顺着这个流程阅读内核源代码。具体的说明，可以参考后面的代码分析。 </p>  <p><a href="http://www.wowotech.net/content/uploadfile/201408/d7d8826b98dcd42ff63de66398709a9a20140822134032.gif"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="suspend_flow" border="0" alt="suspend_flow" src="http://www.wowotech.net/content/uploadfile/201408/ec1bf5143f7fe6d2b0b02d9c5557259f20140822134033.gif" width="583" height="756" /></a> </p>  <h2>4. 代码分析 </h2>  <h3>4.1 suspend入口 </h3>  <p>在用户空间执行如下操作： </p>  <blockquote>   <p>echo "freeze" > /sys/power/state </p>    <p>echo "standby" > /sys/power/state </p>    <p>echo "mem" > /sys/power/state </p> </blockquote>  <p>会通过sysfs触发suspend的执行，相应的处理代码如下： </p>  <pre class="prettyprint lang-cpp linenums">static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,
+                           const char *buf, size_t n)
+{
+        suspend_state_t state;
+        int error;
+
+        error = pm_autosleep_lock();
+        if (error)
+                return error;
+
+        if (pm_autosleep_state() > PM_SUSPEND_ON) {
+                error = -EBUSY;
+                goto out;
+        }
+
+        state = decode_state(buf, n);
+        if (state < PM_SUSPEND_MAX)
+                error = pm_suspend(state);
+        else if (state == PM_SUSPEND_MAX)
+                error = hibernate();
+        else
+                error = -EINVAL;
+
+ out:
+        pm_autosleep_unlock();
+        return error ? error : n;
+}
+
+power_attr(state);</pre>
+
+<p class="MsoNormal" align="left">power_attr定义了一个名称为<span lang="EN-US">state</span>的<span lang="EN-US">attribute</span>文件，该文件的<span lang="EN-US">store</span>接口为<span lang="EN-US">state_store</span>，该接口在<span lang="EN-US">lock</span>住<span lang="EN-US">autosleep</span>功能后，解析用户传入的<span lang="EN-US">buffer</span>（<span lang="EN-US">freeze</span>、<span lang="EN-US">standby or mem</span>），转换成<span lang="EN-US">state</span>参数。<o:p></o:p> </p>
+state参数的类型为suspend_state_t，在include\linux\suspend.h中定义，为电源管理状态在内核中的表示。具体如下： 
+
+<pre class="prettyprint lang-cpp linenums">typedef int __bitwise suspend_state_t;
+
+#define PM_SUSPEND_ON           ((__force suspend_state_t) 0)
+#define PM_SUSPEND_FREEZE       ((__force suspend_state_t) 1)
+#define PM_SUSPEND_STANDBY      ((__force suspend_state_t) 2)
+#define PM_SUSPEND_MEM          ((__force suspend_state_t) 3)
+#define PM_SUSPEND_MIN          PM_SUSPEND_FREEZE
+#define PM_SUSPEND_MAX          ((__force suspend_state_t) 4)</pre>
+
+<p class="MsoNormal" align="left">根据state的值，如果不是（<span lang="EN-US">PM_SUSPEND_MAX</span>，对应hibernate功能），则调用pm_suspend接口，进行后续的处理。<span style="line-height: 1.5">&#160;</span> </p>
+
+<p class="MsoNormal" align="left">pm_suspend在kernel/power/suspend.c定义，处理所有的suspend过程。<o:p></o:p>&#160;&#160; </p>
+
+<h2><span lang="EN-US">4.2 pm_suspend & enter_state<o:p></o:p></span> </h2>
+
+<p class="MsoNormal" align="left">pm_suspend的实现非常简单，简单的做一下参数合法性判断，直接调用enter_state接口，如下： </p>
+
+<pre class="prettyprint lang-cpp linenums">int pm_suspend(suspend_state_t state)
+{
+        int error;
+
+        if (state <= PM_SUSPEND_ON || state >= PM_SUSPEND_MAX)
+                return -EINVAL;
+
+        error = enter_state(state);
+        if (error) {
+                suspend_stats.fail++;
+                dpm_save_failed_errno(error);
+        } else {
+                suspend_stats.success++;
+        }
+        return error;
+}</pre>
+
+<p class="MsoNormal" align="left">enter_state代码为： </p>
+
+<pre class="prettyprint lang-cpp linenums">static int enter_state(suspend_state_t state)
+{
+        int error;
+
+        if (!valid_state(state))
+                return -ENODEV;
+
+        if (!mutex_trylock(&pm_mutex))
+                return -EBUSY;
+
+        if (state == PM_SUSPEND_FREEZE)
+                freeze_begin();
+
+        printk(KERN_INFO "PM: Syncing filesystems ... ");
+        sys_sync();
+        printk("done.\n");
+
+        pr_debug("PM: Preparing system for %s sleep\n", pm_states[state]);
+        error = suspend_prepare(state);
+        if (error)
+                goto Unlock;
+
+        if (suspend_test(TEST_FREEZER))
+                goto Finish;
+
+        pr_debug("PM: Entering %s sleep\n", pm_states[state]);
+        pm_restrict_gfp_mask();
+        error = suspend_devices_and_enter(state);
+        pm_restore_gfp_mask();
+
+ Finish:
+        pr_debug("PM: Finishing wakeup.\n");
+        suspend_finish();
+ Unlock:
+        mutex_unlock(&pm_mutex);
+        return error;
+}</pre>
+
+<p><span style="line-height: 1.5">主要工作包括：</span> </p>
+
+<p class="MsoNormal" align="left">a）调用valid_state，判断该平台是否支持该电源状态。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">suspend的最终目的，是让系统进入可恢复的挂起状态，而该功能必须有平台相关代码的参与才能完成，因此内核PM Core就提供了一系列的回调函数（封装在platform_suspend_ops中），让平台代码（如arch/arm/mach-xxx/pm.c）实现，然后由PM Core在合适的时机调用。这些回调函数包含一个valid函数，就是用来告知PM Core，支持哪些state。<o:p></o:p> </p>
+最后看一下valid_state的实现（删除了无关代码）： 
+
+<pre class="prettyprint lang-cpp linenums">bool valid_state(suspend_state_t state)
+{
+        if (state == PM_SUSPEND_FREEZE) {
+                return true;
+        }
+        /*
+         * PM_SUSPEND_STANDBY and PM_SUSPEND_MEMORY states need lowlevel
+         * support and need to be valid to the lowlevel
+         * implementation, no valid callback implies that none are valid.
+         */
+        return suspend_ops && suspend_ops->valid && suspend_ops->valid(state);
+}</pre>
+
+<p class="MsoNormal" align="left">如果是freeze，无需平台代码参与即可支持，直接返回true。对于standby和mem，则需要调用suspend_ops的valid回掉，由底层平台代码判断是否支持。<span style="line-height: 1.5">&#160;</span> </p>
+
+<p class="MsoNormal" align="left">b）加互斥锁，只允许一个实例处理suspend。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">c）如果state是freeze，调用freeze_begin，进行suspend to freeze相关的特殊动作。我会在后面统一分析freeze的特殊动作，这里暂不描述。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">d）打印提示信息，同步文件系统。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">e）调用suspend_prepare，进行suspend前的准备，主要包括switch console和process&thread freezing。如果失败，则终止suspend过程。 </p>
+
+<p class="MsoNormal" align="left">f）然后，调用suspend_devices_and_enter接口，该接口负责suspend和resume的所有实际动作。前半部分，suspend console、suspend device、关中断、调用平台相关的suspend_ops使系统进入低功耗状态。后半部分，在系统被事件唤醒后，处理相关动作，调用平台相关的suspend_ops恢复系统、开中断、resume device、resume console。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">g）最后，调用suspend_finish，恢复（或等待恢复）process&thread，还原console。 <span style="line-height: 1.5">&#160;</span> </p>
+
+<p class="MsoNormal" align="left"><strong>4.3 suspend_prepare</strong><o:p></o:p> </p>
+suspend_prepare的代码如下： 
+
+<pre class="prettyprint lang-cpp linenums">static int suspend_prepare(suspend_state_t state)
+{
+        int error;
+
+        if (need_suspend_ops(state) && (!suspend_ops || !suspend_ops->enter))
+                return -EPERM;
+
+        pm_prepare_console();
+
+        error = pm_notifier_call_chain(PM_SUSPEND_PREPARE);
+        if (error)
+                goto Finish;
+
+        error = suspend_freeze_processes();
+        if (!error)
+                return 0;
+
+        suspend_stats.failed_freeze++;
+        dpm_save_failed_step(SUSPEND_FREEZE);
+ Finish:
+        pm_notifier_call_chain(PM_POST_SUSPEND);
+        pm_restore_console();
+        return error;
+}</pre>
+
+<p class="MsoNormal" align="left">主要工作为：<span lang="EN-US"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">a）检查suspend_ops是否提供了.enter回调，没有的话，返回错误。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">b）调用pm_prepare_console，将当前console切换到一个虚拟console并重定向内核的kmsg（需要的话）。该功能称作VT switch，后面我会在稍微详细的介绍一下，但Linux控制台子系统是相当复杂的，更具体的分析，要在控制台子系统的分析文章中说明。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">c）调用pm_notifier_call_chain，发送suspend开始的消息（PM_SUSPEND_PREPARE），后面会详细描述。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">d）调用suspend_freeze_processes，freeze用户空间进程和一些内核线程。该功能称作freezing-of-tasks，我会专门用一篇文章去分析它。本文就不再详细说明了。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">e）如果freezing-of-tasks失败，调用pm_restore_console，将console切换回原来的console，并返回错误，以便能终止suspend。<o:p></o:p>&#160;&#160; </p>
+
+<p class="MsoNormal" align="left"><strong>4.4 suspend_devices_and_enter<o:p></o:p></strong> </p>
+suspend_devices_and_enter的过程较为复杂，代码实现如下： 
+
+<pre class="prettyprint lang-cpp linenums">int suspend_devices_and_enter(suspend_state_t state)
+{
+        int error;
+        bool wakeup = false;
+
+        if (need_suspend_ops(state) && !suspend_ops)
+                return -ENOSYS;
+
+        trace_machine_suspend(state);
+        if (need_suspend_ops(state) && suspend_ops->begin) {
+                error = suspend_ops->begin(state);
+                if (error)
+                        goto Close;
+        }
+        suspend_console();
+        ftrace_stop();
+        suspend_test_start();
+        error = dpm_suspend_start(PMSG_SUSPEND);
+        if (error) {
+                printk(KERN_ERR "PM: Some devices failed to suspend\n");
+                goto Recover_platform;
+        }
+        suspend_test_finish("suspend devices");
+        if (suspend_test(TEST_DEVICES))
+                goto Recover_platform;
+
+        do {
+                error = suspend_enter(state, &wakeup);
+        } while (!error && !wakeup && need_suspend_ops(state)
+                && suspend_ops->suspend_again && suspend_ops->suspend_again());
+
+ Resume_devices:
+        suspend_test_start();
+        dpm_resume_end(PMSG_RESUME);
+        suspend_test_finish("resume devices");
+        ftrace_start();
+        resume_console();
+ Close:
+        if (need_suspend_ops(state) && suspend_ops->end)
+                suspend_ops->end();
+        trace_machine_suspend(PWR_EVENT_EXIT);
+        return error;
+
+ Recover_platform:
+        if (need_suspend_ops(state) && suspend_ops->recover)
+                suspend_ops->recover();
+        goto Resume_devices;
+}</pre>
+
+<p class="MsoNormal" align="left">a）再次检查平台代码是否需要提供以及是否提供了suspend_ops。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">b）调用suspend_ops的begin回调（有的话），通知平台代码，以便让其作相应的处理（需要的话）。可能失败，需要跳至Close处执行恢复操作（suspend_ops->end）。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">c）调用suspend_console，挂起console。该接口由"kernel\printk.c"实现，主要是hold住一个lock，该lock会阻止其它代码访问console。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">d）调用ftrace_stop，停止ftrace功能。ftrace是一个很有意思的功能，后面再介绍。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">e）调用dpm_suspend_start，调用所有设备的->prepare和->suspend回调函数（具体可参考“<a href="http://www.wowotech.net/linux_kenrel/pm_interface.html">Linux电源管理(4)_Power Management Interface</a>”的描述），suspend需要正常suspend的设备。suspend device可能失败，需要跳至 Recover_platform，执行recover操作（suspend_ops->recover）。<o:p></o:p> </p>
+f）以上都是suspend前的准备工作，此时，调用suspend_enter接口，使系统进入指定的电源状态。该接口的内容如下： 
+
+<pre class="prettyprint lang-cpp linenums">static int suspend_enter(suspend_state_t state, bool *wakeup)
+{
+        int error;
+
+        if (need_suspend_ops(state) && suspend_ops->prepare) {
+                error = suspend_ops->prepare();
+                if (error)
+                        goto Platform_finish;
+        }
+
+        error = dpm_suspend_end(PMSG_SUSPEND);
+        if (error) {
+                printk(KERN_ERR "PM: Some devices failed to power down\n");
+                goto Platform_finish;
+        }
+
+        if (need_suspend_ops(state) && suspend_ops->prepare_late) {
+                error = suspend_ops->prepare_late();
+                if (error)
+                        goto Platform_wake;
+        }
+
+        if (suspend_test(TEST_PLATFORM))
+                goto Platform_wake;
+
+        /*
+         * PM_SUSPEND_FREEZE equals
+         * frozen processes + suspended devices + idle processors.
+         * Thus we should invoke freeze_enter() soon after
+         * all the devices are suspended.
+         */
+        if (state == PM_SUSPEND_FREEZE) {
+                freeze_enter();
+                goto Platform_wake;
+        }
+
+        error = disable_nonboot_cpus();
+        if (error || suspend_test(TEST_CPUS))
+                goto Enable_cpus;
+
+        arch_suspend_disable_irqs();
+        BUG_ON(!irqs_disabled());
+
+        error = syscore_suspend();
+        if (!error) {
+                *wakeup = pm_wakeup_pending();
+                if (!(suspend_test(TEST_CORE) || *wakeup)) {
+                        error = suspend_ops->enter(state);
+                        events_check_enabled = false;
+                }
+                syscore_resume();
+        }
+
+        arch_suspend_enable_irqs();
+        BUG_ON(irqs_disabled());
+
+ Enable_cpus:
+        enable_nonboot_cpus();
+
+ Platform_wake:
+        if (need_suspend_ops(state) && suspend_ops->wake)
+                suspend_ops->wake();
+
+        dpm_resume_start(PMSG_RESUME);
+
+ Platform_finish:
+        if (need_suspend_ops(state) && suspend_ops->finish)
+                suspend_ops->finish();
+
+        return error;
+}</pre>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f1）该接口处理完后，会通过返回值告知是否enter成功，同时通过wakeup指针，告知调用者，是否有wakeup事件发生，导致电源状态切换失败。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f2）调用suspend_ops的prepare回调（有的话），通知平台代码，以便让其在即将进行状态切换之时，再做一些处理（需要的话）。该回调可能失败（平台代码出现意外），失败的话，需要跳至Platform_finish处，调用suspend_ops的finish回调，执行恢复操作。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f3）调用dpm_suspend_end，调用所有设备的->suspend_late和->suspend_noirq回调函数（具体可参考“<a href="http://www.wowotech.net/linux_kenrel/pm_interface.html">Linux电源管理(4)_Power Management Interface</a>”的描述），suspend late suspend设备和需要在关中断下suspend的设备。需要说明的是，这里的noirq，是通过禁止所有的中断线的形式，而不是通过关全局中断的方式。同样，该操作可能会失败，失败的话，跳至Platform_finish处，执行恢复动作。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f4）调用suspend_ops的prepare_late回调（有的话），通知平台代码，以便让其在最后关头，再做一些处理（需要的话）。该回调可能失败（平台代码出现意外），失败的话，需要跳至Platform_wake处，调用suspend_ops的wake回调，执行device的resume、调用suspend_ops的finish回调，执行恢复操作。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f5）如果是suspend to freeze，执行相应的操作，包括<span style="background-color: #ffffff; font-family: arial, helvetica, sans-serif; white-space: normal; color: #333333">冻结进程、</span><span style="background-color: #ffffff; font-family: arial, helvetica, sans-serif; white-space: normal; color: #333333">suspended devices（参数为PM_SUSPEND_FREEZE）、</span><span style="background-color: #ffffff; font-family: arial, helvetica, sans-serif; white-space: normal; color: #333333">cpu进入idle</span>。如果有任何事件使CPU从idle状态退出，跳至Platform_wake处，执行wake操作。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f6）调用disable_nonboot_cpus，禁止所有的非boot cpu。也会失败，执行恢复操作即可。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f7）调用arch_suspend_disable_irqs，关全局中断。如果无法关闭，则为bug。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f8）调用syscore_suspend，suspend system core。同样会失败，执行恢复操作即可。有关syscore，我会在另一篇文章中详细描述。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f9）如果很幸运，以上操作都成功了，那么，切换吧。不过，别高兴太早，还得调用pm_wakeup_pending检查一下，这段时间内，是否有唤醒事件发生，如果有就要终止suspend。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f10）如果一切顺利，调用suspend_ops的enter回调，进行状态切换。这时，系统应该已经suspend了……<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f11）suspend过程中，唤醒事件发生，系统唤醒，该函数接着执行resume动作，并最终返回。resume动作基本上是suspend的反动作，就不再继续分析了。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; f12）或者，由于意外，suspend终止，该函数也会返回。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">g）suspend_enter返回，如果返回原因不是发生错误，且不是wakeup事件。则调用suspend_ops的suspend_again回调，检查是否需要再次suspend。再什么情况下要再次suspend呢？需要看具体的平台了，谁知道呢。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">h）继续resume操作，resume device、start ftrace、resume console、suspend_ops->end等等。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">i）该函数返回后，表示系统已经resume。&#160; </p>
+
+<p class="MsoNormal" align="left"><strong>4.5 suspend_finish</strong><o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">比较简单：<o:p></o:p> </p>
+
+<pre class="prettyprint lang-cpp linenums">static void suspend_finish(void)
+{
+        suspend_thaw_processes();
+        pm_notifier_call_chain(PM_POST_SUSPEND);
+        pm_restore_console();
+}</pre>
+
+<p class="MsoNormal" align="left">a）恢复所有的用户空间进程和内核线程。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">b）发送suspend结束的通知。<o:p></o:p> </p>
+
+<p class="MsoNormal" align="left">c）将console切换回原来的。<span style="line-height: 1.5">&#160;</span>&#160;&#160; </p>
+
+<p class="MsoNormal" align="left">&#160;</p>
+
+<p class="MsoNormal" align="left"><span style="font-size: 18px"><strong>5. 重要知识点回顾</strong></span><span lang="X-NONE"><o:p></o:p></span> </p>
+
+<h3><span style="font-size: 14px"><strong>5.1 VT switch</strong></span><o:p></o:p> </h3>
+
+<p class="MsoNormal" align="left">通常情况下，系统控制台模块（<span lang="X-NONE">drivers\tty\vt\</span>）会在<span lang="X-NONE">suspend</span>的过程中，重新分配一个<span lang="X-NONE">console</span>，并将控制台切换到该<span lang="X-NONE">console</span>上。然后在<span lang="X-NONE">resume</span>时，切换回旧的<span lang="X-NONE">console</span>。这就是<span lang="X-NONE">VT switch</span>功能。<span lang="X-NONE">VT switch</span>是很耗时的，因此内核提供了一些机制，控制是否使用这个功能：<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">1）提供一个接口函数<span lang="X-NONE">pm_set_vt_switch</span>（<span lang="X-NONE">drivers\tty\vt\vt_ioctl.c</span>），方便其它内核模块从整体上关闭或者开启<span lang="X-NONE">VT switch</span>功能。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">2）<span lang="X-NONE">VT switch</span>全局开关处于开启状态时，满足如下的一种条件（可参考<span lang="X-NONE">kernel\power\console.c</span>相关的描述），即会使能<span lang="X-NONE">VT switch<o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160;&#160; a）有<span lang="X-NONE">console driver</span>调用<span lang="X-NONE">pm_vt_switch_required</span>接口，显式的要求使能<span lang="X-NONE">VT switch</span>。<span lang="X-NONE">PM core</span>的<span lang="X-NONE">console</span>模块会把这些信息记录在一个名称为<span lang="X-NONE">pm_vt_switch_list</span>的链表中。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160; b）系统禁止在<span lang="X-NONE">suspend</span>的过程中<span lang="X-NONE">suspend console</span>（由<span lang="X-NONE">kernel/printk.c</span>中的<span lang="X-NONE">console_suspend_enabled</span>变量控制）。很有可能需要使用<span lang="X-NONE">console</span>查看<span lang="X-NONE">suspend</span>过程，此时为了使<span lang="X-NONE">console</span>不混乱，有必要进行<span lang="X-NONE">VT switch</span>。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">&#160;&#160;&#160;&#160;&#160;&#160; c）没有任何<span lang="X-NONE">console driver</span>关心是否需要<span lang="X-NONE">VT switch</span>，换句话说没有任何<span lang="X-NONE">driver</span>调用<span lang="X-NONE">pm_vt_switch_required</span>接口要求使能或禁止<span lang="X-NONE">VT switch</span>功能。此时会按照旧的习惯，进行<span lang="X-NONE">VT switch</span>。<span lang="X-NONE"><o:p></o:p></span>&#160;&#160; </p>
+
+<p class="MsoNormal" align="left">&#160; </p>
+
+<p class="MsoNormal" align="left">因此，<span lang="X-NONE">suspend</span>过程对<span lang="X-NONE">console</span>的处理分为<span lang="X-NONE">4</span>步：<span lang="X-NONE"><o:p></o:p></span> </p>
+prepare console：负责在需要<span lang="X-NONE">VT swich</span>时，将当前<span lang="X-NONE">console</span>切换到<span lang="X-NONE">SUSPEND console</span>。 
+
+<pre class="prettyprint lang-cpp linenums">int pm_prepare_console(void)
+{
+        if (!pm_vt_switch())
+                return 0;
+
+        orig_fgconsole = vt_move_to_console(SUSPEND_CONSOLE, 1);
+        if (orig_fgconsole < 0)
+                return 1;
+
+        orig_kmsg = vt_kmsg_redirect(SUSPEND_CONSOLE);
+        return 0;
+}</pre>
+
+<p class="MsoNormal" align="left">suspend console：挂起<span lang="X-NONE">console</span>，由<span lang="X-NONE">kernel/printk.c</span>实现，主要是<span lang="X-NONE">hold</span>住<span lang="X-NONE">console</span>用的互斥锁，使他人无法使用<span lang="X-NONE">console</span>。<span lang="X-NONE"><o:p></o:p></span>&#160;&#160; </p>
+
+<p class="MsoNormal" align="left">resume console：对<span lang="X-NONE">console</span>解锁。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">restore console：将<span lang="X-NONE">console</span>恢复为初始的<span lang="X-NONE">console</span>。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<pre class="prettyprint lang-cpp linenums">void pm_restore_console(void)
+{
+        if (!pm_vt_switch())
+                return;
+
+        if (orig_fgconsole >= 0) {
+                vt_move_to_console(orig_fgconsole, 0);
+                vt_kmsg_redirect(orig_kmsg);
+        }
+}</pre>
+
+<p class="MsoNormal" align="left">也许，您会问，<span lang="X-NONE">why VT switch</span>？先留着这个疑问吧，等到分析控制台时再回答。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<h3><span style="font-size: 14px"><strong>5.2 freezing of task</strong></span><o:p></o:p> </h3>
+
+<p class="MsoNormal" align="left">进程的<span lang="X-NONE">freezing</span>功能，是<span lang="X-NONE">suspend</span>、<span lang="X-NONE">hibernate</span>等电源管理功能的组成部分，在新版本内核中，它被独立出来，作为一个独立的电源管理状态（<span lang="X-NONE">freeze</span>）。该功能的目的，是在电源管理的状态切换过程中，确保所有用户空间进程和部分内核线程处于一个稳定的状态。有关该功能的具体描述，请参考<span lang="X-NONE">wowotech</span>后续的文章。<span style="line-height: 1.5">&#160;</span> </p>
+
+<h3><span style="font-size: 14px"><strong>5.3 PM notifier</strong></span><o:p></o:p> </h3>
+
+<p class="MsoNormal" align="left">PM notifier是基于内核<span lang="X-NONE">blocking notifier</span>功能实现的。<span lang="X-NONE">blocking notifier</span>提供了一种<span lang="X-NONE">kernel</span>内部的消息通知机制，消息接受者通过<span lang="X-NONE">notifier</span>注册的方式，注册一个回调函数，关注消息发送者发出的<span lang="X-NONE">notifier</span>。当消息产生时，消息产生者通过调用回调函数的形式，通知消息接受者。这种调用，是可以被阻塞的，因此称作<span lang="X-NONE">blocking notifier</span>。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">那<span lang="X-NONE">suspend</span>功能为什么使用<span lang="X-NONE">notifier</span>呢？原因可能有多种，这里我举一个例子，这是我们日常开发中可能会遇到的。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">由之前的描述可知，<span lang="X-NONE">suspend</span>过程中，<span lang="X-NONE">suspend device</span>发生在进程被<span lang="X-NONE">freeze</span>之后，<span lang="X-NONE">resume device</span>发生在进程被恢复之前。那么：<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">1）如果有些设备就需要在<span lang="X-NONE">freeze</span>进程之前<span lang="X-NONE">suspend</span>怎么办？<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">2）如果有些设备的<span lang="X-NONE">resume</span>动作需要较多延时，或者要等待什么事情发生，那么如果它的<span lang="X-NONE">resume</span>动作发生在进程恢复之前，岂不是要阻止所有进程的恢复？更甚者，如果该设备要等待某个进程的数据才能<span lang="X-NONE">resume</span>，怎么办？<span lang="X-NONE"><o:p></o:p></span> </p>
+再来看<span lang="X-NONE">suspend_prepare</span>和<span lang="X-NONE">suspend_finish</span>中的处理： 
+
+<pre class="prettyprint lang-cpp linenums">static int suspend_prepare(suspend_state_t state) {
+…
+        error = pm_notifier_call_chain(PM_SUSPEND_PREPARE);
+        if (error)
+                goto Finish;
+
+        error = suspend_freeze_processes();
+        …
+}
+
+static void suspend_finish(void)
+{
+        suspend_thaw_processes();
+        pm_notifier_call_chain(PM_POST_SUSPEND);
+        pm_restore_console();
+}</pre>
+
+<p class="MsoNormal" align="left">原来<span lang="X-NONE">PM notifier</span>是在设备模型的框架外，开了一个后门，那些比较特殊的<span lang="X-NONE">driver</span>，可以绕过设备模型，直接接收<span lang="X-NONE">PM</span>发送的<span lang="X-NONE">suspend</span>信息，以便执行自身的<span lang="X-NONE">suspend</span>动作。特别是<span lang="X-NONE">resume</span>时，可以在其它进程都正好工作的时候，只让<span lang="X-NONE">suspend</span>进程等待<span lang="X-NONE">driver</span>的<span lang="X-NONE">resume</span>。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">感兴趣的读者，可以围观一下下面这个活生生的例子（顺便提一下，好的设计是不应该有例外的）：<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left">drivers\video\omap2\dss\core.c<o:p></o:p>&#160;&#160; </p>
+
+<h3><span style="font-size: 14px"><strong>5.4 device PM ops 和</strong></span><span style="font-size: 14px" lang="X-NONE"><strong>platform PM ops</strong></span><span style="font-size: 14px"><strong>的调用时机</strong></span><span lang="X-NONE"><o:p></o:p></span> </h3>
+对<span lang="X-NONE">Linux</span>驱动工程师来说，<span lang="X-NONE">device PM ops</span>和<span lang="X-NONE">platform PM ops</span>就是电源管理（<span lang="X-NONE">suspend</span>）的全部，只要在合适的地方，实现合适的回调函数，即可实现系统的电源管理。但现实太复杂了，以至于<span lang="X-NONE">kernel</span>提供的这两个数据结构也很复杂，再回忆一下，如下： 
+
+<pre class="prettyprint lang-cpp linenums">struct dev_pm_ops {
+        int (*prepare)(struct device *dev);
+        void (*complete)(struct device *dev);
+        int (*suspend)(struct device *dev);
+        int (*resume)(struct device *dev);
+        int (*freeze)(struct device *dev);
+        int (*thaw)(struct device *dev);
+        int (*poweroff)(struct device *dev);
+        int (*restore)(struct device *dev);
+        int (*suspend_late)(struct device *dev);
+        int (*resume_early)(struct device *dev);
+        int (*freeze_late)(struct device *dev);
+        int (*thaw_early)(struct device *dev);
+        int (*poweroff_late)(struct device *dev);
+        int (*restore_early)(struct device *dev);
+        int (*suspend_noirq)(struct device *dev);
+        int (*resume_noirq)(struct device *dev);
+        int (*freeze_noirq)(struct device *dev);
+        int (*thaw_noirq)(struct device *dev);
+        int (*poweroff_noirq)(struct device *dev);
+        int (*restore_noirq)(struct device *dev);
+        int (*runtime_suspend)(struct device *dev);
+        int (*runtime_resume)(struct device *dev);
+        int (*runtime_idle)(struct device *dev);
+};
+
+struct platform_suspend_ops {
+        int (*valid)(suspend_state_t state);
+        int (*begin)(suspend_state_t state);
+        int (*prepare)(void);
+        int (*prepare_late)(void);
+        int (*enter)(suspend_state_t state);
+        void (*wake)(void);
+        void (*finish)(void);
+        bool (*suspend_again)(void);
+        void (*end)(void);
+        void (*recover)(void);
+};</pre>
+
+<p class="MsoNormal" align="left">虽然内核的注释已经相当详细了，但我们一定会犯晕，到底该实现哪些回调？这些回调的应用场景又是什么？蜗蜗以为，要熟练使用这些回调，唯一的方法就是多<span lang="X-NONE">coding</span>、多理解。除此之外，我们可以总结一下在电源状态切换时，这些回调的调用时机，从侧面帮助理解。如下（只介绍和<span lang="X-NONE">suspend</span>功能有关的，<span lang="X-NONE">struct dev_pm_ops</span>简称<span lang="X-NONE">D</span>，<span lang="X-NONE">struct platform_suspend_ops</span>简称<span lang="X-NONE">P</span>）：<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p class="MsoNormal" align="left"><a href="http://www.wowotech.net/content/uploadfile/201408/63ee3ab38963489e40787f14378fb39620140822135344.gif"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="pm_ops_flow" border="0" alt="pm_ops_flow" src="http://www.wowotech.net/content/uploadfile/201408/b6884309987aaf29cb4212c290e2ae8920140822135346.gif" width="585" height="850" /></a> </p>
+
+<p class="MsoNormal" align="left"><span style="font-size: 14px"><strong>
+      <br /></strong></span></p>
+
+<h3><span style="font-size: 14px"><strong>5.5 suspend过程的同步和</strong></span><span lang="X-NONE"><span style="font-size: 14px"><strong>PM wakeup</strong></span><o:p></o:p></span> </h3>
+
+<p class="MsoNormal" align="left">最重要的事情，如果<span lang="X-NONE">suspend</span>的过程中，有唤醒事件产生怎么办？正常的流程，应该终止<span lang="X-NONE">suspend</span>，返回并处理事件。但由于<span lang="X-NONE">suspend</span>过程的特殊性，进程被<span lang="X-NONE">freeze</span>、关中断等等，导致事情并没有那么简单，以至于在很久的一段时间内，<span lang="X-NONE">kernel</span>都不能很好的处理。这也称作<span lang="X-NONE">suspend</span>过程的同步问题。<span lang="X-NONE"><o:p></o:p></span> </p>
+
+<p>在美好的旧时光里，<span lang="X-NONE">suspend</span>大多用于热关机，因此同步问题的影响并不突出<span lang="X-NONE">(</span>因为操作并不频繁<span lang="X-NONE">)</span>。但来到新时代之后，事情变了，<span lang="X-NONE">Android</span>竟然用<span lang="X-NONE">suspend</span>作日常的待机（操作就相当频繁了），这时问题就大了。那怎么解决呢？得靠<span lang="X-NONE">system wakeup framework</span>，也就是<span lang="X-NONE">suspend</span>过程中所调用的pm_wakeup_pending接口所在的模块。我会在下一篇文章中继续该模块的分析，这里就不再继续了。 </p>
+
+<p>&#160;</p>
+
+<p><em>原创文章，转发请注明出处。蜗窝科技，<a href="http://www.wowotech.net/linux_kenrel/suspend_and_resume.html">www.wowotech.net</a>。</em></p>	<p class="tag">标签:	<a href="http://www.wowotech.net/tag/Linux">Linux</a>	<a href="http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8">内核</a>	<a href="http://www.wowotech.net/tag/suspend">suspend</a>	<a href="http://www.wowotech.net/tag/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86">电源管理</a>	<a href="http://www.wowotech.net/tag/resume">resume</a></p>
+		<a href="http://www.wowotech.net/support_us.html" style="display:block;text-align:center;">
+		<img src="http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png" align="middle" width="86" height="40"/>
+	</a>
+	<div class="nextlog">		&laquo; <a href="http://www.wowotech.net/irq_subsystem/interrupt_descriptor.html">linux kernel的中断子系统之（三）：IRQ number和中断描述符</a>
+				|
+				 <a href="http://www.wowotech.net/irq_subsystem/irq-domain.html">Linux kernel的中断子系统之（二）：IRQ Domain介绍</a>&raquo;
+	</div>
+		<a name="comments"></a>
+	<p class="comment-header"><b>评论：</b></p>
+			<div class="comment" id="comment-3863">
+		<a name="3863"></a>
+				<div class="comment-info">
+			<b><a href="http://no" target="_blank">bt_baseband</a> </b><br /><span class="comment-time">2016-04-26 15:20</span>
+			<div class="comment-content">I found a type error: &quot;CPU hotplug、wakeup处理等----过----个知识点&quot;</div>
+			<div class="comment-reply"><a href="#comment-3863" onclick="commentReply(3863,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-3864">
+		<a name="3864"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2016-04-26 16:10</span>
+			<div class="comment-content">@bt_baseband：多谢提醒，稍后改正:-)</div>
+			<div class="comment-reply"><a href="#comment-3864" onclick="commentReply(3864,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		<div class="comment" id="comment-2531">
+		<a name="2531"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-09-05 18:40</span>
+			<div class="comment-content">Hi, wowo<br />我现在遇到的问题, 从现象看是 在test&nbsp;&nbsp;suspend的时候, cpu被disable后不能enable.<br />操作下:<br />echo processors &gt; /sys/power/pm_test<br />echo mem&nbsp;&nbsp;&gt; /sys/power/mem<br />log:<br />Disabling non-boot CPUs ...<br />CPU1: shutdown<br />CPU2: shutdown<br />CPU3: shutdown<br />suspend debug: Waiting for 5 seconds.<br />Enabling non-boot CPUs ...<br />SMP: CPU 0 Waking up CPU 1<br />CPU1: failed to come online<br />Error taking CPU1 up: -5<br />SMP: CPU 0 Waking up CPU 2<br />CPU2: failed to come online<br />Error taking CPU2 up: -5<br />SMP: CPU 0 Waking up CPU 3<br />CPU3: failed to come online<br />Error taking CPU3 up: -5<br />PM: noirq resume of devices complete after 80.429 msecs<br />PM: early resume of devices complete after 0.409 msecs<br />我追踪看到一个奇诡的现象, 不能和理解,&nbsp;&nbsp;我的基本信息3.14内核 arm32:<br />cpu0 唤醒了cpu1<br />cpu1开始执行secondary_start_kernel开始启动自己, 调用路径:<br />secondary_start_kernel-&gt;cpu_startup_entry-&gt;cpu_idle_loop-&gt;while(1)<br /><br />在这个函数里面有个语句set_cpu_online(cpu, true);按理说, 1号cpu就是online的状态了.<br />而在cpu_idle_loop的while(1)的循环里面这个<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (cpu_is_offline(smp_processor_id()))<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arch_cpu_idle_dead();<br />这个if语句里的cpu_is_offline(smp_processor_id())尽然是true. 也就是说1号cpu是offline的!<br />wowo你认为这个现象正常吗?我没找到相关修改cpu 状态的函数逻辑.我的问题可能和这个有关.</div>
+			<div class="comment-reply"><a href="#comment-2531" onclick="commentReply(2531,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-2532">
+		<a name="2532"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-09-05 18:45</span>
+			<div class="comment-content">@firo：还有Error taking CPU1 up: -5 这个错误输出是因为相应的secondary&nbsp;&nbsp;cpu的状态是offline打出来的, 这个错误输出是cpu0打出来的, 具体函数在enable_nonboot_cpus.</div>
+			<div class="comment-reply"><a href="#comment-2532" onclick="commentReply(2532,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-2533">
+		<a name="2533"></a>
+				<div class="comment-info">
+			<b>wowo </b><br /><span class="comment-time">2015-09-05 20:57</span>
+			<div class="comment-content">@firo：firo,您确认这句话成立吗：“cpu1开始执行secondary_start_kernel开始启动自己”？<br />CPU3: failed to come online ，是__cpu_up打印的。<br />Error taking CPU3 up: -5 ，是enable_nonboot_cpus打印的。<br />没有证据显示secondary_start_kernel执行了。<br />我怀疑是suspend的过程中，secondary CPUs的执行环境被破坏了，没有机会执行。</div>
+			<div class="comment-reply"><a href="#comment-2533" onclick="commentReply(2533,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2534">
+		<a name="2534"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-09-05 21:19</span>
+			<div class="comment-content">@wowo：你的推理很可能是正确的!<br /><br />我之前在cpu_die这个函数里面加了句dump_stack, <br />打出的bt栈底是secondary_start_kernel, 我以为secondary CPUs正常启动了.<br />实际是disable_nonboot_cpu处罚了secondary CPUs在idle_cpu_loop里面的cpu_die的执行, 从而输出了bt.<br /><br />看这样子还是secondary CPUs没有正确跳转到初始化的代码上!<br /><br />我今天,&nbsp;&nbsp;看代码发现arch/arm/mach-mybsp/platsmp.c的代码里面竟然没有正确的初始化smp_ops.cpu_kill这个成员.&nbsp;&nbsp;我是从内核3.2直接把这个suspend和idle功能迁移到内核3.14上的. 内核3.2的代码里面没有smp_operations这个结构(我没找到).cpu die, cpu kill这些功能在3.2的内核都是通过在mach-*/下面定义platform_cpu_die/kill这样的全局函数, 从而在被smp子系统调用的.<br /><br />另外, 我看到http://events.linuxfoundation.org/sites/events/files/slides/clement-smp-bring-up-on-arm-soc.pdf 这个doc里面说cpu&nbsp;&nbsp;kill 和 cpu die之间要同步. 我怀疑可能和这个有关, 不过感觉概率不大.<br /><br />至于你说的&quot;secondary CPUs的执行环境被破坏了&quot; 这种可能性很大. <br />我追踪过CPU0 调用smp_boot_secondary平台相关的代码都被执行了. <br />这些代码在3.2是好用的, 另外代码的逻辑非常简单:<br />1. smp cross call 发IPI&nbsp;&nbsp;wakeup唤醒 相应的secondary CPUs<br />2. 设置secondary CPUs 的boot&nbsp;&nbsp;address.<br />3. 清除 secondary CPUs的reset 标志位.<br /><br />不知道哪里能破坏secondary CPUs的执行环境.wowo有没有可能的怀疑点?</div>
+			<div class="comment-reply"><a href="#comment-2534" onclick="commentReply(2534,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2535">
+		<a name="2535"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-09-05 21:26</span>
+			<div class="comment-content">@firo：我很可能是因为disable nonboot cpus这个路径上包含了一些从3.2移过来的代码导致的.<br />就多了这两句, <br />#ifdef CONFIG_SHEEVA_DEEP_IDLE<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;armadaxp_fabric_prepare_deepIdle();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;armadaxp_fabric_prepare_hotplug();<br />#endif<br />这个CONFIG_SHEEVA_DEEP_IDLE配置项被打开了.</div>
+			<div class="comment-reply"><a href="#comment-2535" onclick="commentReply(2535,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-2536">
+		<a name="2536"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-09-06 09:53</span>
+			<div class="comment-content">@firo：可以从两个方面入手：secondary是否真的被唤醒？boot Address是否正确？Address里面的内容是否正确？<br />因为boot CPU在醒着，这些东西还是很好查的。</div>
+			<div class="comment-reply"><a href="#comment-2536" onclick="commentReply(2536,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2537">
+		<a name="2537"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-09-06 10:14</span>
+			<div class="comment-content">@wowo：Thanks!<br /><br />我试着排查一下.</div>
+			<div class="comment-reply"><a href="#comment-2537" onclick="commentReply(2537,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-2539">
+		<a name="2539"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-09-06 17:26</span>
+			<div class="comment-content">@wowo：Hi, wowo,<br />阶段性的进展:<br />调试发现在smp_boot_secondary这个函数的步骤3<br /><br /> 清除 secondary CPUs的reset 标志位. <br /><br />之前Secondary CPUs的reset标志位就是没置位的!<br /> 我怀疑问题出在disable_nonboot_cpus 和 cpu_die里面.<br />追到了wfi, 也没看到相关的设置reset标志位的调用.<br /><br />另外, 查看硬件手册, 有上这样的描述:<br />Place the CPU to Wait For Interrupt mode. When the CPU enters this state, the following steps<br />occur:<br />a) CPU activity is halted, outstanding instructions are completed, and the write buffer is drained<br />out.<br />b) The CPU clocks are halted.<br />c) An internal reset is generated to the CPU.<br />d) The PMU power down the CPU core.<br /><br />貌似是硬件, 来设置这个reset标志位.</div>
+			<div class="comment-reply"><a href="#comment-2539" onclick="commentReply(2539,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-2540">
+		<a name="2540"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-09-06 18:36</span>
+			<div class="comment-content">@firo：这部分已经是arch-dependent的了，取决于您所使用的平台的特性。cpu die和cpu boot的实现，要相互配合。另外，可以检查一下，cpu die中是否有主动关clock、关power？</div>
+			<div class="comment-reply"><a href="#comment-2540" onclick="commentReply(2540,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-2541">
+		<a name="2541"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-09-06 18:45</span>
+			<div class="comment-content">@wowo：die的实现:<br />1. 设置唤醒事件, 和在可能的情况下power down l2<br />2. disable&nbsp;&nbsp;cpu snoop, 这个貌似和cpu的coherency有关.<br />3. 进入wfi</div>
+					</div>
+			</div>
+		<div class="comment comment-children" id="comment-2551">
+		<a name="2551"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-09-08 17:32</span>
+			<div class="comment-content">@wowo：原因找到了, 因为kernel menuconfig 的原因导致一段汇编代码没编译.<br />哎....</div>
+					</div>
+			</div>
+		</div>
+		</div>
+		</div>
+		</div>
+		<div class="comment" id="comment-2509">
+		<a name="2509"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-08-30 13:03</span>
+			<div class="comment-content">代码分布<br />2）Device PM<br /> 加上<br />include/linux/pm.h<br />如何?<br /><br />另外, 这句<br />a）调用suspend_ops的enter回调（有的话），通知平台代码，以便让其作相应的准备（需要的话）<br />和代码语义不符.<br /> if (need_suspend_ops(state) &amp;&amp; (!suspend_ops || !suspend_ops-&gt;enter))<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return -EPERM;<br />我理解这里只是做一个检测, 没有调用.</div>
+			<div class="comment-reply"><a href="#comment-2509" onclick="commentReply(2509,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-2510">
+		<a name="2510"></a>
+				<div class="comment-info">
+			<b>wowo </b><br /><span class="comment-time">2015-08-30 19:07</span>
+			<div class="comment-content">@firo：多谢指正，确实如此，等等修改。谢谢</div>
+			<div class="comment-reply"><a href="#comment-2510" onclick="commentReply(2510,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		<div class="comment" id="comment-2505">
+		<a name="2505"></a>
+				<div class="comment-info">
+			<b><a href="http://firoyang.org" target="_blank">firo</a> </b><br /><span class="comment-time">2015-08-30 00:52</span>
+			<div class="comment-content">非常赞! 思路清晰, 语言通俗, 内容全面!!! <br />脑浆炸裂一般爽啊!<br />从此楼主博客是我家!!!</div>
+			<div class="comment-reply"><a href="#comment-2505" onclick="commentReply(2505,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-2508">
+		<a name="2508"></a>
+				<div class="comment-info">
+			<b>wowo </b><br /><span class="comment-time">2015-08-30 07:06</span>
+			<div class="comment-content">@firo：多谢夸奖~</div>
+			<div class="comment-reply"><a href="#comment-2508" onclick="commentReply(2508,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		<div class="comment" id="comment-2252">
+		<a name="2252"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">linuxer</a> </b><br /><span class="comment-time">2015-07-20 19:05</span>
+			<div class="comment-content">有一个小瑕疵，文档中描述“f）调用suspend_test，判断是否为suspend to freeze，如果是，则已经完成，直接跳至h步骤。”，看起来这里表述可能有问题，对于suspend过程，如果系统要进入的电源管理状态是PM_SUSPEND_FREEZE的话，还是需要执行suspend_devices_and_enter的（步骤g）。<br /><br />对于PM_SUSPEND_FREEZE，其动作包括三个部分：<br />1、冻结进程<br />2、suspended devices（电源管理状态的参数是PM_SUSPEND_FREEZE）<br />3、cpu进入idle</div>
+			<div class="comment-reply"><a href="#comment-2252" onclick="commentReply(2252,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-2253">
+		<a name="2253"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-07-20 19:58</span>
+			<div class="comment-content">@linuxer：大神怎么有闲情雅致看电源管理了？哈哈。是的，被suspend_test误导了，还不够细致啊，等下改改。</div>
+			<div class="comment-reply"><a href="#comment-2253" onclick="commentReply(2253,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2256">
+		<a name="2256"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">linuxer</a> </b><br /><span class="comment-time">2015-07-20 23:35</span>
+			<div class="comment-content">@wowo：项目中有一个issue和freezer相关，因此看的比较仔细，哈哈<br />另外，我马上要写中断子系统中和电源管理子系统相关的内容，因此也在阅读电源管理的代码</div>
+			<div class="comment-reply"><a href="#comment-2256" onclick="commentReply(2256,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		</div>
+		<div class="comment" id="comment-2212">
+		<a name="2212"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">heziq</a> </b><br /><span class="comment-time">2015-07-14 18:45</span>
+			<div class="comment-content">@wowo<br />@linuxer<br /><br />struct device_driver {<br />&nbsp;&nbsp;&nbsp;&nbsp;const char&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*name;<br />&nbsp;&nbsp;&nbsp;&nbsp;struct bus_type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*bus;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;struct module&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*owner;<br />&nbsp;&nbsp;&nbsp;&nbsp;const char&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*mod_name;&nbsp;&nbsp;&nbsp;&nbsp;/* used for built-in modules */<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;bool suppress_bind_attrs;&nbsp;&nbsp;&nbsp;&nbsp;/* disables bind/unbind via sysfs */<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;const struct of_device_id&nbsp;&nbsp;&nbsp;&nbsp;*of_match_table;<br />&nbsp;&nbsp;&nbsp;&nbsp;const struct acpi_device_id&nbsp;&nbsp;&nbsp;&nbsp;*acpi_match_table;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;int (*probe) (struct device *dev);<br />&nbsp;&nbsp;&nbsp;&nbsp;int (*remove) (struct device *dev);<br />&nbsp;&nbsp;&nbsp;&nbsp;void (*shutdown) (struct device *dev);<br />&nbsp;&nbsp;&nbsp;&nbsp;int (*suspend) (struct device *dev, pm_message_t state);<br />&nbsp;&nbsp;&nbsp;&nbsp;int (*resume) (struct device *dev);<br />&nbsp;&nbsp;&nbsp;&nbsp;const struct attribute_group **groups;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;const struct dev_pm_ops *pm;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;struct driver_private *p;<br />};<br />在这里面有&nbsp;&nbsp;&nbsp;&nbsp;int (*suspend) (struct device *dev, pm_message_t state);<br />&nbsp;&nbsp;&nbsp;&nbsp;int (*resume) (struct device *dev);<br />但是我在内核中没有找到使用他的地方，一般情况下使用的是struct dev_pm_ops 中的suspend和resume。既然没有使用，为什么还留着他呢？<br /><br />在休眠过程中的调用<br />&nbsp;&nbsp;&nbsp;&nbsp;if (!callback &amp;&amp; dev-&gt;driver &amp;&amp; dev-&gt;driver-&gt;pm) {<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;info = &quot;driver &quot;;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;callback = pm_op(dev-&gt;driver-&gt;pm, state);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />很明显调用的是dev-&gt;driver-&gt;pm，而没有调用dev-&gt;driver-&gt;suspend.dev是struct dev结构体<br /><br />在这个Ac97_bus.c 文件中好像用了一次dev-&gt;driver-&gt;suspend</div>
+			<div class="comment-reply"><a href="#comment-2212" onclick="commentReply(2212,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-2213">
+		<a name="2213"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-07-14 21:00</span>
+			<div class="comment-content">@heziq：driver-&gt;suspend是旧接口，现在很少使用了。保留的目的是向前兼容。</div>
+			<div class="comment-reply"><a href="#comment-2213" onclick="commentReply(2213,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		<div class="comment" id="comment-2146">
+		<a name="2146"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">koala</a> </b><br /><span class="comment-time">2015-07-07 09:56</span>
+			<div class="comment-content">这里的noirq，是通过禁止所有的中断线的形式，而不是通过关全局中断的方式。<br />--------------------------<br />wowo,请教一下，上面一句话怎么理解？</div>
+			<div class="comment-reply"><a href="#comment-2146" onclick="commentReply(2146,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-2148">
+		<a name="2148"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-07-07 10:50</span>
+			<div class="comment-content">@koala：对ARM（或者ARM中断控制器）来说，可以单独开关每个设备的中断（即控制device到GIC之间的路径），也可以开关全局中断（即GIC到CPU的路径）。这里指的是前一种。</div>
+			<div class="comment-reply"><a href="#comment-2148" onclick="commentReply(2148,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2171">
+		<a name="2171"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">koala</a> </b><br /><span class="comment-time">2015-07-08 09:23</span>
+			<div class="comment-content">@wowo：当dpm_suspend_noirq之后，所有外设的中断线被关闭。假如此时外设来一个中断，由于irq被disable了，CPU无法响应，irq_handler就不会被执行，那就是说此时这个wakeup source是无法阻止系统休眠的？即使后面有pm_wakeup_pending的检查，因为这个中断无法送达GIC。<br />wowo，不知道哪边理解的不正确？</div>
+			<div class="comment-reply"><a href="#comment-2171" onclick="commentReply(2171,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2172">
+		<a name="2172"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-07-08 09:50</span>
+			<div class="comment-content">@koala：首先，suspend noirq的时候，确实会调用suspend_device_irqs disable所有设备的中断线，但有例外，就是那些具有IRQF_NO_SUSPEND（request IRQ是提供的）标志的设备，具体可参考如下的调用逻辑：suspend_enter--&gt;dpm_suspend_end--&gt;dpm_suspend_noirq--&gt;suspend_device_irqs--&gt;__disable_irq。 <br />另外，suspend noirq之后，紧接着就会关全局中断，之后才会调用pm_wakeup_pending检查pending状态，它检查的，是suspend noirq之前以及之后的所有wakeup event。<br />最后，全局中断被关闭之后，就只能依赖suspend enter时的由CPU自行检查了，如果这一段时间内，有中断产生，enter会立即返回。</div>
+			<div class="comment-reply"><a href="#comment-2172" onclick="commentReply(2172,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2185">
+		<a name="2185"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">koala</a> </b><br /><span class="comment-time">2015-07-09 15:09</span>
+			<div class="comment-content">@wowo：比如通话时，proximity靠近时灭屏，系统suspend。然后远离后Proximity的irq又能唤醒系统。虽然Proximity的中断线没有关闭，但是全局中断在suspend之前关闭了啊，为啥proximity的irq能在suspend之后唤醒系统呢？</div>
+			<div class="comment-reply"><a href="#comment-2185" onclick="commentReply(2185,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-2186">
+		<a name="2186"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-07-09 16:37</span>
+			<div class="comment-content">@koala：这个估计要linuxer同学给我们解释一下，我的理解是：关全局中断，意味着CPU不再处理（handler）GIC送来的中断，但并不说明GIC送来的中断不能唤醒CPU。<br />因此，suspend之后，产生中断，CPU醒来，继续执行，直到全局中断再次enable（arch_suspend_enable_irqs），CPU才会跳转到指定的中断handler中去处理中断。</div>
+			<div class="comment-reply"><a href="#comment-2186" onclick="commentReply(2186,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-2189">
+		<a name="2189"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">koala</a> </b><br /><span class="comment-time">2015-07-09 18:46</span>
+			<div class="comment-content">@wowo：关闭全局中断(GIC到CPU的路径),那么GIC为什么还能把中断送到CPU呢？(但并不说明GIC送来的中断不能唤醒CPU。)<br /><br />那就是说关闭全局中断，只是关闭CPU相应中断的能力，但是外部的中断还是能通过GIC把CPU enable的。</div>
+					</div>
+			</div>
+		</div>
+		</div>
+		</div>
+		<div class="comment comment-children" id="comment-2191">
+		<a name="2191"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">linuxer</a> </b><br /><span class="comment-time">2015-07-09 19:53</span>
+			<div class="comment-content">@koala：既然wowo召唤我，那我就说两句好了，虽然这里是wowo同学的主场，呵呵<br /><br /> 其实GIC和各个CPU的接口包括两种硬件信号：<br />（a）触发CPU中断的信号。nIRQCPU和nFIQCPU信号线，熟悉ARM CPU的工程师对这两个信号线应该不陌生，主要用来触发ARM cpu进入IRQ mode和FIQ mode。<br />（b）Wake up信号。nFIQOUT和nIRQOUT信号线，去ARM CPU的电源管理模块，用来唤醒CPU的<br /><br />因此disable了CPU的中断仅仅是堵死了中断这一个分支而已，wakeup信号仍在正常工作中。</div>
+			<div class="comment-reply"><a href="#comment-2191" onclick="commentReply(2191,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-2192">
+		<a name="2192"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">koala</a> </b><br /><span class="comment-time">2015-07-09 20:53</span>
+			<div class="comment-content">@linuxer：嗯，这下子明白了，谢谢wowo和linuxer两位大神！</div>
+			<div class="comment-reply"><a href="#comment-2192" onclick="commentReply(2192,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		</div>
+		<div class="comment" id="comment-1840">
+		<a name="1840"></a>
+				<div class="comment-info">
+			<b>qinghu </b><br /><span class="comment-time">2015-05-20 15:15</span>
+			<div class="comment-content">你好，我向你提问的问题，还有你的答复，怎么在你的评论里找不到了呢？<br />您删除了吗＞</div>
+			<div class="comment-reply"><a href="#comment-1840" onclick="commentReply(1840,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-1841">
+		<a name="1841"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-05-20 15:33</span>
+			<div class="comment-content">@qinghu：应该不会，您是指这些吗？<br />http://www.wowotech.net/pm_subsystem/pm_domain_overview.html#1815<br />博客的搜索、查询做的不是很好，抱歉！</div>
+			<div class="comment-reply"><a href="#comment-1841" onclick="commentReply(1841,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		<div class="comment" id="comment-1761">
+		<a name="1761"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-05-12 08:54</span>
+			<div class="comment-content">@xiao-coding:<br />以omap平台为例，suspend_ops-&gt;enter位于“arch/arm/mach-omap2/pm.c”中：<br />static int omap_pm_enter(suspend_state_t suspend_state)<br />{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;int ret = 0;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (!omap_pm_suspend)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return -ENOENT; /* XXX doublecheck */<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;switch (suspend_state) {<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case PM_SUSPEND_STANDBY:<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case PM_SUSPEND_MEM:<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ret = omap_pm_suspend();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default:<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ret = -EINVAL;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return ret;<br />}<br />“arch/arm/mach-omap2/pm44xx.c”等文件中，有对omap_pm_suspend赋值，最终调用的函数为omap4_pm_suspend等等。<br />你可以按照最这个过程在你所用的平台上找一下。具体做什么事情，和平台有关，我没办法告诉你。</div>
+			<div class="comment-reply"><a href="#comment-1761" onclick="commentReply(1761,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-1762">
+		<a name="1762"></a>
+				<div class="comment-info">
+			<b>xiao-coding </b><br /><span class="comment-time">2015-05-12 09:43</span>
+			<div class="comment-content">@wowo：谢谢您的回答</div>
+			<div class="comment-reply"><a href="#comment-1762" onclick="commentReply(1762,this)">回复</a></div>		</div>
+			</div>
+		</div>
+		<div class="comment" id="comment-1751">
+		<a name="1751"></a>
+				<div class="comment-info">
+			<b>xiao-coding </b><br /><span class="comment-time">2015-05-11 19:20</span>
+			<div class="comment-content">@wowo: 看您的blog，有这么一段话&nbsp;&nbsp;“f10）如果一切顺利，调用suspend_ops的enter回调，进行状态切换。这时，系统应该已经suspend了……” ， 我的疑问是如果这时候有中断发生，那么这个中断是怎么处理的？ 然后如何继续调用 syscore_resume()等恢复系统的？</div>
+			<div class="comment-reply"><a href="#comment-1751" onclick="commentReply(1751,this)">回复</a></div>
+		</div>
+			<div class="comment comment-children" id="comment-1752">
+		<a name="1752"></a>
+				<div class="comment-info">
+			<b>xiao-coding </b><br /><span class="comment-time">2015-05-11 19:22</span>
+			<div class="comment-content">@xiao-coding：我在suspend_enter()函数里加了log，但是总是抓不到系统何时调用的syscore_resume()函数？</div>
+			<div class="comment-reply"><a href="#comment-1752" onclick="commentReply(1752,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-1753">
+		<a name="1753"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-05-11 19:29</span>
+			<div class="comment-content">@xiao-coding：能抓到执行“error = suspend_ops-&gt;enter(state);”吗？例如在这之前打印？</div>
+			<div class="comment-reply"><a href="#comment-1753" onclick="commentReply(1753,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-1754">
+		<a name="1754"></a>
+				<div class="comment-info">
+			<b>xiao-coding </b><br /><span class="comment-time">2015-05-11 19:33</span>
+			<div class="comment-content">@wowo：可以的</div>
+			<div class="comment-reply"><a href="#comment-1754" onclick="commentReply(1754,this)">回复</a></div>		</div>
+			<div class="comment comment-children" id="comment-1756">
+		<a name="1756"></a>
+				<div class="comment-info">
+			<b>xiao-coding </b><br /><span class="comment-time">2015-05-11 19:34</span>
+			<div class="comment-content">@xiao-coding：我想请教您的是，从产生中断到执行syscore_resume()这之间的流程是怎么样的？</div>
+			<div class="comment-reply"><a href="#comment-1756" onclick="commentReply(1756,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-1758">
+		<a name="1758"></a>
+				<div class="comment-info">
+			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-05-11 20:28</span>
+			<div class="comment-content">@xiao-coding：这依赖于具体的平台实现（ suspend_ops-&gt;enter），你可以把enter回调的代码贴一下。</div>
+			<div class="comment-reply"><a href="#comment-1758" onclick="commentReply(1758,this)">回复</a></div>		</div>
+			</div>
+		<div class="comment comment-children" id="comment-1759">
+		<a name="1759"></a>
+				<div class="comment-info">
+			<b>@wowo </b><br /><span class="comment-time">2015-05-11 20:48</span>
+			<div class="comment-content">@wowo：找了好长时间, suspend_ops-&gt;enter这个函数指针,没有找到在哪里赋值的?</div>
+					</div>
+			</div>
+		<div class="comment comment-children" id="comment-1760">
+		<a name="1760"></a>
+				<div class="comment-info">
+			<b>xiao-coding </b><br /><span class="comment-time">2015-05-11 20:54</span>
+			<div class="comment-content">@wowo：@wowo: 这个enter函数里到底做了些什么?</div>
+					</div>
+			</div>
+		</div>
+		</div>
+		</div>
+		</div>
+	    <div id="pagenavi">
+	     <span>1</span>  <a href="http://www.wowotech.net/pm_subsystem/suspend_and_resume.html/comment-page-2#comments">2</a>  <a href="http://www.wowotech.net/pm_subsystem/suspend_and_resume.html/comment-page-3#comments">3</a>     </div>
+		<div id="comment-place">
+	<div class="comment-post" id="comment-post">
+		<div class="cancel-reply" id="cancel-reply" style="display:none"><a href="javascript:void(0);" onclick="cancelReply()">取消回复</a></div>
+		<p class="comment-header"><b>发表评论：</b><a name="respond"></a></p>
+		<form method="post" name="commentform" action="http://www.wowotech.net/index.php?action=addcom" id="commentform">
+			<input type="hidden" name="gid" value="81" />
+						<p>
+				<input type="text" name="comname" maxlength="49" value="" size="22" tabindex="1">
+				<label for="author"><small>昵称</small></label>
+			</p>
+			<p>
+				<input type="text" name="commail"  maxlength="128"  value="" size="22" tabindex="2">
+				<label for="email"><small>邮件地址 (选填)</small></label>
+			</p>
+			<p>
+				<input type="text" name="comurl" maxlength="128"  value="" size="22" tabindex="3">
+				<label for="url"><small>个人主页 (选填)</small></label>
+			</p>
+						<p><textarea name="comment" id="comment" rows="10" tabindex="4"></textarea></p>
+			<p><img src="http://www.wowotech.net/include/lib/checkcode.php" align="absmiddle" /><input name="imgcode" type="text" class="input" size="5" tabindex="5" /> <input type="submit" id="comment_submit" value="发表评论" tabindex="6" /></p>
+			<input type="hidden" name="pid" id="comment-pid" value="0" size="22" tabindex="1"/>
+		</form>
+	</div>
+	</div>
+		<div style="clear:both;"></div>
+</div><!--end #contentleft-->
+<ul id="sidebar">
+	<li>
+	<h3><span>站内搜索</span></h3>
+	<ul>
+	<script type="text/javascript">document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E%3Cscript charset="utf-8" src="http://znsv.baidu.com/customer_search/api/js?sid=16798210514584749375') + '&plate_url=' + (encodeURIComponent(window.location.href)) + '&t=' + (Math.ceil(new Date()/3600000)) + unescape('"%3E%3C/script%3E'));</script>	</ul>
+	</li>
+	<li>
+	<h3><span>功能</span></h3>
+	<ul>
+	<a href="http://www.wowotech.net/message_board.html">留言板<br></a>
+<a href="http://www.wowotech.net/?plugin=commentlist">评论列表<br></a>	</ul>
+	</li>
+	<li>
+	<h3><span>随机文章</span></h3>
+	<ul id="randlog">
+		<li><a href="http://www.wowotech.net/bluetooth/bt_protocol_arch.html">蓝牙协议分析(2)_协议架构</a></li>
+		<li><a href="http://www.wowotech.net/pm_subsystem/cpufreq_driver.html">Linux cpufreq framework(2)_cpufreq driver</a></li>
+		<li><a href="http://www.wowotech.net/pm_subsystem/pm_domain_overview.html">Linux PM domain framework(1)_概述和使用流程</a></li>
+		<li><a href="http://www.wowotech.net/kernel_synchronization/223.html">RCU synchronize原理分析</a></li>
+		<li><a href="http://www.wowotech.net/timer_subsystem/posix-timer.html">Linux时间子系统之（六）：POSIX timer</a></li>
+		</ul>
+	</li>
+	<li>
+	<h3><span>最新评论</span></h3>
+	<ul id="newcomment">
+		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/alloc_workqueue.html#4134">@zcjfish：修正下第二个问题：&nbsp;&nbsp;第二个问题是假设有4...</a></li>
+		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/alloc_workqueue.html#4133">现在的ARM core都有hotplug功能，就是说如果lo...</a></li>
+		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/gic_driver.html#4132">你好，请问PPI 中断的使用场景都有哪些？ 或者说什么样的中...</a></li>
+		<li id="comment">XXX	<br /><a href="http://www.wowotech.net/gpio_subsystem/pin-controller-driver.html#4131">膜拜~</a></li>
+		<li id="comment">wowo	<br /><a href="http://www.wowotech.net/device_model/dt-code-analysis.html#4130">@js_wawayu：应该不能吧？</a></li>
+		</ul>
+	</li>
+	<li>
+	<h3><span>文章分类</span></h3>
+	<ul id="blogsort">
+		<li>
+	<a href="http://www.wowotech.net/sort/linux_kenrel">Linux内核分析(10)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=4"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<ul>
+				<li>
+			<a href="http://www.wowotech.net/sort/device_model">统一设备模型(14)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=12"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/pm_subsystem">电源管理子系统(40)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=13"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/irq_subsystem">中断子系统(14)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=14"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/process_management">进程管理(5)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=15"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/kernel_synchronization">内核同步机制(17)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=16"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/gpio_subsystem">GPIO子系统(3)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=17"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/timer_subsystem">时间子系统(13)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=18"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/comm">通信类协议(4)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=20"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/memory_management">内存管理(5)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=21"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/graphic_subsystem">图形子系统(1)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=23"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/filesystem">文件系统(0)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=26"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				</ul>
+			<li>
+	<a href="http://www.wowotech.net/sort/u-boot">u-boot分析(2)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=25"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/linux_application">Linux应用技巧(11)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=3"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/soft">软件开发(6)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=1"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/basic_tech">基础技术(4)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=6"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<ul>
+				<li>
+			<a href="http://www.wowotech.net/sort/bluetooth">蓝牙(9)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=10"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/armv8a_arch">ARMv8A Arch(7)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=19"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				<li>
+			<a href="http://www.wowotech.net/sort/display">显示(3)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=22"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				</ul>
+			<li>
+	<a href="http://www.wowotech.net/sort/basic_subject">基础学科(9)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=7"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/tech_discuss">技术漫谈(10)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=8"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<li>
+	<a href="http://www.wowotech.net/sort/project">项目专区(0)</a>
+	<a href="http://www.wowotech.net/rss.php?sort=9"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+			<ul>
+				<li>
+			<a href="http://www.wowotech.net/sort/x_project">X Project(5)</a>
+			<a href="http://www.wowotech.net/rss.php?sort=24"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
+		</li>
+				</ul>
+			</ul>
+	</li>
+	<li>
+	<h3><span>文章存档</span></h3>
+	<ul id="record">
+		<li><a href="http://www.wowotech.net/record/201606">2016年6月(8)</a></li>
+		<li><a href="http://www.wowotech.net/record/201605">2016年5月(8)</a></li>
+		<li><a href="http://www.wowotech.net/record/201604">2016年4月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201603">2016年3月(5)</a></li>
+		<li><a href="http://www.wowotech.net/record/201602">2016年2月(5)</a></li>
+		<li><a href="http://www.wowotech.net/record/201601">2016年1月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201512">2015年12月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201511">2015年11月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201510">2015年10月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201509">2015年9月(4)</a></li>
+		<li><a href="http://www.wowotech.net/record/201508">2015年8月(3)</a></li>
+		<li><a href="http://www.wowotech.net/record/201507">2015年7月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201506">2015年6月(3)</a></li>
+		<li><a href="http://www.wowotech.net/record/201505">2015年5月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201504">2015年4月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201503">2015年3月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201502">2015年2月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201501">2015年1月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201412">2014年12月(17)</a></li>
+		<li><a href="http://www.wowotech.net/record/201411">2014年11月(8)</a></li>
+		<li><a href="http://www.wowotech.net/record/201410">2014年10月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201409">2014年9月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201408">2014年8月(12)</a></li>
+		<li><a href="http://www.wowotech.net/record/201407">2014年7月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201406">2014年6月(6)</a></li>
+		<li><a href="http://www.wowotech.net/record/201405">2014年5月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201404">2014年4月(9)</a></li>
+		<li><a href="http://www.wowotech.net/record/201403">2014年3月(7)</a></li>
+		<li><a href="http://www.wowotech.net/record/201402">2014年2月(3)</a></li>
+		<li><a href="http://www.wowotech.net/record/201401">2014年1月(4)</a></li>
+		</ul>
+	</li>
+<div class="rss">
+<a href="http://www.wowotech.net/rss.php" title="RSS订阅"><img src="http://www.wowotech.net/content/templates/default/images/rss.gif" alt="订阅Rss"/></a>
+</div>
+</ul><!--end #siderbar-->
+</div><!--end #content-->
+<div style="clear:both;"></div>
+<div id="footerbar">
+	Copyright @ 2013-2015 <a href="http://www.wowotech.net" title="wowotech">蜗窝科技</a> All rights reserved.
+	Powered by <a href="http://www.emlog.net" title="采用emlog系统">emlog</a>
+	<a href="http://www.miibeian.gov.cn" target="_blank"></a> <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?9d3da49d9cb9a5eaca161fc2905551df";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>	</div><!--end #footerbar-->
+</div><!--end #wrap-->
+<script>prettyPrint();</script>
+</body>
+</html>

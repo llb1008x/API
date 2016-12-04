@@ -1,0 +1,25 @@
+
+
+-------- Original Message --------
+Subject:	Case: 02033415 has been updated with a new comment - How to enable PMIC div_clk3 at 19.2Mhz on the LK
+Date:	Tue, 2 Jun 2015 08:19:05 +0000 (GMT)
+From:	CDMATech Support <support.cdmatech@qualcomm.com>
+To:	maggie.ma@zhntd.com <maggie.ma@zhntd.com>
+
+
+Dear Valued Customer,
+
+The following case has been updated with a new comment.
+
+Case Contact: Maggie Ma
+Case Number:  02033415
+Subject: How to enable PMIC div_clk3 at 19.2Mhz on the LK
+
+Case Type: Bug/Issue
+
+New Comment: Dear customer,
+you can refer to Pm8x41.c (bootable\bootloader\lk\dev\pmic\pm8x41)
+use pm8x41_reg_write to write 0x5D46 register to 0x80.
+about pm8941 registers you can refer to 80-NA555-2_PM8941_SOFTWARE_INTERFACE.pdf
+
+thanks!
