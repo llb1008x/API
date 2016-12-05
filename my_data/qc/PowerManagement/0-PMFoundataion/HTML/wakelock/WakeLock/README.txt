@@ -1,1 +1,0 @@
-WakeLock sample sources are provided to users under the BSD 2.0 license.  

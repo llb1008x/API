@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">WakeLock</string>
-    <string name="tip_help">What will happen</string>
-	<string name="timecount">Time passed:0s</string>
-
-</resources>

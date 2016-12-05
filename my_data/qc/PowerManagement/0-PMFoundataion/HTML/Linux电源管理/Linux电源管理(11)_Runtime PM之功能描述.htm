@@ -1,521 +1,0 @@
- 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Linux电源管理(11)_Runtime PM之功能描述</title>
-<meta name="keywords" content="Linux 嵌入式 ARM RTOS Technology 享受 C语言,Linux,PM,电源管理,runtime,rpm" />
-<meta name="description" content="1. 前言   终于可以写Runtime PM（后面简称RPM）了，说实话，蜗蜗有点小激动。因为从个人的角度讲，我很推崇使用RPM进行日常的动态电源管理，而不是suspend机制。..." />
-<meta name="generator" content="emlog" />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.wowotech.net/xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.wowotech.net/wlwmanifest.xml" />
-<link rel="alternate" type="application/rss+xml" title="RSS"  href="http://www.wowotech.net/rss.php" />
-<link href="http://www.wowotech.net/content/templates/default/main.css" rel="stylesheet" type="text/css" />
-<link href="http://www.wowotech.net/admin/editor/plugins/code/prettify.css" rel="stylesheet" type="text/css" />
-<script src="http://www.wowotech.net/admin/editor/plugins/code/prettify.js" type="text/javascript"></script>
-<script src="http://www.wowotech.net/include/lib/js/common_tpl.js" type="text/javascript"></script>
-<!--[if IE 6]>
-<script src="http://www.wowotech.net/content/templates/default/iefix.js" type="text/javascript"></script>
-<![endif]-->
-</head>
-<body>
-<div id="wrap">
-  <div id="header">
-    <h1><a href="http://www.wowotech.net/">蜗窝科技</a></h1>
-    <h3>慢下来，享受技术。</h3>
-  </div>
-    <div id="banner"><a href="http://www.wowotech.net/"><img src="http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg" height="134" width="960" /></a></div>
-    <div id="nav">	<ul class="bar">
-			<li class="item common">
-			<a href="http://www.wowotech.net/" >博客</a>
-					</li>
-			<li class="item common">
-			<a href="http://www.wowotech.net/sort/project" >项目</a>
-			            <ul class="sub-nav">
-                <li><a href="http://www.wowotech.net/sort/x_project">X Project</a></li>			</ul>
-            		</li>
-			<li class="item common">
-			<a href="http://www.wowotech.net/forum" target="_blank">讨论区</a>
-					</li>
-			<li class="item common">
-			<a href="http://www.wowotech.net/about.html" >关于蜗窝</a>
-					</li>
-			<li class="item common">
-			<a href="http://www.wowotech.net/contact_us.html" >联系我们</a>
-					</li>
-			<li class="item common">
-			<a href="http://www.wowotech.net/support_us.html" >支持我们</a>
-					</li>
-			<li class="item common">
-			<a href="http://www.wowotech.net/admin" >登录</a>
-					</li>
-		</ul>
-</div>﻿<div id="content">
-<div id="contentleft">
-	<h2>Linux电源管理(11)_Runtime PM之功能描述</h2>
-	<p class="date">作者：<a href="http://www.wowotech.net/author/2" title=" runangaozhong@163.com">wowo</a> 发布于：2014-10-8 23:32 
-			分类：<a href="http://www.wowotech.net/sort/pm_subsystem">电源管理子系统</a>
-	 	</p>
-	<h4>1. 前言 </h4>  <p>终于可以写Runtime PM（后面简称RPM）了，说实话，蜗蜗有点小激动。因为从个人的角度讲，我很推崇使用RPM进行日常的动态电源管理，而不是suspend机制。 </p>  <p>软件工程的基本思想就是模块化：高内聚和低耦合。通俗地讲呢，就是“各人自扫门前雪”，尽量扫好自己的（高内聚），尽量不和别人交互（低耦合）。而RPM正体现了这一思想：每个设备（包括CPU）都处理好自身的电源管理工作，尽量以最低的能耗完成交代的任务，尽量在不需要工作的时候进入低功耗状态，尽量不和其它模块有过多耦合。每个设备都是最节省的话，整个系统一定是最节省的，最终达到无所谓睡、无所谓醒的天人合一状态。 </p>  <p>讲到这里想到自己的一则趣事：大学时，蜗蜗是寝室长，但不爱打扫卫生，于是就提出一个口号，“不污染，不治理；谁污染，谁治理”。结果呢，大家猜就是了，呵呵。言归正传，开始吧。 </p>  <h4>2. Runtime PM的软件框架 </h4>  <p>听多了RPM的传说，有种莫名的恐惧，觉的会很复杂。但看代码，也就是“drivers/base/power/runtime.c”中1400行而已。 </p>  <p>从设计思路上讲，它确实简单。下面是一个大概的软件框架： </p>  <p><a href="http://www.wowotech.net/content/uploadfile/201410/f03735c6ab3d2842f47a4b3afca7d37e20141009152816.gif"><img title="Runtime PM architecture" style="border-left-width: 0px; border-right-width: 0px; border-bottom-width: 0px; float: none; margin-left: auto; display: block; border-top-width: 0px; margin-right: auto" border="0" alt="Runtime PM architecture" src="http://www.wowotech.net/content/uploadfile/201410/4f0b5b3e8e1dcfd7ce36e34e69fc909720141009152818.gif" width="510" height="480" /></a> </p>  <p>device driver（或者driver所在的bus、class等）需要提供3个回调函数，runtime_suspend、runtime_resume和runtime_idle，分别用于suspend device、resume device和idle device。它们一般由RPM core在合适的时机调用，以便降低device的power consumption。 </p>  <p>而调用的时机，最终是由device driver决定的。driver会在适当的操作点，调用RPM core提供的put和get系列的helper function，汇报device的当前状态。RPM core会为每个device维护一个引用计数，get时增加计数值，put时减少计数值，当计数为0时，表明device不再被使用，可以立即或一段时间后suspend，以节省功耗。 </p>  <p>好吧，说总是简单，那做呢？很不幸，<span style="color: #0000ff">到目前为止，linux kernel的runtime PM还是很复杂</span>。这里的复杂，不是从实现的角度，而是从对外的角度。在“include\linux\pm_runtime.h”中，RPM提供了将近50个接口。<span style="color: #0000ff">软件模块化的设计理念中，最重要的一个原则就是提供简洁的接口</span>。很显然，RPM没有做到！ </p>  <p>无论RPM面对的问题有多么复杂，无论理由有多么充分，它也应坚守“简洁性”这一原则。否则，结果只有一个----无人敢用。这就是当前Linux kernel电源管理中“<a href="http://www.wowotech.net/linux_kenrel/autosleep.html">Opportunistic suspend</a>”和RPM两种机制并存的原因。但是，就算现状不理想，也不能否认RPM的先进性，在当前以及未来很长的一段时间内，它会是kernel电源管理更新比较活跃的部分，因为可以做的还很多。 </p>  <p>鉴于这个现状，本文以及后续RPM有关的文章，会选取最新的kernel（当前为<a title="linux-3.17" href="https://kernel.org/pub/linux/kernel/v3.x/linux-3.17.tar.xz">linux-3.17</a>），以便及时同步相关的更新。 </p>  <h4>3. Runtime PM的运行机制 </h4>  <h5>3.1 核心机制</h5>  <p>RPM的核心机制是这样的：</p>  <p>1）为每个设备维护一个引用计数（device->power.usage_count），用于指示该设备的使用状态。</p>  <p>2）需要使用设备时，device driver调用pm_runtime_get（或pm_runtime_get_sync）接口，增加引用计数；不再使用设备时，device driver调用pm_runtime_put（或pm_runtime_put_sync）接口，减少引用计数。</p>  <p>3）每一次put，RPM core都会判断引用计数的值。如果为零，表示该设备不再使用（idle）了，则使用异步（ASYNC）或同步（SYNC）的方式，调用设备的.runtime_idle回调函数。</p>  <p>4）.runtime_idle的存在，是为了在idle和suspend之间加一个缓冲，避免频繁的suspend/resume操作。因此它的职责是：判断设备是否具备suspend的条件，如果具备，在合适的时机，suspend设备。</p>  <blockquote>   <p>可以不提供，RPM core会使用异步（ASYNC）或同步（SYNC）的方式，调用设备的.runtime_suspend回调函数，suspend设备，同时记录设备的PM状态；</p>    <p>可以调用RPM core提供helper函数（pm_runtime_autosuspend_expiration、pm_runtime_autosuspend、pm_request_autosuspend），要求在指定的时间后，suspend设备。</p> </blockquote>  <p>5）pm_runtime_autosuspend、pm_request_autosuspend等接口，会起一个timer，并在timer到期后，使用异步（ASYNC）或同步（SYNC）的方式，调用设备的.runtime_suspend回调函数，suspend设备，同时记录设备的PM状态。</p>  <p>6）每一次get，RPM core都会判断设备的PM状态，如果不是active，则会使用异步（ASYNC）或同步（SYNC）的方式，调用设备的.runtime_resume回调函数，resume设备。</p>  <p><font color="#0000ff">注1：Runtime PM中的“suspend”，不一定要求设备必须进入低功耗状态，而是要求设备在suspend后，不再处理数据，不再和CPUs、RAM进行任何的交互，直到设备的.runtime_resume被调用。因为此时设备的parent（如bus controller）、CPU是、RAM等，都有可能因为suspend而不再工作，如果设备再有任何动作，都会造成不可预期的异常。下面是“Documentation\power\runtime_pm.txt”中的解释，供大家参考：</font></p>  <blockquote>   <p>* Once the subsystem-level suspend callback (or the driver suspend callback,      <br />&#160; if invoked directly) has completed successfully for the given device, the PM       <br />&#160; core regards the device as suspended, which need not mean that it has been       <br />&#160; put into a low power state.&#160; It is supposed to mean, however, that the       <br />&#160; device will not process data and will not communicate with the CPU(s) and       <br />&#160; RAM until the appropriate resume callback is executed for it.&#160; The runtime       <br />&#160; PM status of a device after successful execution of the suspend callback is       <br />&#160; 'suspended'.</p> </blockquote>  <p><font color="#0000ff">注2：回忆一下</font><a href="http://www.wowotech.net/linux_kenrel/wakeup_events_framework.html"><font color="#0000ff">wakeup events</font></a><font color="#0000ff">和</font><a href="http://www.wowotech.net/linux_kenrel/wakelocks.html"><font color="#0000ff">wakeup lock</font></a><font color="#0000ff">，Runtime PM和它们在本质上是一样的，都是实时的向PM core报告“我不工作了，可以睡了”、“我要工作了，不能睡（或醒来吧）”。不同的是：wakeup events和RPM的报告者是内核空间drivers，而wakeup lock是用户空间进程；wakeup events和wakelock涉及的睡眠对象是整个系统，包括CPU和所有的devices，而RPM是一个一个独立的device（CPU除外，它由cpu idle模块处理，可看作RPM的特例）。</font></p>  <h5>3.2 get和put的时机</h5>  <p>这个话题的本质是：device idle的判断标准是什么？</p>  <p>再回忆一下“<a href="http://www.wowotech.net/linux_kenrel/autosleep.html">autosleep</a>”中有关“Opportunistic suspend”的讨论，对“Opportunistic suspend”而言，suspend时机的判断是相当困难的，因为整机的运行环境比较复杂。而每一个具体设备的idle，就容易多了，这就是Runtime PM的优势。回到这个话题上，对device而言，什么是idle？</p>  <p>device是通过用户程序为用户提供服务的，而服务的方式分为两种：接受指令，做事情（被动）；上报事件（主动，一般通过中断的方式）。因此，设备active的时间段，包括【接受指令，完成指令】和【事件到达，由driver记录下来】两个。除此之外的时间，包括driver从用户程序获得指令（以及相关的数据）、driver将事件（以及相关的数据）交给应用程序，都是idle时间。</p>  <p>那idle时间是否应立即suspend以节省功耗？不一定，要具体场景具体对待：例如网络传输，如果网络连接正常，那么在可预期的、很短的时间内，设备又会active（传输网络数据），如果频繁suspend，会降低性能，且不会省电；比如用户按键，具有突发性，因而可以考虑suspend；等等。</p>  <p>由于get和put正是设备idle状态的切换点，因此get和put的时机就容易把握了：</p>  <p>1）主动访问设备时，如写寄存器、发起数据传输等等，get，增加引用计数，告诉RPM core设备active；访问结束后，put，减小引用计数，告诉RPM core设备可能idle。</p>  <p>2）设备有事件通知时，get（可能在中断处理中）；driver处理完事件后，put。</p>  <p><font color="#0000ff">注3：以上只是理论场景，实际可以放宽，以减小设计的复杂度。</font></p>  <h5>3.3 异步（ASYNC）和同步（SYNC）</h5>  <p>设备驱动代码可在进程和中断两种上下文执行，因此put和get等接口，要么是由用户进程调用，要么是由中断处理函数调用。由于这些接口可能会执行device的.runtime_xxx回调函数，而这些接口的执行时间是不确定的，有些可能还会睡眠等待。这对用户进程或者中断处理函数来说，是不能接受的。</p>  <p>因此，RPM core提供的默认接口（pm_runtime_get/pm_runtime_put等），采用异步调用的方式（由ASYNC flag表示），启动一个work queue，在单独的线程中，调用.runtime_xxx回调函数，这可以保证设备驱动之外的其它模块正常运行。</p>  <p>另外，如果设备驱动清楚地知道自己要做什么，也可以使用同步接口（pm_runtime_get_sync/pm_runtime_put_sync等），它们会直接调用.runtime_xxx回调函数，不过，后果自负！</p>  <h5>3.4 Runtime PM过程中的同步问题</h5>  <p>由于.runtime_xxx回调函数可能采用异步的形式调用，以及Generic PM suspend和RPM并存的现状，要求RPM要小心处理同步问题，包括：</p>  <blockquote>   <p>多个.runtime_suspend请求之间的同步；      <br />多个.runtime_resume请求之间的同步；       <br />多个.runtime_idle请求之间的同步；       <br />.runtime_suspend请求和.runtime_resume请求之间的同步；       <br />.runtime_suspend请求和system suspend之间的同步；       <br />.runtime_resume请求和system resume之间的同步；       <br />等等。</p> </blockquote>  <p>由此可知，RPM core将会有相当一部分代码，用来处理同步问题。</p>  <h5>3.5 级联设备之间的Runtime PM</h5>  <p>struct device结构中，有一个parent指针，指向该设备的父设备（没有的话为空）。父设备通常是Bus、host controller，设备的正常工作，依赖父设备。体现在RPM中，就是如下的行为：</p>  <p>1）parent设备下任何一个设备处于active状态，parent必须active。</p>  <p>2）parent设备下任何一个设备idle了，要通知parent，parent以此记录处于active状态的child设备个数。</p>  <p>3）parent设备下所有子设备都idle了，parent才可以idle。</p>  <p>以上行为RPM core会自动处理，不需要驱动工程师太过操心。</p>  <h5>3.6 device的runtime status及其初始状态</h5>  <p>在Runtime Power Management的过程中，device可处于四种状态：RPM_ACTIVE、RPM_RESUMING、RPM_SUSPENDED和RPM_SUSPENDING。</p>  <blockquote>   <p>RPM_ACTIVE，设备处于正常工作的状态，表示设备的.runtime_resume回调函数执行成功；</p>    <p>RPM_SUSPENDED，设备处于suspend状态，表示设备.runtime_suspend回调函数执行成功；</p>    <p>RPM_RESUMING，设备的.runtime_resume正在被执行；</p>    <p>RPM_SUSPENDING，设备的.runtime_suspend正在被执行。</p>    <p><font color="#0000ff">注4：前面说过，.runtime_idle只是suspend前的过渡，因此runtime status和idle无关。</font></p> </blockquote>  <p>device注册时，设备模型代码会调用pm_runtime_init接口，将设备的runtime status初始化为RPM_SUSPENDED，而kernel并不知道某个设备初始化时的真正状态，因此设备驱动需要根据实际情况，调用RPM的helper函数，将自身的status设置正确。</p>  <h4>4. runtime PM的API汇整</h4>  <p>RPM提供的API位于“include/linux/pm_runtime.h”中，在这里先浏览一下，目的有二：一是对前面描述的RPM运行机制有一个感性的认识；二是为后面分析RPM的运行机制做准备。</p>  <p><font color="#0000ff">注5：我会把和驱动编写相关度较高的API加粗，其它的能不用就不用、能不看就不看！</font></p>  <p>extern int __pm_runtime_idle(struct device *dev, int rpmflags);   <br />extern int __pm_runtime_suspend(struct device *dev, int rpmflags);    <br />extern int __pm_runtime_resume(struct device *dev, int rpmflags);</p>  <blockquote>   <p>这三个函数是RPM的idle、put/suspend、get/resume等操作的基础，根据rpmflag，有着不同的操作逻辑。后续很多API，都是基于它们三个。一般不会在设备驱动中直接使用。</p> </blockquote>  <p><strong>extern int pm_schedule_suspend(struct device *dev, unsigned int delay);</strong></p>  <blockquote>   <p>在指定的时间后（delay，单位是ms），suspend设备。该接口为异步调用，不会更改设备的引用计数，可在driver的.rpm_idle中调用，免去driver自己再启一个timer的烦恼。</p> </blockquote> <strong>extern void pm_runtime_enable(struct device *dev);   <br />extern void pm_runtime_disable(struct device *dev);</strong>  <blockquote>   <p>设备RPM功能的enable/disable，可嵌套调用，会使用一个变量（dev->power.disable_depth）记录disable的深度。只要disable_depth大于零，就意味着RPM功能不可使用，很多的API调用（如suspend/reesume/put/get等）会返回失败。</p>    <p>RPM初始化时，会将所有设备的disable_depth置为1，也就是disable状态，driver初始化完毕后，要根据设备的时机状态，调用这两个函数，将RPM状态设置正确。</p> </blockquote>  <p>extern void pm_runtime_allow(struct device *dev);   <br />extern void pm_runtime_forbid(struct device *dev);</p>  <blockquote>   <p>RPM core通过sysfs（drivers/base/power/sysfs.c），为每个设备提供一个“/sys/devices/.../power/control”文件，通过该文件可让用户空间程序直接访问device的RPM功能。这两个函数用来控制是否开启该功能（默认开启）。</p> </blockquote>  <p>extern int pm_runtime_barrier(struct device *dev);</p>  <blockquote>   <p>这名字起的！！！</p>    <p>由3.3的描述可知，很多RPM请求都是异步的，这些请求会挂到一个名称为“pm_wq”的工作队列上，这个函数的目的，就是清空这个队列，另外如果有resume请求，同步等待resume完成。好复杂，希望driver永远不要用到它！！</p> </blockquote>  <p>extern int pm_generic_runtime_idle(struct device *dev);   <br />extern int pm_generic_runtime_suspend(struct device *dev);    <br />extern int pm_generic_runtime_resume(struct device *dev);</p>  <blockquote>   <p>几个通用的函数，一般给subsystem的RPM driver使用，直接调用devie driver的相应的callback函数。</p> </blockquote>  <p>extern void pm_runtime_no_callbacks(struct device *dev);</p>  <blockquote>   <p>告诉RPM core自己没有回调函数，不用再调用了（或者调用都是成功的），真啰嗦。</p> </blockquote>  <p>extern void pm_runtime_irq_safe(struct device *dev);</p>  <blockquote>   <p>告诉RPM core，如下函数可以在中断上下文调用：     <br />pm_runtime_idle()      <br />pm_runtime_suspend()      <br />pm_runtime_autosuspend()      <br />pm_runtime_resume()      <br />pm_runtime_get_sync()      <br />pm_runtime_put_sync()      <br />pm_runtime_put_sync_suspend()      <br />pm_runtime_put_sync_autosuspend()</p> </blockquote>  <p>static inline int pm_runtime_idle(struct device *dev)   <br />static inline int pm_runtime_suspend(struct device *dev)    <br />static inline int pm_runtime_resume(struct device *dev)</p>  <blockquote>   <p>直接使用同步的方式，尝试idle/suspend/resume设备，如果条件许可，就会执行相应的callback函数。driver尽量不要使用它们。</p> </blockquote>  <p>static inline int pm_request_idle(struct device *dev)   <br />static inline int pm_request_resume(struct device *dev)</p>  <blockquote>   <p>和上面类似，不过调用方式为异步。尽量不要使用它们。</p> </blockquote>  <p><strong>static inline int pm_runtime_get(struct device *dev)     <br />static inline int pm_runtime_put(struct device *dev)</strong></p>  <blockquote>   <p>增加/减少设备的使用计数，并判断是否为0，如果为零，尝试调用设备的idle callback，如果不为零，尝试调用设备的resume callback。</p>    <p>这两个接口是RPM的正统接口啊，多多使用！</p> </blockquote>  <p>static inline int pm_runtime_get_sync(struct device *dev)   <br />static inline int pm_runtime_put_sync(struct device *dev)     <br />static inline int pm_runtime_put_sync_suspend(struct device *dev)</p>  <blockquote>   <p>和上面类似，只不过为同步调用。另外提供了一个可直接调用suspend的put接口，何必的！</p> </blockquote>  <p>   <br />static inline int pm_runtime_autosuspend(struct device *dev)    <br />static inline int pm_request_autosuspend(struct device *dev)    <br />static inline int pm_runtime_put_autosuspend(struct device *dev)    <br />static inline int pm_runtime_put_sync_autosuspend(struct device *dev)</p>  <blockquote>   <p>autosuspend相关接口。所谓的autosuspend，就是在suspend的基础上，增加一个timer，还是觉得有点啰嗦。不说了。</p> </blockquote>  <p>static inline void pm_runtime_use_autosuspend(struct device *dev)    <br />static inline void pm_runtime_dont_use_autosuspend(struct device *dev)    <br />extern void pm_runtime_set_autosuspend_delay(struct device *dev, int delay);    <br />extern unsigned long pm_runtime_autosuspend_expiration(struct device *dev);</p>  <blockquote>   <p>控制是否使用autosuspend功能，以及设置/获取autosuspend的超时值。</p> </blockquote>  <p>总结一下：总觉得这些API所提供的功能有些重叠，重叠的有点啰嗦。可能设计者为了提供更多的便利，可过渡的便利和自由，反而是一种束缚和烦恼！</p>  <h4>5. runtime PM的使用步骤 </h4>  <p>觉得上面已经讲了，就不再重复了。</p>  <p>&#160;</p>  <p><em>原创文章，转发请注明出处。蜗窝科技，<a href="http://www.wowotech.net/linux_kenrel/rpm_overview.html">www.wowotech.net</a>。</em></p>	<p class="tag">标签:	<a href="http://www.wowotech.net/tag/Linux">Linux</a>	<a href="http://www.wowotech.net/tag/PM">PM</a>	<a href="http://www.wowotech.net/tag/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86">电源管理</a>	<a href="http://www.wowotech.net/tag/runtime">runtime</a>	<a href="http://www.wowotech.net/tag/rpm">rpm</a></p>
-		<a href="http://www.wowotech.net/support_us.html" style="display:block;text-align:center;">
-		<img src="http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png" align="middle" width="86" height="40"/>
-	</a>
-	<div class="nextlog">		&laquo; <a href="http://www.wowotech.net/kernel_synchronization/atomic.html">Linux内核同步机制之（一）：原子操作</a>
-				|
-				 <a href="http://www.wowotech.net/device_model/device_resource_management.html">Linux设备模型(9)_device resource management</a>&raquo;
-	</div>
-		<a name="comments"></a>
-	<p class="comment-header"><b>评论：</b></p>
-			<div class="comment" id="comment-2328">
-		<a name="2328"></a>
-				<div class="comment-info">
-			<b>yokingwang </b><br /><span class="comment-time">2015-07-28 10:04</span>
-			<div class="comment-content">为作者点个赞， 文章写的很好，最近看电源管理，帮助很大！<br />谢谢了！</div>
-			<div class="comment-reply"><a href="#comment-2328" onclick="commentReply(2328,this)">回复</a></div>
-		</div>
-			<div class="comment comment-children" id="comment-2332">
-		<a name="2332"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-07-28 12:15</span>
-			<div class="comment-content">@yokingwang：不用客气。</div>
-			<div class="comment-reply"><a href="#comment-2332" onclick="commentReply(2332,this)">回复</a></div>		</div>
-			</div>
-		</div>
-		<div class="comment" id="comment-1934">
-		<a name="1934"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-06-03 20:07</span>
-			<div class="comment-content">@bear20081015:回复的层数有限制，不然都挤在右边不美观。<br />“比如在系统suspend的时候可能需要先把设备从 pm runtime suspend中resume回来，然后再放到系统suspend希望的硬件状态中去”，这意味driver需要在suspend回调中resume device，那么driver要很清楚的知道自己在做什么，因而不能调用“pm_runtime_get”因为它是异步的，是不起作用的。<br />driver可以这么做：<br />1. 调用pm_runtime_get_sync。<br />2. 不要使用runtime接口了，反正resume后，需要根据实际情况重置runtime状态。<br />因此不会存在你最早所说的问题吧？</div>
-			<div class="comment-reply"><a href="#comment-1934" onclick="commentReply(1934,this)">回复</a></div>
-		</div>
-			<div class="comment comment-children" id="comment-1935">
-		<a name="1935"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-06-03 20:08</span>
-			<div class="comment-content">@wowo：然后还有一种方法，driver可以在prepare中get并resume设备。</div>
-			<div class="comment-reply"><a href="#comment-1935" onclick="commentReply(1935,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-1938">
-		<a name="1938"></a>
-				<div class="comment-info">
-			<b>bear20081015 </b><br /><span class="comment-time">2015-06-03 23:30</span>
-			<div class="comment-content">@wowo：谢谢wowo耐心的回答，这样基本上就没问题了。<br /><br />总觉得PM RUNTIME设计的不太好啊，比如driver owner认为在PM_RUNTIME_DISABLE之前都可以调用PM RUNTIME的API，但实际上只有sync的PM RUNTIME API才会生效。当PM runtime和suspend，power domain搅在一起的时候，驱动工程师需要了解的限制就比较多了。我们最近就碰到了一个驱动错误使用PM RUNTIME导致的问题。<br /><br />另外问点题外话，<br />1. 除了评论区交流外，能否考虑点其他的交流方式，比如邮件列表或者qq交流群啥的？感觉评论区这种方式效率不太高啊。<br />2. 这里接受别人的文章么？需要啥流程么？我平时也比较喜欢作笔记记录自己的学习过程，但没人review所以都是记录在自己的笔记本中，希望能有更多的机会和你们交流。</div>
-			<div class="comment-reply"><a href="#comment-1938" onclick="commentReply(1938,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-1939">
-		<a name="1939"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-06-04 08:50</span>
-			<div class="comment-content">@bear20081015：我也有同感，runtime PM设计的有点啰嗦，不优雅易用。看看最终会进化成什么样子吧。<br /><br />关于评论交流的问题，我们之间也讨论过很多次，主要目的是想把大家的交流留存下来。其实很多时候，评论的帮助很大，有时会比正文还大。确实，这样效率不是很高。最好的方法是，每一条评论，都可以通过邮件、QQ、微信等方式及时通知到相关人员。可我对网页相关的东西懂得太少，没法自由的定制。<br /><br />蜗窝接受其它文章的，原则是原创、有自己的思考在里面。至于其它的流程，都不需要，只要注册个账号就行了。不过后台编辑器不太好用，要写很多东西的话，可能需要Windows Live Writer等类似的PC软件。<br />目前主要是我和Linuxer在维护，我写power management有关的东西，Linuxer写中断、timer、同步有关的东西。由于业余时间太少，涉及到的点不多，还是希望有志同道合的人一起维护的。说不定哪天可以出本书呢。</div>
-			<div class="comment-reply"><a href="#comment-1939" onclick="commentReply(1939,this)">回复</a></div>		</div>
-			</div>
-		</div>
-		<div class="comment comment-children" id="comment-2717">
-		<a name="2717"></a>
-				<div class="comment-info">
-			<b>cy </b><br /><span class="comment-time">2015-10-06 11:27</span>
-			<div class="comment-content">@wowo：system wide的suspend过程中，在device的prepare回调，如果发现设备已经被runtime suspend了，就直接绕过这个设备的suspend流程，接着处理下一个设备。至少一些pci设备的驱动是按照上面的方式来直接跳过device suspend的。<br />我看不出有必要resume这个设备？</div>
-			<div class="comment-reply"><a href="#comment-2717" onclick="commentReply(2717,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-2721">
-		<a name="2721"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-10-08 09:05</span>
-			<div class="comment-content">@cy：还是有的：<br />例如某一个设备，正常工作时为S0状态，Runtime suspend时为S1状态，Suspend时为S2状态。但是，S1状态不能直接切换到S2状态，必须通过S0状态切换（如在S0状态时写寄存器）。<br />这时，suspend的时候，就需要runtime resume。</div>
-			<div class="comment-reply"><a href="#comment-2721" onclick="commentReply(2721,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-2728">
-		<a name="2728"></a>
-				<div class="comment-info">
-			<b>cy </b><br /><span class="comment-time">2015-10-08 18:57</span>
-			<div class="comment-content">@wowo：你指的是D0,D1...etc?</div>
-			<div class="comment-reply"><a href="#comment-2728" onclick="commentReply(2728,this)">回复</a></div>		</div>
-			</div>
-		<div class="comment comment-children" id="comment-2729">
-		<a name="2729"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-10-08 19:05</span>
-			<div class="comment-content">@cy：呵呵，那些名字是我随便说的，只是为了说明其中的意义。</div>
-			<div class="comment-reply"><a href="#comment-2729" onclick="commentReply(2729,this)">回复</a></div>		</div>
-			</div>
-		<div class="comment comment-children" id="comment-2730">
-		<a name="2730"></a>
-				<div class="comment-info">
-			<b>cy </b><br /><span class="comment-time">2015-10-08 20:24</span>
-			<div class="comment-content">@wowo：看到一个commit id， 如果driver认为没有必要resume，那就跳过了，<br />还是跟driver的实现有关，就算system wide的suspend想把device放到D3，如果runtime suspend的设备是D2，并且设备的driver告诉pm core说，我在D2也没关系，那么pm core就会让设备留在D2。<br /><br />commit aae4518b3124b29f8dc81c829c704fd2df72e98b<br />Author: Rafael J. Wysocki &lt;rafael.j.wysocki@intel.com&gt;<br />Date:&nbsp;&nbsp; Fri May 16 02:46:50 2014 +0200<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;PM / sleep: Mechanism to avoid resuming runtime-suspended devices unnecessarily</div>
-					</div>
-			</div>
-		</div>
-		</div>
-		</div>
-		</div>
-		<div class="comment" id="comment-1924">
-		<a name="1924"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">蜗蜗</a> </b><br /><span class="comment-time">2015-06-03 16:31</span>
-			<div class="comment-content">@bear20081015:<br />我把您的问题贴到了这里，我们在这里讨论。<br />================================================================================<br />1.一个设备在系统suspend之前处于RPM_SUSPENDED状态；此时dev-&gt;power.usage_count=0，dev-&gt;power.runtime_state = RPM_SUSPENDED； <br />2.在dev-&gt;prepare函数， system suspend框架会调用pm_runtime_get_noresume，此时dev-&gt;power.usage_count=1， runtime_state仍然是RPM_SUSPENEDED； <br />3.接着，system suspend会调用device_suspend_late，这个函数中调用了__pm_runtime_disable()。如果恰好在此之前，有人希望通过pm_runtime_get来resume这个设备，那么就会把一个pending的resume request放到pm runtime work queue上；此时usage_count=2， runtime_state = RPM_SUSPENDED； <br />4. 在__pm_runtime_disable中，函数会调用__pm_runtime_barrier，这会取消step3中的pending resume请求。 但不会将usage_count减1。此时usage_count=2， runtime_state = RPM_SUSPENDED。 <br />5. 当系统resume回来的时候，它会调用pm_runtime_put来将usage_count减1。 此时usage_count=1， runtime_state = RPM_SUSPENDED。 <br /><br />可以看到，经过这几个步骤后，device的runtime_state和usage_count出现了不匹配的情况，runtime_state=RPM_SUSPENDED的时候usage_count应该是0，但现在变成了1。我做的实验也是这样。不知道这算不算runtime的bug呢？还是我上面哪一步有问题？请指教，谢谢！</div>
-			<div class="comment-reply"><a href="#comment-1924" onclick="commentReply(1924,this)">回复</a></div>
-		</div>
-			<div class="comment comment-children" id="comment-1925">
-		<a name="1925"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">蜗蜗</a> </b><br /><span class="comment-time">2015-06-03 16:38</span>
-			<div class="comment-content">@蜗蜗：我觉得问题的关键是：<br />“如果恰好在此之前，有人希望通过pm_runtime_get来resume这个设备，那么就会把一个pending的resume request放到pm runtime work queue上；此时usage_count=2， runtime_state = RPM_SUSPENDED； ”<br />上面的步骤执行后，系统suspend就应该abort了，后续的__pm_runtime_disable就不应该接着执行。</div>
-			<div class="comment-reply"><a href="#comment-1925" onclick="commentReply(1925,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-1926">
-		<a name="1926"></a>
-				<div class="comment-info">
-			<b>bear20081015 </b><br /><span class="comment-time">2015-06-03 17:11</span>
-			<div class="comment-content">@蜗蜗：wowo，哪里的代码体现了这一点？我看到的代码是如果在device_suspend_late里面， __pm_runtime_disable之前有人调用了pm_runtime_abort的话，系统是不会从suspend中abort的。如果是在device_suspend的pm_runtimer_barrier之前的话则系统会abort。不知道我理解的对不对？</div>
-			<div class="comment-reply"><a href="#comment-1926" onclick="commentReply(1926,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-1927">
-		<a name="1927"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-06-03 17:29</span>
-			<div class="comment-content">@bear20081015：dpm_suspend_start--&gt;dpm_suspend--&gt;device_suspend--&gt;__device_suspend--&gt;pm_runtime_barrier<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;直到这个地方，device的resume请求都是可被处理的。<br />然后在pm_runtime_barrier之后，会suspend设备。<br />设备suspend了，也就意味着不会再产生resume事件了，也就不应该再对其执行pm_rutime_put操作了（这是由设备的suspend代码保证的）。<br />因此在随后的device_suspend_late里面，已经假设设备不会再有resume请求，这也是suspend、suspend_late的设计初衷。<br />因此suspend_late时，不应该出现我们讨论的这种情况。</div>
-			<div class="comment-reply"><a href="#comment-1927" onclick="commentReply(1927,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-1928">
-		<a name="1928"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-06-03 17:30</span>
-			<div class="comment-content">@wowo：错了，应该是“也就不应该再对其执行pm_rutime_get操作了”</div>
-			<div class="comment-reply"><a href="#comment-1928" onclick="commentReply(1928,this)">回复</a></div>		</div>
-			</div>
-		<div class="comment comment-children" id="comment-1929">
-		<a name="1929"></a>
-				<div class="comment-info">
-			<b>bear20081015 </b><br /><span class="comment-time">2015-06-03 17:44</span>
-			<div class="comment-content">@wowo：&quot;设备suspend了，也就意味着不会再产生resume事件了，也就不应该再对其执行pm_rutime_put操作了（这是由设备的suspend代码保证的）。&quot;如果有这个假设的话，那么是没有问题的。<br /><br />还是有点疑问，既然有这样的假设，<br />1.为什么还要在suspend_late中调用pm_runtime_disable呢，反正这时候也不会有pm runtime的操作了吧？ <br />2. 为啥不干脆在__device_suspend-&gt;pm_runtime_barrier之后就直接将pm_runtime_disable了呢？是让device在suspend函数中还能调用pm runtime么？<br /><br />问题比较多，见谅！</div>
-			<div class="comment-reply"><a href="#comment-1929" onclick="commentReply(1929,this)">回复</a></div>		</div>
-			</div>
-		<div class="comment comment-children" id="comment-1930">
-		<a name="1930"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-06-03 18:43</span>
-			<div class="comment-content">@bear20081015：不用客气，也不要再说“请教”之类的话了，我们是在讨论，愈辩愈明嘛。<br />关于suspend后device的行为，可以参考“include/linux/pm.h”中的注释（我在“http://www.wowotech.net/linux_kenrel/suspend_and_resume.html”中也有强调）：<br />* @suspend: Executed before putting the system into a sleep state in which the<br /> *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contents of main memory are preserved.&nbsp;&nbsp;The exact action to perform<br /> *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;depends on the device&#039;s subsystem (PM domain, device type, class or bus<br /> *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type), but generally the device must be quiescent after subsystem-level<br /> *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@suspend() has returned, so that it doesn&#039;t do any I/O or DMA.<br /> *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Subsystem-level @suspend() is executed for all devices after invoking<br /> *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;subsystem-level @prepare() for all of them.<br /><br />至于你的两个疑问，其实是一个，我猜原因是这样的：<br />对系统的suspend而言，操作对象不是单一设备，所以suspend或者suspend_late是针对系统中的所有设备的。suspend对应pm_runtime_barrier，suspend_late对应pm_runtime_disable，有两个好处：<br />1. 结构上是清晰的（suspend之后调用pm_runtime_disable也有可能是可以的）。<br />2. 设备之间可能有依存关系，所以先barrier所有设备的runtime请求，然后再disable所有设备的runtime功能，是比较合符逻辑。<br /><br />嗯，其实这两个好处也可以归结为一个，就是结构清晰，至于功能上，可能没有特别深层次的考虑（毕竟，设备已经suspend了，什么时候pm_runtime_disable，都无伤大雅了）。</div>
-					</div>
-			</div>
-		<div class="comment comment-children" id="comment-1933">
-		<a name="1933"></a>
-				<div class="comment-info">
-			<b>bear20081015 </b><br /><span class="comment-time">2015-06-03 19:44</span>
-			<div class="comment-content">@bear20081015：为啥不能在最下面回复了？？？长度限制么？<br /><br />wowo，不好意思，关于pm runtime在suspend中的设计还是觉得有点奇怪：<br />我看到pm runtime的documents说对于某些设备来说，有可能它在系统suspend和pm runtime suspend下的实现会不一样，比如在系统suspend的时候可能需要先把设备从 pm runtime suspend中resume回来，然后再放到系统suspend希望的硬件状态中去。如果是这样的话，假如下面的情形：<br />1. 系统suspend之前设备处于pm runtime suspend状态；<br />2. 在device-&gt;suspend callback function中，先调用pm_runtime_put将设备唤醒，再把它放到某些更低功耗的状态中。<br /><br />这种用法是不是会有下面的问题：<br />1. 执行pm runtime是在workqueue中，而这个workqueue在suspend比较早的阶段就被freeze了， 也就是说pm_runtime_put并不会真正打开设备？<br />2. 因为pm_runtime_barrier是在device-&gt;suspend之前调用的，如果这个resume的请求被pending在wq上的话，等执行到suspend_late的pm_runtime_disable时还是会产生我最早说的问题吧？</div>
-					</div>
-			</div>
-		</div>
-		</div>
-		</div>
-		</div>
-		<div class="comment" id="comment-1745">
-		<a name="1745"></a>
-				<div class="comment-info">
-			<b>gerrie </b><br /><span class="comment-time">2015-05-08 13:37</span>
-			<div class="comment-content">lz 文章有高深..正在理解中<br />新版驱动和sysfs结合比较多.<br />我想问有没办法通过sysfs在用户空间主动挂起一个设备呢??<br />例如我的某个驱动 在sys的power接口中有<br />autosuspend_delay_ms<br />control<br />runtime_active_time<br />runtime_status<br />runtime_suspended_time<br />wakeup<br />wakeup_abort_count<br />wakeup_active<br />wakeup_active_count<br />wakeup_count<br />wakeup_expire_count<br />wakeup_last_time_ms<br />wakeup_max_time_ms<br />wakeup_prevent_sleep_time_ms<br />wakeup_total_time_ms<br />这些东西,我尝试过.<br />#echo disabled &gt; control <br />#cat control <br />disabled <br />但是设备仍在供电.<br />或者 这样.<br />root@A0001:/sys/bus/platform/drivers/msm-dwc3 # echo -n &quot;msm_dwc3&quot;&gt;unbind<br />这样做可以.但是设备被系统resume时,系统会宕机重启..<br />其实原理上能实现么?通过sysfs在用户空间主动挂起一个设备</div>
-			<div class="comment-reply"><a href="#comment-1745" onclick="commentReply(1745,this)">回复</a></div>
-		</div>
-			<div class="comment comment-children" id="comment-1746">
-		<a name="1746"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">wowo</a> </b><br /><span class="comment-time">2015-05-08 15:00</span>
-			<div class="comment-content">@gerrie：我相信kernel不会提供这样的接口的，driver的suspend，由kernel统一调度了。如果需要特列，open、close也就行啊，或者提供一个ioctl，或者driver自行提供一个sysfs节点，等等。总之不需要这样的标准接口。</div>
-			<div class="comment-reply"><a href="#comment-1746" onclick="commentReply(1746,this)">回复</a></div>		</div>
-			</div>
-		</div>
-		<div class="comment" id="comment-1292">
-		<a name="1292"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">xuchu</a> </b><br /><span class="comment-time">2015-03-05 09:28</span>
-			<div class="comment-content">学习了，帮助挺大的，多谢楼主分享。</div>
-			<div class="comment-reply"><a href="#comment-1292" onclick="commentReply(1292,this)">回复</a></div>
-		</div>
-			<div class="comment comment-children" id="comment-1295">
-		<a name="1295"></a>
-				<div class="comment-info">
-			<b>wowo </b><br /><span class="comment-time">2015-03-05 10:44</span>
-			<div class="comment-content">@xuchu：不客气，感谢支持~~~</div>
-			<div class="comment-reply"><a href="#comment-1295" onclick="commentReply(1295,this)">回复</a></div>		</div>
-			</div>
-		</div>
-		<div class="comment" id="comment-1282">
-		<a name="1282"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">qkhhyga</a> </b><br /><span class="comment-time">2015-03-04 14:53</span>
-			<div class="comment-content">＠wowo：我有一个问题想请教一下：在runtime　pm中，在设计driver时，如果在外设处于suspend状态，突然外设有事件上报，即产生中断，在中断处理函数中去异步地get引用计数，那么此时runtime_resume有可能会比读取外设数据的执行程序要晚，这样的问题如何解决？即使resume在此之前，也会带来一定的延时，影响中断的响应时间</div>
-			<div class="comment-reply"><a href="#comment-1282" onclick="commentReply(1282,this)">回复</a></div>
-		</div>
-			<div class="comment comment-children" id="comment-1284">
-		<a name="1284"></a>
-				<div class="comment-info">
-			<b>wowo </b><br /><span class="comment-time">2015-03-04 15:43</span>
-			<div class="comment-content">@qkhhyga：这取决于runtime_resume和“读取外设数据的执行程序”需要做哪些事情。<br />首先有一点是要保证的，设备必须正确resume后，才能读取数据。那么执行流就应该这样：pm_runtime_get--&gt;runtime_resume--&gt;读取数据。因此我们的设计应该保证，在runtime_resume之后，才能读取数据。或者，读取数据的程序，就是runtime_resume触发执行的。因此，不会存在runtime_resume执行较晚的可能（要在设计上杜绝）。<br />至于所担心的影响中断响应，则完全不必，pm_runtime_get是异步的，因此会在中断结束后，起一个线程执行runtime_resume，不会影响中断。</div>
-			<div class="comment-reply"><a href="#comment-1284" onclick="commentReply(1284,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-1293">
-		<a name="1293"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">qkhhyga</a> </b><br /><span class="comment-time">2015-03-05 10:24</span>
-			<div class="comment-content">@wowo：＠wowo：非常感谢你的解答，另外，如果在外设suspend的时候，来了一个中断，而这个中断是要求cpu读取外设数据，那么，因为pm_runtime_get是异步的，所以resume是在workqueue中执行（需要调度），而读取外设数据又要保证在resume之后再读，这样的话就会影响应用程序的响应时间了。这是否也是在设计上应该注意的呢？比如把异步的改为同步的get</div>
-			<div class="comment-reply"><a href="#comment-1293" onclick="commentReply(1293,this)">回复</a></div>		</div>
-			<div class="comment comment-children" id="comment-1294">
-		<a name="1294"></a>
-				<div class="comment-info">
-			<b>wowo </b><br /><span class="comment-time">2015-03-05 10:38</span>
-			<div class="comment-content">@qkhhyga：是的，这就是PM的代价，也是PM QOS framework的目的所在。如果应用程序对这个延迟很在意，那么，系统设计者就要想办法，以其它代价去减小这个延迟。<br />所以，首先要确定的是：应用的延迟容忍是多少（request），driver的延迟是多少（constraint）？<br />最后，用同步get不是好方法，这样的话这个应用是爽了，可其它模块就悲剧了（中断延迟过大，同时需要保证你的runtime_resume可以在中断上下文执行）。</div>
-			<div class="comment-reply"><a href="#comment-1294" onclick="commentReply(1294,this)">回复</a></div>		</div>
-			</div>
-		</div>
-		</div>
-		</div>
-		<div class="comment" id="comment-1157">
-		<a name="1157"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">schedule</a> </b><br /><span class="comment-time">2015-02-03 11:52</span>
-			<div class="comment-content">rpm 和 system level 的suspend 流程之间的协调期待wowo</div>
-			<div class="comment-reply"><a href="#comment-1157" onclick="commentReply(1157,this)">回复</a></div>
-		</div>
-			</div>
-		<div class="comment" id="comment-1153">
-		<a name="1153"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">schedule</a> </b><br /><span class="comment-time">2015-02-03 09:04</span>
-			<div class="comment-content">我觉得，wakeup source 本质上是用户控制的，每次休眠都是用户期望的。<br />而rpm最终是基于 “预测机制” 不是每次都是正确的，类似 cpuidle cpufreq子系统</div>
-			<div class="comment-reply"><a href="#comment-1153" onclick="commentReply(1153,this)">回复</a></div>
-		</div>
-			<div class="comment comment-children" id="comment-1155">
-		<a name="1155"></a>
-				<div class="comment-info">
-			<b>wowo </b><br /><span class="comment-time">2015-02-03 10:59</span>
-			<div class="comment-content">@schedule：个人意见，就电源管理而言，机器控制会比用户控制智能的多，因为用户是不知道什么时候该省电的。只要能解决“如果控制错误怎么办？”这个问题。如果错误对用户使用的影响是有限或者不可感知的，就没有问题。</div>
-			<div class="comment-reply"><a href="#comment-1155" onclick="commentReply(1155,this)">回复</a></div>		</div>
-			</div>
-		</div>
-		<div class="comment" id="comment-1150">
-		<a name="1150"></a>
-				<div class="comment-info">
-			<b><a href="http://www.wowotech.net/" target="_blank">schedule</a> </b><br /><span class="comment-time">2015-02-03 08:38</span>
-			<div class="comment-content">感谢楼主分享</div>
-			<div class="comment-reply"><a href="#comment-1150" onclick="commentReply(1150,this)">回复</a></div>
-		</div>
-			</div>
-		<div class="comment" id="comment-876">
-		<a name="876"></a>
-				<div class="comment-info">
-			<b>luckywang </b><br /><span class="comment-time">2014-12-10 15:25</span>
-			<div class="comment-content">学习了，总结的挺好的</div>
-			<div class="comment-reply"><a href="#comment-876" onclick="commentReply(876,this)">回复</a></div>
-		</div>
-			<div class="comment comment-children" id="comment-878">
-		<a name="878"></a>
-				<div class="comment-info">
-			<b>wowo </b><br /><span class="comment-time">2014-12-10 18:22</span>
-			<div class="comment-content">@luckywang：谢谢~</div>
-			<div class="comment-reply"><a href="#comment-878" onclick="commentReply(878,this)">回复</a></div>		</div>
-			</div>
-		</div>
-	    <div id="pagenavi">
-	     <span>1</span>  <a href="http://www.wowotech.net/pm_subsystem/rpm_overview.html/comment-page-2#comments">2</a>     </div>
-		<div id="comment-place">
-	<div class="comment-post" id="comment-post">
-		<div class="cancel-reply" id="cancel-reply" style="display:none"><a href="javascript:void(0);" onclick="cancelReply()">取消回复</a></div>
-		<p class="comment-header"><b>发表评论：</b><a name="respond"></a></p>
-		<form method="post" name="commentform" action="http://www.wowotech.net/index.php?action=addcom" id="commentform">
-			<input type="hidden" name="gid" value="94" />
-						<p>
-				<input type="text" name="comname" maxlength="49" value="" size="22" tabindex="1">
-				<label for="author"><small>昵称</small></label>
-			</p>
-			<p>
-				<input type="text" name="commail"  maxlength="128"  value="" size="22" tabindex="2">
-				<label for="email"><small>邮件地址 (选填)</small></label>
-			</p>
-			<p>
-				<input type="text" name="comurl" maxlength="128"  value="" size="22" tabindex="3">
-				<label for="url"><small>个人主页 (选填)</small></label>
-			</p>
-						<p><textarea name="comment" id="comment" rows="10" tabindex="4"></textarea></p>
-			<p><img src="http://www.wowotech.net/include/lib/checkcode.php" align="absmiddle" /><input name="imgcode" type="text" class="input" size="5" tabindex="5" /> <input type="submit" id="comment_submit" value="发表评论" tabindex="6" /></p>
-			<input type="hidden" name="pid" id="comment-pid" value="0" size="22" tabindex="1"/>
-		</form>
-	</div>
-	</div>
-		<div style="clear:both;"></div>
-</div><!--end #contentleft-->
-<ul id="sidebar">
-	<li>
-	<h3><span>站内搜索</span></h3>
-	<ul>
-	<script type="text/javascript">document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E%3Cscript charset="utf-8" src="http://znsv.baidu.com/customer_search/api/js?sid=16798210514584749375') + '&plate_url=' + (encodeURIComponent(window.location.href)) + '&t=' + (Math.ceil(new Date()/3600000)) + unescape('"%3E%3C/script%3E'));</script>	</ul>
-	</li>
-	<li>
-	<h3><span>功能</span></h3>
-	<ul>
-	<a href="http://www.wowotech.net/message_board.html">留言板<br></a>
-<a href="http://www.wowotech.net/?plugin=commentlist">评论列表<br></a>	</ul>
-	</li>
-	<li>
-	<h3><span>随机文章</span></h3>
-	<ul id="randlog">
-		<li><a href="http://www.wowotech.net/pm_subsystem/pm_interface.html">Linux电源管理(4)_Power Management Interface</a></li>
-		<li><a href="http://www.wowotech.net/x_project/develop_env.html">X-000-PRE-开发环境搭建</a></li>
-		<li><a href="http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html">Linux电源管理(2)_Generic PM之基本概念和软件架构</a></li>
-		<li><a href="http://www.wowotech.net/armv8a_arch/memory-model.html">ARMv8之memory model</a></li>
-		<li><a href="http://www.wowotech.net/irq_subsystem/interrupt_subsystem_architecture.html">Linux kernel的中断子系统之（一）：综述</a></li>
-		</ul>
-	</li>
-	<li>
-	<h3><span>最新评论</span></h3>
-	<ul id="newcomment">
-		<li id="comment">simonzhang	<br /><a href="http://www.wowotech.net/device_model/dt-code-analysis.html#4135">感谢郭同学获益良多</a></li>
-		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/alloc_workqueue.html#4134">@zcjfish：修正下第二个问题：&nbsp;&nbsp;第二个问题是假设有4...</a></li>
-		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/alloc_workqueue.html#4133">现在的ARM core都有hotplug功能，就是说如果lo...</a></li>
-		<li id="comment">zcjfish	<br /><a href="http://www.wowotech.net/irq_subsystem/gic_driver.html#4132">你好，请问PPI 中断的使用场景都有哪些？ 或者说什么样的中...</a></li>
-		<li id="comment">XXX	<br /><a href="http://www.wowotech.net/gpio_subsystem/pin-controller-driver.html#4131">膜拜~</a></li>
-		</ul>
-	</li>
-	<li>
-	<h3><span>文章分类</span></h3>
-	<ul id="blogsort">
-		<li>
-	<a href="http://www.wowotech.net/sort/linux_kenrel">Linux内核分析(10)</a>
-	<a href="http://www.wowotech.net/rss.php?sort=4"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-			<ul>
-				<li>
-			<a href="http://www.wowotech.net/sort/device_model">统一设备模型(14)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=12"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/pm_subsystem">电源管理子系统(40)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=13"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/irq_subsystem">中断子系统(14)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=14"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/process_management">进程管理(5)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=15"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/kernel_synchronization">内核同步机制(17)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=16"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/gpio_subsystem">GPIO子系统(3)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=17"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/timer_subsystem">时间子系统(13)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=18"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/comm">通信类协议(4)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=20"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/memory_management">内存管理(5)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=21"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/graphic_subsystem">图形子系统(1)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=23"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/filesystem">文件系统(0)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=26"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				</ul>
-			<li>
-	<a href="http://www.wowotech.net/sort/u-boot">u-boot分析(2)</a>
-	<a href="http://www.wowotech.net/rss.php?sort=25"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-			<li>
-	<a href="http://www.wowotech.net/sort/linux_application">Linux应用技巧(11)</a>
-	<a href="http://www.wowotech.net/rss.php?sort=3"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-			<li>
-	<a href="http://www.wowotech.net/sort/soft">软件开发(6)</a>
-	<a href="http://www.wowotech.net/rss.php?sort=1"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-			<li>
-	<a href="http://www.wowotech.net/sort/basic_tech">基础技术(4)</a>
-	<a href="http://www.wowotech.net/rss.php?sort=6"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-			<ul>
-				<li>
-			<a href="http://www.wowotech.net/sort/bluetooth">蓝牙(9)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=10"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/armv8a_arch">ARMv8A Arch(7)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=19"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				<li>
-			<a href="http://www.wowotech.net/sort/display">显示(3)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=22"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				</ul>
-			<li>
-	<a href="http://www.wowotech.net/sort/basic_subject">基础学科(9)</a>
-	<a href="http://www.wowotech.net/rss.php?sort=7"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-			<li>
-	<a href="http://www.wowotech.net/sort/tech_discuss">技术漫谈(10)</a>
-	<a href="http://www.wowotech.net/rss.php?sort=8"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-			<li>
-	<a href="http://www.wowotech.net/sort/project">项目专区(0)</a>
-	<a href="http://www.wowotech.net/rss.php?sort=9"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-			<ul>
-				<li>
-			<a href="http://www.wowotech.net/sort/x_project">X Project(5)</a>
-			<a href="http://www.wowotech.net/rss.php?sort=24"><img src="http://www.wowotech.net/content/templates/default/images/rss.png" alt="订阅该分类"/></a>
-		</li>
-				</ul>
-			</ul>
-	</li>
-	<li>
-	<h3><span>文章存档</span></h3>
-	<ul id="record">
-		<li><a href="http://www.wowotech.net/record/201606">2016年6月(8)</a></li>
-		<li><a href="http://www.wowotech.net/record/201605">2016年5月(8)</a></li>
-		<li><a href="http://www.wowotech.net/record/201604">2016年4月(7)</a></li>
-		<li><a href="http://www.wowotech.net/record/201603">2016年3月(5)</a></li>
-		<li><a href="http://www.wowotech.net/record/201602">2016年2月(5)</a></li>
-		<li><a href="http://www.wowotech.net/record/201601">2016年1月(6)</a></li>
-		<li><a href="http://www.wowotech.net/record/201512">2015年12月(6)</a></li>
-		<li><a href="http://www.wowotech.net/record/201511">2015年11月(9)</a></li>
-		<li><a href="http://www.wowotech.net/record/201510">2015年10月(9)</a></li>
-		<li><a href="http://www.wowotech.net/record/201509">2015年9月(4)</a></li>
-		<li><a href="http://www.wowotech.net/record/201508">2015年8月(3)</a></li>
-		<li><a href="http://www.wowotech.net/record/201507">2015年7月(7)</a></li>
-		<li><a href="http://www.wowotech.net/record/201506">2015年6月(3)</a></li>
-		<li><a href="http://www.wowotech.net/record/201505">2015年5月(7)</a></li>
-		<li><a href="http://www.wowotech.net/record/201504">2015年4月(9)</a></li>
-		<li><a href="http://www.wowotech.net/record/201503">2015年3月(9)</a></li>
-		<li><a href="http://www.wowotech.net/record/201502">2015年2月(6)</a></li>
-		<li><a href="http://www.wowotech.net/record/201501">2015年1月(6)</a></li>
-		<li><a href="http://www.wowotech.net/record/201412">2014年12月(17)</a></li>
-		<li><a href="http://www.wowotech.net/record/201411">2014年11月(8)</a></li>
-		<li><a href="http://www.wowotech.net/record/201410">2014年10月(9)</a></li>
-		<li><a href="http://www.wowotech.net/record/201409">2014年9月(7)</a></li>
-		<li><a href="http://www.wowotech.net/record/201408">2014年8月(12)</a></li>
-		<li><a href="http://www.wowotech.net/record/201407">2014年7月(6)</a></li>
-		<li><a href="http://www.wowotech.net/record/201406">2014年6月(6)</a></li>
-		<li><a href="http://www.wowotech.net/record/201405">2014年5月(9)</a></li>
-		<li><a href="http://www.wowotech.net/record/201404">2014年4月(9)</a></li>
-		<li><a href="http://www.wowotech.net/record/201403">2014年3月(7)</a></li>
-		<li><a href="http://www.wowotech.net/record/201402">2014年2月(3)</a></li>
-		<li><a href="http://www.wowotech.net/record/201401">2014年1月(4)</a></li>
-		</ul>
-	</li>
-<div class="rss">
-<a href="http://www.wowotech.net/rss.php" title="RSS订阅"><img src="http://www.wowotech.net/content/templates/default/images/rss.gif" alt="订阅Rss"/></a>
-</div>
-</ul><!--end #siderbar-->
-</div><!--end #content-->
-<div style="clear:both;"></div>
-<div id="footerbar">
-	Copyright @ 2013-2015 <a href="http://www.wowotech.net" title="wowotech">蜗窝科技</a> All rights reserved.
-	Powered by <a href="http://www.emlog.net" title="采用emlog系统">emlog</a>
-	<a href="http://www.miibeian.gov.cn" target="_blank"></a> <script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "//hm.baidu.com/hm.js?9d3da49d9cb9a5eaca161fc2905551df";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>	</div><!--end #footerbar-->
-</div><!--end #wrap-->
-<script>prettyPrint();</script>
-</body>
-</html>
