@@ -16,3 +16,11 @@ http://blog.chinaunix.net/uid-20321537-id-4049149.html
 
 ubuntu下配置git和github初体验 "
 http://blog.chinaunix.net/uid-24782829-id-3183604.html
+
+
+配置vim
+git clone https://github.com/chxuan/vimplus.git
+
+
+linux下的tty设备
+http://blog.csdn.net/goodluckwhh/article/details/13368279

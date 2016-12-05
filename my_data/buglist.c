@@ -290,6 +290,15 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 power待机功耗相关的
 /*{
 
+	对待这类问题要有个完整的判断逻辑：
+
+	正常待机问题（分场景），待机电流问题（底电流，开数据的电流3G，4G），电池续航问题(一系列场景下手机使用时间)
+	
+
+	ttyC0 是不是也跟modem相关？
+	wake up byCONN2AP
+
+
 	基本的概念：
 	1.Cell standby：手机搜索信号的稳定
 
@@ -299,6 +308,14 @@ power待机功耗相关的
 	。VoLTE即Voice over LTE，它是一种IP数据传输技术，无需2G/3G网，全部业务承载于4G网络上，可实现数据与语音业务在同一网络下的统一。
 	换言之，4G网络下不仅仅提供高速率的数据业务，同时还提供高质量的音视频通话，后者便需要VoLTE技术来实现。
 
+	3.tty：
+	在linux中，tty设备用来抽象串口类型的设备，它位于字符驱动之下，抽象了串口设备需要的特性、功能，抽象后的一个tty设备即可表示一个串行输入、
+	输出接口（比如控制台口，串口、pty设备接口）。
+
+    tty core：它以统一一致的方式来处理流向某个tty设备的数据以及来自某个tty设备的数据，并向用户空间提供了统一一致的用户接口，向底层即真实的
+	设备驱动提供了统一一致的编程接口。利用这些特性，可以很容易为一个新的串口设备编写驱动程序以及用户程序。
+    line discipline：它是线路规程的意思。正如它的名字一样，它表示的是这条终端”线程”的输入与输出规范设置。主要用来进行输入/输出数据的预处理，
+	写入设备的数据要先经过它的处理才会被发送给真实的设备驱动，从设备接收的数据也会先经过它的处理才会进入到tty core的处理逻辑。
 
 1.功耗要注意的几个地方
 
@@ -323,11 +340,11 @@ power待机功耗相关的
 
 	}
 
-	
 	b.抓取battersystats.log和wakeup_sources.log，以及导出mobile log；
 	抓取方法：
 	adb shell dumpsys batterystats > battersystats.log
 	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
+
 
 	c.比较关键的两个log文件batterystats.log和kernel.log
 	batterystats.log记录系统耗电的过程
@@ -754,6 +771,7 @@ GNSPR#58813 送测待机电流偏高
 charging充电相关的
 /*{
 
+ 关机电压跟开机电压是不一样的，首先开机电压肯定要比关机电压高。
 
 需要注意的地方：
 
