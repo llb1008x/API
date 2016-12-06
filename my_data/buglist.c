@@ -12,6 +12,8 @@
 6.anthor其他问题
 
 
+mtk log下几个log的意思
+
 
 
 Fuel_gauge更换了充电芯片
@@ -317,6 +319,14 @@ power待机功耗相关的
     line discipline：它是线路规程的意思。正如它的名字一样，它表示的是这条终端”线程”的输入与输出规范设置。主要用来进行输入/输出数据的预处理，
 	写入设备的数据要先经过它的处理才会被发送给真实的设备驱动，从设备接收的数据也会先经过它的处理才会进入到tty core的处理逻辑。
 
+	4.modem
+	调制解调器
+
+	4.BTS：
+	基站收发台
+
+
+
 1.功耗要注意的几个地方
 
 	a.首先明确是否有modem log，c2kmdlog文件，modem log 特别耗电，而且占空间然后察看modem log的时间变化。
@@ -340,39 +350,42 @@ power待机功耗相关的
 
 	}
 
+
 	b.抓取battersystats.log和wakeup_sources.log，以及导出mobile log；
+	这两个文件对于功耗的分析很重要，系统个部分耗电多少，持有锁，唤醒...
 	抓取方法：
 	adb shell dumpsys batterystats > battersystats.log
 	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
 
 
 	c.比较关键的两个log文件batterystats.log和kernel.log
-	batterystats.log记录系统耗电的过程
+		batterystats.log记录系统耗电的过程
+		
+		1.signal level 当前环境的信号质量
+		信号质量差，modem一直在找信号，耗电量肯定大，所以网络环境变化在一定程度上也会造成耗电。
+
+		2.wake lock 应用是否长时间占用锁
+		wake up alarm, wake up by 
+		以上两个都有一个限度，什么样才属于过度，什么样在合理范围内?
+
+		3.系统是否被经常被应用唤醒
+		在sys.log目录下，搜索alarm 
+		应用推送业务，频繁唤醒。
+
+		kernel部分的统计思路是：
+		1. 搜索"wake up by"关键字，只看kworker或是system_server进程打印的
+		2. 如果是EINT event的话，要接着搜索"is pending"关键字，找到是哪个EINT
+		EINT是外部中断，GPT是什么？
+		3. 如果CLDMA event的话，要接着搜索"wakeup source"关键字，找到是哪个channel			
+		4. 计算时间的话，从wakeup event后面的第一个PM: suspend exit到后面第一个PM: suspend entry之间的时间差
+
+		sys log部分的统计思路是：
+		1. 搜索关键字"wakeup alarm"
+		2. 只查找type为0和type为2的alarm
+		3. 过滤package name做统计
+
 	
-	1.signal level 当前环境的信号质量
-	信号质量差，modem一直在找信号，耗电量肯定大，所以网络环境变化在一定程度上也会造成耗电。
-
-	2.wake lock 应用是否长时间占用锁
-	wake up alarm, wake up by 
-	以上两个都有一个限度，什么样才属于过度，什么样在合理范围内?
-
-	3.系统是否被经常被应用唤醒
-	在sys.log目录下，搜索alarm 
-	应用推送业务，频繁唤醒。
-
-	kernel部分的统计思路是：
-	1. 搜索"wake up by"关键字，只看kworker或是system_server进程打印的
-	2. 如果是EINT event的话，要接着搜索"is pending"关键字，找到是哪个EINT
-	EINT是外部中断，GPT是什么？
-	3. 如果CLDMA event的话，要接着搜索"wakeup source"关键字，找到是哪个channel			
-	4. 计算时间的话，从wakeup event后面的第一个PM: suspend exit到后面第一个PM: suspend entry之间的时间差
-
-	sys log部分的统计思路是：
-	1. 搜索关键字"wakeup alarm"
-	2. 只查找type为0和type为2的alarm
-	3. 过滤package name做统计
-
-	
+	d.常见的待机电流:
 	极致省电模式电流：5mA以上
 	飞行模式待机电流：3——4mA
 	未开数据待机电流：5——6mA
@@ -385,7 +398,7 @@ power待机功耗相关的
 
 
 
-	功耗测试的标准：
+	e.功耗测试的标准：
 	1.移动运营商的电流为9ma，电信运营商的电流为9mA，联通运营商的电流为16mA
 	2.计算公式：电流（ma）×时间（H）=Mah
 	  如联通卡待机12小时耗电量为：（16×12）÷6020=3%
@@ -414,7 +427,7 @@ power待机功耗相关的
 	3.通过log察看唤醒源是谁，谁唤醒的，同时要关闭应用推送业务，避免推送经常唤醒系统。
 	4.modem搜信号会唤醒系统
 	环境变化影响，一般的MODEM 待机测试，需要关闭应用推送业务，蓝牙／WIFI／GPS，最好关闭数据链接，
-        因为应用推送业务瞬间一段时间会比较打，等待10-15 分钟稳定，测试20分钟左右
+    因为应用推送业务瞬间一段时间会比较大，等待10-15 分钟稳定，测试20分钟左右
 
 
 	
@@ -745,20 +758,86 @@ GNSPR#54241	恢出厂清三方，开数据关闭所有快捷开关，清后台�
 
 
 
+GNSPR#58813
+	现象：送测待机电流偏高
+
+
+
+两份log看起来都一样，com.gionee.cloud.gpe定时起来，同时引起了网络跟com.android.contacts and com.gionee.cloud.gpe的连接
+gionee.cloud平均6m唤醒一次，导致20s的异常波形
+
+聯通3G:
+    main log:
+    Line 392: 12-02 11:51:50.708433 6156 6227 D Posix : [Posix_connect Debug]Process com.android.contacts :80
+    Line 535: 12-02 11:52:05.186478 2563 3904 D Posix : [Posix_connect Debug]Process com.gionee.cloud.gpe :5222
+    Line 676: 12-02 12:05:33.468285 6156 6253 D Posix : [Posix_connect Debug]Process com.android.contacts :80
+    
+    main log:
+    12-02 11:47:53.007978 1576 1729 D AlarmManager: wakeup alarm = Alarm{2db3665 type 0 when 1480650448619 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = false
+    12-02 11:47:53.015030 1576 1729 D AlarmManager: wakeup alarm = Alarm{46827eb type 2 when 538857 com.gionee.softmanager}; package = com.gionee.softmanagerneedGrouping = false
+    12-02 11:52:20.006299 1576 1729 D AlarmManager: wakeup alarm = Alarm{21df2fd type 2 when 806203 com.android.phone}; package = com.android.phoneneedGrouping = false
+    12-02 11:58:09.012702 1576 1729 D AlarmManager: wakeup alarm = Alarm{46af243 type 0 when 1480650966655 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = false
+    12-02 11:58:09.015941 1576 1729 D AlarmManager: wakeup alarm = Alarm{a2bc0c0 type 2 when 1155094 com.android.phone}; package = com.android.phoneneedGrouping = false
+    12-02 12:04:09.038977 1576 1729 D AlarmManager: wakeup alarm = Alarm{1b6956d type 0 when 1480651330256 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = true
+    12-02 12:04:09.040910 1576 1729 D AlarmManager: wakeup alarm = Alarm{b9305a2 type 2 when 1515265 com.android.phone}; package = com.android.phoneneedGrouping = true
+    
+    kernel log:
+    12-02 11:44:14------->12-02 11:44:15, sleep_time = 31.0 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+    12-02 11:44:51------->12-02 11:44:52, sleep_time = 35.1 , wake_up_time = 1.2 , wake_up_reason = alarm
+    12-02 11:45:48------->12-02 11:45:49, sleep_time = 20.7 , wake_up_time = 1.8 , wake_up_reason = CLDMA_MD-10-10
+    12-02 11:47:53------->12-02 11:47:54, sleep_time = 122.5 , wake_up_time = 1.2 , wake_up_reason = alarm
+    12-02 11:49:36------->12-02 11:49:38, sleep_time = 102.1 , wake_up_time = 2.6 , wake_up_reason = EINT_212
+    12-02 11:50:10------->12-02 11:50:11, sleep_time = 31.8 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+    12-02 11:52:20------->12-02 11:52:21, sleep_time = 8.9 , wake_up_time = 1.3 , wake_up_reason = alarm
+    12-02 11:58:09------->12-02 11:58:10, sleep_time = 347.7 , wake_up_time = 1.2 , wake_up_reason = alarm
+    12-02 11:58:10------->12-02 11:58:13, sleep_time = 0.2 , wake_up_time = 3.1 , wake_up_reason = CLDMA_MD-20
+    12-02 12:04:09------->12-02 12:04:10, sleep_time = 355.5 , wake_up_time = 1.2 , wake_up_reason = alarm
+    12-02 12:04:10------->12-02 12:04:11, sleep_time = 0.2 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-20
+    
+移動3G:
+    main log:
+    Line 447: 12-02 11:27:42.119386 3272 6423 D Posix : [Posix_connect Debug]Process com.android.contacts :80
+    Line 647: 12-02 11:27:44.843551 2590 4086 D Posix : [Posix_connect Debug]Process com.gionee.cloud.gpe :5222
+    Line 1174: 12-02 11:29:01.855725 2590 4086 D Posix : [Posix_connect Debug]Process com.gionee.cloud.gpe :5222
+    Line 1390: 12-02 11:36:50.941793 2590 4086 D Posix : [Posix_connect Debug]Process com.gionee.cloud.gpe :5222
+    Line 1460: 12-02 11:36:51.529011 3272 6612 D Posix : [Posix_connect Debug]Process com.android.contacts :80
+    Line 1496: 12-02 11:36:52.649083 3272 6612 D Posix : [Posix_connect Debug]Process com.android.contacts :80
+    Line 1521: 12-02 11:36:54.725319 3272 6612 D Posix : [Posix_connect Debug]Process com.android.contacts :80
+    12-02 11:35:12.010899 1552 1747 D AlarmManager: wakeup alarm = Alarm{920b011 type 0 when 1480649582841 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = false
+    12-02 11:35:12.016786 1552 1747 D AlarmManager: wakeup alarm = Alarm{8f08777 type 2 when 1355796 com.android.phone}; package = com.android.phoneneedGrouping = false
+    
+    kernel log:
+    12-02 11:17:02------->12-02 11:17:04, sleep_time = 5.0 , wake_up_time = 2.1 , wake_up_reason = CLDMA_MD-10
+    12-02 11:17:31------->12-02 11:17:40, sleep_time = 26.5 , wake_up_time = 9.8 , wake_up_reason = CLDMA_MD-10-10-10
+    12-02 11:17:44------->12-02 11:17:45, sleep_time = 3.2 , wake_up_time = 1.5 , wake_up_reason = alarm
+    12-02 11:18:30------->12-02 11:18:31, sleep_time = 44.3 , wake_up_time = 1.5 , wake_up_reason = alarm
+    12-02 11:18:39------->12-02 11:18:40, sleep_time = 7.6 , wake_up_time = 1.5 , wake_up_reason = CLDMA_MD-10
+    12-02 11:18:44------->12-02 11:18:45, sleep_time = 3.6 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+    12-02 11:21:17------->12-02 11:21:18, sleep_time = 152.4 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+    12-02 11:21:22------->12-02 11:21:23, sleep_time = 3.8 , wake_up_time = 1.3 , wake_up_reason = CLDMA_MD-10
+    12-02 11:22:15------->12-02 11:22:16, sleep_time = 1.4 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+    12-02 11:23:15------->12-02 11:23:16, sleep_time = 59.0 , wake_up_time = 1.4 , wake_up_reason = EINT_212
+    12-02 11:27:39------->12-02 11:27:51, sleep_time = 262.6 , wake_up_time = 12.6 , wake_up_reason = CLDMA_MD-10-4-4-4
+    12-02 11:29:09------->12-02 11:29:15, sleep_time = 1.5 , wake_up_time = 6.5 , wake_up_reason = alarm
+    12-02 11:30:05------->12-02 11:30:06, sleep_time = 50.0 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-20
+    12-02 11:35:12------->12-02 11:35:14, sleep_time = 305.0 , wake_up_time = 2.1 , wake_up_reason = alarm
+
+
 
 GNSPR #56384
 	现象：【品质压力】恢复出厂设置》清除所有安装的三方应用,插入SIM卡-开关飞行模式,
 	关闭后台所有后台运行/设置开关,电量为99%待机11H后电量为94%》耗电5% 2/40 C45、Q23、Q22
 
-	
-
-
-
-GNSPR#58813 送测待机电流偏高
-
-
-
 };
+
+
+
+
+
+
+
+
+
 
 
 
@@ -774,13 +853,13 @@ charging充电相关的
  关机电压跟开机电压是不一样的，首先开机电压肯定要比关机电压高。
 
 需要注意的地方：
-
-	1.OTG开关不能只开关中断，原因跟USB的热插拔相似，插入USB（插入模块，创建设备文件，节点），拔除USB（关闭中断，想上层上报信息，，关闭中断，卸载模块）。
-	2.一些问题有待新版本测试，以前版本OTG和反向充电开关默认是关闭的
-	3.fg_coulom库仑计的检测，变化？
+	1.fg_coulom库仑计的检测，变化，这里底层对于库仑计的数据的读取，数据的转换等相关内容？
+	2.电量显示异常问题？电量显示的准确性
 
 
 
+
+相关的BUG
 GNSPR#54689	
 	现象：测机放桌面，电量从9%直接掉0%自动关机后，连充电器自动开机，重启恢复（未做大量开关机动作）
 
@@ -801,29 +880,6 @@ GNSPR#54689
 		#define CUST_SYSTEM_OFF_VOLTAGE 3385 关机电压，而在9%左右电压已经低于关机电压了，
 		可能是电量计偏差较大，或者负载较大的原因，将电压拉低了。
 	<3>[37450.398205]  (2)[205:bat_routine_thr][kernel]AvgVbat 3434,bat_vol 3360, AvgI 0, I 0, VChr 0, AvgT 43, T 44, ZCV 3362, CHR_Type 0, SOC  10: 10:  9
-
-
-
-
-
-
-
-GNSPR #53212 	 OTG：连接2A旅充头，简单操作测机10min，未充进电，充电前电量显示57%，充电后点电量显示57%（未做过大量重启、开关机操作）【随机一次】A29
-
-
-
-GNSPR #52967	 OTG：G1605手机插上一拖一反充线给M6手机反充电，充电10分钟后，查看充电电流，其中有值低于800mA（附图）。
-
-
-
-GNSPR #53732 	 OTG：设置中反向充电和ＭＭＩ反充充电，切换后，设置中开启反向充电和ＭＭＩ里面都不能反向充电。
-
-
-这两个问题都是充电频繁断开，跟OTG底层接口有关
-GNSPR #52977	 OTG：测试机G1605给另一个G1605和S8充电，两台被充电的手机一直很频繁充电/不充电（附视频）
-GNSPR #52885	 OTG：使用G1605给S8反向充电，频繁充电过程出现中断，但很快又连接上的问题（附视频）
-
-
 
 
 GNSPR#53131 
@@ -856,7 +912,6 @@ MTK提供的解决方法
 	CFG_UART_TOOL_HANDSHAKE :=0
 
 
-
 		cust_bldr.mak:
 		CFG_UART_TOOL_HANDSHAKE :=0
 
@@ -871,8 +926,8 @@ MTK提供的解决方法
                 g_meta_com_type = META_USB_COM;
 		    BOOTING_TIME_PROFILING_LOG("USB handshake");
 	    }
-	   //GioneeDrv LiLuBao 20161121 modify for fixed GNSPR#53131 end
-            #endif
+	   /*GioneeDrv LiLuBao 20161121 modify for fixed GNSPR#53131 end
+        #endif
 
 
 	2.方案二：修改检测延迟的时间timeout，不见效
@@ -890,11 +945,8 @@ MTK提供的解决方法
 	#define CFG_USB_ENUM_TIMEOUT            (8000)           /* 8s */
 	USB枚举时间超时，改变之后影响座充充电时间
 
-	
 	#define CFG_USB_HANDSHAKE_TIMEOUT       (2500)    	 /* 2.5s */
 	USB握手时间超时，改变之后影响了用USB充电的时间
-
-
 
 	3.方案三：
 	将dlpt_init_inLK()移动到如下，在6s左右:如上传log：session--usb-44444.log
@@ -902,10 +954,8 @@ MTK提供的解决方法
 	dprintf(CRITICAL, "[PROFILE] ------- show logo takes %d ms --------
 	", (int)get_timer(time_show_logo));
 	#endif
-	/*add bebug by mtk ALPS02765977 20160624
+	/*add bebug by mtk ALPS02765977 20160624*/
 	dlpt_init_inLK();
-
-
 
 
 GNSPR#57824
@@ -920,7 +970,60 @@ GNSPR#57824
 		2.电量计未来的及初始化
 		电量计未初始化（RTC相关）导致使用默认的值，电压为0，未达到开机电压，启动不了。
 
-	
+		pmic子系统在未初始化时采用的默认值
+/*		
+		signed int gFG_DOD0_init = 0;
+	 	signed int gFG_DOD0 = 0;
+		signed int gFG_DOD1 = 0;
+		signed int gFG_DOD_B = 0;
+		signed int gFG_coulomb = 0;
+		signed int gFG_coulomb_act = 0;
+		signed int gFG_voltage = 0;
+		signed int gFG_current = 0;
+		signed int gFG_current_init = 0;
+		signed int gFG_capacity = 0;
+		signed int gFG_capacity_by_c = -1;
+		signed int gFG_capacity_by_c_init = 0;
+		signed int gFG_capacity_by_v = 0;
+		signed int gFG_capacity_by_v_init = 0;
+		signed int gFG_temp = 100;
+		signed int gFG_temp_avg = 100;
+		signed int gFG_temp_avg_init = 100;
+		signed int gFG_resistance_bat = 0;
+		signed int gFG_compensate_value = 0;
+		signed int gFG_ori_voltage = 0;
+		signed int gFG_BATT_CAPACITY = 0;
+		signed int gFG_voltage_init = 0;
+		signed int gFG_current_auto_detect_R_fg_total = 0;
+		signed int gFG_current_auto_detect_R_fg_count = 0;
+		signed int gFG_current_auto_detect_R_fg_result = 0;
+		signed int gFG_15_vlot = 3700;
+		signed int gFG_BATT_CAPACITY_high_current = 1200;
+		signed int gFG_BATT_CAPACITY_aging = 1200;
+		signed int gFG_vbat = 0;
+		signed int gFG_swocv = 0;
+		signed int gFG_hwocv = 0;
+		signed int gFG_vbat_soc = 0;
+		signed int gFG_hw_soc = 0;
+		signed int gFG_sw_soc = 0;
+*/
+
+	eservice：
+
+
+GNSPR#59577
+	现象：连接着充电器，手机电量89%，强制重启手机后电量显示为98%，再次操作电量还是98%	
+	开机的时候，系统会根据电量跟RTC上的电量进行比较，如果超过5%，就重新检测电量，如果是扣电池，一定会重新计算电量
+
+	可能的原因：
+		1.跟系统RTC相关，因为RTC会在开机的时候重新给电量计赋值，RTC可能计算或储存错误的电量值
+
+
+
+
+
+
+    最近几个电量显示异常的可能都跟RTC相关
 
 
 
@@ -949,12 +1052,19 @@ GNSPR#57824
 
 
 
+
+
+
+
+
+
 USB&&OTG相关的
 /*{
 
-
-	USB眼图
-
+需要注意的地方：
+	1.USB眼图？
+	2.OTG开关不能只开关中断，原因跟USB的热插拔相似，插入USB（插入模块，创建设备文件，节点），拔除USB（关闭中断，想上层上报信息，，关闭中断，卸载模块）。
+	3.一些问题有待新版本测试，以前版本OTG和反向充电开关默认是关闭的
 
 
 
@@ -977,7 +1087,20 @@ GNSPR#57228
 	出现上述情况的原因一般是驱动程序安装错误或者电脑及手机上有其他程序发生了冲突
 
 
+GNSPR #53212 	 OTG：连接2A旅充头，简单操作测机10min，未充进电，充电前电量显示57%，充电后点电量显示57%（未做过大量重启、开关机操作）【随机一次】A29
 
+
+
+GNSPR #52967	 OTG：G1605手机插上一拖一反充线给M6手机反充电，充电10分钟后，查看充电电流，其中有值低于800mA（附图）。
+
+
+
+GNSPR #53732 	 OTG：设置中反向充电和ＭＭＩ反充充电，切换后，设置中开启反向充电和ＭＭＩ里面都不能反向充电。
+
+
+这两个问题都是充电频繁断开，跟OTG底层接口有关
+GNSPR #52977	 OTG：测试机G1605给另一个G1605和S8充电，两台被充电的手机一直很频繁充电/不充电（附视频）
+GNSPR #52885	 OTG：使用G1605给S8反向充电，频繁充电过程出现中断，但很快又连接上的问题（附视频）
 
 
 

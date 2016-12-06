@@ -24,3 +24,11 @@ git clone https://github.com/chxuan/vimplus.git
 
 linux下的tty设备
 http://blog.csdn.net/goodluckwhh/article/details/13368279
+
+
+手机主叫的信道流程与Modem Log简单分析
+http://blog.csdn.net/zx249388847/article/details/52637563
+
+
+GSM modem,GSM modem的组成/原理/分类/作
+http://www.elecfans.com/baike/bandaoti/bandaotiqijian/20100323203212.html
