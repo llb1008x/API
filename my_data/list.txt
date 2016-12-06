@@ -17,6 +17,7 @@ http://blog.chinaunix.net/uid-20321537-id-4049149.html
 ubuntu下配置git和github初体验 "
 http://blog.chinaunix.net/uid-24782829-id-3183604.html
 
+<<<<<<< HEAD
 
 配置vim
 git clone https://github.com/chxuan/vimplus.git
@@ -32,3 +33,7 @@ http://blog.csdn.net/zx249388847/article/details/52637563
 
 GSM modem,GSM modem的组成/原理/分类/作
 http://www.elecfans.com/baike/bandaoti/bandaotiqijian/20100323203212.html
+=======
+ubuntu完美搭建git服务器：
+http://blog.csdn.net/tommy_wxie/article/details/38779667
+>>>>>>> origin/master
