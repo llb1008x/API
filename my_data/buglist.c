@@ -1,15 +1,14 @@
 
-1.thransplant移植相关
+1.thransplant移植
 
-2.power功耗
+2.power待机功耗
 
 3.charging充电
 
 4.thermal温升
 
-5.USB&&OTG相关的
+5.USB-OTG相关
 
-6.anthor其他问题
 
 
 mtk log下几个log的意思
@@ -259,10 +258,10 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 
 
 
-	移植OTG开关到BBL7515上，USB协议是
+	移植OTG开关到BBL7515上，USB协议？
 
 
-
+	在MTK原生代码上移植充电相关的代码？
 
 
 
@@ -398,7 +397,7 @@ power待机功耗相关的
 
 
 
-	e.功耗测试的标准：
+	e.功耗测试的标准：（但是感觉有些有问题）
 	1.移动运营商的电流为9ma，电信运营商的电流为9mA，联通运营商的电流为16mA
 	2.计算公式：电流（ma）×时间（H）=Mah
 	  如联通卡待机12小时耗电量为：（16×12）÷6020=3%
@@ -409,7 +408,6 @@ power待机功耗相关的
 	  如待机12小时的耗电量为：（5×12）÷6020≈1%
 	6.耗电量算法根据实际项目要求为主，这里仅供参考。
 
-	机~器-人 2016-11-21 11:28:32
 	测试前注意事项：
 	1.高通平台的手机，测试充电，耗电相关项目时，LOG只开前两项，一定不能开启QXDM LOG；
 	2.MTK平台的手机，不能开启MODEM LOG,否则很耗电，不方便数据的统计，只开启MobileLog中的 Android Log、Kernel Log和第三项NetworkLog，开log后需要重启手机。
@@ -427,73 +425,18 @@ power待机功耗相关的
 	3.通过log察看唤醒源是谁，谁唤醒的，同时要关闭应用推送业务，避免推送经常唤醒系统。
 	4.modem搜信号会唤醒系统
 	环境变化影响，一般的MODEM 待机测试，需要关闭应用推送业务，蓝牙／WIFI／GPS，最好关闭数据链接，
-    因为应用推送业务瞬间一段时间会比较大，等待10-15 分钟稳定，测试20分钟左右
+    因为应用推送业务瞬间一段时间会比较大，等待10-15 分钟稳定，测试20分钟左右（这个时间太长了，不太准确）
 
 
 	
-从我这边分析的结果看：没看到网路异常. 就是QQ/WEchat 定时起来跟网路做.
 
-从alarm这部分的唤醒看，都是QQ 跟微信 5min起来一次跟服务器联网.
-11-24 20:00:25.009802 1532 1746 D AlarmManager: wakeup alarm = Alarm{3bb42d2 type 0 when 1479988824257 com.tencent.mobileqq}; package = com.tencent.mobileqqneedGrouping = false
-11-24 20:00:25.012924 1532 1746 D AlarmManager: wakeup alarm = Alarm{5839fa3 type 2 when 22724930 com.tencent.mm}; package = com.tencent.mmneedGrouping = false
-11-24 20:00:25.016047 1532 1746 D AlarmManager: wakeup alarm = Alarm{69e59 type 0 when 1479988824940 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = false
-11-24 20:09:10.015841 1532 1746 D AlarmManager: wakeup alarm = Alarm{869acfc type 2 when 23056399 com.android.phone}; package = com.android.phoneneedGrouping = true
-11-24 20:10:24.025028 1532 1746 D AlarmManager: wakeup alarm = Alarm{2de3d39 type 0 when 1479989424024 com.tencent.mobileqq}; package = com.tencent.mobileqqneedGrouping = true
-11-24 20:15:10.028418 1532 1746 D AlarmManager: wakeup alarm = Alarm{b1307fb type 2 when 23324539 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
-11-24 20:15:10.030567 1532 1746 D AlarmManager: wakeup alarm = Alarm{aab1018 type 0 when 1479989424178 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = true
-11-24 20:15:10.035478 1532 1746 D AlarmManager: wakeup alarm = Alarm{ae42056 type 2 when 23325469 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
-11-24 20:15:10.039940 1532 1746 D AlarmManager: wakeup alarm = Alarm{94d15c4 type 2 when 23325472 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
-11-24 20:15:10.044497 1532 1746 D AlarmManager: wakeup alarm = Alarm{7347b73 type 2 when 23610512 com.android.phone}; package = com.android.phoneneedGrouping = true
-11-24 20:20:24.093182 1532 1746 D AlarmManager: wakeup alarm = Alarm{da6d6bf type 2 when 23630547 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
-11-24 20:20:24.095583 1532 1746 D AlarmManager: wakeup alarm = Alarm{c31d18c type 0 when 1479990024066 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = true
-11-24 20:20:24.099179 1532 1746 D AlarmManager: wakeup alarm = Alarm{d5710d5 type 2 when 23924577 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
-11-24 20:21:48.014131 1532 1746 D AlarmManager: wakeup alarm = Alarm{194ce6d type 2 when 23925104 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
-
-
-Alarm 起来的时候，会伴随着连接网路的动作，CLDMA-10主要是反馈网路RRC的连接状态，用于分组处理.
-11-24 20:00:25------->11-24 20:00:27, sleep_time = 26.9 , wake_up_time = 2.1 , wake_up_reason = alarm
-11-24 20:05:55------->11-24 20:05:57, sleep_time = 328.7 , wake_up_time = 2.7 , wake_up_reason = alarm
-11-24 20:06:16------->11-24 20:06:17, sleep_time = 17.6 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
-11-24 20:09:10------->11-24 20:09:11, sleep_time = 172.7 , wake_up_time = 1.2 , wake_up_reason = alarm
-11-24 20:10:24------->11-24 20:10:25, sleep_time = 72.8 , wake_up_time = 1.7 , wake_up_reason = alarm
-11-24 20:14:09------->11-24 20:14:10, sleep_time = 223.3 , wake_up_time = 1.3 , wake_up_reason = alarm
-11-24 20:14:29------->11-24 20:14:31, sleep_time = 19.0 , wake_up_time = 2.2 , wake_up_reason = CLDMA_MD-10
-11-24 20:15:10------->11-24 20:15:14, sleep_time = 38.5 , wake_up_time = 5.0 , wake_up_reason = alarm
-11-24 20:20:24------->11-24 20:20:29, sleep_time = 309.0 , wake_up_time = 5.7 , wake_up_reason = alarm
-11-24 20:20:49------->11-24 20:20:50, sleep_time = 19.7 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
-11-24 20:21:48------->11-24 20:21:49, sleep_time = 57.4 , wake_up_time = 1.7 , wake_up_reason = alarm
-11-24 20:30:24------->11-24 20:30:26, sleep_time = 514.3 , wake_up_time = 2.1 , wake_up_reason = alarm
-11-24 20:30:44------->11-24 20:30:45, sleep_time = 18.5 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
-11-24 20:31:48------->11-24 20:31:49, sleep_time = 62.2 , wake_up_time = 1.7 , wake_up_reason = alarm
-11-24 20:37:48------->11-24 20:37:50, sleep_time = 358.3 , wake_up_time = 2.7 , wake_up_reason = alarm
-11-24 20:38:09------->11-24 20:38:10, sleep_time = 19.1 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
-11-24 20:40:25------->11-24 20:40:26, sleep_time = 134.1 , wake_up_time = 1.2 , wake_up_reason = alarm
-11-24 20:41:48------->11-24 20:42:17, sleep_time = 81.8 , wake_up_time = 29.7 , wake_up_reason = alarm
-11-24 20:42:21------->11-24 20:42:22, sleep_time = 3.3 , wake_up_time = 1.2 , wake_up_reason = alarm
-
-从main log看，都是QQ 建立socket 连接.
-Line 3118: 11-24 23:36:13.029622 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
-Line 3153: 11-24 23:37:18.034159 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
-Line 3188: 11-24 23:38:23.024540 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
-Line 3221: 11-24 23:39:27.023168 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :443 
-Line 3256: 11-24 23:40:33.029502 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :443 
-Line 3289: 11-24 23:41:38.028188 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :14000 
-Line 3332: 11-24 23:42:43.028241 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :14000 
-Line 3357: 11-24 23:42:45.721971 1734 2651 D Posix : [Posix_connect Debug]Process com.gionee.cloud.gpe :5222 
-Line 3376: 11-24 23:43:47.020887 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
-Line 3415: 11-24 23:44:51.033229 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
-Line 3448: 11-24 23:45:55.019767 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
-Line 3479: 11-24 23:45:56.217867 5012 13486 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq :14000 
-Line 3487: 11-24 23:45:56.223832 5012 13487 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq :14000 
-Line 3509: 11-24 23:45:56.302290 5012 8514 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq :443
-	
 	
 	
 2.出现的相BUG
 
 
 GNSPR#55512：
-	现象：单卡电信数据wifi微信qq15h耗电11%
+	现象：卡1插卡电信，开启数据业务连接WIFI-AP，后台运行微信、QQ、浏览器; 待机15小时50分耗电11%
 
 	经常被唤醒，未能睡眠下去wakeup source CLDMA
 	  Start clock time: 2016-11-15-17-56-42
@@ -591,6 +534,64 @@ GNSPR#55283
 
 
 
+eservice：
+从我这边分析的结果看：没看到网路异常. 就是QQ/WEchat 定时起来跟网路做.
+
+从alarm这部分的唤醒看，都是QQ 跟微信 5min起来一次跟服务器联网.
+11-24 20:00:25.009802 1532 1746 D AlarmManager: wakeup alarm = Alarm{3bb42d2 type 0 when 1479988824257 com.tencent.mobileqq}; package = com.tencent.mobileqqneedGrouping = false
+11-24 20:00:25.012924 1532 1746 D AlarmManager: wakeup alarm = Alarm{5839fa3 type 2 when 22724930 com.tencent.mm}; package = com.tencent.mmneedGrouping = false
+11-24 20:00:25.016047 1532 1746 D AlarmManager: wakeup alarm = Alarm{69e59 type 0 when 1479988824940 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = false
+11-24 20:09:10.015841 1532 1746 D AlarmManager: wakeup alarm = Alarm{869acfc type 2 when 23056399 com.android.phone}; package = com.android.phoneneedGrouping = true
+11-24 20:10:24.025028 1532 1746 D AlarmManager: wakeup alarm = Alarm{2de3d39 type 0 when 1479989424024 com.tencent.mobileqq}; package = com.tencent.mobileqqneedGrouping = true
+11-24 20:15:10.028418 1532 1746 D AlarmManager: wakeup alarm = Alarm{b1307fb type 2 when 23324539 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
+11-24 20:15:10.030567 1532 1746 D AlarmManager: wakeup alarm = Alarm{aab1018 type 0 when 1479989424178 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = true
+11-24 20:15:10.035478 1532 1746 D AlarmManager: wakeup alarm = Alarm{ae42056 type 2 when 23325469 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
+11-24 20:15:10.039940 1532 1746 D AlarmManager: wakeup alarm = Alarm{94d15c4 type 2 when 23325472 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
+11-24 20:15:10.044497 1532 1746 D AlarmManager: wakeup alarm = Alarm{7347b73 type 2 when 23610512 com.android.phone}; package = com.android.phoneneedGrouping = true
+11-24 20:20:24.093182 1532 1746 D AlarmManager: wakeup alarm = Alarm{da6d6bf type 2 when 23630547 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
+11-24 20:20:24.095583 1532 1746 D AlarmManager: wakeup alarm = Alarm{c31d18c type 0 when 1479990024066 com.gionee.cloud.gpe}; package = com.gionee.cloud.gpeneedGrouping = true
+11-24 20:20:24.099179 1532 1746 D AlarmManager: wakeup alarm = Alarm{d5710d5 type 2 when 23924577 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
+11-24 20:21:48.014131 1532 1746 D AlarmManager: wakeup alarm = Alarm{194ce6d type 2 when 23925104 com.tencent.mm}; package = com.tencent.mmneedGrouping = true
+
+
+Alarm 起来的时候，会伴随着连接网路的动作，CLDMA-10主要是反馈网路RRC的连接状态，用于分组处理.
+11-24 20:00:25------->11-24 20:00:27, sleep_time = 26.9 , wake_up_time = 2.1 , wake_up_reason = alarm
+11-24 20:05:55------->11-24 20:05:57, sleep_time = 328.7 , wake_up_time = 2.7 , wake_up_reason = alarm
+11-24 20:06:16------->11-24 20:06:17, sleep_time = 17.6 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+11-24 20:09:10------->11-24 20:09:11, sleep_time = 172.7 , wake_up_time = 1.2 , wake_up_reason = alarm
+11-24 20:10:24------->11-24 20:10:25, sleep_time = 72.8 , wake_up_time = 1.7 , wake_up_reason = alarm
+11-24 20:14:09------->11-24 20:14:10, sleep_time = 223.3 , wake_up_time = 1.3 , wake_up_reason = alarm
+11-24 20:14:29------->11-24 20:14:31, sleep_time = 19.0 , wake_up_time = 2.2 , wake_up_reason = CLDMA_MD-10
+11-24 20:15:10------->11-24 20:15:14, sleep_time = 38.5 , wake_up_time = 5.0 , wake_up_reason = alarm
+11-24 20:20:24------->11-24 20:20:29, sleep_time = 309.0 , wake_up_time = 5.7 , wake_up_reason = alarm
+11-24 20:20:49------->11-24 20:20:50, sleep_time = 19.7 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+11-24 20:21:48------->11-24 20:21:49, sleep_time = 57.4 , wake_up_time = 1.7 , wake_up_reason = alarm
+11-24 20:30:24------->11-24 20:30:26, sleep_time = 514.3 , wake_up_time = 2.1 , wake_up_reason = alarm
+11-24 20:30:44------->11-24 20:30:45, sleep_time = 18.5 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+11-24 20:31:48------->11-24 20:31:49, sleep_time = 62.2 , wake_up_time = 1.7 , wake_up_reason = alarm
+11-24 20:37:48------->11-24 20:37:50, sleep_time = 358.3 , wake_up_time = 2.7 , wake_up_reason = alarm
+11-24 20:38:09------->11-24 20:38:10, sleep_time = 19.1 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+11-24 20:40:25------->11-24 20:40:26, sleep_time = 134.1 , wake_up_time = 1.2 , wake_up_reason = alarm
+11-24 20:41:48------->11-24 20:42:17, sleep_time = 81.8 , wake_up_time = 29.7 , wake_up_reason = alarm
+11-24 20:42:21------->11-24 20:42:22, sleep_time = 3.3 , wake_up_time = 1.2 , wake_up_reason = alarm
+
+从main log看，都是QQ 建立socket 连接.
+Line 3118: 11-24 23:36:13.029622 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
+Line 3153: 11-24 23:37:18.034159 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
+Line 3188: 11-24 23:38:23.024540 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
+Line 3221: 11-24 23:39:27.023168 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :443 
+Line 3256: 11-24 23:40:33.029502 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :443 
+Line 3289: 11-24 23:41:38.028188 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :14000 
+Line 3332: 11-24 23:42:43.028241 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :14000 
+Line 3357: 11-24 23:42:45.721971 1734 2651 D Posix : [Posix_connect Debug]Process com.gionee.cloud.gpe :5222 
+Line 3376: 11-24 23:43:47.020887 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
+Line 3415: 11-24 23:44:51.033229 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
+Line 3448: 11-24 23:45:55.019767 5041 5100 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq:MSF :80 
+Line 3479: 11-24 23:45:56.217867 5012 13486 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq :14000 
+Line 3487: 11-24 23:45:56.223832 5012 13487 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq :14000 
+Line 3509: 11-24 23:45:56.302290 5012 8514 D Posix : [Posix_connect Debug]Process com.tencent.mobileqq :443
+
+
 GNSPR#54702:
 	现象：单卡（移动3g 卡1），开启数据业务，未涉及项保持默认待机12小时，耗电26%
 	
@@ -598,7 +599,9 @@ GNSPR#54702:
 
 	{白卡没有正常睡眠下去，AP端一直在发送AT+ESIMAPP，导致手机无法休眠}?
 
-	已经申请patch
+	已经申请patch，patch里修改了哪些
+	patch下面都是动态库文件，没有代码
+
 
 	jinhao wu
 	65440
@@ -607,40 +610,6 @@ GNSPR#54702:
 	当前版本：alps-mp-m0.mp1-V2.140.3_gnbj6737t.66.m0_p23？
 	怎么知道版本察看，这个在ProjectConfig.mk脚本里面有更新
 
-
-
-GNSPR#54717:
-	现象：T41版本手机待机一晚（12小时40分钟），实际耗电36%；单卡（联通）
-
-
-
-GNSPR#53772
-	现象：恢出厂清三方，开飞行模式关闭所有快捷开关，清后台待机14H，耗电6%、9%
-	18：02->91%
-	08:34->83%
-	耗电8%，22.86mA
-	这个eService关闭了
-
-
-GNSPR#54515
-	现象：
-	恢出厂清三方，不开数据不开飞行关闭所有快捷开关，清后台待机11H，耗电8%  【2次】A3 A30
-	
-	20：00  ->68%
-	08:13 ->60%
-	耗电8%-->26mA
-	
-	有一段时间降的很快	
-
-	20：58->94%
-	08:12->86%
-	耗电8%， 29mA
-
-
-
-GNSPR#54713
-	现象：
-	单卡（电信 卡1），关闭数据业务，未开启飞行模式，未涉及项保持默认待机9.5小时，耗电7%
 
 
 
@@ -822,6 +791,26 @@ gionee.cloud平均6m唤醒一次，导致20s的异常波形
     12-02 11:30:05------->12-02 11:30:06, sleep_time = 50.0 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-20
     12-02 11:35:12------->12-02 11:35:14, sleep_time = 305.0 , wake_up_time = 2.1 , wake_up_reason = alarm
 
+
+待机过程中还有很多峰值较小的波形
+从你提供的log看，是有网络连接，网络连接就可能会有20S，这个主要看网络的配置.
+峰值较小的波形------>这种一般是APK起来.没有做网络的连接.
+
+    kernel log:
+    12-02 11:44:14------->12-02 11:44:15, sleep_time = 31.0 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+    12-02 11:44:51------->12-02 11:44:52, sleep_time = 35.1 , wake_up_time = 1.2 , wake_up_reason = alarm
+    12-02 11:45:48------->12-02 11:45:49, sleep_time = 20.7 , wake_up_time = 1.8 , wake_up_reason = CLDMA_MD-10-10
+    12-02 11:47:53------->12-02 11:47:54, sleep_time = 122.5 , wake_up_time = 1.2 , wake_up_reason = alarm
+    12-02 11:49:36------->12-02 11:49:38, sleep_time = 102.1 , wake_up_time = 2.6 , wake_up_reason = EINT_212
+    12-02 11:50:10------->12-02 11:50:11, sleep_time = 31.8 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-10
+    12-02 11:52:20------->12-02 11:52:21, sleep_time = 8.9 , wake_up_time = 1.3 , wake_up_reason = alarm
+    12-02 11:58:09------->12-02 11:58:10, sleep_time = 347.7 , wake_up_time = 1.2 , wake_up_reason = alarm
+    12-02 11:58:10------->12-02 11:58:13, sleep_time = 0.2 , wake_up_time = 3.1 , wake_up_reason = CLDMA_MD-20
+    12-02 12:04:09------->12-02 12:04:10, sleep_time = 355.5 , wake_up_time = 1.2 , wake_up_reason = alarm----->这种是APK的唤醒，可能就是小波峰。
+    12-02 12:04:10------->12-02 12:04:11, sleep_time = 0.2 , wake_up_time = 1.2 , wake_up_reason = CLDMA_MD-20-----> 这种是网络的唤醒，可能会有20S
+
+
+网络连接有两种情况，一种是alarm起来，然后发起网络连接，另外一种是网络返回数据，唤醒系统，这两种唤醒，都会造成modem 端连接电流很长的case.
 
 
 GNSPR #56384
@@ -1020,10 +1009,58 @@ GNSPR#59577
 
 
 
-
-
-
     最近几个电量显示异常的可能都跟RTC相关
+	
+               关于硬件7秒 强制断电关机，我们设计是power+home组合键 7秒以上 强制断电关机 ，由于电路原因 没有达到组合键功能，按power键7秒就会强制断电关机；这样会引出一些问题：
+
+1，首先7秒时间较短，很容易误触发；如下是我确认的一些SPR：
+
+
+
+59143	 GNSPR	【品质压力】关机状态连充电器，按power键至手机震动，出现开机画面后，手机黑屏并未开机，第三次操作恢复【附视频】2/30 郭日锋	 分配	 高	Q_秦 星达	 2：严重的	Z_张 醒醒	G1605A	 2016-12-02
+
+
+58921	 GNSPR	【品质】手机关机状态连接充电器电量为19%》长按power键开机闪现一下开机画面后》没有开机且快速掉电到16%【再次长按power键恢复，附视频】随机1次	 裁决	 高	W_王 国君	 2：严重的	Y_尤 梦婷	G1605A	 2016-12-01
+
+
+
+57814	 GNSPR	【品质】手机关机后切换卡1与卡2后按电源键开机》弹出开机画面后黑屏开机无作用【开机后恢复，附视频】随机1次	 分配	 高	Y_尤 梦婷	 2：严重的	Y_尤 梦婷	G1605A	 2016-11-27
+  
+
+
+58432	 GNSPR	【品质压力】连充电器关机状态，长按电源键3s有振动，闪一下开机画面又自动关机，第4次操作恢复【4次】A16	 分配	 高	L_刘 子灵	 2：严重的	L_刘 子灵	G1605A	 2016-11-29
+
+56218	 GNSPR	【品质压力】连接充电器-手动关机》按电源键开机有振动闪开机画面但未开机,连续操作3次恢复》再次操作无异常 3/50 B23	 监控	 高	W_王 国君	 2：严重的	W_吴 能田	G1605A	 2016-11-11
+
+
+59244	 GNSPR	【品质】手机连接充电器关机状态按power键》手机震动后闪一下开机画面》就自动黑屏不开机【多次开机恢复，附视频】随机2次	 裁决	 高	W_王 国君	 2：严重的	Y_尤 梦婷	G1605A	 2016-12-03
+
+
+57833	 GNSPR	【品质】耗电至自动关机，连接标配充电器充电至13%后，长按Power键5-6秒无法开机，只闪过开机画面后继续充电，再次长按Power键17秒左右才开机成功【单机1次】附log与视频 11.27 8:22 王博文	 裁决	 高	L_李 路宝	 3：中等的	B_白 海燕	G1605A	 2016-11-27
+
+57824	 GNSPR	【品质】手机低电量自动关机待机一晚上连接充电器》充电到7%以后长按power键开机》闪现开机画面后手机不开机》且从7%快速充到12%又快速掉到8%一直连着充电器【5分钟后长按power键恢复，附视频】随机1次	 裁决	 高	L_李 路宝	 2：严重的	Y_尤 梦婷	G1605A	 2016-11-27
+
+2，7秒强制断电后，RTC丢失，导致时间丢失、电量丢等 引出的一些问题   恢复原始时间 和电量跳变 问题，这些比较严重：
+
+
+58578	 GNSPR	【品质压力】开启飞行，长按电源键11s重启至待机界面，时间又回到8:00，实际时间未19:14，等2min不自动对时，关闭飞行恢复，路径必现 对比S9无【6台必现】A8	 分配	 普通	W_王 国君	 3：中等的	L_刘 子灵	G1605A	 2016-11-29
+
+59361	 GNSPR	【品质压力】测机关机后，多次短按电源键开机后，时间被重置，时间点变成2010年01月01日8：00，4min后开数据对时恢复【5/50】A11	 分配	 普通	W_王 国君	 2：严重的	L_刘 子灵	G1605A	 2016-12-03
+
+
+57209	 GNSPR	【品质压力】待机界面》时间为09:57分-长按电源键点击关机,2min后长按电源键开机-开机后时间显示为原始时间(1月1日08:00)(对比另一测试机无此现象)》手动对时后恢复 2/10 Q27	 监控	 高	W_王 国君	 2：严重的	W_吴 能田	G1605A	 2016-11-22
+
+59577	 GNSPR	【品质压力】连接着充电器，手机电量89%，强制重启手机后电量显示为98%，再次操作电量还是98%【附视频】单机一次 余前志	 分配	 普通	L_李 路宝	 3：中等的	Z_张 醒醒	G1605A	 2016-12-04
+
+3，另外 uart switch、 指纹rpmb标记 也存在这里，也有问题；
+
+我试了 关机闹钟 7秒 强制断电关机后也不行； 不自动对时 开机闹钟也不行；
+是否还有其他日历、等问题，没有太多去看；
+
+
+由于硬件是7秒 强制断电，软件强制关机 时间是11秒，硬件在软件之前 所以会导致MTK原有的强制关机功能不能触发； 理论上应该是 软件强制关机不起作用 再需要硬件强制断电功能；
+目前这方面问题不少，建议暂时先去掉这个硬件功能，如果不能去掉，建议缩短断电时间（目前是400mS），增大RTC旁边电容，争取不让rtc丢失；
+USB检测那段时间大概也是6秒多，有些BUG可能是关机充电按power开机，USB检测6秒多后震动，显示log，但是按了power7s导致的刚开机有关机了。
 
 
 
