@@ -874,6 +874,7 @@ GNSPR#54689
 GNSPR#53131 
 	现象：关机状态连充电器，长按电源键3s开机，10s后才有振动提示和开机画面 对比S9无【6台必现】A9
 
+	这个问题跟平台有一定的关系
 MTK提供的解决方法
 	1.方案一：这种方法在于在握手之前先判断是否是长按了音量下（强制刷机）,个人觉得这种方案是可以的，刷机本来就是用组合键
 	   Sure, you can add keypad check function before usb_handshake() as you point out.
@@ -945,6 +946,55 @@ MTK提供的解决方法
 	#endif
 	/*add bebug by mtk ALPS02765977 20160624*/
 	dlpt_init_inLK();
+
+
+FAQ18845
+	[REPRODUCTIVE]
+          1, 6735/6753/6735M 手机
+          2， 手机USB线连接 AC Adapter 充电器
+          3， 查看uart log
+ 
+          抓取uart log 看到：
+                     force STANDARD_HOST
+	[PLFM] USB cable in
+	[14:49:50][pmic_IsUsbCableIn] 1
+	[14:49:51][pmic_IsUsbCableIn] 1
+	pl pmic powerkey Release
+	[14:49:52][pmic_IsUsbCableIn] 1
+	pl pmic powerkey Release
+	[14:49:53][pmic_IsUsbCableIn] 1
+	pl pmic powerkey Release
+	[14:49:54][pmic_IsUsbCableIn] 1
+	pl pmic powerkey Release
+	[14:49:55][pmic_IsUsbCableIn] 1
+	pl pmic powerkey Release
+	[14:49:56][pmic_IsUsbCableIn] 1
+	pl pmic powerkey Release
+	[14:49:57][pmic_IsUsbCableIn] 1
+	pl pmic powerkey Release
+ 
+[ANALYSIS]          
+          为减小preloader size 默认强制USB 类型赋值为 STANDARD_HOST ，此情况下会去执行USB 枚举。 但是实际上是AC Adapter，因此会不断的枚举直到超时。枚举时间正好是8S。
+ 
+[SOLUTION]
+          /vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6735/src/drivers/pmic.c
+           
+
+118#ifndef PMIC_TYPE_DETECTION
+119
+120int hw_charger_type_detection(void)
+121{
+122    print("force STANDARD_HOST\r\n");
+123    return STANDARD_HOST;
+124}
+
+      在make file 中定义 PMIC_TYPE_DETECTION 宏即可。
+ 
+      如果开启该宏后引起preloader size 过大导致build 失败或者下载失败，则请参考FAQ15079 FAQ11794  处理。
+
+
+
+
 
 
 GNSPR#57824
@@ -1061,7 +1111,8 @@ GNSPR#59577
 USB检测那段时间大概也是6秒多，有些BUG可能是关机充电按power开机，USB检测6秒多后震动，显示log，但是按了power7s导致的刚开机有关机了。
 
 
-
+这个问题是关机充电状态下（出了充电图标），按power7s（硬件的强制关机），这个过程是先调用power_off->reset->正常开机
+reset有两三秒时间
 
 
 }*/
