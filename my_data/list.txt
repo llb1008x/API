@@ -41,3 +41,7 @@ http://blog.csdn.net/tommy_wxie/article/details/38779667
 高通骁龙410C开发板基础知识
 http://blog.csdn.net/sungod612/article/details/52698754
 
+
+
+USB OTG插入检测识别
+http://blog.csdn.net/uranus_wm/article/details/9838847
