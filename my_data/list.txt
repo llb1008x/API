@@ -107,3 +107,17 @@ make install
 
 android开发环境搭建
 http://blog.csdn.net/evenness/article/details/16116027
+
+============================================
+Checking build tools versions...
+************************************************************
+You are attempting to build with the incorrect version
+of java.
+ 
+Your version is: Picked up _JAVA_OPTIONS:   -Dawt.useSystemAAFontSettings=gasp.
+The correct version is: Java SE 1.6.
+ 
+Please follow the machine setup instructions at
+    http://source.android.com/source/download.html
+    ************************************************************
+
