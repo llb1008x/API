@@ -63,3 +63,47 @@ http://www.cnblogs.com/riky/archive/2006/12/28/606242.html
 
 Linux 内存的布局 
 http://blog.csdn.net/maotianwang/article/details/11370849
+
+
+
+
+搭建开发环境 qualcomm410 2016.12.17
+
+1.安装java开环境
+  openjdk-7-jdk安装，
+
+  首先安装过程中要用到ppa，相当于个人的软件库。
+  Ubuntu PPA软件源的介绍与使用  
+  http://blog.csdn.net/baidu_22502417/article/details/46683549
+  但是安装过程中出现了这个问题：＂sudo: add-apt-repository: command not fou＂, 
+  是缺少必要的软件依赖包：
+  sudo apt-get install python-software-properties
+  sudo apt-get install software-properties-common
+  下载密钥：86F44E2A
+
+  安装android studio
+  下载软件安装包：android studio 中文网 http://www.android-studio.org/
+
+llb@llb-pc:~$ curl https://dl-ssl.google.com/dl/googlesource/git-repo/repo >~/bin/repo
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+Dload  Upload   Total   Spent    Left  Speed
+0     0    0     0    0     0      0      0 --:--:--  0:05:00 --:--:--     0
+curl: (28) Connection timed out after 300017 milliseconds
+改为下面的：google被墙了
+curl "http://php.webtutor.pl/en/wp-content/uploads/2011/09/repo" > ~/bin/repo
+
+
+repo下载国内链接android源码：
+http://blog.csdn.net/ldld1717/article/details/52462869
+编译android源码make version版本不对
+
+make版本不符合要求，不能编译android的解决方法
+http://blog.csdn.net/lr2131/article/details/45673603./configure
+
+但是都要sudo
+make
+make install
+要有root权限
+
+android开发环境搭建
+http://blog.csdn.net/evenness/article/details/16116027
