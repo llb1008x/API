@@ -1,0 +1,258 @@
+﻿
+1.android手机系统adb常用的命令:
+
+	要使用adb命令，手机需要打开USB debug。
+
+	安装软件
+	adb install apk文件名称.apk
+	重新安装该软件
+	adb install -r apk文件名称.apk
+
+	卸载apk软件
+	adb uninstall apk包名.apk
+
+	查看手机上的运行日志，此项可以用来查错
+	adb logcat
+
+	查看手机是否连接，以及连接了几台手机
+	adb devices
+
+	A为手机路径，B为电脑路径，意思为：把文件从手机中复制到电脑上
+	adb pull
+	A为手机路径，B为电脑路径，意思为：把文件从电脑复制到手机上
+	adb push
+
+	进入手机的超级终端Terminal
+	adb shell
+
+	重新挂载文件系统
+	adb remount
+
+	重启手机
+	adb reboot
+	重启到Recovery界面
+	adb reboot recovery
+	重启到bootloader界面
+	adb reboot bootloader
+
+	例子：刷官方高版本后重新获取ROOT和降级方法（部份操作）
+
+	进行adb运行环境
+	adb shell
+
+	设置超级用户模式
+	su
+
+	映射出目录
+	mount -o remount,rw -t yaffs2 /dev/block/mtdblock3 /system
+
+	退出su
+	exit
+
+	退出shell准备接受下一个adb命令
+	exit
+
+	增加flash_image文件到手机上
+	adb push flash_image.zip /system/bin/flash_image
+
+	recovery先复制到卡上
+	adb push recovery-RA-heroc-v1.6.2.img /sdcard
+
+	再次进入adb环境
+	adb shell
+
+	修改文件属性
+	chmod 0755 /system/bin/flash_image
+
+	重启系统
+	reboot 
+
+	手机正常的log在/sdcard/mtklog 下，死机log在/data/anr下
+	adb pull  /sdcard/mtklog /home/llb/project/PRO/data/
+
+	adb remount （重新挂载系统分区，使系统分区重新可写）
+
+	adb shell dumpsys batterystats > battersystats.log
+	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
+
+
+
+2.git/repo命令：	
+
+	1.repo forall -cvp git branch -a   察看目录下的分支
+
+	
+
+	2.清理残留的
+		git clean  -fdx  .  清理编译或残留的一些文件
+
+		git reset HEAD
+
+		git checkout     .  恢复到以前提交的状态
+
+
+	3.git代码更新命令
+		repo forall -vcp git fetch			把服务器代码库上的代码下到本地
+		repo forall -vcp git branch <your branch name> GNBJ-LTE-MT37-AN-G1605A_CTA-031.00.000-161014AA
+		repo forall -vcp git checkout <your branch name>
+
+
+	4.git log --oneline察看所有提交请情况
+
+	
+	5.git diff HEAD  与主目录的差异
+
+
+	6.repo forall -cvp gitk 察看项目下所有分支的情况（图形界面）
+	
+	7.常用的命令
+		git fetch			更新代码
+		git merge origin/code_main_dev  合并到主分支
+
+		git add .			添加文件到暂存区
+		git commit -m  "LINUX_G1605A_GNDCR#49641_GUOJQ" 提交自己的修改
+		git push origin LINUX_G1605A_GNDCR#49641_GUOJQ:code_main_dev 提交到提交自己的代码到远程代码库 
+
+		git status			git工作去的状态
+
+		git rm -r --cache 文件和路径
+
+	8.git branch -D         删除分支	
+	
+	git checkout -b  LINUX_G1605A_GNDCR#_LLB  origin/code_main_dev
+	
+	9.repo封装的操作 对整个项目文件都操作
+		清除
+		repo forall -vcp git clean -dfx
+		repo forall -vcp git reset HEAD
+		repo forall -vcp git checkout .
+		更新
+		repo forall -vcp git fetch
+		repo forall -vcp git merge origin/code_main_dev
+	
+
+	10.origin/code_main_dev 
+
+	11.git tag   察看版本号
+		Git 中的tag指向一次commit的id，通常用来给开发分支做一个标记，如标记一个版本号。
+
+		打标签
+		git tag -a v1.01 -m "Relase version 1.01"
+		注解：git tag 是打标签的命令，-a 是添加标签，其后要跟新标签号，-m 及后面的字符串是对该标签的注释。
+		
+		删除标签
+		git tag -d v1.01
+		注解：-d 表示删除，后面跟要删除的tag名字
+
+
+	12.通过git下载linux内核
+	git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+	
+	13.往服务器上推送代码
+	git push origin LINUX_G1605A_GNDCR#49641_GUOJQ:code_main_dev 
+
+
+	14. git ls-files 察看版本库区内的文件
+
+	git reflog
+
+	36263383c77e36b8f9a64544423a3adcef9727ab
+
+
+
+	git 回滚操作，回撤
+	
+
+
+3.android编译的命令：
+
+    a.脚本编译的版本：
+	
+	BBL7337A ：金立手机全套的的软硬件，user，debug
+	
+	BBL7337A_CMCC：要送到中国移动部测试用的，基本的软硬件，没有金立定制的软件      
+	
+	BBL7337A_CT：
+
+	BBL7337A_CTA ：         
+
+	BBL7337A_platform   ：没有上层framework以上的，只有底层驱动及以下的部分
+
+	BBL7337A_sign:签名版
+
+	编译某个目录
+	./TmakeGionee G1605A -p vendor/mediatek/proprietary/external/charger/
+	./TmakeGionee G1605A -p vendor/mediatek/proprietary/external/libshowlogo/
+	推送到手机bin下
+
+        adb remount （重新挂载系统分区，使系统分区重新可写）
+	adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/bin/kpoc_charger   system/bin/
+	adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/lib/libshowlogo.so  system/lib/
+
+	调整log时间
+	./ktime -i kernel_log -o kernel_log_output
+
+    b.android相关的基本内容
+	
+	OTA：over the air technology,
+	NVRAM：非易失性随机访问存储
+	BP：baseband processor
+	AP:application processor
+
+
+    c.烧写user版本要签名
+
+
+4.linux 下常用命令
+
+	find--->	find   path   -option   [   -print ]   [ -exec   -ok   command ]   {} \;
+
+		find    .  -name  文件名     搜索当前路径下的文件名
+		-type 查找某一类型的文件，诸如：b-块设备文件；d-目录；c-字符设备文件；p-管道文件；l-符号链接文件；f-普通文件；s-socket文件。
+
+	 grep  -i  CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT  gionee  -R
+
+
+
+
+
+5.通过ftp挂在烧写服务器上的rom
+
+sudo curlftpfs -o rw,allow_other,uid=1000,gid=1000 ftp://gnftp:gionee@10.8.0.22/software_release/git_release/2016-10/02_ANDROID/G1605A/   /home/llb/project/WORK/ftp/
+
+	GID为GroupId，即组ID，用来标识用户组的唯一标识符
+	UID为UserId，即用户ID，用来标识每个用户的唯一标示符
+	通过cat /etc/passwd | grep 你的用户名
+	会出现类似root:x:0:0:root:/root:/bin/bash的字样
+	那两个0就是uid和gid了.
+
+
+
+上面的命令好像有问题，这个可以
+挂载
+sudo mount -t cifs -o username=gnftp,password=gionee //10.8.0.22/software_release   ~/project/WORK/ftp/
+
+卸载
+fusermount -u  ~/project/WORK/ftp/ 或 umount  ~/project/WORK/ftp/
+
+
+挂载到以前的项目服务器上，这两个都是y3_driver只是路径不同
+sudo sshfs -o allow_other y3_driver@10.8.0.24:/home/y3_driver  /home/llb/project/WORK/ssh            密码：y3_driver 
+
+sudo sshfs -o allow_other y3_driver@10.8.0.24:/home/y3_driver/extend_data/guojianqiu    /home/llb/project/WORK/ssh_extend
+(03:14:56 PM) guojianqiu:
+
+通过ssh挂载服务器 ssh y3_driver@10.8.0.24
+
+
+
+6.ssh协议用法？
+
+	
+
+
+7.c语法
+
+
+
+
