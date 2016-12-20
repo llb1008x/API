@@ -204,3 +204,109 @@
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+	   MT6351芯片的接口 charging_hw_bw25896.c
+
+	   CONFIG_MTK_UART_USB_SWITCH，USB转串口开关
+
+	   fg_coulomb：库仑计这个变量，记录电池电量的变化，充电为正递增，放电为负递减，插拔充电器新计数，电量计的多少表示电池电量变化的
+	   gFG_coulomb_act
+
+	   init.mt6735.rc系统初始化用到的，创建一些设备节点，赋值一定的权限，配置节点，和其他初始化要用到的init文件
+       batterymonitor.cpp上层管理的
+
+	}
+
+
+-->/*charging*/
+{
+
+	1.充电的基本流程，电量的校准，库仑计参数，电量上报
+
+充电相关的构题体：
+struct PMU_ChargerStruct {
+	bool bat_exist;
+	bool bat_full;
+	s32 bat_charging_state;
+	u32 bat_vol;
+	bool bat_in_recharging_state;
+	u32 Vsense;
+	bool charger_exist;
+	u32 charger_vol;
+	s32 charger_protect_status;
+	s32 ICharging;
+	s32 IBattery;
+	s32 temperature;
+	s32 temperatureR;
+	s32 temperatureV;
+	u32 total_charging_time;
+	u32 PRE_charging_time;
+	u32 CC_charging_time;
+	u32 TOPOFF_charging_time;
+	u32 POSTFULL_charging_time;
+	u32 charger_type;
+	s32 SOC;
+	s32 UI_SOC;
+	u32 nPercent_ZCV;
+	u32 nPrecent_UI_SOC_check_point;
+	u32 ZCV;
+
+
+
+
+    do_chrdet_int_task--->upmu_is_chr_det
+
+	底层硬件
+
+	pmic子系统
+
+	powe_supply子系统
+
+	batterymonitor
+
+
+
+    linux  mount 的用法？
+
+	2.power_supply子系统
+
+	3.各种场景
+		温升导致的降电流
+		打电话导致的降电流
+		关机充电
+		OTG反向充电
+
+    4.大的场景
+	  标准充电
+	  快速充电
+	  无线充电
+	  非标准充电
+	  USB BC1.2协议
+
+
+    5.移植G1605A充电代码
+
+
+}

@@ -2,8 +2,23 @@
 查找的资料：
 
 
-USB眼图：
-http://blog.csdn.net/vvcumt/article/details/38852347
+
+linux内核：
+
+list_for_each_entry 
+http://blog.csdn.net/xubin341719/article/details/7098611
+
+
+linux内核中的GPIO系统之（1）：软件框架 
+http://blog.csdn.net/loongembedded/article/details/49466637
+
+
+linux 内核分析之list_head
+http://www.cnblogs.com/riky/archive/2006/12/28/606242.html
+
+
+Linux 内存的布局 
+http://blog.csdn.net/maotianwang/article/details/11370849
 
 
 linux  thermal体系框架
@@ -14,17 +29,49 @@ Linux动态频率调节系统CPUFreq
 http://blog.chinaunix.net/uid-20321537-id-4049149.html
 
 
-ubuntu下配置git和github初体验
-http://blog.chinaunix.net/uid-24782829-id-3183604.html
-
-
-配置vim
-git clone https://github.com/chxuan/vimplus.git
-
-
 linux下的tty设备
 http://blog.csdn.net/goodluckwhh/article/details/13368279
 
+
+
+
+
+
+
+
+
+
+battery：
+
+android 4.4 电池电量管理底层分析(C\C++层) 
+http://blog.csdn.net/daweibalang717/article/details/41446993
+
+
+
+
+
+
+
+
+
+
+
+USB：
+
+USB OTG插入检测识别
+http://blog.csdn.net/uranus_wm/article/details/9838847
+
+
+USB眼图：
+http://blog.csdn.net/vvcumt/article/details/38852347
+
+
+
+
+
+
+
+other：
 
 手机主叫的信道流程与Modem Log简单分析
 http://blog.csdn.net/zx249388847/article/details/52637563
@@ -42,27 +89,21 @@ http://blog.csdn.net/tommy_wxie/article/details/38779667
 http://blog.csdn.net/sungod612/article/details/52698754
 
 
-
-USB OTG插入检测识别
-http://blog.csdn.net/uranus_wm/article/details/9838847
-
-
-list_for_each_entry 
-http://blog.csdn.net/xubin341719/article/details/7098611
+ubuntu下配置git和github初体验
+http://blog.chinaunix.net/uid-24782829-id-3183604.html
 
 
-linux内核中的GPIO系统之（1）：软件框架 
-http://blog.csdn.net/loongembedded/article/details/49466637
+配置vim
+git clone https://github.com/chxuan/vimplus.git
 
 
 
-linux 内核分析之list_head
-http://www.cnblogs.com/riky/archive/2006/12/28/606242.html
 
 
 
-Linux 内存的布局 
-http://blog.csdn.net/maotianwang/article/details/11370849
+
+
+
 
 
 
