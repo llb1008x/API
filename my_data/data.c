@@ -659,12 +659,101 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 -->/*MTK，QC两个平台快充的对比*/
 {
 
---->MTK  pump express：
+	
+--->MTK平台快充方案MTK  pump express：
+	
+	软件控制流程：
+	充电器检测-->根据BC1.2协议进行充电端口检测,是否是标准的交流充电器-->电量是否大于95%-->升高充电电压电流发送一定的指令”current pattern“-->
+	检查MTK识别点的电压是否有响应，有响应就继续升压，如果不能就恢复充电电压到5V-->电量达到快满电的时候应该无法进行这样的通信了
+	通过发送current pattern（特定的电流波形） 控制充电电压的up down来进行通信 VBUS端，所以当充电满的时候就无法通信，不能快充
+
+	当看门狗检测到充电器输出的电流小于130mA，时间超过240ms后，充电电压就下降到5V
+
+
+	软件流程：
+
+	battery_pump_express_charger_check()快充充电器检测-->mtk_ta_reset_vchr
 
 
 
 
---->QC3.0：
+
+
+
+
+	{
+
+		pwd  pump express  快充技术 好像switch charge 也是快充技术
+
+		1.------->[1]MTK Pump Express Plus Introduction V01.pdf
+		pump express plus 使用PSR架构
+		pump express  使用P-charge架构
+		是不是苹果出了个plus什么都有plus了。。。。。。
+
+		adaptor 适配器，电源
+		适配器
+
+		SW快充的流程
+		1.设置提高输出电压的模式
+		2.检查b点电压是否是MTK平台的TA的标示
+		3.设置升压模式到TA =9，设置本地化相应的参数，充电使能
+		4.电压保持在5V的状态
+		5.当电池接近充电电满的的时候，充电电流很小，充进去的电量很小，所以需要设置一个充电截止的标准，高于这个标准，反复插拔都不充电，低于的时候就充电
+
+		通过对充电点的检查决定是用什么方式充电，检查应该是轮询的方式
+
+		这两个单词都有电压的意思?
+		voltage
+		current
+
+
+		充电的硬件保护
+		1.如果充电器意外的接到了高电压，看门狗会立刻启动应急预案将电压降低到5V
+		2.温度监控等相关安全措施会保护充电安全
+
+
+		使用pump express 快充技术还要相关的IC，修改一点配置等
+		充电的过程开始也是要通信的，建立沟通，IC发指令控制电压电流的变化
+			1.快充用更大的功率，降低更多的充电时间
+			2.usb设备传输的电压是有限制的，唯一的办法是提高输出电量，电源管理IC端，提高电压输出能力。
+			3.大的适配器输出电量可以获得大的充电电压，降低充电时间
+			4.pump express充电技术跟switch charge充电技术好像可以兼容
+			5.允许充电器根据电流决定充电所需的初始电压，由PMIC发出脉冲电流指令通过USB的Vbus传送给充电器，充电器依照这个指令调变输出电压，电压逐渐增加至高达5V 达到最大充电电流。
+			
+
+		2.------>[1]MTK Pump Express Plus Verify Guideline.pdf
+		充电算法？这个文档好像都是些概述
+
+		3.------>[1]MTK Pump Express Verify Guideline V1.0.pdf
+		标题是说对快充的修改，
+			1.对于TA电压的设置依赖于开路电压进行调整，TA？
+			2.开路电压提高0.1V
+			3.手机上电压的模式，没看明白哪个对哪个？
+			4.伏安特性曲线，不同的量
+			5.先进行识别，电压小于3.7v，迅速升高电压
+
+		4.------>MTK Pump Express  20131212.pdf
+		这篇文章，中文版的简介
+
+		5.------>MTK Pump Express introduction and HW design guide_V1.1.pdf
+		跟1.MTK Pump Express Plus Introduction V01.pdf很像
+
+
+		6.------>MTK Pump Express Plus Introduction V01- English.pdf
+		有一个充电IC，手机，适配器相关的原理图。整个内容跟前面的很相似
+			1.操作的原则，多大电流范围哪可以操作，操作的流程，这是英文版的
+
+		快充的一些细节还没讲？
+	}
+
+
+
+
+
+
+--->高通平台快充方案QC3.0：
+
+
 
 	一些概念：	
 	{
@@ -672,7 +761,7 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 		POR：the Plan of Record 记录计划   记忆学习
 
-		PMI SMB
+		PMI SMB：好像是高通平台手机端和充电适配器端的IC
 
 		HVDCP：high voltage dedicated charger port高电压可检测的充电接口
 
@@ -738,7 +827,7 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
-
+fuelgauge service
 
 
 
@@ -815,7 +904,7 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 	}
 
 
-	   healthd进程负责监听底层上报的事件，uevent，periodic_chores负责将相应的事件上报给batterymonitor
+--->  healthd进程负责监听底层上报的事件，uevent，periodic_chores负责将相应的事件上报给batterymonitor
 		主循环
 		static void healthd_mainloop(void) {
 			while (1) {
@@ -853,6 +942,81 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
+	--->MTK不同充电算法的切换：
+		void mt_battery_charging_algorithm(void)
+		{
+			battery_charging_control(CHARGING_CMD_RESET_WATCH_DOG_TIMER, NULL);
+
+		#if defined(CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT)
+		#if defined(PUMPEX_PLUS_RECHG)
+			if (BMT_status.bat_in_recharging_state == KAL_TRUE && pep_det_rechg == KAL_TRUE)
+				ta_check_chr_type = KAL_TRUE;
+		#endif
+			battery_pump_express_charger_check();
+		#endif
+			switch (BMT_status.bat_charging_state) {
+			case CHR_PRE:
+				BAT_PreChargeModeAction();
+				break;
+
+			case CHR_CC:
+				BAT_ConstantCurrentModeAction();
+				break;
+
+			case CHR_BATFULL:
+				BAT_BatteryFullAction();
+				break;
+
+			case CHR_HOLD:
+				BAT_BatteryHoldAction();
+				break;
+
+			case CHR_ERROR:
+				BAT_BatteryStatusFailAction();
+				break;
+			}
+
+			battery_charging_control(CHARGING_CMD_DUMP_REGISTER, NULL);
+		}
+
+
+
+	--->快充充电算法：
+		代码定义的相关的宏：CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT
+
+		static void battery_pump_express_charger_check(void)
+		{
+			if (KAL_TRUE == ta_check_chr_type &&
+				STANDARD_CHARGER == BMT_status.charger_type &&
+				BMT_status.SOC >= batt_cust_data.ta_start_battery_soc &&
+				BMT_status.SOC < batt_cust_data.ta_stop_battery_soc) {
+				battery_log(BAT_LOG_CRTI, "[PE+]Starting PE Adaptor detection\n");
+
+				mutex_lock(&ta_mutex);
+				wake_lock(&TA_charger_suspend_lock);
+
+				mtk_ta_reset_vchr();
+
+				mtk_ta_init();
+				mtk_ta_detector();
+
+				/* need to re-check if the charger plug out during ta detector */
+				if (KAL_TRUE == ta_cable_out_occur)
+					ta_check_chr_type = KAL_TRUE;
+				else
+					ta_check_chr_type = KAL_FALSE;
+		#if defined(PUMPEX_PLUS_RECHG)
+				/*PE detection disable in the event of recharge after 1st PE detection is finished */
+				pep_det_rechg = KAL_FALSE;
+		#endif
+				wake_unlock(&TA_charger_suspend_lock);
+				mutex_unlock(&ta_mutex);
+			} else {
+				battery_log(BAT_LOG_CRTI,
+						"[PE+]Stop battery_pump_express_charger_check, SOC=%d, ta_check_chr_type = %d, charger_type = %d\n",
+						BMT_status.SOC, ta_check_chr_type, BMT_status.charger_type);
+			}
+		}
 
 
 
