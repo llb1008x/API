@@ -47,8 +47,12 @@ android 4.4 电池电量管理底层分析(C\C++层)
 http://blog.csdn.net/daweibalang717/article/details/41446993
 
 
+android 4.4 电池电量显示分析（低电量提醒与电池图标）Java 层 
+http://blog.csdn.net/daweibalang717/article/details/40615453
 
 
+MT6589充电模块浅析
+http://blog.csdn.net/wn360459196/article/details/11031073
 
 
 
@@ -64,6 +68,11 @@ http://blog.csdn.net/uranus_wm/article/details/9838847
 
 USB眼图：
 http://blog.csdn.net/vvcumt/article/details/38852347
+
+
+BC1.1标准 
+http://blog.csdn.net/zhaoguowei2010/article/details/8970319
+
 
 
 
