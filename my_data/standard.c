@@ -875,3 +875,43 @@ void fg_qmax_update_for_aging(void)
 #endif
 }
 
+
+
+
+
+
+
+healthd进程负责监听底层上报的事件
+主循环
+static void healthd_mainloop(void) {
+    while (1) {
+        struct epoll_event events[eventct];
+        int nevents;
+        int timeout = awake_poll_interval;
+        int mode_timeout;
+
+        mode_timeout = healthd_mode_ops->preparetowait();
+        if (timeout < 0 || (mode_timeout > 0 && mode_timeout < timeout))
+            timeout = mode_timeout;
+        nevents = epoll_wait(epollfd, events, eventct, timeout);
+
+        if (nevents == -1) {
+            if (errno == EINTR)
+                continue;
+            KLOG_ERROR(LOG_TAG, "healthd_mainloop: epoll_wait failed\n");
+            break;
+        }
+
+        for (int n = 0; n < nevents; ++n) {
+            if (events[n].data.ptr)
+                (*(void (*)(int))events[n].data.ptr)(events[n].events);//这个语句想干啥？
+        }
+
+        if (!nevents)
+            periodic_chores();
+
+        healthd_mode_ops->heartbeat();
+    }
+
+    return;
+}
