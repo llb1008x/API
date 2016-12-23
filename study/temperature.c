@@ -21,8 +21,8 @@ int main()
     printf("华氏度转化为摄氏度\n");  
     
     #if defined(REVERSE)
-    for(fathr=upper;fathr>lower;fathr-step){
-        
+    for(fathr=upper;fathr>lower;fathr--){
+        //for(fathr=upper;fathr>lower;fathr-step),如果用这条语句，fathr-step一直是常量，没有变化,当然最后计算的结果都是常量
         celsius=(5.0/9.0)*(fathr-32.0);
         sleep(1);
         printf("%lf\t%lf\n",fathr,celsius);
