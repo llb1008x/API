@@ -200,6 +200,10 @@
 
 	USB2.0 USB3.0协议？
 
+	USB 的vid，pid
+	vid：vendor id
+	pid：product id
+
 
 
 
@@ -618,6 +622,7 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 		打电话导致的降电流
 		关机充电
 		OTG反向充电
+		低电保护
 
     4.大的场景
 	  标准充电
@@ -672,79 +677,16 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 	软件流程：
 
-	battery_pump_express_charger_check()快充充电器检测-->mtk_ta_reset_vchr
+	battery_pump_express_charger_check()快充充电器检测-->mtk_ta_reset_vchr（）充电电压恢复到5V-->mtk_ta_init（）充电器端初始化，判断标志位电压
+
+	能否升到9V/12V-->mtk_ta_detector()对充电器进行判断-->mtk_ta_retry_increase（）调整VBUS上的电压进行升压判断-->charging_set_ta_current_pattern()
+
+	调整电流时序也就是所谓的curent  pattern 指令信号-->调整三次，如果每次升压超过3V，累计三次表示成功，则判断是快充充电器。
 
 
 
 
 
-
-
-
-	{
-
-		pwd  pump express  快充技术 好像switch charge 也是快充技术
-
-		1.------->[1]MTK Pump Express Plus Introduction V01.pdf
-		pump express plus 使用PSR架构
-		pump express  使用P-charge架构
-		是不是苹果出了个plus什么都有plus了。。。。。。
-
-		adaptor 适配器，电源
-		适配器
-
-		SW快充的流程
-		1.设置提高输出电压的模式
-		2.检查b点电压是否是MTK平台的TA的标示
-		3.设置升压模式到TA =9，设置本地化相应的参数，充电使能
-		4.电压保持在5V的状态
-		5.当电池接近充电电满的的时候，充电电流很小，充进去的电量很小，所以需要设置一个充电截止的标准，高于这个标准，反复插拔都不充电，低于的时候就充电
-
-		通过对充电点的检查决定是用什么方式充电，检查应该是轮询的方式
-
-		这两个单词都有电压的意思?
-		voltage
-		current
-
-
-		充电的硬件保护
-		1.如果充电器意外的接到了高电压，看门狗会立刻启动应急预案将电压降低到5V
-		2.温度监控等相关安全措施会保护充电安全
-
-
-		使用pump express 快充技术还要相关的IC，修改一点配置等
-		充电的过程开始也是要通信的，建立沟通，IC发指令控制电压电流的变化
-			1.快充用更大的功率，降低更多的充电时间
-			2.usb设备传输的电压是有限制的，唯一的办法是提高输出电量，电源管理IC端，提高电压输出能力。
-			3.大的适配器输出电量可以获得大的充电电压，降低充电时间
-			4.pump express充电技术跟switch charge充电技术好像可以兼容
-			5.允许充电器根据电流决定充电所需的初始电压，由PMIC发出脉冲电流指令通过USB的Vbus传送给充电器，充电器依照这个指令调变输出电压，电压逐渐增加至高达5V 达到最大充电电流。
-			
-
-		2.------>[1]MTK Pump Express Plus Verify Guideline.pdf
-		充电算法？这个文档好像都是些概述
-
-		3.------>[1]MTK Pump Express Verify Guideline V1.0.pdf
-		标题是说对快充的修改，
-			1.对于TA电压的设置依赖于开路电压进行调整，TA？
-			2.开路电压提高0.1V
-			3.手机上电压的模式，没看明白哪个对哪个？
-			4.伏安特性曲线，不同的量
-			5.先进行识别，电压小于3.7v，迅速升高电压
-
-		4.------>MTK Pump Express  20131212.pdf
-		这篇文章，中文版的简介
-
-		5.------>MTK Pump Express introduction and HW design guide_V1.1.pdf
-		跟1.MTK Pump Express Plus Introduction V01.pdf很像
-
-
-		6.------>MTK Pump Express Plus Introduction V01- English.pdf
-		有一个充电IC，手机，适配器相关的原理图。整个内容跟前面的很相似
-			1.操作的原则，多大电流范围哪可以操作，操作的流程，这是英文版的
-
-		快充的一些细节还没讲？
-	}
 
 
 
@@ -904,6 +846,116 @@ fuelgauge service
 	}
 
 
+--->检测充电器
+	void do_chrdet_int_task(void)
+	{
+		if (g_bat_init_flag == KAL_TRUE) {
+	#if !defined(CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT)
+			if (upmu_is_chr_det() == KAL_TRUE) {
+	#else
+			battery_charging_control(CHARGING_CMD_GET_DISO_STATE, &DISO_data);
+			if ((DISO_data.diso_state.cur_vusb_state == DISO_ONLINE) ||
+				(DISO_data.diso_state.cur_vdc_state == DISO_ONLINE)) {
+	#endif
+				battery_log(BAT_LOG_CRTI, "[do_chrdet_int_task] charger exist!\n");
+				BMT_status.charger_exist = KAL_TRUE;
+
+				wake_lock(&battery_suspend_lock);
+
+	#if defined(CONFIG_POWER_EXT)
+				mt_usb_connect();
+				battery_log(BAT_LOG_CRTI,
+						"[do_chrdet_int_task] call mt_usb_connect() in EVB\n");
+	#elif defined(CONFIG_MTK_POWER_EXT_DETECT)
+				if (KAL_TRUE == bat_is_ext_power()) {
+					mt_usb_connect();
+					battery_log(BAT_LOG_CRTI,
+							"[do_chrdet_int_task] call mt_usb_connect() in EVB\n");
+					return;
+				}
+	#endif
+			} else {
+				battery_log(BAT_LOG_CRTI, "[do_chrdet_int_task] charger NOT exist!\n");
+				BMT_status.charger_exist = KAL_FALSE;
+
+	#if defined(CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT)
+				battery_log(BAT_LOG_CRTI,
+						"turn off charging for no available charging source\n");
+				battery_charging_control(CHARGING_CMD_ENABLE, &BMT_status.charger_exist);
+	#endif
+
+	#ifdef CONFIG_MTK_KERNEL_POWER_OFF_CHARGING
+				if (g_platform_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT
+					|| g_platform_boot_mode == LOW_POWER_OFF_CHARGING_BOOT) {
+					battery_log(BAT_LOG_CRTI,
+							"[pmic_thread_kthread] Unplug Charger/USB In Kernel Power Off Charging Mode!  Shutdown OS!\r\n");
+					battery_charging_control(CHARGING_CMD_SET_POWER_OFF, NULL);
+					/* mt_power_off(); */
+				}
+	#endif
+
+				wake_unlock(&battery_suspend_lock);
+
+	#if defined(CONFIG_POWER_EXT)
+				mt_usb_disconnect();
+				battery_log(BAT_LOG_CRTI,
+						"[do_chrdet_int_task] call mt_usb_disconnect() in EVB\n");
+	#elif defined(CONFIG_MTK_POWER_EXT_DETECT)
+				if (KAL_TRUE == bat_is_ext_power()) {
+					mt_usb_disconnect();
+					battery_log(BAT_LOG_CRTI,
+							"[do_chrdet_int_task] call mt_usb_disconnect() in EVB\n");
+					return;
+				}
+	#endif
+	#if defined(CONFIG_MTK_PUMP_EXPRESS_SUPPORT) || defined(CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT)
+				is_ta_connect = KAL_FALSE;
+				ta_check_chr_type = KAL_TRUE;
+				ta_cable_out_occur = KAL_TRUE;
+	#endif
+
+			}
+
+			/* reset_parameter_dod_charger_plug_event(); */
+			wakeup_fg_algo(FG_CHARGER);
+			/* Place charger detection and battery update here is used to speed up charging icon display. */
+
+			mt_battery_charger_detect_check();
+			if (BMT_status.UI_SOC2 == 100 && BMT_status.charger_exist == KAL_TRUE) {
+				BMT_status.bat_charging_state = CHR_BATFULL;
+				BMT_status.bat_full = KAL_TRUE;
+				g_charging_full_reset_bat_meter = KAL_TRUE;
+			}
+
+			if (g_battery_soc_ready == KAL_FALSE) {
+				if (BMT_status.nPercent_ZCV == 0)
+					battery_meter_initial();
+
+				BMT_status.SOC = battery_meter_get_battery_percentage();
+			}
+
+			if (BMT_status.bat_vol > 0)
+				mt_battery_update_status();
+
+	#if defined(CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT)
+			DISO_data.chr_get_diso_state = KAL_TRUE;
+	#endif
+
+			wake_up_bat();
+		} else {
+	#if defined(CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT)
+			g_vcdt_irq_delay_flag = KAL_TRUE;
+	#endif
+			battery_log(BAT_LOG_CRTI,
+					"[do_chrdet_int_task] battery thread not ready, will do after bettery init.\n");
+		}
+
+	}
+
+
+
+
+
 --->  healthd进程负责监听底层上报的事件，uevent，periodic_chores负责将相应的事件上报给batterymonitor
 		主循环
 		static void healthd_mainloop(void) {
@@ -984,6 +1036,72 @@ fuelgauge service
 	--->快充充电算法：
 		代码定义的相关的宏：CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT
 
+			{
+
+		pwd  pump express  快充技术 好像switch charge 也是快充技术
+
+		1.------->[1]MTK Pump Express Plus Introduction V01.pdf
+		pump express plus 使用PSR架构
+		pump express  使用P-charge架构
+		是不是苹果出了个plus什么都有plus了。。。。。。
+
+		adaptor 适配器，电源
+		适配器
+
+		SW快充的流程
+		1.设置提高输出电压的模式
+		2.检查b点电压是否是MTK平台的TA的标示
+		3.设置升压模式到TA =9，设置本地化相应的参数，充电使能
+		4.电压保持在5V的状态
+		5.当电池接近充电电满的的时候，充电电流很小，充进去的电量很小，所以需要设置一个充电截止的标准，高于这个标准，反复插拔都不充电，低于的时候就充电
+
+		通过对充电点的检查决定是用什么方式充电，检查应该是轮询的方式
+
+		这两个单词都有电压的意思?
+		voltage：电压
+		current：电流
+
+
+		充电的硬件保护
+		1.如果充电器意外的接到了高电压，看门狗会立刻启动应急预案将电压降低到5V
+		2.温度监控等相关安全措施会保护充电安全
+
+
+		使用pump express 快充技术还要相关的IC，修改一点配置等
+		充电的过程开始也是要通信的，建立沟通，IC发指令控制电压电流的变化
+			1.快充用更大的功率，降低更多的充电时间
+			2.usb设备传输的电压是有限制的，唯一的办法是提高输出电量，电源管理IC端，提高电压输出能力。
+			3.大的适配器输出电量可以获得大的充电电压，降低充电时间
+			4.pump express充电技术跟switch charge充电技术好像可以兼容
+			5.允许充电器根据电流决定充电所需的初始电压，由PMIC发出脉冲电流指令通过USB的Vbus传送给充电器，充电器依照这个指令调变输出电压，
+			电压逐渐增加至高达5V 达到最大充电电流。
+			
+
+		2.------>[1]MTK Pump Express Plus Verify Guideline.pdf
+		充电算法？这个文档好像都是些概述
+
+		3.------>[1]MTK Pump Express Verify Guideline V1.0.pdf
+		标题是说对快充的修改，
+			1.对于TA电压的设置依赖于开路电压进行调整，TA？
+			2.开路电压提高0.1V
+			3.手机上电压的模式，没看明白哪个对哪个？
+			4.伏安特性曲线，不同的量
+			5.先进行识别，电压小于3.7v，迅速升高电压
+
+		4.------>MTK Pump Express  20131212.pdf
+		这篇文章，中文版的简介
+
+		5.------>MTK Pump Express introduction and HW design guide_V1.1.pdf
+		跟1.MTK Pump Express Plus Introduction V01.pdf很像
+
+
+		6.------>MTK Pump Express Plus Introduction V01- English.pdf
+		有一个充电IC，手机，适配器相关的原理图。整个内容跟前面的很相似
+			1.操作的原则，多大电流范围哪可以操作，操作的流程，这是英文版的
+
+		快充的一些细节还没讲？
+	}	
+
 		static void battery_pump_express_charger_check(void)
 		{
 			if (KAL_TRUE == ta_check_chr_type &&
@@ -1018,6 +1136,140 @@ fuelgauge service
 			}
 		}
 
+		升压代码，current pattern ，通过VBUS上的一定规律的电流变化进行握手识别，通信
+		static u32 charging_set_ta_current_pattern(void *data)
+		{
+			u32 increase = *(u32 *) (data);
+			u32 charging_status = false;
+
+		#if defined(HIGH_BATTERY_VOLTAGE_SUPPORT)
+			u32 cv_voltage = BATTERY_VOLT_04_340000_V;
+		#else
+			u32 cv_voltage = BATTERY_VOLT_04_200000_V;
+		#endif
+
+			charging_get_charging_status(&charging_status);
+			if (false == charging_status) {
+				charging_set_cv_voltage(&cv_voltage);	/* Set CV */
+				bq24196_set_ichg(0x0);	/* Set charging current 500ma */
+				bq24196_set_chg_config(0x1);	/* Enable Charging */
+			}
+
+			if (increase == true) {
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_increase() on 1");
+				msleep(85);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_increase() off 1");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_increase() on 2");
+				msleep(85);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_increase() off 2");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_increase() on 3");
+				msleep(281);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_increase() off 3");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_increase() on 4");
+				msleep(281);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_increase() off 4");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_increase() on 5");
+				msleep(281);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_increase() off 5");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_increase() on 6");
+				msleep(485);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_increase() off 6");
+				msleep(50);
+
+				pr_debug("mtk_ta_increase() end\n");
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				msleep(200);
+			} else {
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_decrease() on 1");
+				msleep(281);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_decrease() off 1");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_decrease() on 2");
+				msleep(281);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_decrease() off 2");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_decrease() on 3");
+				msleep(281);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_decrease() off 3");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_decrease() on 4");
+				msleep(85);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_decrease() off 4");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_decrease() on 5");
+				msleep(85);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_decrease() off 5");
+				msleep(85);
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+				pr_debug("mtk_ta_decrease() on 6");
+				msleep(485);
+
+				bq24196_set_iinlim(0x0);	/* 100mA */
+				pr_debug("mtk_ta_decrease() off 6");
+				msleep(50);
+
+				pr_debug("mtk_ta_decrease() end\n");
+
+				bq24196_set_iinlim(0x2);	/* 500mA */
+			}
+
+			return STATUS_OK;
+		}
 
 
 
@@ -1027,7 +1279,21 @@ fuelgauge service
 
 
 
+2016.12.19
 
+11.59				USB充电			77%
+13：36			   拔充电器			  94%
+13：41			   座充充电			  94%
+13：50			   拔充电器			  95%
+
+
+
+
+2016.12.22		OTG反向充电
+
+09：45~47
+主机		960mA~1100mA
+从机		150mA~250mA
 
 
 
@@ -1123,7 +1389,253 @@ fuelgauge service
 
 
 
+拔掉充电器
+12-19 13:36:04.798953 <3>[ 6057.928755]  (0)[54:pmic_thread][name:battery_common_fg_20&][do_chrdet_int_task] charger NOT exist!
+12-19 13:36:04.799003 <7>[ 6057.928805]  (0)[54:pmic_thread][name:battery_meter_fg_20&][battery_meter_driver] malloc size=16
+12-19 13:36:04.799071 <3>[ 6057.928873]  (0)[54:pmic_thread][name:battery_common_fg_20&][BAT_thread]Cable out 
+12-19 13:36:04.799083 <4>[ 6057.928885]  (0)[54:pmic_thread][name:usb20&][MUSB]mt_usb_disconnect 501: is ready 1 is_host 0 power 1
+12-19 13:36:04.799101 <6>[ 6057.928903] -(0)[54:pmic_thread]android_usb gadget: disable function 'mtp'/ffffffc0b1e8a980
+12-19 13:36:04.799110 <4>[ 6057.928912] -(0)[54:pmic_thread]mtp_function_disable
+12-19 13:36:04.799122 <4>[ 6057.928924] -(0)[54:pmic_thread][name:mtk_qmu&]QMU_WARN,<mtk_qmu_stop 468>, TQ 1 already inactive
+12-19 13:36:04.799164 <4>[ 6057.928966] -(0)[54:pmic_thread][name:mtk_qmu&]QMU_WARN,<mtk_qmu_stop 473>, Stop RQ 1
+12-19 13:36:04.799203 <4>[ 6057.929005] -(0)[54:pmic_thread][name:musb_hdrc&][MUSB]nuke 615: call musb_g_giveback on function nuke ep is ep1out
+12-19 13:36:04.799215 <4>[ 6057.929017] -(0)[54:pmic_thread][name:mtk_qmu&]QMU_WARN,<mtk_qmu_stop 468>, TQ 2 already inactive
+12-19 13:36:04.799227 <6>[ 6057.929029] -(0)[54:pmic_thread]android_usb gadget: disable function 'Function FS Gadget'/ffffffc0ad6ed1f8
+12-19 13:36:04.799241 <4>[ 6057.929043] -(0)[54:pmic_thread][name:mtk_qmu&]QMU_WARN,<mtk_qmu_stop 473>, Stop RQ 2
+12-19 13:36:04.799272 <4>[ 6057.929074] -(0)[54:pmic_thread][name:musb_hdrc&][MUSB]nuke 615: call musb_g_giveback on function nuke ep is ep2out
+12-19 13:36:04.799284 <4>[ 6057.929086] -(0)[54:pmic_thread][name:mtk_qmu&]QMU_WARN,<mtk_qmu_stop 468>, TQ 3 already inactive
+12-19 13:36:04.799298 <5>[ 6057.929100] -(0)[54:pmic_thread][name:g_android&][g_android][USB]android_disconnect: 
+12-19 13:36:04.799323 <5>[ 6057.929125] -(0)[54:pmic_thread][name:g_android&][g_android][USB]android_disconnect: dev->connected = 0 
+12-19 13:36:04.799333 <6>[ 6057.929135] -(0)[54:pmic_thread]android_usb gadget: [COM]composite_disconnect: reassign the complete function!!
+12-19 13:36:04.799345 <4>[ 6057.929147]  (0)[54:pmic_thread][name:usb20&][MUSB]mt_usb_disable 340: <1,1>,<2,4,2,1>
+12-19 13:36:04.800182 <4>[ 6057.929984]  (0)[54:pmic_thread][name:usb20_phy&][MUSB]usb_phy_savecurrent 536: usb save current success
+12-19 13:36:04.800193 <4>[ 6057.929995]  (0)[54:pmic_thread][name:usb20&][MUSB]mt_usb_disable 358: <2,4,2,2>
+12-19 13:36:04.800204 <4>[ 6057.930006] -(0)[54:pmic_thread][name:usb20&][MUSB]vcore_release 195: musb lock get, release it, mtk_musb:ffffffc0b5f1c308
+12-19 13:36:04.800218 <7>[ 6057.930020]  (0)[54:pmic_thread][VcoreFS] [name:mt_vcore_dvfs_1&]feature_en: 1(0), recover_en: 1, kicker: 4, new_opp: -1(0)
+12-19 13:36:04.800231 <7>[ 6057.930033]  (0)[54:pmic_thread][VcoreFS] [name:mt_vcore_dvfs_1&][-1, 0, -1, -1, -1, -1]
+12-19 13:36:04.800243 <7>[ 6057.930045]  (0)[54:pmic_thread][VcoreFS] [name:mt_vcore_dvfs_1&]kicker: 4, opp: 0, curr_opp: 0(0)
+12-19 13:36:04.800261 <7>[ 6057.930063]  (0)[54:pmic_thread][VcoreFS] [name:mt_vcore_dvfs_1&]opp: 0, vcore: 1150000(1150000) 
+12-19 13:36:04.800275 <4>[ 6057.930077]  (0)[54:pmic_thread][name:usb20&][MUSB]vcore_release 202: release VCORE ok
+12-19 13:36:04.800286 <4>[ 6057.930088]  (0)[54:pmic_thread][name:musb_hdrc&][MUSB]musb_stop 1357: HDRC disabled
+12-19 13:36:04.800299 <4>[ 6057.930101]  (0)[54:pmic_thread][name:usb20&][MUSB]mt_usb_disconnect 531: unlock
+12-19 13:36:04.800310 <4>[ 6057.930112]  (0)[54:pmic_thread][name:usb20&][MUSB]mt_usb_disconnect 537: cable_mode=1
+12-19 13:36:04.800320 <4>[ 6057.930122]  (0)[54:pmic_thread][name:usb20&][MUSB]mt_usb_disconnect 546: [MUSB] USB disconnect
+12-19 13:36:04.800557 <7>[ 6057.930359]  (0)[54:pmic_thread][name:battery_meter_fg_20&][g_Get_I_Charging] gFG_current_inout_battery : -3790
+12-19 13:36:04.800568 <3>[ 6057.930370]  (0)[54:pmic_thread][name:battery_common_fg_20&][kernel][battery_update] SOC 93,UI_SOC2 95, status 3
+12-19 13:36:04.800577 <3>[ 6057.930379]  (0)[54:pmic_thread][name:battery_common_fg_20&][DLPT_POWER_OFF_EN] run
+12-19 13:36:04.800621 <3>[ 6057.930423]  (0)[54:pmic_thread][name:battery_common_fg_20&][BATTERY] wake_up_bat. 
+12-19 13:36:04.800661 <4>[ 6057.930463]  (0)[54:pmic_thread][PWRAP] clear EINT flag mt_pmic_wrap_eint_status=0x0
+12-19 13:36:04.802008 <7>[ 6057.931810]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] init_flag = 1
+12-19 13:36:04.802108 <7>[ 6057.931910]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] charger_exist = 0
+12-19 13:36:04.802201 <7>[ 6057.932003]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] set suspend time
+12-19 13:36:04.802516 <7>[ 6057.932318]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_29_16 = 0x1
+12-19 13:36:04.802534 <7>[ 6057.932336]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_15_00 = 0x6bf2
+12-19 13:36:04.802551 <7>[ 6057.932353]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_31_16 = 0x702
+12-19 13:36:04.802568 <7>[ 6057.932370]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_15_00 = 0x13d8
+12-19 13:36:04.802579 <7>[ 6057.932381]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] fg_coulomb = 6647
+12-19 13:36:04.802666 <7>[ 6057.932468]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] fgadc_reset
+12-19 13:36:04.802907 <7>[ 6057.932709]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_29_16 = 0x0
+12-19 13:36:04.802924 <7>[ 6057.932726]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_15_00 = 0x0
+12-19 13:36:04.802940 <7>[ 6057.932742]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_31_16 = 0x0
+12-19 13:36:04.802957 <7>[ 6057.932759]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_15_00 = 0x0
+12-19 13:36:04.803050 <7>[ 6057.932852]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] charger_exist = 0
+12-19 13:36:04.803136 <7>[ 6057.932938]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] is_charging = 1
+12-19 13:36:04.803226 <7>[ 6057.933028]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] gFG_DOD0 = 7
+12-19 13:36:04.803314 <7>[ 6057.933116]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] gFG_DOD1 = 7
+12-19 13:36:04.803425 <4>[ 6057.933227]  (0)[4447:kworker/0:0][name:usb20&][MUSB]usb_cable_connected 594: type(0)
+12-19 13:36:04.803436 <5>[ 6057.933238]  (0)[4447:kworker/0:0][name:g_android&][g_android][USB]android_work: is_hwconnected=0 
+12-19 13:36:04.803637 <5>[ 6057.933439]  (0)[4447:kworker/0:0][name:g_android&][g_android][USB]android_work: sent uevent USB_STATE=DISCONNECTED
+12-19 13:36:04.803727 <5>[ 6057.933529]  (0)[4447:kworker/0:0][name:g_android&][g_android][USB]android_work: sent uevent USB_STATE=HWDISCONNECTED
+12-19 13:36:04.803738 <5>[ 6057.933540]  (0)[4447:kworker/0:0][name:g_android&][g_android][USB]android_work: did not send zero uevent
+12-19 13:36:04.804690 <6>[ 6057.934492]  (0)[3909:MtpServer]mtp_release
+12-19 13:36:04.805991 <3>[ 6057.935793]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][fg2.0]CUST_TRACKING_POINT: 0.
+12-19 13:36:04.806010 <3>[ 6057.935812]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][Battery] mt_battery_update_duration_time , last_time=6057 current_time=6057 duration=0
+12-19 13:36:04.806051 <7>[ 6057.935853]  (0)[208:bat_routine_thr][name:battery_meter_fg_20&][battery_meter_driver] malloc size=16
+12-19 13:36:04.806118 <3>[ 6057.935920]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][BAT_thread]Cable out 
+12-19 13:36:04.806130 <4>[ 6057.935932]  (0)[208:bat_routine_thr][name:usb20&][MUSB]mt_usb_disconnect 501: is ready 1 is_host 0 power 0
+12-19 13:36:04.808142 <4>[ 6057.937944]  (0)[1167:UEventObserver][name:usb20&][MUSB]musb_do_idle 248: otg_state b_idle
+
+
+
 
 
 座充阶段：
 
+12-19 13:36:54.228068 <3>[ 6107.357856]  (0)[54:pmic_thread][name:battery_common_fg_20&][do_chrdet_int_task] charger exist!
+12-19 13:36:54.228123 <7>[ 6107.357911]  (0)[54:pmic_thread][name:battery_meter_fg_20&][battery_meter_driver] malloc size=16
+12-19 13:36:54.228198 <3>[ 6107.357986]  (0)[54:pmic_thread][name:charging_hw_bq24158&][is_chr_det] 1
+12-19 13:36:54.228612 <7>[ 6107.358400]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] init_flag = 1
+12-19 13:36:54.228716 <7>[ 6107.358504]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] charger_exist = 1
+12-19 13:36:54.228999 <7>[ 6107.358787]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_29_16 = 0x0
+12-19 13:36:54.229016 <7>[ 6107.358804]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_15_00 = 0x12ba
+12-19 13:36:54.229033 <7>[ 6107.358821]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_31_16 = 0xffef
+12-19 13:36:54.229049 <7>[ 6107.358837]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_15_00 = 0xd613
+12-19 13:36:54.229059 <7>[ 6107.358847]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] fg_coulomb = -57
+12-19 13:36:54.229151 <7>[ 6107.358939]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] set suspend time
+12-19 13:36:54.229454 <7>[ 6107.359242]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_29_16 = 0x0
+12-19 13:36:54.229471 <7>[ 6107.359259]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_15_00 = 0x12ba
+12-19 13:36:54.229487 <7>[ 6107.359275]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_31_16 = 0xffef
+12-19 13:36:54.229502 <7>[ 6107.359290]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_15_00 = 0xd613
+12-19 13:36:54.229512 <7>[ 6107.359300]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] fg_coulomb = -57
+12-19 13:36:54.229600 <7>[ 6107.359388]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] fgadc_reset
+12-19 13:36:54.229850 <7>[ 6107.359638]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_29_16 = 0x0
+12-19 13:36:54.229866 <7>[ 6107.359654]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_15_00 = 0x0
+12-19 13:36:54.229882 <7>[ 6107.359670]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_31_16 = 0x0
+12-19 13:36:54.229898 <7>[ 6107.359686]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_15_00 = 0x0
+12-19 13:36:54.229990 <7>[ 6107.359778]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] charger_exist = 1
+12-19 13:36:54.230080 <7>[ 6107.359868]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] is_charging = 1
+12-19 13:36:54.230169 <7>[ 6107.359957]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] gFG_DOD0 = 7
+12-19 13:36:54.230256 <7>[ 6107.360044]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] gFG_DOD1 = 7
+12-19 13:36:54.248415 <7>[ 6107.378203]  (0)[577:AALServiceMain][name:ddp_pwm&][PWM] (latest= 5):   980(  63, 235)  981(  63, 260)  982(  63, 269)  983(  63, 284)  984(  63, 300)
+12-19 13:36:54.258183 <7>[ 6107.387971]  (0)[4447:kworker/0:0][VcoreFS] [name:mt_vcore_dvfs_1&]feature_en: 1(0), recover_en: 1, kicker: 2, new_opp: -1(0)
+12-19 13:36:54.258202 <7>[ 6107.387990]  (0)[4447:kworker/0:0][VcoreFS] [name:mt_vcore_dvfs_1&][-1, 0, -1, -1, -1, -1]
+12-19 13:36:54.258215 <7>[ 6107.388003]  (0)[4447:kworker/0:0][VcoreFS] [name:mt_vcore_dvfs_1&]kicker: 2, opp: 0, curr_opp: 0(0)
+12-19 13:36:54.258234 <7>[ 6107.388022]  (0)[4447:kworker/0:0][VcoreFS] [name:mt_vcore_dvfs_1&]opp: 0, vcore: 1150000(1150000) 
+12-19 13:36:54.258248 <7>[ 6107.388036]  (0)[4447:kworker/0:0][VcoreFS] [name:mt_vcore_dvfs_1&][-1, 0, -1, -1, -1, -1]
+12-19 13:36:54.258261 <7>[ 6107.388049]  (0)[4447:kworker/0:0][VcoreFS] [name:mt_vcore_dvfs_1&]opp: 0, faxi: 218000(218000), fvenc: 300000(300000) 
+12-19 13:36:54.258277 <7>[ 6107.388065]  (0)[4447:kworker/0:0][VcoreFS] [name:mt_vcore_dvfs_1&]opp: 0, fddr: 1280000(1280000) 
+12-19 13:36:54.258288 <2>[ 6107.388076]  (0)[4447:kworker/0:0][name:fliper&]
+12-19 13:36:54.258288 <2>[ 6107.388076] <<SOC DVFS FLIPER>> flip to E(0), 500
+12-19 13:36:54.318342 <7>[ 6107.448130]  (0)[58:cfinteractive][name:mt_cpufreq&][Power/cpufreq] @_mt_cpufreq_set_locked(): Vproc = 950mv, freq = 598000 KHz
+12-19 13:36:54.332000 <7>[ 6107.461788]  (0)[577:AALServiceMain][name:ddp_pwm&][PWM] (latest= 5):   985(  63, 317)  986(  63, 334)  987(  63, 350)  988(  63, 367)  989(  63, 384)
+12-19 13:36:54.354935 <7>[ 6107.484723]  (0)[587:AALLightSensor][name:aal_control&][ALS/AAL]Get als dat :65
+12-19 13:36:54.398441 <7>[ 6107.528229]  (0)[58:cfinteractive][name:mt_cpufreq&][Power/cpufreq] @_mt_cpufreq_set_locked(): Vproc = 950mv, freq = 299000 KHz
+12-19 13:36:54.416202 <7>[ 6107.545990]  (0)[577:AALServiceMain][name:ddp_pwm&][PWM] (latest= 5):   990(  63, 401)  991(  63, 417)  992(  63, 434)  993(  63, 452)  994(  63, 468)
+12-19 13:36:54.499424 <7>[ 6107.629212]  (0)[577:AALServiceMain][name:ddp_pwm&][PWM] (latest= 5):   995(  63, 484)  996(  63, 501)  997(  63, 518)  998(  63, 537)  999(  63, 551)
+12-19 13:36:54.518592 <7>[ 6107.648380]  (0)[58:cfinteractive][name:mt_cpufreq&][Power/cpufreq] @_mt_cpufreq_set_locked(): Vproc = 1143mv, freq = 1300000 KHz
+12-19 13:36:54.519947 <4>[ 6107.649735]  (0)[95:hps_main][name:mt_hotplug_strategy_algo&][HPS] (0000)(1)DBG_HRT(57)(158)(0)(0) (4)(4)(4)(4)(1) (80)(7)(1) (0)(0)(0) (0)(158)(7)(0)(158) wifi_base(0)
+12-19 13:36:54.538033 <3>[ 6107.667821]  (0)[54:pmic_thread][name:pmic_chr_type_det&]CDP, PASS
+12-19 13:36:54.538136 <4>[ 6107.667924]  (0)[54:pmic_thread][name:usb20_phy&][MUSB]Charger_Detect_Init 656: Charger_Detect_Init
+12-19 13:36:54.555750 <7>[ 6107.685538]  (0)[587:AALLightSensor][name:aal_control&][ALS/AAL]Get als dat :65
+12-19 13:36:54.556362 <7>[ 6107.686150]  (0)[56:dlpt_notify_thr][name:pmic&][dlpt] get_dlpt_imix_charging 9648 4365 3100 118
+12-19 13:36:54.558076 <2>[ 6107.687864]  (0)[56:dlpt_notify_thr][name:mt_pbm&][PBM] [ma_to_mw] 4367(mV) * 5500(mA) = 24018(mW)
+12-19 13:36:54.558104 <7>[ 6107.687892]  (0)[56:dlpt_notify_thr][name:pmic&][exec_dlpt_callback] g_dlpt_val=5500
+12-19 13:36:54.558116 <7>[ 6107.687904]  (0)[56:dlpt_notify_thr][name:pmic&][DLPT_final] 5500,0,94,94,5500
+12-19 13:36:54.580984 <7>[ 6107.710772]  (0)[577:AALServiceMain][name:ddp_pwm&][PWM] (latest= 5):  1000(  63, 568) 1001(  63, 583) 1002(  63, 600) 1003(  63, 616) 1004(  63, 633)
+12-19 13:36:54.648480 <7>[ 6107.778268]  (0)[58:cfinteractive][name:mt_cpufreq&][Power/cpufreq] @_mt_cpufreq_set_locked(): Vproc = 950mv, freq = 299000 KHz
+12-19 13:36:54.653996 <3>[ 6107.783784]  (0)[577:AALServiceMain][name:aed&]AEE_MONITOR_SET[status]: 0x1
+12-19 13:36:54.665189 <7>[ 6107.794977]  (0)[577:AALServiceMain][name:ddp_pwm&][PWM] (latest= 5):  1005(  63, 649) 1006(  63, 667) 1007(  63, 683) 1008(  63, 699) 1009(  63, 717)
+12-19 13:36:54.688233 <7>[ 6107.818021]  (0)[102:display_esd_che][name:primary_display&][DISPCHECK][ESD]ESD check begin
+12-19 13:36:54.688533 <7>[ 6107.818321]  (0)[102:display_esd_che][name:primary_display&][DISPCHECK][ESD]ESD config thread=ffffffc0540e7000
+12-19 13:36:54.697916 <7>[ 6107.827704]  (0)[102:display_esd_che][name:primary_display&][DISPCHECK][ESD]_esd_check_config_handle_vdo ret=0
+12-19 13:36:54.698135 <7>[ 6107.827923]  (0)[102:display_esd_che][name:primary_display&][DISPCHECK][ESD]ESD config thread done~
+12-19 13:36:54.698214 <7>[ 6107.828002]  (0)[102:display_esd_che][name:ddp_dsi&][DISPCHECK][DSI]enter cmp i=0
+12-19 13:36:54.698417 <7>[ 6107.828205]  (0)[102:display_esd_che][name:primary_display&][DISPCHECK][ESD]ESD check end
+12-19 13:36:54.718782 <4>[ 6107.848570]  (0)[4447:kworker/0:0][name:gt9xx_driver&]<<-GTP-DEBUG->> [2174][Esd]0x8040 = 0xFF, 0x8041 = 0xAA
+12-19 13:36:54.749515 <7>[ 6107.879303]  (0)[577:AALServiceMain][name:ddp_pwm&][PWM] (latest= 5):  1010(  63, 735) 1011(  63, 751) 1012(  63, 767) 1013(  63, 784) 1014(  63, 801)
+12-19 13:36:54.756924 <7>[ 6107.886712]  (0)[587:AALLightSensor][name:aal_control&][ALS/AAL]Get als dat :65
+12-19 13:36:54.831460 <7>[ 6107.961248]  (0)[577:AALServiceMain][name:ddp_pwm&][PWM] (latest= 5):  1015(  63, 817) 1016(  63, 834) 1017(  63, 851) 1018(  63, 867) 1019(  63, 883)
+12-19 13:36:54.948260 <3>[ 6108.078048]  (0)[54:pmic_thread][name:pmic_chr_type_det&]step B2 : STANDARD CHARGER!
+12-19 13:36:54.948450 <4>[ 6108.078238]  (0)[54:pmic_thread][name:usb20_phy&][MUSB]Charger_Detect_Release 666: Charger_Detect_Release
+12-19 13:36:54.948494 <3>[ 6108.078282]  (0)[54:pmic_thread][name:battery_common_fg_20&][BAT_thread]Cable in, CHR_Type_num=4
+12-19 13:36:54.948891 <7>[ 6108.078679]  (0)[54:pmic_thread][name:battery_meter_fg_20&][g_Get_I_Charging] gFG_current_inout_battery : 3139
+12-19 13:36:54.948936 <3>[ 6108.078724]  (0)[54:pmic_thread][name:battery_common_fg_20&][kernel][battery_update] SOC 93,UI_SOC2 94, status 1
+12-19 13:36:54.948973 <3>[ 6108.078761]  (0)[54:pmic_thread][name:battery_common_fg_20&][DLPT_POWER_OFF_EN] run
+12-19 13:36:54.949142 <3>[ 6108.078930]  (0)[54:pmic_thread][name:battery_common_fg_20&][BATTERY] wake_up_bat. 
+12-19 13:36:54.949267 <4>[ 6108.079055]  (0)[54:pmic_thread][PWRAP] clear EINT flag mt_pmic_wrap_eint_status=0x0
+12-19 13:36:54.950564 <3>[ 6108.080352]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][fg2.0]CUST_TRACKING_POINT: 0.
+12-19 13:36:54.950614 <3>[ 6108.080402]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][Battery] mt_battery_update_duration_time , last_time=6350 current_time=6357 duration=6
+12-19 13:36:54.950764 <7>[ 6108.080552]  (0)[208:bat_routine_thr][name:battery_meter_fg_20&][battery_meter_driver] malloc size=16
+12-19 13:36:54.951002 <3>[ 6108.080790]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][BAT_thread]Cable in, CHR_Type_num=4
+12-19 13:36:54.951989 <7>[ 6108.081777]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] init_flag = 1
+12-19 13:36:54.952385 <7>[ 6108.082173]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] charge_tracking_time = 60
+12-19 13:36:54.952787 <5>[ 6108.082575] -(0)[422:fuelgauged][name:mtk_rtc_hal_common&]mtk_rtc_hal_common: rtc_spare_reg[0] = {16412, 127, 8}
+12-19 13:36:54.952841 <7>[ 6108.082629]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] rtc_fg_soc = 93
+12-19 13:36:54.953348 <7>[ 6108.083136]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] charger_exist = 1
+12-19 13:36:54.953740 <7>[ 6108.083528]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] shutdown_system_voltage = 3385
+12-19 13:36:54.954124 <7>[ 6108.083912]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] update = 1
+12-19 13:36:54.958901 <7>[ 6108.088689]  (0)[208:bat_routine_thr][name:battery_meter_fg_20&][g_Get_I_Charging] gFG_current_inout_battery : 3009
+12-19 13:36:54.959871 <7>[ 6108.089659]  (0)[587:AALLightSensor][name:aal_control&][ALS/AAL]Get als dat :65
+12-19 13:36:54.968556 <7>[ 6108.098344]  (0)[208:bat_routine_thr][name:battery_meter_fg_20&][BattVoltToTemp] 16900
+12-19 13:36:54.968615 <7>[ 6108.098403]  (0)[208:bat_routine_thr][name:battery_meter_fg_20&][force_get_tbat] 672,670,1,297,10,24
+12-19 13:36:54.971225 <3>[ 6108.101013]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 4370,bat_vol 4367, AvgI 976, I 300, VChr 4759, AvgT 24, T 24, ZCV 4331, CHR_Type 4, SOC  93: 93: 94
+12-19 13:36:54.971264 <4>[ 6108.101052]  (0)[422:fuelgauged][bq24158] 
+12-19 13:36:54.973957 <7>[ 6108.103745]  (0)[422:fuelgauged][name:battery_meter_fg_20&][BattVoltToTemp] 16900
+12-19 13:36:54.974010 <7>[ 6108.103798]  (0)[422:fuelgauged][name:battery_meter_fg_20&][force_get_tbat] 672,669,1,301,10,25
+12-19 13:36:54.974051 <7>[ 6108.103839]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] temperture = 25
+12-19 13:36:54.975510 <7>[ 6108.105298]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] fg_current = 3005
+12-19 13:36:54.975886 <7>[ 6108.105674]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] current_state = 1
+12-19 13:36:54.976551 <7>[ 6108.106339]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_29_16 = 0x0
+12-19 13:36:54.976608 <7>[ 6108.106396]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_nter] mt6328_upmu_get_fg_nter_15_00 = 0xc
+12-19 13:36:54.976664 <7>[ 6108.106452]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_31_16 = 0x0
+12-19 13:36:54.976717 <7>[ 6108.106505]  (0)[422:fuelgauged][name:battery_meter_hal&][dump_car] upmu_get_fg_car_15_00 = 0x1f47
+12-19 13:36:54.976757 <7>[ 6108.106545]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] fg_coulomb = 0
+12-19 13:36:54.977150 <7>[ 6108.106938]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] SOC = 93
+12-19 13:36:54.977517 <7>[ 6108.107305]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] gFG_DOD0 = 7
+12-19 13:36:54.977878 <7>[ 6108.107666]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] gFG_DOD1 = 7
+12-19 13:36:54.978590 <7>[ 6108.108378]  (0)[58:cfinteractive][name:mt_cpufreq&][Power/cpufreq] @_mt_cpufreq_set_locked(): Vproc = 1143mv, freq = 1300000 KHz
+12-19 13:36:54.978735 <4>[ 6108.108523]  (0)[266:healthd][0x0]=0x50 [0x1]=0xf8 [0x2]=0xb6 
+12-19 13:36:54.980734 <12>[ 6108.110522]  (0)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:54.981014 <4>[ 6108.110802]  (0)[266:healthd][0x3]=0x51 [0x4]=0xb [0x5]=0x4 
+12-19 13:36:54.982256 <14>[ 6108.112044]  (0)[266:healthd]healthd: battery l=94 v=4371 t=25.0 h=2 st=2 chg=a
+12-19 13:36:54.982409 <14>[ 6108.112197]  (0)[266:healthd]healthd: send_already = 0
+12-19 13:36:54.982584 <4>[ 6108.112372]  (0)[208:bat_routine_thr][0x6]=0x7a 
+12-19 13:36:54.982603 <3>[ 6108.112391]  (0)[208:bat_routine_thr][name:battery_common_fg_20&]g_gn_screenon_time=(20), g_call_state=0, g_boot_reason=0, g_boot_mode=0
+12-19 13:36:54.982727 <3>[ 6108.112515]  (0)[210:mtk charger_hv_][name:battery_common_fg_20&][check_battery_exist] baton_count = 0
+12-19 13:36:54.982727 <3>[ 6108.112515]  
+12-19 13:36:54.995135 <3>[ 6108.124923]  (0)[210:mtk charger_hv_][name:battery_common_fg_20&][check_battery_exist] baton_count = 0
+12-19 13:36:54.995135 <3>[ 6108.124923]  <7>[ 6108.128093]  (0)[210:mtk charger_hv_][name:battery_meter_fg_20&][g_Get_I_Charging] gFG_current_inout_battery : 2138
+12-19 13:36:54.998324 <3>[ 6108.128112]  (0)[210:mtk charger_hv_][name:battery_common_fg_20&][gn_update_BatteryPresentCurrent] BAT_ChargerVoltage = (4749), PresentCurrent = (213)
+12-19 13:36:54.999262 <3>[ 6108.129050]  (0)[208:bat_routine_thr][name:switch_charging&][BATTERY] Pre-CC mode charge, timer=0 on 0 !!
+12-19 13:36:54.999262 <3>[ 6108.129050] 
+12-19 13:36:55.003748 <3>[ 6108.133536]  (0)[208:bat_routine_thr][name:switch_charging&][BATTERY] select_charging_current !
+12-19 13:36:55.003766 <3>[ 6108.133554]  (0)[208:bat_routine_thr][name:switch_charging&][BATTERY] Default CC mode charging : 100000, input current = 100000
+12-19 13:36:55.014520 <3>[ 6108.144308]  (0)[208:bat_routine_thr][name:switch_charging&][BATTERY] pchr_turn_on_charging(), enable =1 !
+12-19 13:36:55.014535 <4>[ 6108.144323]  (0)[266:healthd][bq24158] [0x0]=0x50 
+12-19 13:36:55.016345 <12>[ 6108.146133]  (0)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:55.016548 <4>[ 6108.146336]  (0)[208:bat_routine_thr][0x1]=0xf8 [0x2]=0xb6 [0x3]=0x51 [0x4]=0x4b [0x5]=0x4 [0x6]=0x7a 
+12-19 13:36:55.019199 <3>[ 6108.148987]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][mt_kpoc_power_off_check] , chr_vol=4759, boot_mode=0
+12-19 13:36:55.019215 <3>[ 6108.149003]  (0)[208:bat_routine_thr][name:battery_common_fg_20&]wait event 1
+12-19 13:36:55.029915 <7>[ 6108.159703]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] tracking time = 0
+12-19 13:36:55.030008 <7>[ 6108.159796]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] difference_voltage_update = 20
+12-19 13:36:55.030103 <7>[ 6108.159891]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] duration_type = 0
+12-19 13:36:55.030114 <7>[ 6108.159902]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] duration time = 6
+12-19 13:36:55.030204 <7>[ 6108.159992]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] charger_exist = 1
+12-19 13:36:55.030291 <7>[ 6108.160079]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] battery_full = 0
+12-19 13:36:55.030377 <7>[ 6108.160165]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] update = 0
+12-19 13:36:55.030388 <7>[ 6108.160176]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] voltage = 4370
+12-19 13:36:55.030475 <7>[ 6108.160263]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] UI_SOC = 93
+12-19 13:36:55.030560 <7>[ 6108.160348]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] UI_SOC2 = 94
+12-19 13:36:55.030572 <3>[ 6108.160360]  (0)[422:fuelgauged][name:battery_common_fg_20&]******** battery : bat_update_thread_wakeup  ********
+12-19 13:36:55.030832 <7>[ 6108.160620]  (0)[209:bat_update_thre][name:battery_meter_fg_20&][g_Get_I_Charging] gFG_current_inout_battery : 3015
+12-19 13:36:55.030843 <3>[ 6108.160631]  (0)[209:bat_update_thre][name:battery_common_fg_20&][kernel][battery_update] SOC 93,UI_SOC2 94, status 1
+12-19 13:36:55.030853 <3>[ 6108.160641]  (0)[209:bat_update_thre][name:battery_common_fg_20&][DLPT_POWER_OFF_EN] run
+12-19 13:36:55.030899 <3>[ 6108.160687]  (0)[209:bat_update_thre][name:battery_common_fg_20&]wait event 2
+12-19 13:36:55.045081 <14>[ 6108.174869]  (0)[266:healthd]healthd: battery l=94 v=4371 t=25.0 h=2 st=2 chg=a
+12-19 13:36:55.045256 <14>[ 6108.175044]  (0)[266:healthd]healthd: send_already = 0
+12-19 13:36:55.069119 <5>[ 6108.198907] -(0)[422:fuelgauged][name:mtk_rtc_hal_common&]mtk_rtc_hal_common: rtc_spare_reg[0] = {16412, 127, 8}
+12-19 13:36:55.069210 <5>[ 6108.198998]  (0)[422:fuelgauged][name:battery_meter_fg_20&][fg_res] set rtc = 93
+12-19 13:36:55.096930 <12>[ 6108.226718]  (0)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:55.097903 <14>[ 6108.227691]  (0)[266:healthd]healthd: battery l=94 v=4370 t=24.0 h=2 st=2 chg=a
+12-19 13:36:55.105050 <14>[ 6108.234838]  (0)[266:healthd]healthd: send_already = 0
+12-19 13:36:55.107420 <12>[ 6108.237208]  (0)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:55.109627 <14>[ 6108.239415]  (0)[266:healthd]healthd: battery l=94 v=4370 t=24.0 h=2 st=2 chg=a
+12-19 13:36:55.109791 <14>[ 6108.239579]  (0)[266:healthd]healthd: send_already = 0
+12-19 13:36:55.111303 <12>[ 6108.241091]  (0)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:55.112225 <14>[ 6108.242013]  (0)[266:healthd]healthd: battery l=94 v=4370 t=24.0 h=2 st=2 chg=a
+12-19 13:36:55.112376 <14>[ 6108.242164]  (0)[266:healthd]healthd: send_already = 0
+12-19 13:36:55.121748 <4>[ 6108.251536] -(1)[0:swapper/1]CPU1: Booted secondary processor
+12-19 13:36:55.121770 <6>[ 6108.251558] -(1)[0:swapper/1][name:cpuinfo&]Detected VIPT I-cache on CPU1
+12-19 13:36:55.121882 <6>[ 6108.251670] -(1)[0:swapper/1][name:topology&]CPU1: update cpu_capacity 1024
+12-19 13:36:55.122331 <7>[ 6108.252119]  (0)[95:hps_main][name:wd_common_drv&][wdk]bind kicker thread[212] to cpu[1]
+12-19 13:36:55.123291 <4>[ 6108.253079] -(2)[0:swapper/2]CPU2: Booted secondary processor
+12-19 13:36:55.123309 <6>[ 6108.253097] -(2)[0:swapper/2][name:cpuinfo&]Detected VIPT I-cache on CPU2
+12-19 13:36:55.123415 <6>[ 6108.253203] -(2)[0:swapper/2][name:topology&]CPU2: update cpu_capacity 1024
+12-19 13:36:55.123928 <7>[ 6108.253716]  (0)[95:hps_main][name:wd_common_drv&][wdk]bind kicker thread[213] to cpu[2]
+12-19 13:36:55.124908 <4>[ 6108.254696] -(3)[0:swapper/3]CPU3: Booted secondary processor
+12-19 13:36:55.124929 <6>[ 6108.254717] -(3)[0:swapper/3][name:cpuinfo&]Detected VIPT I-cache on CPU3
+12-19 13:36:55.125043 <6>[ 6108.254831] -(3)[0:swapper/3][name:topology&]CPU3: update cpu_capacity 1024
+12-19 13:36:55.125645 <7>[ 6108.255433]  (0)[95:hps_main][name:wd_common_drv&][wdk]bind kicker thread[214] to cpu[3]
+12-19 13:36:55.126228 <4>[ 6108.256016]  (0)[95:hps_main][name:mt_hotplug_strategy_algo&][HPS] (0020)(1)action end(100)(643)(0)(0) (4)(4)(4)(4)(1) (104)(12)(0) (0)(0)(0) (1)(643)(13)(0)(643) wifi_base(0)
+12-19 13:36:55.127210 <12>[ 6108.256998]  (3)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:55.128577 <14>[ 6108.258365]  (3)[266:healthd]healthd: battery l=94 v=4370 t=24.0 h=2 st=2 chg=a
+12-19 13:36:55.128742 <14>[ 6108.258530]  (3)[266:healthd]healthd: send_already = 0
+12-19 13:36:55.129909 <12>[ 6108.259697]  (3)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:55.130858 <14>[ 6108.260646]  (3)[266:healthd]healthd: battery l=94 v=4370 t=24.0 h=2 st=2 chg=a
+12-19 13:36:55.131024 <14>[ 6108.260812]  (3)[266:healthd]healthd: send_already = 0
+12-19 13:36:55.132158 <12>[ 6108.261946]  (3)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:55.133459 <14>[ 6108.263247]  (3)[266:healthd]healthd: battery l=94 v=4370 t=24.0 h=2 st=2 chg=a
+12-19 13:36:55.133630 <14>[ 6108.263418]  (3)[266:healthd]healthd: send_already = 0
+12-19 13:36:55.134711 <12>[ 6108.264499]  (3)[266:healthd]healthd: Unknown battery status '3'
+12-19 13:36:55.135667 <14>[ 6108.265455]  (3)[266:healthd]healthd: battery l=94 v=4370 t=24.0 h=2 st=2 chg=a
+12-19 13:36:55.135842 <14>[ 6108.265630]  (3)[266:healthd]healthd: send_already = 0
