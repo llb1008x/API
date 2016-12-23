@@ -10,6 +10,22 @@ battery_log(BAT_LOG_FULL, "wait event 1\n");
 //GioneeDrv LiLuBao 20161009 modify for platform change end
 
 
+自己添加的宏
+#define  GNDRV_LLB_CHANGE
+修改模式
+//GioneeDrv LiLuBao 20161109 modify for platform change begin
+
+#if defined(GNDRV_LLB_CHANGE)
+     KPOC_LOGI("[ChargingAnimation: %s %d],in  bootlogo_show_charging modify by llb",__FUNCTION__,__LINE__);	
+#endif
+
+
+......
+
+//GioneeDrv LiLuBao 20161009 modify for platform change end
+
+
+
 
 #define BMLOG_DEBUG_LEVEL   7
 
@@ -411,14 +427,23 @@ typedef signed int(*CHARGING_CONTROL) (CHARGING_CTRL_CMD cmd, void *data);
 
 CHARGING_CONTROL battery_charging_control;
 
-定义轮训接口
+/*定义轮训接口*/
 static void get_charging_control(void)
 {
 	battery_charging_control = chr_control_interface;
 }
 
-对具体的函数调用指针轮训，调用。这样操作是为了方便移植，可以针对不同的芯片定义不同的
-chargnig_func函数指针数组
+
+/*定义这样一个函数指针，负责调用不同的函数处理不同的命令和数据*/
+typedef  s32(*BATTERY_METER_CONTROL)  (int cmd, void *data);
+BATTERY_METER_CONTROL  battery_meter_ctrl = NULL;
+
+/*将bm_ctrl_cmd接口给那个函数指针，调用不同的函数接口*/
+battery_meter_ctrl = bm_ctrl_cmd;
+
+
+/*对具体的函数调用指针轮训，调用。这样操作是为了方便移植，可以针对不同的芯片定义不同的
+chargnig_func函数指针数组*/
 kal_int32 chr_control_interface(CHARGING_CTRL_CMD cmd, void *data)
 {
 	kal_int32 status;
@@ -457,7 +482,7 @@ static kal_uint32(*const charging_func[CHARGING_CMD_NUMBER]) (void *data) = {
 		
 		battery_meter_ctrl = bm_ctrl_cmd;
  
-6.代码相关的文件（注意不同的项目不一样）
+6./*代码相关的文件（注意不同的项目不一样）
 	芯片相关的代码：/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/kernel-3.18/drivers/misc/mediatek/power/mt6755
 	充电相关的代码：/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/kernel-3.18/drivers/power/mediatek
 			修改的gionee目录下：/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/gionee/code/driver/project_common/BBL7337_DRV_COMMON/	kernel-3.18/drivers/power/mediatek
@@ -476,18 +501,19 @@ static kal_uint32(*const charging_func[CHARGING_CMD_NUMBER]) (void *data) = {
 	/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/gionee/config
 
 	/.local/share/Trash/files 垃圾箱目录？
+*/
 
 
 
 
-
-8.这个宏的定义是什么意思 
-#if defined(CONFIG_POWER_EXT) 条件编译 定义了这个宏就为真
+8./*这个宏的定义是什么意思 
 相比以前的#if CONFIG_POWER_EXIT 用法要灵活
-当然条件编译的用法要学
+当然条件编译的用法要学*/
+#if defined(CONFIG_POWER_EXT)  /*条件编译 定义了这个宏就为真*/
 
 
-9.定时器
+
+9./*定时器*/
 	if (time_after(last_timer, timeout)) {
 		if (!timer_pending(&musb_idle_timer))
 			last_timer = timeout;
@@ -499,9 +525,9 @@ static kal_uint32(*const charging_func[CHARGING_CMD_NUMBER]) (void *data) = {
 	last_timer = timeout;
 
 
-10.察看中断号 cat  /proc/interrupts
+10./*察看中断号 cat  /proc/interrupts
 
-G1605A的中断
+G1605A的中断*/
            CPU0       CPU1       
  29:          0          0       GIC  29  arch_timer
  30:     250493      63863       GIC  30  arch_timer
@@ -590,9 +616,9 @@ IPI5:         0          0       IRQ work interrupts
 
 
 
-11.usb_otg设备的处理过程和GPIO的配置
+11./*usb_otg设备的处理过程和GPIO的配置*/
 
-	1.设备树相关的配置(基本的设备树的配置)
+	/*1.设备树相关的配置(基本的设备树的配置)*/
 
 	usb0:usb20@11200000 {				//USB20的基地址为11200000
 		compatible = "mediatek,mt6735-usb20";	//通过设备树匹配的名称mt6735-usb20
@@ -662,7 +688,7 @@ IPI5:         0          0       IRQ work interrupts
 		status = "okay";
 	};
 
-12.枚举的用法enum
+12./*枚举的用法enum*/
 
 
 
@@ -670,7 +696,7 @@ IPI5:         0          0       IRQ work interrupts
 
 
 
-13.充电相关的几个代码
+13./*充电相关的几个代码*/
 	
 	1.upmu_is_chr_det()
 	字面意思是电源管理系统对充电的检测，至于这个宏CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT应该是是否支持电池给手机充电或者电池给外设充电
@@ -683,11 +709,11 @@ IPI5:         0          0       IRQ work interrupts
 		STANDARD_HOST,		/* USB : 450mA */
 		CHARGING_HOST,		/* 往外供电 */
 		NONSTANDARD_CHARGER,	/* AC : 450mA~1A */
-		STANDARD_CHARGER,	/* AC : ~1A */
+		STANDARD_CHARGER,	/* AC 充电器的电流大: ~1A */
 	} CHARGER_TYPE;
 	
 
-	pmic中断的设置，（可能是触发了某个中断，转换成这个中断对应的状态，什么样的配置）	
+	/*pmic中断的设置，（可能是触发了某个中断，转换成这个中断对应的状态，什么样的配置）	*/
 	/*****************************************************************************
 	 * interrupt Setting
 	 ******************************************************************************/
@@ -774,11 +800,11 @@ IPI5:         0          0       IRQ work interrupts
 				MT6328_INT_CON2_CLR, interrupt_status2),
 	};
 
-这整个过程可能是中断触发，执行回调函数，回调函数里面对中断的类型进行遍历，跟哪个状态对比，符合的就产生对应的配置
-什么样的状态
+/*这整个过程可能是中断触发，执行回调函数，回调函数里面对中断的类型进行遍历，跟哪个状态对比，符合的就产生对应的配置
+什么样的状态*/
 
 
-14.创建设备节点，上层向设备节点写值，是否打开开关，底层读写寄存器		
+14./*创建设备节点，上层向设备节点写值，是否打开开关，底层读写寄存器		*/
 
 	//Gionee GuoJianqiu 201601026 modify for OTG SWITCH begin
 	#if defined(GN_BATTERY_OTGCHARGE_SWITCH_SUPPORT)
@@ -821,11 +847,11 @@ IPI5:         0          0       IRQ work interrupts
 	#endif
 	//Gionee GuoJianqiu 201601026 modify for OTG SWITCH end
 
-15.电池电量的计算，及一些参数的变化
+15./*电池电量的计算，及一些参数的变化
 
-上面当电量充到100%后，如果使用GM2.0算法，就会重置电池的一些参数
+上面当电量充到100%后，如果使用GM2.0算法，就会重置电池的一些参数*/
 
-a.更新电池老化系数
+/*a.更新电池老化系数*/
 void fg_qmax_update_for_aging(void)
 {
 #if defined(CONFIG_POWER_EXT)
@@ -875,43 +901,110 @@ void fg_qmax_update_for_aging(void)
 #endif
 }
 
+16./*对不同数据的取平均运算*/
 
+static unsigned int mt_battery_average_method(BATTERY_AVG_ENUM type, unsigned int *bufferdata,
+					      unsigned int data, signed int *sum,
+					      unsigned char batteryIndex)
+{
+	unsigned int avgdata;
 
+	mt_battery_average_method_init(type, bufferdata, data, sum);
 
+	*sum -= bufferdata[batteryIndex];
+	*sum += data;
+	bufferdata[batteryIndex] = data;
+	avgdata = (*sum) / BATTERY_AVERAGE_SIZE;
 
-
-
-healthd进程负责监听底层上报的事件
-主循环
-static void healthd_mainloop(void) {
-    while (1) {
-        struct epoll_event events[eventct];
-        int nevents;
-        int timeout = awake_poll_interval;
-        int mode_timeout;
-
-        mode_timeout = healthd_mode_ops->preparetowait();
-        if (timeout < 0 || (mode_timeout > 0 && mode_timeout < timeout))
-            timeout = mode_timeout;
-        nevents = epoll_wait(epollfd, events, eventct, timeout);
-
-        if (nevents == -1) {
-            if (errno == EINTR)
-                continue;
-            KLOG_ERROR(LOG_TAG, "healthd_mainloop: epoll_wait failed\n");
-            break;
-        }
-
-        for (int n = 0; n < nevents; ++n) {
-            if (events[n].data.ptr)
-                (*(void (*)(int))events[n].data.ptr)(events[n].events);//这个语句想干啥？
-        }
-
-        if (!nevents)
-            periodic_chores();
-
-        healthd_mode_ops->heartbeat();
-    }
-
-    return;
+	battery_log(BAT_LOG_FULL, "bufferdata[%d]= (%d)\n", batteryIndex, bufferdata[batteryIndex]);
+	return avgdata;
 }
+
+static void mt_battery_average_method_init(BATTERY_AVG_ENUM type, unsigned int *bufferdata,
+					   unsigned int data, signed int *sum)
+{
+	unsigned int i;
+	static kal_bool batteryBufferFirst = KAL_TRUE;
+	static kal_bool previous_charger_exist = KAL_FALSE;
+	static kal_bool previous_in_recharge_state = KAL_FALSE;
+	static unsigned char index;
+
+	/* reset charging current window while plug in/out { */
+	if (type == BATTERY_AVG_CURRENT) {
+		if (BMT_status.charger_exist == KAL_TRUE) {
+			if (previous_charger_exist == KAL_FALSE) {
+				batteryBufferFirst = KAL_TRUE;
+				previous_charger_exist = KAL_TRUE;
+				if ((BMT_status.charger_type == STANDARD_CHARGER)
+#if defined(CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT)
+				    && (DISO_data.diso_state.cur_vdc_state == DISO_ONLINE)
+#endif
+				    )
+					data = batt_cust_data.ac_charger_current / 100;
+				else if (BMT_status.charger_type == CHARGING_HOST)
+					data = batt_cust_data.charging_host_charger_current / 100;
+				else if (BMT_status.charger_type == NONSTANDARD_CHARGER)
+					data = batt_cust_data.non_std_ac_charger_current / 100;	/* mA */
+				else	/* USB */
+					data = batt_cust_data.usb_charger_current / 100;	/* mA */
+			} else if ((previous_in_recharge_state == KAL_FALSE)
+				   && (BMT_status.bat_in_recharging_state == KAL_TRUE)) {
+				batteryBufferFirst = KAL_TRUE;
+
+				if ((BMT_status.charger_type == STANDARD_CHARGER)
+#if defined(CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT)
+				    && (DISO_data.diso_state.cur_vdc_state == DISO_ONLINE)
+#endif
+				    )
+					data = batt_cust_data.ac_charger_current / 100;
+				else if (BMT_status.charger_type == CHARGING_HOST)
+					data = batt_cust_data.charging_host_charger_current / 100;
+				else if (BMT_status.charger_type == NONSTANDARD_CHARGER)
+					data = batt_cust_data.non_std_ac_charger_current / 100;	/* mA */
+				else	/* USB */
+					data = batt_cust_data.usb_charger_current / 100;	/* mA */
+			}
+
+			previous_in_recharge_state = BMT_status.bat_in_recharging_state;
+		} else {
+			if (previous_charger_exist == KAL_TRUE) {
+				batteryBufferFirst = KAL_TRUE;
+				previous_charger_exist = KAL_FALSE;
+				data = 0;
+			}
+		}
+	}
+	/* reset charging current window while plug in/out } */
+
+	battery_log(BAT_LOG_FULL, "batteryBufferFirst =%d, data= (%d)\n", batteryBufferFirst, data);
+
+	if (batteryBufferFirst == KAL_TRUE) {
+		for (i = 0; i < BATTERY_AVERAGE_SIZE; i++)
+			bufferdata[i] = data;
+
+
+		*sum = data * BATTERY_AVERAGE_SIZE;
+	}
+
+	index++;
+	if (index >= BATTERY_AVERAGE_DATA_NUMBER) {
+		index = BATTERY_AVERAGE_DATA_NUMBER;
+		batteryBufferFirst = KAL_FALSE;
+	}
+}
+
+17./*遍历双向链表，用法具有通用性，高级进阶，数据结构和算法*/
+#define list_for_each_entry(pos, head, member)				\
+	for (pos = list_entry((head)->next, typeof(*pos), member);	\
+	     &pos->member != (head); 	\
+	     pos = list_entry(pos->member.next, typeof(*pos), member))
+
+
+#define list_entry(ptr, type, member) \
+	container_of(ptr, type, member)
+
+
+#ifndef container_of
+#define container_of(ptr, type, member) ({			\
+	const typeof(((type *)0)->member) * __mptr = (ptr);	\
+	(type *)((char *)__mptr - offsetof(type, member)); })
