@@ -259,6 +259,8 @@
 
 
 		功耗，降电流问题
+		飞行模式下的电流是否异常；应用是否经常唤醒，唤醒源；隔离大的驱动模块，看各各部分耗电是否异常；gpio的配置问题，不工作时的suspend模式，
+		gpio引脚是否被上拉导致一直在耗电，probe函数。suspend,resume
 
 	}
 
@@ -539,7 +541,7 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 }
 
 
-	USB充电阶段
+--->USB充电阶段
     do_chrdet_int_task（）充电器插入触发的中断，检测--->upmu_is_chr_det（）充电器端检测，充电器是否正常--->wakeup_fg_algo（） FG_CHARGING ,FG_RESUME
 	
 	唤醒电量计算，重置参数--->mt_battery_charger_detect_check()对充电器的检测--->mt_battery_type_detection()充电器类型的检测--->charging_get_charger_type
@@ -564,17 +566,13 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 	USB充电阶段比座充阶段，应该多了USB枚举，识别的接口不一样，充电电流不一样
 
-
-
-
-
-
 	座充充电阶段：
 
 
 
 
 
+--->battery_driver，battery_meter_driver 几个重要的驱动启动，工作过程
 
 
 
@@ -700,6 +698,8 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 	一些概念：	
 	{
 		INOV：The POR Intelligent Negotiation for Optimum Voltage 最优电压记录智能协商方案
+		Quick Charge 4采用高通技术公司独有的第三版最佳电压智慧协商(INOV)电源管理演算法。INOV现已包括首创的即时散热管理技术，
+		将能够在既定的散热条件下，自主选择最佳的电力传输能力，从而优化充电效能。
 
 		POR：the Plan of Record 记录计划   记忆学习
 
@@ -769,7 +769,7 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
-fuelgauge service
+
 
 
 

@@ -423,23 +423,44 @@ signed int bm_ctrl_cmd(BATTERY_METER_CTRL_CMD cmd, void *data)
  *battery_charging_control 函数指针的用法，一定要学会get！
  */
  
+//定义一个函数指针，参数类型和返回值类型
 typedef signed int(*CHARGING_CONTROL) (CHARGING_CTRL_CMD cmd, void *data);
 
+//定义函数指针变量
 CHARGING_CONTROL battery_charging_control;
+
+//枚举要使用的命令
+enum CHARGING_CTRL_CMD {
+	CHARGING_CMD_INIT,
+	CHARGING_CMD_DUMP_REGISTER,
+	CHARGING_CMD_ENABLE,
+	CHARGING_CMD_SET_CV_VOLTAGE,
+	CHARGING_CMD_GET_CURRENT,
+	CHARGING_CMD_SET_CURRENT,
+	CHARGING_CMD_GET_INPUT_CURRENT,
+	CHARGING_CMD_SET_INPUT_CURRENT,
+	CHARGING_CMD_GET_CHARGING_STATUS,
+	CHARGING_CMD_RESET_WATCH_DOG_TIMER,
+	CHARGING_CMD_SET_HV_THRESHOLD,
+	CHARGING_CMD_GET_HV_STATUS,
+	CHARGING_CMD_GET_BATTERY_STATUS,
+	CHARGING_CMD_GET_CHARGER_DET_STATUS,
+	CHARGING_CMD_GET_CHARGER_TYPE,
+	CHARGING_CMD_GET_IS_PCM_TIMER_TRIGGER,
+	CHARGING_CMD_SET_PLATFORM_RESET,
+	CHARGING_CMD_GET_PLATFORM_BOOT_MODE,
+	CHARGING_CMD_ENABLE_POWERPATH,
+	CHARGING_CMD_BOOST_ENABLE,
+	CHARGING_CMD_SET_TA_CURRENT_PATTERN,
+	CHARGING_CMD_NUMBER
+};
+
 
 /*定义轮训接口*/
 static void get_charging_control(void)
 {
 	battery_charging_control = chr_control_interface;
 }
-
-
-/*定义这样一个函数指针，负责调用不同的函数处理不同的命令和数据*/
-typedef  s32(*BATTERY_METER_CONTROL)  (int cmd, void *data);
-BATTERY_METER_CONTROL  battery_meter_ctrl = NULL;
-
-/*将bm_ctrl_cmd接口给那个函数指针，调用不同的函数接口*/
-battery_meter_ctrl = bm_ctrl_cmd;
 
 
 /*对具体的函数调用指针轮训，调用。这样操作是为了方便移植，可以针对不同的芯片定义不同的
@@ -480,7 +501,14 @@ static kal_uint32(*const charging_func[CHARGING_CMD_NUMBER]) (void *data) = {
 		//GioneeDrv GuoJianqiu 20151223 modify for platform change end
 		
 		
+
+		/*定义这样一个函数指针，负责调用不同的函数处理不同的命令和数据*/
+		typedef  s32(*BATTERY_METER_CONTROL)  (int cmd, void *data);
+		BATTERY_METER_CONTROL  battery_meter_ctrl = NULL;
+
+		/*将bm_ctrl_cmd接口给那个函数指针，调用不同的函数接口*/
 		battery_meter_ctrl = bm_ctrl_cmd;
+
  
 6./*代码相关的文件（注意不同的项目不一样）
 	芯片相关的代码：/home/llb/project/PRO/source/BBL7337A/L27_6750_66_BBL7337A_L1.MP10.V1_160427_ALPS/android_mtk_6750_mp/kernel-3.18/drivers/misc/mediatek/power/mt6755

@@ -45,6 +45,11 @@ CMCC ，CTA他们送的是T54版本的软件
 	上层要给底层传达命令，但是fuelgauge没有初始化，就使用默认的电池参数，电量为-1，导致写号错误。
 
 	手机写号？
+
+	+#Gionee GuoJianqiu 20151022 modify for CR01570292 begin
+	+service fuelgauged /system/bin/fuelgauged
+	+    class main
+	+#Gionee GuoJianqiu 20151022 modify for CR01570292 end
 }
 
 

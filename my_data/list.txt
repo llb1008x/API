@@ -55,7 +55,12 @@ MT6589充电模块浅析
 http://blog.csdn.net/wn360459196/article/details/11031073
 
 
+如何让电源为电池充电提供最大功率
+http://www.21ic.com/app/power/201409/601764.htm
 
+
+Linux的电源管理架构 
+http://blog.csdn.net/u012719256/article/details/52692395
 
 
 
