@@ -262,6 +262,11 @@
 		飞行模式下的电流是否异常；应用是否经常唤醒，唤醒源；隔离大的驱动模块，看各各部分耗电是否异常；gpio的配置问题，不工作时的suspend模式，
 		gpio引脚是否被上拉导致一直在耗电，probe函数。suspend,resume
 
+		android drone： android 无人机
+		access point：桥接器，访问节点
+
+		
+
 	}
 
 
