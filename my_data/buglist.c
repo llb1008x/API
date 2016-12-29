@@ -882,6 +882,11 @@ GNSPR #56384
 
 
 
+
+
+
+
+
 charging充电相关的
 /*{
 
@@ -891,7 +896,7 @@ charging充电相关的
 	1.fg_coulom库仑计的检测，变化，这里底层对于库仑计的数据的读取，数据的转换等相关内容？
 	2.电量显示异常问题？电量显示的准确性
 
-	关机检测 shutdown_gauge,电压过高就关机
+	电量0%，1%的上报，低电保护lowpower_protect_init（）
 
 
 
@@ -919,13 +924,7 @@ GNSPR#54689
 	<3>[37450.398205]  (2)[205:bat_routine_thr][kernel]AvgVbat 3434,bat_vol 3360, AvgI 0, I 0, VChr 0, AvgT 43, T 44, ZCV 3362, CHR_Type 0, SOC  10: 10:  9
 
 
-GNSPR#53131 
-
-
-
-
-
-
+ 
 
 GNSPR#57824
 	现象：手机低电量自动关机待机一晚上连接充电器》充电到7%以后长按power键开机》闪现开机画面后手机不开机》
@@ -977,7 +976,6 @@ GNSPR#57824
 		signed int gFG_sw_soc = 0;
 */
 
-	eservice：
 
 
 GNSPR#59577
@@ -1002,15 +1000,11 @@ GNSPR#59577
 
 57814	 GNSPR	【品质】手机关机后切换卡1与卡2后按电源键开机》弹出开机画面后黑屏开机无作用【开机后恢复，附视频】随机1次	 分配	 高	Y_尤 梦婷	 2：严重的	Y_尤 梦婷	G1605A	 2016-11-27
   
-
-
 58432	 GNSPR	【品质压力】连充电器关机状态，长按电源键3s有振动，闪一下开机画面又自动关机，第4次操作恢复【4次】A16	 分配	 高	L_刘 子灵	 2：严重的	L_刘 子灵	G1605A	 2016-11-29
 
 56218	 GNSPR	【品质压力】连接充电器-手动关机》按电源键开机有振动闪开机画面但未开机,连续操作3次恢复》再次操作无异常 3/50 B23	 监控	 高	W_王 国君	 2：严重的	W_吴 能田	G1605A	 2016-11-11
 
-
 59244	 GNSPR	【品质】手机连接充电器关机状态按power键》手机震动后闪一下开机画面》就自动黑屏不开机【多次开机恢复，附视频】随机2次	 裁决	 高	W_王 国君	 2：严重的	Y_尤 梦婷	G1605A	 2016-12-03
-
 
 57833	 GNSPR	【品质】耗电至自动关机，连接标配充电器充电至13%后，长按Power键5-6秒无法开机，只闪过开机画面后继续充电，再次长按Power键17秒左右才开机成功【单机1次】附log与视频 11.27 8:22 王博文	 裁决	 高	L_李 路宝	 3：中等的	B_白 海燕	G1605A	 2016-11-27
 
@@ -1077,9 +1071,8 @@ eservice：
 		3.if(shutdown_gauge1_xmins==1&&ui_soc2==1)
 		判断duration time*60是否超时
 
-
 		0% 是在batteryservicey跑的关机流程，不是kernel判断shutdown_cond了
-
+		（0%电量要上报到上层上层判断0%才能跑关机流程，然后传输命令，执行关机）
 		/frameworks/base/services/core/java/com/android/server/BatteryService.java
 
 		参考processValuesLocked
@@ -1089,8 +1082,92 @@ eservice：
 
 		/* mt_battery_shutdown_check(); move to user space */
 
+		这正式是我们要解决的问题啊，//#define SHUTDOWN_GAUGE0 注掉此红开关，应该要等电压的啊?
+		如果batteryservice是会关机，GM2.0就不能让uisoc2为0啊? 这到底是哪里的问题呢?
 
-	}
+        Dear sir
+		但是我不是很理解，这是fuel gauge积分到了0，本来就有到0的情况发生啊
+
+		UI_SOC为0，直接赋值UI_SOC2为0了呀？
+
+		这是正常的，关机条件batteryservice都可以改
+
+		您现在预期要什么效果呢？？
+
+		battery_update
+		//充电器不在位，且未满足关机条件：
+			}
+			else
+			{        /* Only Battery */		但是这个判断代码里没有
+				if(shutdown_cond > 0) {
+					FGLOG_DEBUG("[FGADC_SHUT] %s\n",
+						(shutdown_cond == 1)? "0%SOC shutdown":((shutdown_cond==2)?"30min shutdown":"voltage low shutdown"));
+					uisoc_0Percent_tracking();
+				} else {
+
+
+		void uisoc_0Percent_tracking(void)
+		{
+			static int timer_counter = 10;
+			int percent=0;
+
+			if (ui_soc <= 0) {
+				ui_soc = 0;
+			} else {
+				percent=battery_duration_time/timer_counter;
+
+				ui_soc=ui_soc-percent;
+
+				if(ui_soc<=0)
+					ui_soc=0;
+			}
+
+
+		void uisoc_update_uisoc2(void)
+		{
+			int pseudoUI;
+			static int pre_pseudoUI;
+			static int smooth_uisoc2_cnt = 0;
+		FGLOG_NOTICE("[uisoc_update_uisoc2]pseudoUI=%d,pre_pseudoUI=%d,ui_soc=%d,batterypseudo1=%d\n",pseudoUI,pre_pseudoUI,ui_soc,batterypseudo1);
+			pseudoUI=(((ui_soc-batterypseudo1))*100+(batterypseudo100-batterypseudo1)/2)/(batterypseudo100-batterypseudo1);
+		FGLOG_NOTICE("[uisoc_update_uisoc2]ui_soc2=%d,ui_soc=%d,pseudoUI=%d\n",ui_soc2,ui_soc,pseudoUI);
+			if(ui_soc2==-100) {
+				if(pseudoUI<=0) {
+					if(is_kpoc())
+						ui_soc2=0;
+					else
+						ui_soc2=1;
+				} else if(pseudoUI>=100) {
+					ui_soc2=100;
+				} else {
+					ui_soc2=pseudoUI;
+				}
+			} else {
+				if(ui_soc==0) {
+					ui_soc2=0;
+
+
+			}
+
+			Any update?
+			您可以在kernel自己改一下
+			UI_SOC2为0的话改回1
+
+			在
+			bmd_crtl_cmd_from_user
+
+			case FG_DAEMON_CMD_SET_UI_SOC2:
+			{
+
+			BMT_status.UI_SOC2=UI_SOC;
+			之后加上判断
+			若为0
+			改为1即可
+
+			这样就会限制在kernel只有shutdown cond！0的时候才会关机了
+
+			thanks
+
 
 
 
@@ -1171,6 +1248,7 @@ GNSPR #52885	 OTG：使用G1605给S8反向充电，频繁充电过程出现中�
 OTG失败，USB也不显示，USB五个引脚的作用？
 
 
+GNSPR#53131
 			现象：关机状态连充电器，长按电源键3s开机，10s后才有振动提示和开机画面 对比S9无【6台必现】A9
 
 	这个问题跟平台有一定的关系
