@@ -162,7 +162,7 @@
 
 	git 回滚操作，回撤
 	
-
+	git commit --amend
 
 3.android编译的命令：
 
