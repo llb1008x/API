@@ -63,6 +63,8 @@ Linux的电源管理架构
 http://blog.csdn.net/u012719256/article/details/52692395
 
 
+Linux电源管理相关的一些列文章（涉及面很广）
+http://www.wowotech.net/sort/pm_subsystem
 
 
 
@@ -119,12 +121,9 @@ linux下安装google protobuf（详细）
 http://blog.csdn.net/xiexievv/article/details/47396725
 
 
-Google Protobuf开发指南
-https://my.oschina.net/macwe/blog/157862
+Google Protobuf的安装、配置、以及简单demo编译
+http://blog.csdn.net/allenlinrui/article/details/10098809
 
-
-Linux电源管理相关的一些列文章（涉及面很广）
-http://www.wowotech.net/sort/pm_subsystem
 
 
 
