@@ -5,10 +5,10 @@
 
 
 
-/*1.USB&&OTG*/
+->/*1.USB&&OTG*/
 {
     
---->OTG功能的检测过程:
+-->OTG功能的检测过程:
 
     该设备支持OTG，下面说下设备的发现过程：
 
@@ -39,7 +39,7 @@
 
 
 
---->usb设备驱动相关
+-->usb设备驱动相关
 
 1.基本概念：
 	1.endpoint：端点描述符？
@@ -569,20 +569,8 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 	
 
-	USB充电阶段比座充阶段，应该多了USB枚举，识别的接口不一样，充电电流不一样
-
 	座充充电阶段：
-
-
-
-
-
---->battery_driver，battery_meter_driver 几个重要的驱动启动，工作过程
-
-
-
-
-
+	USB充电阶段比座充阶段，应该多了USB枚举，识别的接口不一样，充电电流不一样
 
 
 
@@ -616,6 +604,11 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
+
+--->battery_driver，battery_meter_driver 几个重要的驱动启动，工作过程
+
+
+
    
 
 	2.power_supply子系统
@@ -639,9 +632,123 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
+}
 
 
+
+->/*电源管理的整个框架(涉及的面很广)*/
+{
+-->基本概念
+{
+	hibernate：冬眠	hibernation image
+
+}
+
+
+
+-->linux时钟系统（这个不是不想看，有点困难）
+
+
+
+
+
+
+
+
+-->linux 下的suspend模式，降低功耗：
+
+     在Linux中,休眠主要分三个主要的步骤:
+
+     1、冻结用户态进程和内核态任务
+
+     2、调用注册的设备的suspend的回调函数
+
+     3、顺序是按照注册顺序
+
+
+	 freeze task，suspend_to_idle
+
+	 进程冻结技术：冻结的对象是内核中可以被调度执行的实体，包括用户进程、内核线程和work_queue。
+	 标记系统freeze状态的有三个重要的全局变量：pm_freezing、system_freezing_cnt和pm_nosig_freezing，如果全为0，
+	 表示系统未进入冻结；system_freezing_cnt>0表示系统进入冻结，pm_freezing=true表示冻结用户进程，pm_nosig_freezing=true
+	 表示冻结内核线程和workqueue。它们会在freeze_processes和freeze_kernel_threads中置位，在thaw_processes和
+	 thaw_kernel_threads中清零。
+
+	 判断标志位，信号处理
+
+	 调用__refrigerator进入冻结
+	 /* Refrigerator is place where frozen processes are stored :-). */
+	bool __refrigerator(bool check_kthr_stop)
+	{
+		/* Hmm, should we be allowed to suspend when there are realtime
+		processes around? */
+		bool was_frozen = false;
+		long save = current->state;
+
+		pr_debug("%s entered refrigerator\n", current->comm);
+
+		//死循环相当于while（1）
+		for (;;) {
+			set_current_state(TASK_UNINTERRUPTIBLE);
+
+			spin_lock_irq(&freezer_lock);
+			current->flags |= PF_FROZEN;
+			if (!freezing(current) ||
+				(check_kthr_stop && kthread_should_stop()))
+				current->flags &= ~PF_FROZEN;
+			spin_unlock_irq(&freezer_lock);
+
+			if (!(current->flags & PF_FROZEN))
+				break;
+			was_frozen = true;
+			schedule();
+		}
+
+		pr_debug("%s left refrigerator\n", current->comm);
+
+		/*
+		* Restore saved task state before returning.  The mb'd version
+		* needs to be used; otherwise, it might silently break
+		* synchronization which depends on ordered task state change.
+		*/
+		set_current_state(save);
+
+		return was_frozen;
+	}
+
+Q：
+	 1.android处于suspend或者休眠状态时有哪些还是处在active的？
+	 	modem会定期唤醒，还有些暂时不清楚，CPU不读取指令
+
+	 2.没有使用冻结技术的哪些线程，进程要怎样处理
+	   系统休眠的时候基本上是要冻结的，没有冻结的系统就没有睡下去，异常唤醒。
+
+
+-->cpu频率的动态调节，cpufreq,big+little
+
+	高性能的CPU，频率高，性能高，功耗也高，big
+	低性能的CPU，频率低，性能低，功耗低，little
+
+	有时候CPU分大核，小核的，性能不都一样，但是kernel 的schedule调度的时候是分辨不了的，视所有的CPU都一样，
+	正常工作情况下，CPU都有自己的cpufreq table，根据相应的需求使用不同的freq，但是对SMP需要littel+big的组合，
+	虚拟CPU core
+	{
+	当bL switching处于enable状态时，该driver变成一个特殊的cpufreq driver，在调整频率的时候，可以根据情况，切换core的cluster。
+
+
+    此时只有4个虚拟的core对系统可见（由arm bL switcher driver控制，3.2节会介绍），系统不关心这些core属于哪个cluster、是big core还是Little core；
+
+    确切的说，每一个虚拟的core，代表了属于两个cluster的CPU对，可以想象为big+Little组合，只是同一时刻，只有一个core处于enable状态（big or Little）；
+
+    该driver会搜集2个cluster的frequency table，并合并成一个（保存在freq_table[2]中）。合并后，找出这些frequency中big core最小的那个（clk_big_min）
+	以及Little core最大的那个（clk_little_max）；
+
+    基于cpufreq framework进行频率调整时，如果所要求的频率小于clk_big_min，则将该虚拟core所对应的Little core使能，如果所要求得频率大于clk_little_max，
+	则将该虚拟core所对应的big core使能。	
+
+	}
 	
+
 
 
 }
@@ -663,12 +770,11 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
-
--->/*MTK，QC两个平台快充的对比*/
+->/*MTK，QC两个平台快充的对比*/
 {
 
 	
---->MTK平台快充方案MTK  pump express：
+-->MTK平台快充方案MTK  pump express：
 	
 	软件控制流程：
 	充电器检测-->根据BC1.2协议进行充电端口检测,是否是标准的交流充电器-->电量是否大于95%-->升高充电电压电流发送一定的指令”current pattern“-->
@@ -696,9 +802,8 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
---->高通平台快充方案QC3.0：
 
-
+-->高通平台快充方案QC3.0：
 
 	一些概念：	
 	{
@@ -727,8 +832,6 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 	QC3.0充电算法
 
 	通过一系列的系统信号（还是前面的通信协议），决定给手机设备提供最合适的充电电压，同步充电配置
-
-
 
 
 
@@ -765,20 +868,6 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 }
 
-在不同的电池参数文件中，都有相对应的表，
-pc-temp-ocv-lut，为温度、SOC对应得电压表，PMU8916获取的电压值，通过查该表，在温度和电压下，可得到当前的SOC。
-rbatt-sf-lut，为温度、soc对应的电池内阻表，这里主要考虑内阻的影响，对OCV的修正，new_ocv=ocv+rbatt(内阻)*current（当前电流）。
-fcc-temp-lut，为温度对应的fcc表，ibat-acc-luit，为温度、电流对应的acc表，这两个是起到修正SOC的作用，相关计算为：
-soc_uuc = ((fcc - acc) * 100) / fcc，fcc、acc均为查表所得，
-soc_acc = DIV_ROUND_CLOSEST(100 * (soc_ocv - soc_uuc),(100 - soc_uuc)); //最终soc_acc，为上报的SOC.
-
-
-
-PMU8916的bms算法和PMU8612的有区别，其中对last_ocv_uv的估值计算的源码已经不开放，在monitor_soc_work的工作线程，
-会上报事件uevent，当HAL层，收到消息，然后调用getprop的方法，获取相关的参数，如，电阻、电流、fcc、acc等，来估算出
-last_ocv_uv，然后调用setprop，把该值设下去，并启动工作线程，根据last_ocv_uv，查表得到soc，并经过修正SOC，并再次上
-报事件，循环下去。这个估值算法，我猜可能是一套学习算法，具体的没有源码，不清楚，只知道它把算法变为.bin文件，用了
-binder机制，作为服务一直运行。
 
 
 
@@ -796,11 +885,14 @@ binder机制，作为服务一直运行。
 
 
 
-/*对硬件的操作*/
+
+
+
+->/*对硬件的操作*/
 {
 	底层对硬件操作最好能和芯片手册对应这看
 
---->1.hw_charger_type_detection底层检测充电器类型
+-->1.hw_charger_type_detection底层检测充电器类型
 	这些bc11就是指BC1.1协议
 	检测充电器类型根据BC1.1协议来的，给D+一个电压，检测D-上的电压，如果是低电平非标准充电；如果电压相同，标准充电；
 	有一定的分压，专用的或其他类型的充电器。
@@ -858,7 +950,7 @@ binder机制，作为服务一直运行。
 	}
 
 
---->检测充电器
+-->检测充电器
 	void do_chrdet_int_task(void)
 	{
 		if (g_bat_init_flag == KAL_TRUE) {
@@ -968,7 +1060,7 @@ binder机制，作为服务一直运行。
 
 
 
---->  healthd进程负责监听底层上报的事件，uevent，periodic_chores负责将相应的事件上报给batterymonitor
+	-->healthd进程负责监听底层上报的事件，uevent，periodic_chores负责将相应的事件上报给batterymonitor
 		主循环
 		static void healthd_mainloop(void) {
 			while (1) {
@@ -1006,7 +1098,7 @@ binder机制，作为服务一直运行。
 
 
 
-	--->MTK不同充电算法的切换：
+	-->MTK不同充电算法的切换：
 		void mt_battery_charging_algorithm(void)
 		{
 			battery_charging_control(CHARGING_CMD_RESET_WATCH_DOG_TIMER, NULL);
@@ -1045,7 +1137,7 @@ binder机制，作为服务一直运行。
 
 
 
-	--->快充充电算法：
+	-->快充充电算法：
 		代码定义的相关的宏：CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT
 
 			{

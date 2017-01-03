@@ -77,6 +77,7 @@ http://www.cnbeta.com/articles/387057.htm
 
 
 
+
 USB：
 
 USB OTG插入检测识别
@@ -91,6 +92,8 @@ BC1.1标准
 http://blog.csdn.net/zhaoguowei2010/article/details/8970319
 
 
+USB协 USB协通讯议--深入理解 通讯议--深入理解 
+http://blog.csdn.net/myarrow/article/details/8484113
 
 
 
