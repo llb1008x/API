@@ -139,14 +139,13 @@ Google Protobuf开发指南
 https://my.oschina.net/macwe/blog/157862
 
 
-
-
-
 高通平台开发一系列文章
 http://blog.csdn.net/LoongEmbedded/article/category/5611401/1
 
 
-
+linux公社资料分享
+http://linux.linuxidc.com/
+用户名与密码都是www.linuxidc.com
 
 
 
