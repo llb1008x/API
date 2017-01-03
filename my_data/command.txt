@@ -213,6 +213,12 @@
 	 grep  -i  CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT  gionee  -R
 
 
+	nohup command    >/dev/null 2>&1
+	
+	>/dev/null 2>&1  标准输出和错误输出重定向到空的设备描述符中 （垃圾箱）
+	nohup  command 启动一些程序
+	
+
 
 
 

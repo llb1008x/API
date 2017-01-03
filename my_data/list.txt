@@ -63,9 +63,16 @@ Linux的电源管理架构
 http://blog.csdn.net/u012719256/article/details/52692395
 
 
+高通8X16电池BMS算法（一） 
+http://blog.csdn.net/yanleizhouqing/article/details/51592243
+
+
 Linux电源管理相关的一些列文章（涉及面很广）
 http://www.wowotech.net/sort/pm_subsystem
 
+
+看完变高手 高通Quick Charge 2.0从入门到精通
+http://www.cnbeta.com/articles/387057.htm
 
 
 
@@ -125,6 +132,8 @@ Google Protobuf的安装、配置、以及简单demo编译
 http://blog.csdn.net/allenlinrui/article/details/10098809
 
 
+Google Protobuf开发指南
+https://my.oschina.net/macwe/blog/157862
 
 
 
@@ -143,7 +152,7 @@ http://blog.csdn.net/LoongEmbedded/article/category/5611401/1
 
 搭建开发环境 qualcomm410 2016.12.17
 
-1.安装java开环境
+1.安装java开环境，编译android
   openjdk-7-jdk安装，
 
   首先安装过程中要用到ppa，相当于个人的软件库。
@@ -194,4 +203,12 @@ The correct version is: Java SE 1.6.
 Please follow the machine setup instructions at
     http://source.android.com/source/download.html
     ************************************************************
+
+这个要在设置java环境变量的地方加上unset 。。。
+这是因为deepin 操作系统的原因
+
+
+
+2.编译google  protobuf
+
 

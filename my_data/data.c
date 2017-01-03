@@ -265,7 +265,7 @@
 		android drone： android 无人机
 		access point：桥接器，访问节点
 
-		
+
 
 	}
 
@@ -712,6 +712,10 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 		HVDCP：high voltage dedicated charger port高电压可检测的充电接口
 
+		DCP：专用充电端口模式
+
+		paraller  charging  同步充电
+
 	}
 
 
@@ -753,25 +757,28 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 	DP升压，DM降压，发送一条指令升降多少电压（QC3.0是200mV），应该就是通过USB的D+/D-电压判断，在进行选择适当的充电电压
 	当电池负载较大时充电电压会升高，进行高电压充电，当电池负载下降时，充电电压会下降VBUS，但是这个根据负载功耗调整充电电压是有问题把？
 
-	paraller  charging  同步充电
-
-
-
+	
 	QC3.0充电协议
-
-
-
 
 
 
 
 }
 
+在不同的电池参数文件中，都有相对应的表，
+pc-temp-ocv-lut，为温度、SOC对应得电压表，PMU8916获取的电压值，通过查该表，在温度和电压下，可得到当前的SOC。
+rbatt-sf-lut，为温度、soc对应的电池内阻表，这里主要考虑内阻的影响，对OCV的修正，new_ocv=ocv+rbatt(内阻)*current（当前电流）。
+fcc-temp-lut，为温度对应的fcc表，ibat-acc-luit，为温度、电流对应的acc表，这两个是起到修正SOC的作用，相关计算为：
+soc_uuc = ((fcc - acc) * 100) / fcc，fcc、acc均为查表所得，
+soc_acc = DIV_ROUND_CLOSEST(100 * (soc_ocv - soc_uuc),(100 - soc_uuc)); //最终soc_acc，为上报的SOC.
 
 
 
-
-
+PMU8916的bms算法和PMU8612的有区别，其中对last_ocv_uv的估值计算的源码已经不开放，在monitor_soc_work的工作线程，
+会上报事件uevent，当HAL层，收到消息，然后调用getprop的方法，获取相关的参数，如，电阻、电流、fcc、acc等，来估算出
+last_ocv_uv，然后调用setprop，把该值设下去，并启动工作线程，根据last_ocv_uv，查表得到soc，并经过修正SOC，并再次上
+报事件，循环下去。这个估值算法，我猜可能是一套学习算法，具体的没有源码，不清楚，只知道它把算法变为.bin文件，用了
+binder机制，作为服务一直运行。
 
 
 

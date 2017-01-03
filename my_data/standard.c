@@ -1036,3 +1036,16 @@ static void mt_battery_average_method_init(BATTERY_AVG_ENUM type, unsigned int *
 #define container_of(ptr, type, member) ({			\
 	const typeof(((type *)0)->member) * __mptr = (ptr);	\
 	(type *)((char *)__mptr - offsetof(type, member)); })
+
+
+这个语法跟上面相似，还是不会，这种宏函数的用法
+/**
+ * spmi_for_each_container_dev - iterate over the array of devnode resources.
+ * @res: spmi_resource pointer used as the array cursor
+ * @spmi_dev: spmi_device to iterate
+ *
+ * Only useable in spmi-dev-container configurations.
+ */
+#define spmi_for_each_container_dev(res, spmi_dev)			      \
+	for (res = ((spmi_dev)->dev_node ? &(spmi_dev)->dev_node[0] : NULL);  \
+	     (res - (spmi_dev)->dev_node) < (spmi_dev)->num_dev_node; res++)
