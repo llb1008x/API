@@ -95,7 +95,8 @@ http://blog.csdn.net/zhaoguowei2010/article/details/8970319
 USB协 USB协通讯议--深入理解 通讯议--深入理解 
 http://blog.csdn.net/myarrow/article/details/8484113
 
-
+一个USB驱动
+http://wenku.baidu.com/link?url=KiEUVHKjGGMkWxGSiJ9eND2QIstcPxj_tmDILEjAT-tMrpTTZQm-nUbZgP_qABC93NSjhPGGDU4-LecGC6xqKRD04Tf_2dUlIQxbemB18hu
 
 
 
