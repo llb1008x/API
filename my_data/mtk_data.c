@@ -1,211 +1,164 @@
 整理的各种资料文档
 
 
-逻辑和文档都弄的很乱
 
 
-
-->/*1.USB&&OTG*/
 {
-    
--->OTG功能的检测过程:
+   MT6351芯片的接口 charging_hw_bw25896.c
 
-    该设备支持OTG，下面说下设备的发现过程：
+   CONFIG_MTK_UART_USB_SWITCH，USB转串口开关
 
-    作为从设备插入PC端口时：
+   fg_coulomb：库仑计这个变量，记录电池电量的变化，充电为正递增，放电为负递减，插拔充电器新计数，电量计的多少表示电池电量变化的
+   gFG_coulomb库伦积分值通过都去IC的寄存器就可以获得，battery_meter_ctrl(BATTERY_METER_CMD_GET_HW_FG_CAR_ACT, &fg_coulomb);
 
-    1.  系统检测到VBUS上的XEINT28上升沿触发中断，因为PC端会有一个5V从VBUS给过来，进入中断处理函数进一步确认ID脚状态，ID脚为低则状态错误，ID脚为高表示设备应该切换到从设备模式
-
-    2. 通知usb gadget使能vbus，按照device模式使能PHY。gadget在probe时注册了一个SPI软中断IRQ_USB_HSOTG，用于响应数据接收
-
-    3. 开启usb clk，使能PHY，此时外部5V电源供给系统XuotgVBUS，gadget收到IRQ_USB_HSOTG中断要求重启OTG core
-
-    4. USB DP（高速设备为DP，低速设备为DM）上产生一个高电平脉冲，此时PC识别到一个USB设备插入，windows会提示用户
-
-    5. 后续就是SETUP，GET DISCRIPTOR的过程
-
-    
-    作为主设备发现设备插入时：
-
-    1. 系统检测到ID脚上XEINT29下降沿触发中断（实际是插入的usb公口第四脚直接连接到第五脚地上面），进入中断处理，切换到主设备模式
-
-    2. 关中断，使能DC5V给VBUS上电，唤醒ehci与ohci
-
-    3. usb core在内核初始化时注册了一个名为khubd的内核线程，由khubd监控port event。（实际过程我理解是从设别由VUBS供电后，会在DP或DM上产生一个高电平脉冲
-
-    ehci在接收到脉冲信号后识别到设备插入，仅仅是理解，这一点未验证）
-
-    3. khubd获取port，speed后交给ehci，接下来就是usb的SETUP，GET DISCRIPTOR过程
+   init.mt6735.rc系统初始化用到的，创建一些设备节点，赋值一定的权限，配置节点，和其他初始化要用到的init文件
+   batterymonitor.cpp上层管理的
+   
 
 
-
--->usb设备驱动相关
-
-1.基本概念：
-	1.endpoint：端点描述符？
-
-	2.usb_gadget:？
-
-	3.usb descriptor:
-
-	4.DMA:？
-	  QMU：？	
-
-	5.scatter_gather:
-
-	6.HID:人际交互设备，人际交互接口
-
-	7.USB的集中传输协议：OHCI，UHCI，EHCI，xHCI
+		/sys/kernel/debug/   有一系列调试的点
+		usb   wakeupsource
+		这些点就是dump打印出来的文件
 	
-	8.fstab:通常情况下，一个Linux系统将拥有很多的文件系统，然而，仅仅通过一个或非常少的文件系统来配
-	置Linux系统也是可能的，你希望创建多个文件系统的一个原因就是通过使用/etc/fstab文件中指定的mount
-	选项来控制对它们的访问???
-
-	# /etc/fstab: static file system information.
-	#
-	# Use 'blkid' to print the universally unique identifier for a
-	# device; this may be used with UUID= as a more robust way to name devices
-	# that works even if disks are added and removed. See fstab(5).
-	#
-	# <file system> <mount point>   <type>  <options>       <dump>  <pass>
-	proc            /proc           proc    nodev,noexec,nosuid 0       0
-	# / was on /dev/sda1 during installation
-	UUID=c373f7b8-df79-4de2-a2dc-aa6053f02594 /               ext4    errors=remount-ro 0       1
-	# swap was on /dev/sda5 during installation
-	UUID=7127cb00-5843-443d-b479-bbf35ef89748 none            swap    sw              0       0
-
-	9.GIC：通用中断子系统
-
-
-
-2.usb_otg设备的处理过程和GPIO的配置
-
-	1.设备树相关的配置(基本的设备树的配置)
-
-	usb0:usb20@11200000 {				//USB20的基地址为11200000
-		compatible = "mediatek,mt6735-usb20";	//通过设备树匹配的名称mt6735-usb20
-		cell-index = <0>;			//子树有几个	
-		reg = <0x11200000 0x10000>,		//寄存器的地址和范围	
-		      <0x11210000 0x10000>;
-		interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_LOW>;//设置中断模式：中断类型，中断号，中断触发的类型
-		mode = <2>;
-		multipoint = <1>;
-		num_eps = <16>;				//设备树添加的一些属性，共有16个端点描述符
-		clocks = <&perisys PERI_USB0>;
-		clock-names = "usb0";
-		vusb33-supply = <&mt_pmic_vusb33_ldo_reg>;//这个是设置的什么意思？
-		iddig_gpio = <0 1>;			//iddig_gpio = <46 1>;	 //寄存器的位置改了，			
-		drvvbus_gpio = <83 2>;			//drvvbus_gpio = <60 2>;
-	};
-
-	/* USB GPIO Kernal Standardization start */
-	/* GioneeDrv GuoJianqiu 20160425 modify for OTG function begin */
-	&pio {
-		usb_default: usb_default {
-		};
-
-		gpio46_mode1_iddig: iddig_irq_init {
-			pins_cmd_dat {
-				pins = <PINMUX_GPIO46__FUNC_IDDIG>;
-				slew-rate = <0>;
-				bias-pull-up = <00>;
-			};
-		};
-
-		gpio60_mode2_drvvbus: drvvbus_init {
-			pins_cmd_dat {
-				pins = <PINMUX_GPIO60__FUNC_GPIO60>;
-				slew-rate = <1>;
-				bias-pull-down = <00>;
-			};
-		};
-
-		gpio60_mode2_drvvbus_low: drvvbus_low {
-			pins_cmd_dat {
-				pins = <PINMUX_GPIO60__FUNC_GPIO60>;
-				slew-rate = <1>;
-				output-low;
-				bias-pull-down = <00>;
-			};
-		};
-
-		gpio60_mode2_drvvbus_high: drvvbus_high {
-			pins_cmd_dat {
-				pins = <PINMUX_GPIO60__FUNC_GPIO60>;
-				slew-rate = <1>;
-				output-high;
-				bias-pull-down = <00>;
-			};
-		};
-	};
-
-	&usb0 {
-		iddig_gpio = <46 1>;
-		pinctrl-names = "usb_default", "iddig_irq_init", "drvvbus_init", "drvvbus_low", "drvvbus_high";
-		pinctrl-0 = <&usb_default>;
-		pinctrl-1 = <&gpio46_mode1_iddig>;
-		pinctrl-2 = <&gpio60_mode2_drvvbus>;
-		pinctrl-3 = <&gpio60_mode2_drvvbus_low>;
-		pinctrl-4 = <&gpio60_mode2_drvvbus_high>;
-		status = "okay";
-	};
-
-	MTK平台设备树的添加
+	
+		pmic子系统和battery_meter都要初始化完成才可以充电
+	
+	
+		linux  mount 的用法？
 	
 	
 	
-
-	2.开启OTG功能相关的配置
-		a.编译
-		/home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/kernel-3.18/arch/arm/configs
-		gnbj6737t_xx_m0_defconfig文件 
-		打开相关的宏
-		//打开OTG功能，硬件使能
-		CONFIG_USB_MTK_OTG=y
-		CONFIG_USB_MTK_HDRC_HCD=y
-		//人际交互使能
-		CONFIG_USB_HID=y
-		//USB大容量存储使能
-		CONFIG_USB_STORAGE=y
-		//支持一些接口
-		CONFIG_SCSI=y
-		CONFIG_USB_ACM=y
-		
-		//这些宏要打开吗？但是编译文档上没有
-		CONFIG_USB_MU3D_DRV=y
-		CONFIG_MTK_SIB_USB_SWITCH=y
-		CONFIG_USB_MU3D_ONLY_U2_MODE=y
-		CONFIG_USB_XHCI_MTK=y
-		CONFIG_USB_MTK_DUALMODE=y
-		CONFIG_USB_XHCI_HCD=y
-
-		文档上打开的是另一些宏
+		功耗，降电流问题
+		飞行模式下的电流是否异常；应用是否经常唤醒，唤醒源；隔离大的驱动模块，看各各部分耗电是否异常；gpio的配置问题，不工作时的suspend模式，
+		gpio引脚是否被上拉导致一直在耗电，probe函数。suspend,resume
+	
+		android drone： android 无人机
+		access point：桥接器，访问节点
 
 
-	3.相关的函数
-	void mt_usb_otg_init(struct musb *musb)
 
-
-3.limition
-	1.该芯片不支持HNP（主机导向协议）协议，所以当A端插入时手机仅仅当作主设备，所以我们的产品并不是完全匹配OTG条例的（：OTG应该是一个双向的工作，主设备，从设备）
-	2.如果插入USB设备，手机不会在USB总线上发送挂起和重启信号，直到A端拔除。
-
-  android M limition
-	1.通过OTG可以插入集线器，控制传输给多个USB设备
-	2.但是不能通过简单的操作就控制U盘
+}
 
 
 
 
 
-	USB2.0 USB3.0协议？
-
-	USB 的vid，pid
-	vid：vendor id
-	pid：product id
 
 
 
+
+->/*电源管理的整个框架(涉及的面很广)*/
+{
+-->基本概念
+{
+	hibernate：冬眠	hibernation image
+
+}
+
+
+
+-->linux时钟系统（这个不是不想看，有点困难）
+
+
+
+
+
+
+
+
+-->linux 下的suspend模式，降低功耗：
+
+     在Linux中,休眠主要分三个主要的步骤:
+
+     1、冻结用户态进程和内核态任务
+
+     2、调用注册的设备的suspend的回调函数
+
+     3、顺序是按照注册顺序
+
+
+	 freeze task，suspend_to_idle
+
+	 进程冻结技术：冻结的对象是内核中可以被调度执行的实体，包括用户进程、内核线程和work_queue。
+	 标记系统freeze状态的有三个重要的全局变量：pm_freezing、system_freezing_cnt和pm_nosig_freezing，如果全为0，
+	 表示系统未进入冻结；system_freezing_cnt>0表示系统进入冻结，pm_freezing=true表示冻结用户进程，pm_nosig_freezing=true
+	 表示冻结内核线程和workqueue。它们会在freeze_processes和freeze_kernel_threads中置位，在thaw_processes和
+	 thaw_kernel_threads中清零。
+
+	 判断标志位，信号处理
+
+	 调用__refrigerator进入冻结
+	 /* Refrigerator is place where frozen processes are stored :-). */
+	bool __refrigerator(bool check_kthr_stop)
+	{
+		/* Hmm, should we be allowed to suspend when there are realtime
+		processes around? */
+		bool was_frozen = false;
+		long save = current->state;
+
+		pr_debug("%s entered refrigerator\n", current->comm);
+
+		//死循环相当于while（1）
+		for (;;) {
+			set_current_state(TASK_UNINTERRUPTIBLE);
+
+			spin_lock_irq(&freezer_lock);
+			current->flags |= PF_FROZEN;
+			if (!freezing(current) ||
+				(check_kthr_stop && kthread_should_stop()))
+				current->flags &= ~PF_FROZEN;
+			spin_unlock_irq(&freezer_lock);
+
+			if (!(current->flags & PF_FROZEN))
+				break;
+			was_frozen = true;
+			schedule();
+		}
+
+		pr_debug("%s left refrigerator\n", current->comm);
+
+		/*
+		* Restore saved task state before returning.  The mb'd version
+		* needs to be used; otherwise, it might silently break
+		* synchronization which depends on ordered task state change.
+		*/
+		set_current_state(save);
+
+		return was_frozen;
+	}
+
+Q：
+	 1.android处于suspend或者休眠状态时有哪些还是处在active的？
+	 	modem会定期唤醒，还有些暂时不清楚，CPU不读取指令
+
+	 2.没有使用冻结技术的哪些线程，进程要怎样处理
+	   系统休眠的时候基本上是要冻结的，没有冻结的系统就没有睡下去，异常唤醒。
+
+
+-->cpu频率的动态调节，cpufreq,big+little
+
+	高性能的CPU，频率高，性能高，功耗也高，big
+	低性能的CPU，频率低，性能低，功耗低，little
+
+	有时候CPU分大核，小核的，性能不都一样，但是kernel 的schedule调度的时候是分辨不了的，视所有的CPU都一样，
+	正常工作情况下，CPU都有自己的cpufreq table，根据相应的需求使用不同的freq，但是对SMP需要littel+big的组合，
+	虚拟CPU core
+	{
+	当bL switching处于enable状态时，该driver变成一个特殊的cpufreq driver，在调整频率的时候，可以根据情况，切换core的cluster。
+
+
+    此时只有4个虚拟的core对系统可见（由arm bL switcher driver控制，3.2节会介绍），系统不关心这些core属于哪个cluster、是big core还是Little core；
+
+    确切的说，每一个虚拟的core，代表了属于两个cluster的CPU对，可以想象为big+Little组合，只是同一时刻，只有一个core处于enable状态（big or Little）；
+
+    该driver会搜集2个cluster的frequency table，并合并成一个（保存在freq_table[2]中）。合并后，找出这些frequency中big core最小的那个（clk_big_min）
+	以及Little core最大的那个（clk_little_max）；
+
+    基于cpufreq framework进行频率调整时，如果所要求的频率小于clk_big_min，则将该虚拟core所对应的Little core使能，如果所要求得频率大于clk_little_max，
+	则将该虚拟core所对应的big core使能。	
+
+	}
+	
 
 
 
@@ -230,53 +183,7 @@
 
 
 
-
-
-
-    {
-	   MT6351芯片的接口 charging_hw_bw25896.c
-
-	   CONFIG_MTK_UART_USB_SWITCH，USB转串口开关
-
-	   fg_coulomb：库仑计这个变量，记录电池电量的变化，充电为正递增，放电为负递减，插拔充电器新计数，电量计的多少表示电池电量变化的
-	   gFG_coulomb库伦积分值通过都去IC的寄存器就可以获得，battery_meter_ctrl(BATTERY_METER_CMD_GET_HW_FG_CAR_ACT, &fg_coulomb);
-
-	   init.mt6735.rc系统初始化用到的，创建一些设备节点，赋值一定的权限，配置节点，和其他初始化要用到的init文件
-       batterymonitor.cpp上层管理的
-	   
-
-
-		/sys/kernel/debug/   有一系列调试的点
-		usb   wakeupsource
-		这些点就是dump打印出来的文件
-
-
-		pmic子系统和battery_meter都要初始化完成才可以充电
-
-
-		linux  mount 的用法？
-
-
-
-		功耗，降电流问题
-		飞行模式下的电流是否异常；应用是否经常唤醒，唤醒源；隔离大的驱动模块，看各各部分耗电是否异常；gpio的配置问题，不工作时的suspend模式，
-		gpio引脚是否被上拉导致一直在耗电，probe函数。suspend,resume
-
-		android drone： android 无人机
-		access point：桥接器，访问节点
-
-
-
-	}
-
-
-
-
-
-
-
-
--->/*charging*/
+-->/*pmic*/
 {
 
 	1.充电的基本流程，电量的校准，库仑计参数，电量上报
@@ -636,17 +543,71 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
-->/*电源管理的整个框架(涉及的面很广)*/
+
+
+
+
+
+
+
+
+
+
+->/*type-C协议*/
 {
+
 -->基本概念
+    type-C有6个引脚
+    {
+      VBUS
+	  CC1->
+	  CC2->{
+	    数据传输主要有TX/RX两组差分信号，CC1和CC2是两个关键引脚，作用很多：
+
+		• 探测连接，区分正反面，区分DFP和UFP，也就是主从
+
+		• 配置Vbus，有USB Type-C和USB Power Delivery两种模式
+
+		• 配置Vconn，当线缆里有芯片的时候，一个cc传输信号，一个cc变成供电Vconn
+
+		• 配置其他模式，如接音频配件时，dp，pcie时
+
+		电源和地都有4个，这就是为什么可以支持到100W的原因。
+
+	  }
+
+	  D+
+	  D-
+	  GND
+	}
+
+	CC（Configuration Channel）：配置通道，这是USB Type-C里新增的关键通道，它的作用有检测USB连接，检测正反插，USB设备间数据与VBUS的连接建立与管理等。
+
+	USB PD(USB Power Delivery): PD是一种通信协议，它是一种新的电源和通讯连接方式，它允许USB设备间传输最高至100W（20V/5A）的功率，同时它可以改变端口的属性，
+	也可以使端口在DFP与UFP之间切换，它还可以与电缆通信，获取电缆的属性。
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*BC1.2协议*/
 {
-	hibernate：冬眠	hibernation image
+
+
+
 
 }
 
 
 
--->linux时钟系统（这个不是不想看，有点困难）
 
 
 
@@ -655,103 +616,14 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
--->linux 下的suspend模式，降低功耗：
-
-     在Linux中,休眠主要分三个主要的步骤:
-
-     1、冻结用户态进程和内核态任务
-
-     2、调用注册的设备的suspend的回调函数
-
-     3、顺序是按照注册顺序
-
-
-	 freeze task，suspend_to_idle
-
-	 进程冻结技术：冻结的对象是内核中可以被调度执行的实体，包括用户进程、内核线程和work_queue。
-	 标记系统freeze状态的有三个重要的全局变量：pm_freezing、system_freezing_cnt和pm_nosig_freezing，如果全为0，
-	 表示系统未进入冻结；system_freezing_cnt>0表示系统进入冻结，pm_freezing=true表示冻结用户进程，pm_nosig_freezing=true
-	 表示冻结内核线程和workqueue。它们会在freeze_processes和freeze_kernel_threads中置位，在thaw_processes和
-	 thaw_kernel_threads中清零。
-
-	 判断标志位，信号处理
-
-	 调用__refrigerator进入冻结
-	 /* Refrigerator is place where frozen processes are stored :-). */
-	bool __refrigerator(bool check_kthr_stop)
-	{
-		/* Hmm, should we be allowed to suspend when there are realtime
-		processes around? */
-		bool was_frozen = false;
-		long save = current->state;
-
-		pr_debug("%s entered refrigerator\n", current->comm);
-
-		//死循环相当于while（1）
-		for (;;) {
-			set_current_state(TASK_UNINTERRUPTIBLE);
-
-			spin_lock_irq(&freezer_lock);
-			current->flags |= PF_FROZEN;
-			if (!freezing(current) ||
-				(check_kthr_stop && kthread_should_stop()))
-				current->flags &= ~PF_FROZEN;
-			spin_unlock_irq(&freezer_lock);
-
-			if (!(current->flags & PF_FROZEN))
-				break;
-			was_frozen = true;
-			schedule();
-		}
-
-		pr_debug("%s left refrigerator\n", current->comm);
-
-		/*
-		* Restore saved task state before returning.  The mb'd version
-		* needs to be used; otherwise, it might silently break
-		* synchronization which depends on ordered task state change.
-		*/
-		set_current_state(save);
-
-		return was_frozen;
-	}
-
-Q：
-	 1.android处于suspend或者休眠状态时有哪些还是处在active的？
-	 	modem会定期唤醒，还有些暂时不清楚，CPU不读取指令
-
-	 2.没有使用冻结技术的哪些线程，进程要怎样处理
-	   系统休眠的时候基本上是要冻结的，没有冻结的系统就没有睡下去，异常唤醒。
-
-
--->cpu频率的动态调节，cpufreq,big+little
-
-	高性能的CPU，频率高，性能高，功耗也高，big
-	低性能的CPU，频率低，性能低，功耗低，little
-
-	有时候CPU分大核，小核的，性能不都一样，但是kernel 的schedule调度的时候是分辨不了的，视所有的CPU都一样，
-	正常工作情况下，CPU都有自己的cpufreq table，根据相应的需求使用不同的freq，但是对SMP需要littel+big的组合，
-	虚拟CPU core
-	{
-	当bL switching处于enable状态时，该driver变成一个特殊的cpufreq driver，在调整频率的时候，可以根据情况，切换core的cluster。
-
-
-    此时只有4个虚拟的core对系统可见（由arm bL switcher driver控制，3.2节会介绍），系统不关心这些core属于哪个cluster、是big core还是Little core；
-
-    确切的说，每一个虚拟的core，代表了属于两个cluster的CPU对，可以想象为big+Little组合，只是同一时刻，只有一个core处于enable状态（big or Little）；
-
-    该driver会搜集2个cluster的frequency table，并合并成一个（保存在freq_table[2]中）。合并后，找出这些frequency中big core最小的那个（clk_big_min）
-	以及Little core最大的那个（clk_little_max）；
-
-    基于cpufreq framework进行频率调整时，如果所要求的频率小于clk_big_min，则将该虚拟core所对应的Little core使能，如果所要求得频率大于clk_little_max，
-	则将该虚拟core所对应的big core使能。	
-
-	}
-	
 
 
 
-}
+
+
+
+
+
 
 
 
@@ -791,14 +663,72 @@ Q：
 	能否升到9V/12V-->mtk_ta_detector()对充电器进行判断-->mtk_ta_retry_increase（）调整VBUS上的电压进行升压判断-->charging_set_ta_current_pattern()
 
 	调整电流时序也就是所谓的curent  pattern 指令信号-->调整三次，如果每次升压超过3V，累计三次表示成功，则判断是快充充电器。
+	
+		-->快充充电算法：
+		代码定义的相关的宏：CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT
+
+			{
+
+		pwd  pump express  快充技术 好像switch charge 也是快充技术
+
+		1.------->[1]MTK Pump Express Plus Introduction V01.pdf
+		pump express plus 使用PSR架构
+		pump express  使用P-charge架构
+		是不是苹果出了个plus什么都有plus了。。。。。。
+
+		adaptor 适配器，电源
+		适配器
+
+		SW快充的流程
+		1.设置提高输出电压的模式
+		2.检查b点电压是否是MTK平台的TA的标示
+		3.设置升压模式到TA =9，设置本地化相应的参数，充电使能
+		4.电压保持在5V的状态
+		5.当电池接近充电电满的的时候，充电电流很小，充进去的电量很小，所以需要设置一个充电截止的标准，高于这个标准，反复插拔都不充电，低于的时候就充电
+
+		通过对充电点的检查决定是用什么方式充电，检查应该是轮询的方式
 
 
 
+		充电的硬件保护
+		1.如果充电器意外的接到了高电压，看门狗会立刻启动应急预案将电压降低到5V
+		2.温度监控等相关安全措施会保护充电安全
 
 
+		使用pump express 快充技术还要相关的IC，修改一点配置等
+		充电的过程开始也是要通信的，建立沟通，IC发指令控制电压电流的变化
+			1.快充用更大的功率，降低更多的充电时间
+			2.usb设备传输的电压是有限制的，唯一的办法是提高输出电量，电源管理IC端，提高电压输出能力。
+			3.大的适配器输出电量可以获得大的充电电压，降低充电时间
+			4.pump express充电技术跟switch charge充电技术好像可以兼容
+			5.允许充电器根据电流决定充电所需的初始电压，由PMIC发出脉冲电流指令通过USB的Vbus传送给充电器，充电器依照这个指令调变输出电压，
+			电压逐渐增加至高达5V 达到最大充电电流。
+			
+
+		2.------>[1]MTK Pump Express Plus Verify Guideline.pdf
+		充电算法？这个文档好像都是些概述
+
+		3.------>[1]MTK Pump Express Verify Guideline V1.0.pdf
+		标题是说对快充的修改，
+			1.对于TA电压的设置依赖于开路电压进行调整，TA？
+			2.开路电压提高0.1V
+			3.手机上电压的模式，没看明白哪个对哪个？
+			4.伏安特性曲线，不同的量
+			5.先进行识别，电压小于3.7v，迅速升高电压
+
+		4.------>MTK Pump Express  20131212.pdf
+		这篇文章，中文版的简介
+
+		5.------>MTK Pump Express introduction and HW design guide_V1.1.pdf
+		跟1.MTK Pump Express Plus Introduction V01.pdf很像
 
 
+		6.------>MTK Pump Express Plus Introduction V01- English.pdf
+		有一个充电IC，手机，适配器相关的原理图。整个内容跟前面的很相似
+			1.操作的原则，多大电流范围哪可以操作，操作的流程，这是英文版的
 
+		快充的一些细节还没讲？
+	}	
 
 
 
@@ -878,6 +808,185 @@ Q：
 
 
 
+->/*USB&&OTG*/
+{
+    
+-->usb设备驱动相关
+
+1.基本概念：
+	1.endpoint：端点描述符？
+
+	2.usb_gadget:？
+
+	3.usb descriptor:usb设备描述符 
+
+	4.DMA:？
+	  QMU：？	
+
+	5.scatter_gather:
+
+	6.HID:人际交互设备，人际交互接口
+
+	7.USB的集中传输协议：OHCI，UHCI，EHCI，xHCI
+	
+	8.fstab:通常情况下，一个Linux系统将拥有很多的文件系统，然而，仅仅通过一个或非常少的文件系统来配
+	置Linux系统也是可能的，你希望创建多个文件系统的一个原因就是通过使用/etc/fstab文件中指定的mount
+	选项来控制对它们的访问???
+
+	# /etc/fstab: static file system information.
+	#
+	# Use 'blkid' to print the universally unique identifier for a
+	# device; this may be used with UUID= as a more robust way to name devices
+	# that works even if disks are added and removed. See fstab(5).
+	#
+	# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+	proc            /proc           proc    nodev,noexec,nosuid 0       0
+	# / was on /dev/sda1 during installation
+	UUID=c373f7b8-df79-4de2-a2dc-aa6053f02594 /               ext4    errors=remount-ro 0       1
+	# swap was on /dev/sda5 during installation
+	UUID=7127cb00-5843-443d-b479-bbf35ef89748 none            swap    sw              0       0
+
+	9.GIC：通用中断子系统
+
+
+
+2.usb_otg设备的处理过程和GPIO的配置
+
+	1.设备树相关的配置(基本的设备树的配置)
+
+	usb0:usb20@11200000 {				//USB20的基地址为11200000
+		compatible = "mediatek,mt6735-usb20";	//通过设备树匹配的名称mt6735-usb20
+		cell-index = <0>;			//子树有几个	
+		reg = <0x11200000 0x10000>,		//寄存器的地址和范围	
+		      <0x11210000 0x10000>;
+		interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_LOW>;//设置中断模式：中断类型，中断号，中断触发的类型
+		mode = <2>;
+		multipoint = <1>;
+		num_eps = <16>;				//设备树添加的一些属性，共有16个端点描述符
+		clocks = <&perisys PERI_USB0>;
+		clock-names = "usb0";
+		vusb33-supply = <&mt_pmic_vusb33_ldo_reg>;//这个是设置的什么意思？
+		iddig_gpio = <0 1>;			//iddig_gpio = <46 1>;	 //寄存器的位置改了，			
+		drvvbus_gpio = <83 2>;			//drvvbus_gpio = <60 2>;
+	};
+
+	/* USB GPIO Kernal Standardization start */
+	/* GioneeDrv GuoJianqiu 20160425 modify for OTG function begin */
+	&pio {
+		usb_default: usb_default {
+		};
+
+		gpio46_mode1_iddig: iddig_irq_init {
+			pins_cmd_dat {
+				pins = <PINMUX_GPIO46__FUNC_IDDIG>;
+				slew-rate = <0>;
+				bias-pull-up = <00>;
+			};
+		};
+
+		gpio60_mode2_drvvbus: drvvbus_init {
+			pins_cmd_dat {
+				pins = <PINMUX_GPIO60__FUNC_GPIO60>;
+				slew-rate = <1>;
+				bias-pull-down = <00>;
+			};
+		};
+
+		gpio60_mode2_drvvbus_low: drvvbus_low {
+			pins_cmd_dat {
+				pins = <PINMUX_GPIO60__FUNC_GPIO60>;
+				slew-rate = <1>;
+				output-low;
+				bias-pull-down = <00>;
+			};
+		};
+
+		gpio60_mode2_drvvbus_high: drvvbus_high {
+			pins_cmd_dat {
+				pins = <PINMUX_GPIO60__FUNC_GPIO60>;
+				slew-rate = <1>;
+				output-high;
+				bias-pull-down = <00>;
+			};
+		};
+	};
+
+	&usb0 {
+		iddig_gpio = <46 1>;
+		pinctrl-names = "usb_default", "iddig_irq_init", "drvvbus_init", "drvvbus_low", "drvvbus_high";
+		pinctrl-0 = <&usb_default>;
+		pinctrl-1 = <&gpio46_mode1_iddig>;
+		pinctrl-2 = <&gpio60_mode2_drvvbus>;
+		pinctrl-3 = <&gpio60_mode2_drvvbus_low>;
+		pinctrl-4 = <&gpio60_mode2_drvvbus_high>;
+		status = "okay";
+	};
+
+	
+	
+	3.开启OTG功能相关的配置
+		a.编译
+		/home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/kernel-3.18/arch/arm/configs
+		gnbj6737t_xx_m0_defconfig文件 
+		打开相关的宏
+		//打开OTG功能，硬件使能
+		CONFIG_USB_MTK_OTG=y
+		CONFIG_USB_MTK_HDRC_HCD=y
+		//人际交互使能
+		CONFIG_USB_HID=y
+		//USB大容量存储使能
+		CONFIG_USB_STORAGE=y
+		//支持一些接口
+		CONFIG_SCSI=y
+		CONFIG_USB_ACM=y
+		
+		//这些宏要打开吗？但是编译文档上没有
+		CONFIG_USB_MU3D_DRV=y
+		CONFIG_MTK_SIB_USB_SWITCH=y
+		CONFIG_USB_MU3D_ONLY_U2_MODE=y
+		CONFIG_USB_XHCI_MTK=y
+		CONFIG_USB_MTK_DUALMODE=y
+		CONFIG_USB_XHCI_HCD=y
+
+		文档上打开的是另一些宏
+
+
+	4.相关的函数
+	void mt_usb_otg_init(struct musb *musb)
+
+
+-->OTG功能的检测过程:
+
+    该设备支持OTG，下面说下设备的发现过程：
+
+    作为从设备插入PC端口时：
+
+    1.  系统检测到VBUS上的XEINT28上升沿触发中断，因为PC端会有一个5V从VBUS给过来，进入中断处理函数进一步确认ID脚状态，ID脚为低则状态错误，ID脚为高表示设备应该切换到从设备模式
+
+    2. 通知usb gadget使能vbus，按照device模式使能PHY。gadget在probe时注册了一个SPI软中断IRQ_USB_HSOTG，用于响应数据接收
+
+    3. 开启usb clk，使能PHY，此时外部5V电源供给系统XuotgVBUS，gadget收到IRQ_USB_HSOTG中断要求重启OTG core
+
+    4. USB DP（高速设备为DP，低速设备为DM）上产生一个高电平脉冲，此时PC识别到一个USB设备插入，windows会提示用户
+
+    5. 后续就是SETUP，GET DISCRIPTOR的过程
+
+    
+    作为主设备发现设备插入时：
+
+    1. 系统检测到ID脚上XEINT29下降沿触发中断（实际是插入的usb公口第四脚直接连接到第五脚地上面），进入中断处理，切换到主设备模式
+
+    2. 关中断，使能DC5V给VBUS上电，唤醒ehci与ohci
+
+    3. usb core在内核初始化时注册了一个名为khubd的内核线程，由khubd监控port event。（实际过程我理解是从设别由VUBS供电后，会在DP或DM上产生一个高电平脉冲
+
+    ehci在接收到脉冲信号后识别到设备插入，仅仅是理解，这一点未验证）
+
+    3. khubd获取port，speed后交给ehci，接下来就是usb的SETUP，GET DISCRIPTOR过程
+
+
+
+}
 
 
 
@@ -888,7 +997,15 @@ Q：
 
 
 
-->/*对硬件的操作*/
+
+
+
+
+
+
+
+
+->/*code*/
 {
 	底层对硬件操作最好能和芯片手册对应这看
 
@@ -948,6 +1065,7 @@ Q：
 
 		return charger_tye;
 	}
+
 
 
 -->检测充电器
@@ -1098,6 +1216,7 @@ Q：
 
 
 
+
 	-->MTK不同充电算法的切换：
 		void mt_battery_charging_algorithm(void)
 		{
@@ -1137,74 +1256,8 @@ Q：
 
 
 
-	-->快充充电算法：
-		代码定义的相关的宏：CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT
-
-			{
-
-		pwd  pump express  快充技术 好像switch charge 也是快充技术
-
-		1.------->[1]MTK Pump Express Plus Introduction V01.pdf
-		pump express plus 使用PSR架构
-		pump express  使用P-charge架构
-		是不是苹果出了个plus什么都有plus了。。。。。。
-
-		adaptor 适配器，电源
-		适配器
-
-		SW快充的流程
-		1.设置提高输出电压的模式
-		2.检查b点电压是否是MTK平台的TA的标示
-		3.设置升压模式到TA =9，设置本地化相应的参数，充电使能
-		4.电压保持在5V的状态
-		5.当电池接近充电电满的的时候，充电电流很小，充进去的电量很小，所以需要设置一个充电截止的标准，高于这个标准，反复插拔都不充电，低于的时候就充电
-
-		通过对充电点的检查决定是用什么方式充电，检查应该是轮询的方式
-
-		这两个单词都有电压的意思?
-		voltage：电压
-		current：电流
 
 
-		充电的硬件保护
-		1.如果充电器意外的接到了高电压，看门狗会立刻启动应急预案将电压降低到5V
-		2.温度监控等相关安全措施会保护充电安全
-
-
-		使用pump express 快充技术还要相关的IC，修改一点配置等
-		充电的过程开始也是要通信的，建立沟通，IC发指令控制电压电流的变化
-			1.快充用更大的功率，降低更多的充电时间
-			2.usb设备传输的电压是有限制的，唯一的办法是提高输出电量，电源管理IC端，提高电压输出能力。
-			3.大的适配器输出电量可以获得大的充电电压，降低充电时间
-			4.pump express充电技术跟switch charge充电技术好像可以兼容
-			5.允许充电器根据电流决定充电所需的初始电压，由PMIC发出脉冲电流指令通过USB的Vbus传送给充电器，充电器依照这个指令调变输出电压，
-			电压逐渐增加至高达5V 达到最大充电电流。
-			
-
-		2.------>[1]MTK Pump Express Plus Verify Guideline.pdf
-		充电算法？这个文档好像都是些概述
-
-		3.------>[1]MTK Pump Express Verify Guideline V1.0.pdf
-		标题是说对快充的修改，
-			1.对于TA电压的设置依赖于开路电压进行调整，TA？
-			2.开路电压提高0.1V
-			3.手机上电压的模式，没看明白哪个对哪个？
-			4.伏安特性曲线，不同的量
-			5.先进行识别，电压小于3.7v，迅速升高电压
-
-		4.------>MTK Pump Express  20131212.pdf
-		这篇文章，中文版的简介
-
-		5.------>MTK Pump Express introduction and HW design guide_V1.1.pdf
-		跟1.MTK Pump Express Plus Introduction V01.pdf很像
-
-
-		6.------>MTK Pump Express Plus Introduction V01- English.pdf
-		有一个充电IC，手机，适配器相关的原理图。整个内容跟前面的很相似
-			1.操作的原则，多大电流范围哪可以操作，操作的流程，这是英文版的
-
-		快充的一些细节还没讲？
-	}	
 
 		static void battery_pump_express_charger_check(void)
 		{
