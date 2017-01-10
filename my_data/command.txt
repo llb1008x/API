@@ -130,8 +130,6 @@
 		repo forall -vcp git fetch
 		repo forall -vcp git merge origin/code_main_dev
 	
-		repo forall -vcp git merge origin/bbl7515a_camp_main_dev
-	
 
 	10.origin/code_main_dev 
 

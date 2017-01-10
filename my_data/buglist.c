@@ -11,17 +11,6 @@
 
 
 
-mtk log下几个log的意思
-
-
-
-Fuel_gauge更换了充电芯片
-以前只是廉价的替代芯片
-
-送测有那几个版本？
-CMCC ，CTA他们送的是T54版本的软件
-
-
 
 
 
@@ -300,7 +289,6 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
         }
 }
 	
-
 
 
 

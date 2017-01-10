@@ -78,6 +78,12 @@ http://www.cnbeta.com/articles/387057.htm
 
 
 
+
+
+
+
+
+
 USB：
 
 USB OTG插入检测识别
@@ -98,6 +104,18 @@ http://blog.csdn.net/myarrow/article/details/8484113
 
 一个USB驱动
 http://wenku.baidu.com/link?url=KiEUVHKjGGMkWxGSiJ9eND2QIstcPxj_tmDILEjAT-tMrpTTZQm-nUbZgP_qABC93NSjhPGGDU4-LecGC6xqKRD04Tf_2dUlIQxbemB18hu
+
+
+USB&nbsp;Type-C
+http://blog.csdn.net/fouweng/article/details/53435528
+
+
+USB协通讯议--深入理解 
+http://blog.csdn.net/myarrow/article/details/8484113
+
+
+
+
 
 
 
@@ -148,6 +166,11 @@ http://blog.csdn.net/LoongEmbedded/article/category/5611401/1
 linux公社资料分享
 http://linux.linuxidc.com/
 用户名与密码都是www.linuxidc.com
+
+
+
+
+
 
 
 

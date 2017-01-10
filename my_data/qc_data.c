@@ -6,33 +6,87 @@
 ->基本概念
 {
 
-    PWM:pulse width modulation 
-
-    LPG:light pulse generator 
-
     SPMI：system power management interface：系统电源管理接口
 
     AICL：automatic input current limit：自动化输入电流限制
-
-    BMD ：battery missing detection
 
     warm reset:热复位，full reset：全复位
 
     ESR：Equivalent series resistance 等效串联电阻
 
+	USB PD：usb power delivery是电源传输通信的一种协议，功率传输协议
+
     USB_IN,DC_IN,
 
+	PWM:pulse width modulation 
+
+    LPG:light pulse generator 
+
+	BMD ：battery missing detection
+
+
 }
+
+
+
+
+几个比较重要的点
+{
+
+	1.并行充电
+	PM8998提供接口，给不同的设备提供不同的电压，管理不同设备电源供应
+	SMB1381充电
+
+	2.fuelgauge
+
+	3.QC3.0
+
+	4.reset
+
+	
+
+}
+
 
 
 
 ->相关的文档
 {
   1.pm8998,_pm8005,_and_pmi8998_power_management_ics_design_guidelines.pdf
+  PM8998，PM8005作为pmic子系统供电管理的核心
+  PMI8998管理系统供电的接口，充电，SMB1381充电
+
+  整个系统比较耗电的部分：CPU,modem，LCD,audio,haptic,LED?
+
+  pmic电源管理子系统的框架及IC
+  {
+	PM8998:  Most of the housekeeping (including system clocks) and
+	output power management functions(core负责整个系统的日常电源管理包括系统时钟，和输出电能管理  可能是整个系统个模块能量的供应)
+
+	PMI8998：Most of the input power management functions (including
+	charger) and user interfaces（绝大部分充电的管理，还有一部分是SMB1381负责charging和提供用户接口）
+
+	PM8005：Regulator integration on slave PMIC helps to balance
+	power and thermal dissipation on either side of the MSM
+	and optimize PDN routing（这个应该是起到辅助作用，充电时分散接口部分过热，降低充电过程不必要的功耗提高充电效率，优化给整个系统供电）
+
+  }
+
+
+
+
+
+  usb_type-c_integration_guide_with_qualcomm_chipset.pdf
+
 
 
 
 }
+
+
+
+
+
 
 
 ->相关的代码
@@ -169,6 +223,12 @@
 
 
 }
+
+
+
+
+
+
 
 
 

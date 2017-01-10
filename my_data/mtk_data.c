@@ -3,6 +3,8 @@
 
 
 
+
+
 {
    MT6351芯片的接口 charging_hw_bw25896.c
 
@@ -557,7 +559,7 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 {
 
 -->基本概念
-    type-C有6个引脚
+    type-C有24个引脚（下面几个是主要的还有Tx/Rx）
     {
       VBUS
 	  CC1->
@@ -575,16 +577,31 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 		电源和地都有4个，这就是为什么可以支持到100W的原因。
 
 	  }
-
 	  D+
 	  D-
 	  GND
+	  Tx/Rx 两组
 	}
+
+	type-c的几个模式：
+		DFP(Downstream Facing Port): 下行端口，可以理解为Host，DFP提供VBUS，也可以提供数据。
+		UFP(Upstream Facing Port): 上行端口，可以理解为Device，UFP从VBUS中取电，并可提供数据。
+		DRP(Dual Role Port): 双角色端口，DRP既可以做DFP(Host)，也可以做UFP(Device)，也可以在DFP与UFP间动态切换
+
 
 	CC（Configuration Channel）：配置通道，这是USB Type-C里新增的关键通道，它的作用有检测USB连接，检测正反插，USB设备间数据与VBUS的连接建立与管理等。
 
 	USB PD(USB Power Delivery): PD是一种通信协议，它是一种新的电源和通讯连接方式，它允许USB设备间传输最高至100W（20V/5A）的功率，同时它可以改变端口的属性，
 	也可以使端口在DFP与UFP之间切换，它还可以与电缆通信，获取电缆的属性。
+
+
+	type-c方便正反插，传输速率高（信号会有干扰），供电能力强（USB pd）正反充电，核心的两个是CC引脚配置，检测和usb pd协议的支持
+
+
+-->type-c协议，检测端口
+		设备的连接和断开通过检测CC引脚上的电压，并管理VBUS，当设备没有插入时关闭VBUS
+	DRP在待机模式下每50ms在DFP和UFP间切换一次。当切换至DFP时，CC管脚上必须有一个上拉至VBUS的电阻Rp或者输出一个电流源，当切换至UFP时，CC管脚上必须有一个下拉至GND
+	的电阻Rd。此切换动作必须由CC Logic芯片来完成。当DFP检测到UFP插入之后才可以输出VBUS，当UFP拔出以后必须关闭VBUS。此动作必须由CC Logic芯片来完成。
 
 
 
