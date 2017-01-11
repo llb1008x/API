@@ -8,7 +8,7 @@
 
     SPMI：system power management interface：系统电源管理接口
 
-    AICL：automatic input current limit：自动化输入电流限制
+    AICL：automatic input current limit：自动化输入电流限制(这也是一个算法)
 
     warm reset:热复位，full reset：全复位
 
@@ -16,7 +16,7 @@
 
 	USB PD：usb power delivery是电源传输通信的一种协议，功率传输协议
 
-    USB_IN,DC_IN,
+    USB_IN,DC_IN：？
 
 	PWM:pulse width modulation 
 
@@ -43,7 +43,41 @@
 
 	4.reset
 
+	5.BC1.2还是type-c检测，当然这两个协议的流程也要很清楚
+
+	6.OA，OVP这类过压，过流问题
+
+	7.LD0，buck/boost
+
+	8.sink mode  ，source mode
 	
+	9.  Vconn:
+	  {
+	    Vconn（3.0~5.5V） 和VBUS（4.75~5.5V）一样可以提供能量，CC1.CC2中一个工作在CC模式，另一个是Vconn
+	    USB3.0，USB PD使用的cables也不一样，内部还有芯片
+
+	    通过Vconn传输控制命令时电压要降到2.7V
+
+	    VPH_PWR 
+
+
+	  }
+
+	10.USB power delivery
+	{
+	
+
+	}
+
+	11.BC1.2中定义的充电类型
+	SDP：标准下行接开口，电脑USB
+	CDP：充电下行接口
+	DCP：标准的座充
+	OCP：other chargng port非标准充电器
+	float charger:浮充？非标准充电器，兼容type-c接口
+
+
+	weak charger
 
 }
 
@@ -52,7 +86,7 @@
 
 ->相关的文档
 {
-  1.pm8998,_pm8005,_and_pmi8998_power_management_ics_design_guidelines.pdf
+  1.pm8998,pm8005,and pmi8998_power_management_ics_design_guidelines.pdf
   PM8998，PM8005作为pmic子系统供电管理的核心
   PMI8998管理系统供电的接口，充电，SMB1381充电
 
@@ -70,14 +104,46 @@
 	power and thermal dissipation on either side of the MSM
 	and optimize PDN routing（这个应该是起到辅助作用，充电时分散接口部分过热，降低充电过程不必要的功耗提高充电效率，优化给整个系统供电）
 
+	SMB1381：Simultaneous DC_IN charging + OTG support via SMB1381 in parallel charging configuration
+    （通过SMB1381支持OTG功能，分摊另一部分的充电功能）
   }
 
 
+  Input Power Management  
+  1.三个独立引脚可以输入供应能量USB_IN, DC_IN, and Vbatt
+  2.modem模块的能量供应通过VPH_PWR而不是VBAT
+  3.DC_IN and USB_IN的输入电压必须在UVLO，DVLO之间，P46
+  4.当充电器移除后立刻停止充电，PMI8998进入低功耗模式，阻止电池的漏电流，延长寿命
+
+
+  USB type-c的检测：
+  设备的连接和断开通过检测CC引脚上的电压，并管理VBUS，当设备没有插入时关闭VBUS
+DRP在待机模式下每50ms（50~100ms）在DFP和UFP间切换一次。当切换至DFP时，CC管脚上必须有一个上拉至VBUS的电阻Rp或者输出一个电流源，当切换至UFP时，
+CC管脚上必须有一个下拉至GND的电阻Rd。此切换动作必须由CC Logic芯片来完成。当DFP检测到UFP插入之后才可以输出VBUS，当UFP拔出以后必须关闭VBUS。
+此动作必须由CC Logic芯片来完成。
+
+  sink mode：在tCCDebounce (100 to 200 ms)的检测中，CC引脚的电压在0.25V~2.04V，则为充电模式
+  source mode：在tCCDebounce (100 to 200 ms)的检测中，CC引脚的电压小于1.65V，则为反向充电模式
+
+  PMI8998可以配置一个低功耗模式，降低充电反向充电所消耗的能量
+
+  上面有一个crude sensor好像会产生一些异常波形，正是的要关闭或者修改一些代码
+
+
+  BC.1.2检测
+
+
+  QC2.0 3.0检测
+  手机端发送几个升降时序，充电器端回应一定的时序则是QC3.0，否则是QC2.0
 
 
 
-  usb_type-c_integration_guide_with_qualcomm_chipset.pdf
 
+  Power Sink Mode流程太长... 
+
+  Power source mode
+
+  Dead or Weak Battery Mode
 
 
 
@@ -220,6 +286,41 @@
 		};
 	};
 
+
+
+
+	voters相关
+	struct client_vote {
+		int	state;
+		int	value;
+	};
+
+
+	struct votable {
+		struct client_vote	votes[NUM_MAX_CLIENTS];
+		struct device		*dev;
+		const char		*name;
+		int			num_clients;
+		int			type;
+		int			effective_client_id;
+		int			effective_result;
+		int			default_result;
+		struct mutex		vote_lock;
+		int			(*callback)(struct device *dev,
+							int effective_result,
+							int effective_client,
+							int last_result,
+							int last_client);
+	};
+
+
+	/* voters */
+	struct votable			*fcc_votable;
+	struct votable			*usb_icl_votable;
+	struct votable			*dc_icl_votable;
+	struct votable			*usb_suspend_votable;
+	struct votable			*dc_suspend_votable;
+	struct votable			*battchg_suspend_votable;
 
 
 }

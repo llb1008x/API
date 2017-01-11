@@ -76,6 +76,14 @@
 	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
 
 
+	通过wifi连接ADB ：
+	adb shell "setprop persist.adb.tcp.port 5555"
+	adb tcpip 5555
+
+	-Disconnect the device from the PC USB, and do the following from your command prompt using adb over WiFi (replace "192.168.68.167" with your device's IP address):
+
+	adb connect 192.168.68.167 
+
 
 2.git/repo命令：	
 
@@ -154,15 +162,16 @@
 
 	14. git ls-files 察看版本库区内的文件
 
-	git reflog
-
-	36263383c77e36b8f9a64544423a3adcef9727ab
-
-
 
 	git 回滚操作，回撤
 	
 	git commit --amend
+
+
+	./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest.git -b android_mtk_n_6737m_65_mp1 -m master.xml 
+
+	./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest -b gionee_packages_apk_amigo -m SW17W05_oversea_master.xml
+
 
 3.android编译的命令：
 
@@ -194,11 +203,12 @@
 
     b.android相关的基本内容
 	
-	OTA：over the air technology,
-	NVRAM：非易失性随机访问存储
-	BP：baseband processor
-	AP:application processor
+	改变电脑上java jdk的版本
+	sudo update-alternatives --config java
+	
+	sudo update-alternatives --config javac
 
+	java -version
 
     c.烧写user版本要签名
 
@@ -258,6 +268,8 @@ sudo sshfs -o allow_other y3_driver@10.8.0.24:/home/y3_driver/extend_data/guojia
 
 
 7.c语法
+
+
 
 
 
