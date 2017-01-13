@@ -16,13 +16,21 @@
 
 	USB PD：usb power delivery是电源传输通信的一种协议，功率传输协议
 
-    USB_IN,DC_IN：？
+    USB_IN,DC_IN：这个是type-c充电的几个引脚，主要通过USB_IN,并行充电的时候通过DC_IN,辅助增加充电能力
 
 	PWM:pulse width modulation 
 
     LPG:light pulse generator 
 
 	BMD ：battery missing detection
+
+	BC1.2中定义的充电类型
+	SDP：标准下行接开口，电脑USB
+	CDP：充电下行接口
+	DCP：标准的座充
+	OCP：other chargng port非标准充电器
+	float charger:浮充？非标准充电器，兼容type-c接口
+
 
 
 }
@@ -69,15 +77,28 @@
 
 	}
 
-	11.BC1.2中定义的充电类型
-	SDP：标准下行接开口，电脑USB
-	CDP：充电下行接口
-	DCP：标准的座充
-	OCP：other chargng port非标准充电器
-	float charger:浮充？非标准充电器，兼容type-c接口
+
+	11.AICL自动调整输入电流，保障充电电流的安全稳定(充电电流和系统负载，这个策略很重要) Automatic Input Current Limit 
+	UVLO，DVLO的范围设置很重要
+
+	算法和判断逻辑：
+		1当输入电流达到充电器最大输出电流或者2软件设置的最大值时（USBIN_AICL_OPTIONS_CFG: 0x1380[2]，DCIN_AICL_OPTIONS_CFG: 0x1480[2]，这两个寄存器配置的电流）
+	或者达到总的输出（负载和充电电流）电流使系统相对安全的点
+		
+		1.IC会跟充电器通信，降低充电器的输出电流
+		2.将会使能一个ADC，通过循环反馈，每次降低25mA，直到输入电流低于设定的范围
+		3.出入USB_IN的时候，输入电流设置为500mA,经过BC1.2检测后才会改变范围
+		4.PMI8998有两种策略
+		{ 通过USBIN_AICL_OPTIONS_CFG: 0x1380[5] (1 = continuous method, 0 = discrete method)配置
+
+			Discrete method 分立式的，
+
+			Continuous method 连续的
+		}
 
 
-	weak charger
+
+
 
 }
 
@@ -289,7 +310,16 @@ CC管脚上必须有一个下拉至GND的电阻Rd。此切换动作必须由CC L
 
 
 
-	voters相关
+
+
+
+
+
+
+
+
+	voters相关这个相关的函数，变量的作用
+
 	struct client_vote {
 		int	state;
 		int	value;
@@ -323,9 +353,132 @@ CC管脚上必须有一个下拉至GND的电阻Rd。此切换动作必须由CC L
 	struct votable			*battchg_suspend_votable;
 
 
-}
 
 
+
+
+	struct votable *create_votable(struct device *dev, const char *name,
+					int votable_type,
+					int num_clients,
+					int default_result,
+					int (*callback)(struct device *dev,
+							int effective_result,
+							int effective_client,
+							int last_result,
+							int last_client)
+					)
+	{
+		int i;
+		struct votable *votable = devm_kzalloc(dev, sizeof(struct votable),
+								GFP_KERNEL);
+
+		if (!votable)
+			return ERR_PTR(-ENOMEM);
+
+		if (!callback) {
+			dev_err(dev, "Invalid callback specified for voter\n");
+			return ERR_PTR(-EINVAL);
+		}
+
+		if (votable_type >= NUM_VOTABLE_TYPES) {
+			dev_err(dev, "Invalid votable_type specified for voter\n");
+			return ERR_PTR(-EINVAL);
+		}
+
+		if (num_clients > NUM_MAX_CLIENTS) {
+			dev_err(dev, "Invalid num_clients specified for voter\n");
+			return ERR_PTR(-EINVAL);
+		}
+
+		votable->dev = dev;
+		votable->name = name;
+		votable->num_clients = num_clients;
+		votable->callback = callback;
+		votable->type = votable_type;
+		votable->default_result = default_result;
+		mutex_init(&votable->vote_lock);
+
+		/*
+		* Because effective_result and client states are invalid
+		* before the first vote, initialize them to -EINVAL
+		*/
+		votable->effective_result = -EINVAL;
+		votable->effective_client_id = -EINVAL;
+
+		for (i = 0; i < votable->num_clients; i++)
+			votable->votes[i].state = -EINVAL;
+
+		return votable;
+
+
+
+	}
+
+
+
+	int vote(struct votable *votable, int client_id, bool state, int val)
+	{
+		int effective_id, effective_result;
+		int rc = 0;
+
+		lock_votable(votable);
+
+		if (votable->votes[client_id].state == state &&
+					votable->votes[client_id].value == val) {
+			pr_debug("%s: votes unchanged; skipping\n", votable->name);
+			goto out;
+		}
+
+		votable->votes[client_id].state = state;
+		votable->votes[client_id].value = val;
+
+		pr_debug("%s: %d voting for %d - %s\n",
+				votable->name,
+				client_id, val, state ? "on" : "off");
+		switch (votable->type) {
+		case VOTE_MIN:
+			effective_id = vote_min(votable);
+			break;
+		case VOTE_MAX:
+			effective_id = vote_max(votable);
+			break;
+		case VOTE_SET_ANY:
+			votable->votes[client_id].value = state;
+			effective_result = vote_set_any(votable);
+			if (effective_result != votable->effective_result) {
+				votable->effective_client_id = client_id;
+				votable->effective_result = effective_result;
+				rc = votable->callback(votable->dev,
+							effective_result, client_id,
+							state, client_id);
+			}
+			goto out;
+		}
+
+		/*
+		* If the votable does not have any votes it will maintain the last
+		* known effective_result and effective_client_id
+		*/
+		if (effective_id < 0) {
+			pr_debug("%s: no votes; skipping callback\n", votable->name);
+			goto out;
+		}
+
+		effective_result = votable->votes[effective_id].value;
+
+		if (effective_result != votable->effective_result) {
+			votable->effective_client_id = effective_id;
+			votable->effective_result = effective_result;
+			pr_debug("%s: effective vote is now %d voted by %d\n",
+					votable->name, effective_result, effective_id);
+			rc = votable->callback(votable->dev, effective_result,
+						effective_id, val, client_id);
+		}
+
+	out:
+		unlock_votable(votable);
+		return rc;
+	}
 
 
 

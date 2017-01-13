@@ -40,8 +40,9 @@
 	+    class main
 	+#Gionee GuoJianqiu 20151022 modify for CR01570292 end
 }
+	
 
-
+	
 
 功耗，电流问题
 {
