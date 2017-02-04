@@ -190,7 +190,8 @@
 
 
 		**11.git 回滚操作，回撤（这个命令还有疑问，相关内容）
-		git commit --amend  
+		git    commit   --amend  
+		合并缓存区的修改和最近的一次commit, 然后用生成的新的commit替换掉老的. 如果缓存区没有内容, 那么利用amend可以修改上一次commit的描述.
 	
 		
 
@@ -226,13 +227,13 @@
 		
 			
 		4.repo封装的操作 对整个项目文件都操作
-			清除
-			repo forall -vcp git clean -dfx
-			repo forall -vcp git reset HEAD
-			repo forall -vcp git checkout .
-			更新
-			repo forall -vcp git fetch
-			repo forall -vcp git merge origin/code_main_dev
+		清除
+		repo forall -vcp git clean -dfx
+		repo forall -vcp git reset HEAD
+		repo forall -vcp git checkout .
+		更新
+		repo forall -vcp git fetch
+		repo forall -vcp git merge origin/code_main_dev
 	
 	
 		
@@ -251,76 +252,76 @@
 
 
 4.进入MTK工程模式暗码
-	*#*#3646633#*#*
+		*#*#3646633#*#*
 
-	*#446633#
+		*#446633#
 
-	*#*#4636#*#*   安卓工程模式
+		*#*#4636#*#*   安卓工程模式
 
-	*#8702#        测试模式
+		*#8702#        测试模式
 
-	*#2523#	       察看手机信息
+		*#2523#	       察看手机信息
 
-	*#837500#      察看手机版本
+		*#837500#      察看手机版本
 
-	*#837504#	察看系统的一些信息
+		*#837504#	察看系统的一些信息
 
 
 
 
 5.项目编译相关的命令：
 
-    脚本编译的版本(当然不同的项目还有很多不同的版本)：
+		脚本编译的版本(当然不同的项目还有很多不同的版本)：
 	
-	BBL7337A ：全版本user，debug
+		BBL7337A ：全版本user，debug
 	
-	BBL7337A_CMCC：要送到中国移动部测试用的，基本的软硬件，没有金立定制的软件      
+		BBL7337A_CMCC：要送到中国移动部测试用的，基本的软硬件，没有金立定制的软件      
 	
-	BBL7337A_CT：
+		BBL7337A_CT：
 
-	BBL7337A_CTA ：         
+		BBL7337A_CTA ：         
 
-	BBL7337A_platform   ：没有上层framework以上的，只有底层驱动及以下的部分
+		BBL7337A_platform   ：没有上层framework以上的，只有底层驱动及以下的部分
 
-	BBL7337A_sign:签名版
-
-
-     编译命令：
-	./TmakeGionee  G1605A   -C  将gionee目录内的代码拷贝到各各目录下，覆盖
-	./TmakeGionee  G1605A   -n  全编整个项目
-	./TmakeGionee  G1605A   -r  remake 重编，在原有基础之上
-	./TmakeGionee  G1605A   -i  bootimage  lk  system  <bootimage|systemimage|bootimage|modem>编译不同的模块
-	./TmakeGionee  G1605A   -v  <user|eng|userdebug>编译不同的版本
+		BBL7337A_sign:签名版
 
 
-	编译某个目录
-	./TmakeGionee  G1605A  -p  vendor/mediatek/proprietary/external/charger/
-	./TmakeGionee  G1605A  -p  vendor/mediatek/proprietary/external/libshowlogo/
-	推送到手机bin下
-
-        adb remount （重新挂载系统分区，使系统分区重新可写，不然无法将文件，bin推送到system/bin）
-	adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/bin/kpoc_charger   system/bin/
-	adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/lib/libshowlogo.so  system/lib/
+		 编译命令：
+		./TmakeGionee  G1605A   -C  将gionee目录内的代码拷贝到各各目录下，覆盖
+		./TmakeGionee  G1605A   -n  全编整个项目
+		./TmakeGionee  G1605A   -r  remake 重编，在原有基础之上
+		./TmakeGionee  G1605A   -i  bootimage  lk  system  <bootimage|systemimage|bootimage|modem>编译不同的模块
+		./TmakeGionee  G1605A   -v  <user|eng|userdebug>编译不同的版本
 
 
-	调整log时间
-	./ktime -i kernel_log -o kernel_log_output
+		编译某个目录
+		./TmakeGionee  G1605A  -p  vendor/mediatek/proprietary/external/charger/
+		./TmakeGionee  G1605A  -p  vendor/mediatek/proprietary/external/libshowlogo/
+		推送到手机bin下
+
+		    adb remount （重新挂载系统分区，使系统分区重新可写，不然无法将文件，bin推送到system/bin）
+		adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/bin/kpoc_charger   system/bin/
+		adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/lib/libshowlogo.so  system/lib/
 
 
-	改变电脑上java jdk javac的版本
-	sudo update-alternatives --config java
+		调整log时间
+		./ktime -i kernel_log -o kernel_log_output
+
+
+		改变电脑上java jdk javac的版本
+		sudo update-alternatives --config java
 	
-	sudo update-alternatives --config javac
+		sudo update-alternatives --config javac
 	
-	察看当前的java版本java -version
+		察看当前的java版本java -version
 
 
- 	烧写user版本要签名(烧签名版本的是在window环境下)
+	 	烧写user版本要签名(烧签名版本的是在window环境下)
 
 
 
 
-	**编译android原生代码相关的命令(这个要实践，搭建android开发环境，编译原生代码)
+		**编译android原生代码相关的命令(这个要实践，搭建android开发环境，编译原生代码)
 
 
 
@@ -359,22 +360,23 @@
 		
 	
 	grep命令：
+		常用组合为grep -rinl "要查找的字符串" 查找范围
+		grep  [options] PATTERN [FILE...]即grep [选项]   要查找的字符串    查找范围(查找路径)，
+
+		-r 是递归查找，查找所有文件包含子目录，-i 忽略大小写，-n 是显示行号，-l 只列出匹配的文件名
+
+		
+
+
+	挂在命令mount ，umount
 	
 	
-	
-	
+		umount  /dev/hda2    ， umount /usr  卸载磁盘分区或设备文件
+		
+		mount  -t  ext4  /dev/hda5 /mnt/hda5  (t后面跟的参数是文件系统的类型，当然是可以省略的因为linux会自动检测)
+		
+		mount –o umask=000, iocharset=cp936   /dev/hda5  /mnt/hda5 (解决挂在之后没有权限)
 
-	挂在命令mount ，umount，remount
-
-
-
-
-
-
-
-
-
-	 grep  -i  CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT  gionee  -R
 
 
 	nohup command    >/dev/null 2>&1
@@ -398,21 +400,24 @@ sudo curlftpfs -o rw,allow_other,uid=1000,gid=1000 ftp://gnftp:gionee@10.8.0
 
 
 
-上面的命令好像有问题，这个可以
-挂载
-sudo mount -t cifs -o username=gnftp,password=gionee //10.8.0.22/software_release   ~/project/WORK/ftp/
+	上面的命令好像有问题，这个可以
+	挂载
+	sudo mount -t cifs -o username=gnftp,password=gionee //10.8.0.22/software_release   ~/project/WORK/ftp/
 
-卸载
-fusermount -u  ~/project/WORK/ftp/ 或 umount  ~/project/WORK/ftp/
+	卸载
+	fusermount -u  ~/project/WORK/ftp/ 或 umount  ~/project/WORK/ftp/
 
 
-挂载到以前的项目服务器上，这两个都是y3_driver只是路径不同
-sudo sshfs -o allow_other y3_driver@10.8.0.24:/home/y3_driver  /home/llb/project/WORK/ssh            密码：y3_driver 
+	挂载到以前的项目服务器上，这两个都是y3_driver只是路径不同
+	sudo sshfs -o allow_other y3_driver@10.8.0.24:/home/y3_driver  /home/llb/project/WORK/ssh            密码：y3_driver 
 
-sudo sshfs -o allow_other y3_driver@10.8.0.24:/home/y3_driver/extend_data/guojianqiu    /home/llb/project/WORK/ssh_extend
-(03:14:56 PM) guojianqiu:
+	sudo sshfs -o allow_other y3_driver@10.8.0.24:/home/y3_driver/extend_data/guojianqiu    /home/llb/project/WORK/ssh_extend
+	(03:14:56 PM) guojianqiu:
 
-通过ssh挂载服务器 ssh y3_driver@10.8.0.24
+	通过ssh挂载服务器 ssh y3_driver@10.8.0.24
+
+
+
 
 
 
