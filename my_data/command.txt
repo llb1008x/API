@@ -1,101 +1,152 @@
 ﻿
-1.android手机系统adb常用的命令:
+1.adb常用的命令:
+注意：
+     要使用adb命令，手机需要打开USB debug。
+     电脑这边要对adb进行配置
 
-	要使用adb命令，手机需要打开USB debug。
 
-	安装软件
-	adb install apk文件名称.apk
-	重新安装该软件
+
+     安装软件：
+	adb install   apk文件名称.apk
+	
+     重新安装该软件：
 	adb install -r apk文件名称.apk
 
-	卸载apk软件
+     卸载apk软件：
 	adb uninstall apk包名.apk
 
-	查看手机上的运行日志，此项可以用来查错
+     查看手机上的运行日志：
 	adb logcat
 
-	查看手机是否连接，以及连接了几台手机
+     查看手机是否连接：
 	adb devices
+	
+     A为手机路径，B为电脑路径，意思为：把文件从手机中复制到电脑上
+    	adb pull	<远程路径>  <本地路径> 
 
-	A为手机路径，B为电脑路径，意思为：把文件从手机中复制到电脑上
-	adb pull
-	A为手机路径，B为电脑路径，意思为：把文件从电脑复制到手机上
-	adb push
+     A为手机路径，B为电脑路径，意思为：把文件从电脑复制到手机上
+     	adb push	<本地路径>  <远程路径>
 
-	进入手机的超级终端Terminal
-	adb shell
+     进入手机的超级终端Terminal
+     	adb shell
 
-	重新挂载文件系统
-	adb remount
-
-	重启手机
+     重新挂载文件系统(使系统分区重新可写,或者改变读写权限): 
+	adb remount		/* mount -o remount,rw -t yaffs2 /dev/block/mtdblock3 /system */
+    
+     重启手机
 	adb reboot
-	重启到Recovery界面
+	
+     重启到Recovery界面
 	adb reboot recovery
-	重启到bootloader界面
+	
+     重启到bootloader界面
 	adb reboot bootloader
 
-	例子：刷官方高版本后重新获取ROOT和降级方法（部份操作）
 
-	进行adb运行环境
-	adb shell
+    手机正常的log在/sdcard/mtklog下（死机log在/data/anr下）
+	adb pull  /sdcard/mtklog   /home/llb/project/DEBUG/
 
-	设置超级用户模式
-	su
 
-	映射出目录
-	mount -o remount,rw -t yaffs2 /dev/block/mtdblock3 /system
-
-	退出su
-	exit
-
-	退出shell准备接受下一个adb命令
-	exit
-
-	增加flash_image文件到手机上
-	adb push flash_image.zip /system/bin/flash_image
-
-	recovery先复制到卡上
-	adb push recovery-RA-heroc-v1.6.2.img /sdcard
-
-	再次进入adb环境
-	adb shell
-
-	修改文件属性
-	chmod 0755 /system/bin/flash_image
-
-	重启系统
-	reboot 
-
-	手机正常的log在/sdcard/mtklog 下，死机log在/data/anr下
-	adb pull  /sdcard/mtklog /home/llb/project/PRO/data/
-
-	adb remount （重新挂载系统分区，使系统分区重新可写）
-
+    手机功耗问题导出电池和相关的参数：
 	adb shell dumpsys batterystats > battersystats.log
 	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
 
 
-	通过wifi连接ADB ：
-	adb shell "setprop persist.adb.tcp.port 5555"
-	adb tcpip 5555
+    	通过wifi连接ADB
+	{
+	
+		adb shell "setprop persist.adb.tcp.port 5555"
+		adb tcpip 5555
 
-	-Disconnect the device from the PC USB, and do the following from your command prompt using adb over WiFi (replace "192.168.68.167" with your device's IP address):
+		Disconnect the device from the PC USB, and do the following from your command prompt using adb over WiFi (replace "192.168.68.167" with your device's IP address):
 
-	adb connect 192.168.68.167 
+		adb connect 192.168.68.167 
+	}
+	
+
+	这个例子有待验证
+	{
+		例子：刷官方高版本后重新获取ROOT和降级方法（部份操作）
+
+		进行adb运行环境
+		adb shell
+
+		设置超级用户模式
+		su
+
+		映射出目录
+		mount -o remount,rw -t yaffs2 /dev/block/mtdblock3 /system
+
+		退出su
+		exit
+
+		退出shell准备接受下一个adb命令
+		exit
+
+		增加flash_image文件到手机上
+		adb push flash_image.zip /system/bin/flash_image
+
+		recovery先复制到卡上
+		adb push recovery-RA-heroc-v1.6.2.img /sdcard
+
+		再次进入adb环境
+		adb shell
+
+		修改文件属性
+		chmod 0755 /system/bin/flash_image
+	}
 
 
-	fastboot  刷机
 
 
 
-2.git/repo命令：	
+2.fastboot常用命令(这写命令是G1602A烧写相关的文件)：
+	fastboot flash modem NON-HLOS.bin
+	fastboot flash splash splash.img
+	fastboot flash sbl1 sbl1.mbn
+	fastboot flash sbl1bak sbl1.mbn
+	fastboot flash rpm  rpm.mbn
+	fastboot flash rpmbak rpm.mbn
+	fastboot flash tz tz.mbn
+	fastboot flash tzbak tz.mbn
+	fastboot flash devcfg devcfg.mbn
+	fastboot flash devcfgbak devcfg.mbn
 
-	1.repo forall -cvp git branch -a   察看目录下的分支
+	fastboot flash dsp adspso.bin
+	fastboot flash aboot emmc_appsboot.mbn
+	fastboot flash abootbak emmc_appsboot.mbn
+	fastboot flash boot  boot.img
+	fastboot flash recovery recovery.img
+	fastboot flash system system.img
+	fastboot flash cache cache.img
+	fastboot flash persist persist.img
+	fastboot flash mdtp mdtp.img
+
+
+	fastboot flash cmnlib cmnlib.mbn
+	fastboot flash cmnlibbak cmnlib.mbn
+
+	fastboot flash cmnlib64 cmnlib64.mbn
+	fastboot flash cmnlib64bak cmnlib64.mbn
+	fastboot flash keymaster keymaster.mbn
+	fastboot flash keymasterbak  keymaster.mbn
+
+	fastboot flash userdata userdata.img
+
 
 	
 
-	2.清理残留的
+
+
+
+
+3.git/repo常用命令：	
+注意git相关的操作如git status这个很重要，进行相关操作时一定要注意当前分支是否干净
+
+	1.repo forall -cvp git branch -a   察看整个repo管理目录下的分支
+
+	
+	2.清理残留
 		git clean  -fdx  .  清理编译或残留的一些文件
 
 		git reset HEAD
@@ -181,6 +232,28 @@
 
 	./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest -b gionee_packages_apk_amigo -m SW17W05_oversea_master.xml
 
+
+
+	11.进入MTK工程模式暗码
+	*#*#3646633#*#*
+
+	*#446633#
+
+	*#*#4636#*#*   安卓工程模式
+
+	*#8702#        测试模式
+
+	*#2523#	       察看手机信息
+
+	*#837500#      察看手机版本
+
+	*#837504#	察看系统的一些信息
+
+	15.现在工作的主要指责：
+	   1.charging
+	   2.USB driver
+	   3.thermal
+	   4.power
 
 3.android编译的命令：
 
