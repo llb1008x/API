@@ -100,7 +100,7 @@
 
 
 
-2.fastboot常用命令(这写命令是G1602A烧写相关的文件)：
+2.fastboot常用命令(这写命令是G1602A烧写相关的文件，相关命令还要重新看)：
 	fastboot flash modem NON-HLOS.bin
 	fastboot flash splash splash.img
 	fastboot flash sbl1 sbl1.mbn
@@ -133,76 +133,49 @@
 
 	fastboot flash userdata userdata.img
 
-
 	
 
-
+	当然这里手机除了用组合键进入fastboot还可以用adb命令进入到相应的模式烧写文件
 
 
 
 3.git/repo常用命令：	
-注意git相关的操作如git status这个很重要，进行相关操作时一定要注意当前分支是否干净
+注意git/repo相关的操作如git status这个很重要，进行相关操作时一定要注意当前分支是否干净
 
-	1.repo forall -cvp git branch -a   察看整个repo管理目录下的分支
-
-	
-	2.清理残留
+	git:
+		1.清理残留
 		git clean  -fdx  .  清理编译或残留的一些文件
 
 		git reset HEAD
 
 		git checkout     .  恢复到以前提交的状态
 
-
-	3.git代码更新命令
-		repo forall -vcp git fetch			把服务器代码库上的代码下到本地
-		repo forall -vcp git branch <your branch name> GNBJ-LTE-MT37-AN-G1605A_CTA-031.00.000-161014AA
-		repo forall -vcp git checkout <your branch name>
-
-
-	4.git log --oneline察看所有提交请情况
-
-	
-	5.git diff HEAD  与主目录的差异
-
-
-	6.repo forall -cvp gitk 察看项目下所有分支的情况（图形界面）
-	
-	7.常用的命令
-		git fetch			更新代码
+		
+		2.git代码更新命令
+		git fetch			更新代码(下载到.git文件夹内还未导出到项目里)
 		git merge origin/code_main_dev  合并到主分支
 
-		git add .			添加文件到暂存区
-		git commit -m  "LINUX_G1605A_GNDCR#49641_GUOJQ" 提交自己的修改
-		git push origin LINUX_G1605A_GNDCR#49641_GUOJQ:code_main_dev 提交到提交自己的代码到远程代码库 
 
-		refs/for/
+		3.git log --oneline察看所有提交情况
 
-		git status			git工作去的状态
-
-		git rm -r --cache 文件和路径
-
-	8.git branch -D         删除分支	
 	
-	git checkout -b  LINUX_G1605A_GNDCR#_LLB  origin/code_main_dev
-	
-	9.repo封装的操作 对整个项目文件都操作
-		清除
-		repo forall -vcp git clean -dfx
-		repo forall -vcp git reset HEAD
-		repo forall -vcp git checkout .
-		更新
-		repo forall -vcp git fetch
-		repo forall -vcp git merge origin/code_main_dev
+		4.git diff HEAD  与主目录的差异(这个是当前分支所有的文件比较)
 	
 
-		repo_19.9.0.151 forall  -c  "scp  -p  -P  29418 lilubao@19.9.0.151:hooks/commit-msg  .git/hooks/"
+		5.git status	 察看工作区的状态
+
+		
+		6.git rm -r --cache 文件和路径	删除工作区内的文件，就是不跟踪这个文件的状态
 
 
-	10.origin/code_main_dev 
+		7.git branch -D         删除分支
 
-	11.git tag   察看版本号
-		Git 中的tag指向一次commit的id，通常用来给开发分支做一个标记，如标记一个版本号。
+		
+		8.git checkout -b  LINUX_G1605A_GNDCR#_LLB  origin/code_main_dev	跟踪主分支创建自己的本地分支
+
+		
+		9.git tag   察看软件版本号
+		git 中的tag指向一次commit的id，通常用来给开发分支做一个标记，如标记一个版本号。
 
 		打标签
 		git tag -a v1.01 -m "Relase version 1.01"
@@ -212,29 +185,72 @@
 		git tag -d v1.01
 		注解：-d 表示删除，后面跟要删除的tag名字
 
+		
+		10. git ls-files 察看版本库区内的文件
 
-	12.通过git下载linux内核
-	git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+
+		**11.git 回滚操作，回撤（这个命令还有疑问，相关内容）
+		git commit --amend  
 	
-	13.往服务器上推送代码
-	git push origin LINUX_G1605A_GNDCR#49641_GUOJQ:code_main_dev 
+		
+
+		12.通过git下载linux内核
+		git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
 
 
-	14. git ls-files 察看版本库区内的文件
+
+		12.常用的命令(提交之前先fetch，merge避免修改的冲突)
+		git add .			添加文件到暂存区
+		git fetch 
+		git merge  origin/code_main_dev
+		git commit -m  "LINUX_17G05A_GNDCR#_LLB" 提交自己的修改
+		git push origin LINUX_17G05A_GNDCR#_LLB:code_main_dev 提交到提交自己的代码到远程代码库 
+
+		添加gerrit服务器之后提交要先提交到gerrit
+		git push origin LINUX_17G05A_GNDCR#_LLB:refs/for/code_main_dev
 
 
-	git 回滚操作，回撤
+
+
+	repo:
+		1.repo forall -cvp git branch -a   察看整个repo管理目录下的分支
+
+
+		2.repo更新整个项目工程
+		repo forall -vcp git fetch			把服务器代码库上的代码下到本地
+		repo forall -vcp git branch <your branch name> GNBJ-LTE-MT37-AN-G1605A_CTA-031.00.000-161014AA
+		repo forall -vcp git checkout <your branch name>
 	
-	git commit --amend
+		
+		3.repo forall -cvp gitk 察看项目下所有分支的情况（图形界面）
+		
+			
+		4.repo封装的操作 对整个项目文件都操作
+			清除
+			repo forall -vcp git clean -dfx
+			repo forall -vcp git reset HEAD
+			repo forall -vcp git checkout .
+			更新
+			repo forall -vcp git fetch
+			repo forall -vcp git merge origin/code_main_dev
+	
+	
+		
+			
+		5.下载深圳项目代码
+		./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest.git -b android_mtk_n_6737m_65_mp1 -m master.xml 
+
+		./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest -b gionee_packages_apk_amigo -m SW17W05_oversea_master.xml
+
+		第一次提交之前通过hook使每次提交生成change ID	
+		repo_19.9.0.151 forall  -c  "scp  -p  -P  29418 lilubao@19.9.0.151:hooks/commit-msg  .git/hooks/"
 
 
-	./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest.git -b android_mtk_n_6737m_65_mp1 -m master.xml 
-
-	./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest -b gionee_packages_apk_amigo -m SW17W05_oversea_master.xml
 
 
 
-	11.进入MTK工程模式暗码
+
+4.进入MTK工程模式暗码
 	*#*#3646633#*#*
 
 	*#446633#
@@ -249,17 +265,14 @@
 
 	*#837504#	察看系统的一些信息
 
-	15.现在工作的主要指责：
-	   1.charging
-	   2.USB driver
-	   3.thermal
-	   4.power
 
-3.android编译的命令：
 
-    a.脚本编译的版本：
+
+5.项目编译相关的命令：
+
+    脚本编译的版本(当然不同的项目还有很多不同的版本)：
 	
-	BBL7337A ：金立手机全套的的软硬件，user，debug
+	BBL7337A ：全版本user，debug
 	
 	BBL7337A_CMCC：要送到中国移动部测试用的，基本的软硬件，没有金立定制的软件      
 	
@@ -271,36 +284,95 @@
 
 	BBL7337A_sign:签名版
 
+
+     编译命令：
+	./TmakeGionee  G1605A   -C  将gionee目录内的代码拷贝到各各目录下，覆盖
+	./TmakeGionee  G1605A   -n  全编整个项目
+	./TmakeGionee  G1605A   -r  remake 重编，在原有基础之上
+	./TmakeGionee  G1605A   -i  bootimage  lk  system  <bootimage|systemimage|bootimage|modem>编译不同的模块
+	./TmakeGionee  G1605A   -v  <user|eng|userdebug>编译不同的版本
+
+
 	编译某个目录
-	./TmakeGionee G1605A -p vendor/mediatek/proprietary/external/charger/
-	./TmakeGionee G1605A -p vendor/mediatek/proprietary/external/libshowlogo/
+	./TmakeGionee  G1605A  -p  vendor/mediatek/proprietary/external/charger/
+	./TmakeGionee  G1605A  -p  vendor/mediatek/proprietary/external/libshowlogo/
 	推送到手机bin下
 
-        adb remount （重新挂载系统分区，使系统分区重新可写）
+        adb remount （重新挂载系统分区，使系统分区重新可写，不然无法将文件，bin推送到system/bin）
 	adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/bin/kpoc_charger   system/bin/
 	adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/lib/libshowlogo.so  system/lib/
+
 
 	调整log时间
 	./ktime -i kernel_log -o kernel_log_output
 
-    b.android相关的基本内容
-	
-	改变电脑上java jdk的版本
+
+	改变电脑上java jdk javac的版本
 	sudo update-alternatives --config java
 	
 	sudo update-alternatives --config javac
-
-	java -version
-
-    c.烧写user版本要签名
+	
+	察看当前的java版本java -version
 
 
-4.linux 下常用命令
+ 	烧写user版本要签名(烧签名版本的是在window环境下)
 
-	find--->	find   path   -option   [   -print ]   [ -exec   -ok   command ]   {} \;
 
-		find    .  -name  文件名     搜索当前路径下的文件名
-		-type 查找某一类型的文件，诸如：b-块设备文件；d-目录；c-字符设备文件；p-管道文件；l-符号链接文件；f-普通文件；s-socket文件。
+
+
+	**编译android原生代码相关的命令(这个要实践，搭建android开发环境，编译原生代码)
+
+
+
+
+
+
+6.linux 下常用命令
+
+	locate && find && grep三个命令
+	
+	find命令：
+		find   路径   -name  文件名
+		find   路径   -type  f文件/d目录
+		
+    	查找目录并列出目录下的文件(为找到的每一个目录单独执行ls命令，没有选项-print时文件列表前一行不会显示目录名称)
+		find ./ -type d -print -exec ls {} \;
+    	(这里的参数 -print是显示找到的文件或者目录；而-exec 相当于创建了一个子进程去执行后面的shell命令；分号不能少，不然不是一个完整的命令)
+	
+		查找文件名匹配*.c的文件(\*.c如果是*.c好像不行)
+		find ./ -name \*.c
+	
+		查找文件更新日时在距现在时刻二天以内的文件
+		find ./ -mtime -2
+		查找文件更新日时在距现在时刻二天以上的文件
+		find ./ -mtime +2
+		
+		查找文件size小于10k的文件或目录
+		find ./ -size -10k
+		
+		查找所有者权限有读权限的目录或文件
+		find ./ -perm -u=r
+		
+		查找空文件并删除
+		find ./ -empty -type f -print -delete
+		
+		
+	
+	grep命令：
+	
+	
+	
+	
+
+	挂在命令mount ，umount，remount
+
+
+
+
+
+
+
+
 
 	 grep  -i  CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT  gionee  -R
 
@@ -348,8 +420,6 @@ sudo sshfs -o allow_other y3_driver@10.8.0.24:/home/y3_driver/extend_data/guojia
 
 	
 
-
-7.c语法
 
 
 

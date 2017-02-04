@@ -168,6 +168,10 @@ http://linux.linuxidc.com/
 用户名与密码都是www.linuxidc.com
 
 
+使用fastboot命令刷机流程详解
+http://blog.chinaunix.net/uid-31390529-id-5753369.html
+
+
 
 
 
