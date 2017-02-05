@@ -170,7 +170,8 @@ other：
 	http://blog.chinaunix.net/uid-31390529-id-5753369.html
 
 
-
+	**SSH协议介绍 
+	http://blog.csdn.net/macrossdzh/article/details/5691924
 
 
 

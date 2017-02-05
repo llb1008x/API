@@ -52,7 +52,7 @@
 	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
 
 
-    	通过wifi连接ADB
+    **通过wifi连接ADB
 	{
 	
 		adb shell "setprop persist.adb.tcp.port 5555"
@@ -64,7 +64,7 @@
 	}
 	
 
-	这个例子有待验证
+	**这个例子有待验证
 	{
 		例子：刷官方高版本后重新获取ROOT和降级方法（部份操作）
 
@@ -379,18 +379,23 @@
 
 
 
-	nohup command    >/dev/null 2>&1
+		**有待验证
+		{
+			nohup command    >/dev/null 2>&1
 	
-	>/dev/null 2>&1  标准输出和错误输出重定向到空的设备描述符中 （垃圾箱）
-	nohup  command 启动一些程序
+			>/dev/null 2>&1  标准输出和错误输出重定向到空的设备描述符中 （垃圾箱）
+			nohup  command 启动一些程序
+		}
+
 	
 
 
 
 
-5.通过ftp挂在烧写服务器上的rom
+7.通过ftp挂在烧写服务器上的rom(当然也可以用文件系统直接登陆，拷贝rom包到本地)
 
-sudo curlftpfs -o rw,allow_other,uid=1000,gid=1000 ftp://gnftp:gionee@10.8.0.22/software_release/git_release/2016-10/02_ANDROID/G1605A/   /home/llb/project/WORK/ftp/
+	(这个命令有问题，下面的可以用)
+	sudo curlftpfs -o rw,allow_other,uid=1000,gid=1000 ftp://gnftp:gionee@10.8.0.22/software_release/git_release/2016-10/02_ANDROID/G1605A/   /home/llb/project/WORK/ftp/
 
 	GID为GroupId，即组ID，用来标识用户组的唯一标识符
 	UID为UserId，即用户ID，用来标识每个用户的唯一标示符
@@ -400,7 +405,7 @@ sudo curlftpfs -o rw,allow_other,uid=1000,gid=1000 ftp://gnftp:gionee@10.8.0
 
 
 
-	上面的命令好像有问题，这个可以
+	
 	挂载
 	sudo mount -t cifs -o username=gnftp,password=gionee //10.8.0.22/software_release   ~/project/WORK/ftp/
 
@@ -419,9 +424,6 @@ sudo curlftpfs -o rw,allow_other,uid=1000,gid=1000 ftp://gnftp:gionee@10.8.0
 
 
 
-
-
-6.ssh协议用法？
 
 	
 
