@@ -209,7 +209,18 @@
 
 		添加gerrit服务器之后提交要先提交到gerrit
 		git push origin LINUX_17G05A_GNDCR#_LLB:refs/for/code_main_dev
+		
+		
+		13.删除一个远程分支
+		git push origin --delete  <branchName>这样远程分支是删除了，但是本地仍然有远程分支的副本所以要下面的命令
+		
+		git branch -d -r origin/pending-issues-in-project只是删除该分支
+		
+		git remote prune origin删除所有此类陈旧的远程分支机构。也可以更新在git remote update --prune origin
 
+
+		14.git rebase
+			
 
 
 
