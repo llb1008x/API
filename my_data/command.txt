@@ -220,6 +220,8 @@
 
 
 		14.git rebase
+		git  rebase  origin/code_main_dev     丢弃本地的commit ，并同步迁移到所要提交的分支，自动更新主分支的提交 
+		从命令格式，可以看到git-rebae命令至少需要一个参数，那就是，这个参数可以是一个分支名称，也可以是一次有效的commit。
 			
 
 
