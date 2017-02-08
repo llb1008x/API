@@ -405,7 +405,13 @@
 		}
 
 	
+	
+		格式化U盘：
+		sudo umount /dev/sda1    # 必须先卸载该分区
+		# 格式化为 FAT 分区
+		sudo mkfs.vfat -F 32 /dev/sda1       # -F 参数必须大写，参数有 12，16 和 32，分别对应 FAT12，FAT16，FAT32 
 
+		sudo fdisk  /dev/sdb 对相应的磁盘进行操作
 
 
 

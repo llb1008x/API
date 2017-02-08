@@ -52,7 +52,7 @@
 
 /*RT5081*/
 {
-看文档要提高效率
+
 	
 	RT5081的几个基本功能：
 	switching battery charger ;USB Type-C &&Power Delivery (PD) controller;
@@ -71,7 +71,8 @@
 	high-impedance mode:高阻抗模式为了降低功耗，产生极低的电流
 	
 	charge mode :
-	Minimum Input Voltage Regulation (MIVR):为了阻止输入电压因充电器供电能力不足而下降
+	Minimum Input Voltage Regulation (MIVR):最小输入电压的控制
+	为了阻止输入电压因充电器供电能力不足而下降
 
 
 
@@ -100,6 +101,8 @@
 
 代码：
 	/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/pmic/rt5081/
+	
+	
 
 	
    

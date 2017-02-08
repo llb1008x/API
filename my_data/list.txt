@@ -169,13 +169,17 @@ other：
 	使用fastboot命令刷机流程详解
 	http://blog.chinaunix.net/uid-31390529-id-5753369.html
 
-2017.2.5
+
 	**SSH协议介绍 
 	http://blog.csdn.net/macrossdzh/article/details/5691924
 	
-2017.2.6	
+	
 	git rebase命令
 	http://gitbook.liuhui998.com/4_2.html
+	
+	
+	无线充电IC
+	http://www.elecfans.com/dianyuan/404455.html
 
 
 
