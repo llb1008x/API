@@ -85,6 +85,8 @@
 2017.2.9
 必须:
 	1.调试17G05A开发板，弄清楚要干什么
+		对比rt5081_pmu_charger_gn20.c 与rt5081_pmu_charger.c
+		看看lk，preloader ,kernel三个阶段的dws配置
 	2.看代码，看文档，看log	
 	3.读完那本书，计划下一本看什么书，还有大学幕课也要准备看些什么
 	
