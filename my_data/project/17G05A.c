@@ -131,7 +131,24 @@
 	battery_get_bat_current_sign这个应该是fuelgauge在读取寄存器g_fg_is_charging，读取IC是充电还是放电
 	
 	
- 	charger_manager是专门的管理充电器的子系统吗？
+	
+	
+	
+	charger_manager是专门的管理充电器的子系统？
+	{	
+		单充电芯片还是双充电芯片工作：919是单充电芯片
+		mtk_switch_charging_init
+		mtk_dual_switch_charging_init
+	
+		mtk_charger.c    charger_driver  mtk_charger_probe--->charger_routine_thread
+ 	
+	
+	}
+	
+
+	
+	
+ 	
 	
 	
 	
@@ -151,7 +168,9 @@
 		3.导入电池曲线ZCV table battery_table.dtsi
 		4.Rfg？
 		
+		
 	电量计检测的NTC电阻10k，47k	
+		
 		
 		
 	定义了GM3.0的地方
