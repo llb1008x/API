@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingTop="8dip"
+    android:paddingLeft="5dip"
+    android:paddingBottom="8dip">
+    <ImageView 
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/icon"
+        android:src="@drawable/ic_launcher"
+        android:layout_centerVertical="true"
+        android:paddingRight="5dip"/>
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="星期一"
+        android:id="@+id/week"
+        android:layout_toRightOf="@+id/icon"
+        android:layout_alignParentTop="true"/>
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="温度"
+        android:id="@+id/temperature"
+        android:layout_toRightOf="@+id/icon"
+        android:layout_below="@+id/week"/>
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="情况"
+        android:id="@+id/condition"
+        android:layout_toRightOf="@+id/icon"
+        android:layout_below="@+id/temperature"/>
+    
+</RelativeLayout>

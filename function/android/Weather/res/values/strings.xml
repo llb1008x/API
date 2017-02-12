@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, WeatherActivity!</string>
+    <string name="app_name">Weather</string>
+    <string name="prompt">温馨提示：请检查城市拼音是否输错或者我们没有提供该城市的天气信息,谢谢！</string>
+    
+</resources>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="请输入城市拼音"
+        android:id="@+id/prompt" />
+    <LinearLayout 
+         android:layout_width="fill_parent"
+   	 	 android:layout_height="wrap_content"
+   		 android:orientation="horizontal" >
+	    <AutoCompleteTextView
+	        android:id="@+id/autoTextView"
+	        android:layout_width="180dip"
+	        android:layout_height="wrap_content"
+	        />
+	    <Button 
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="确定"
+	        android:id="@+id/btn_confirm"/>
+    </LinearLayout>
+    
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="实时天气"
+        android:textColor="#ffffff00"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        android:id="@+id/current_time" />
+    <ImageView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/current_icon"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/current_info"/>"
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="未来天气"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        android:textColor="#ffffff00"
+        android:id="@+id/future_time" />
+   
+    <ListView 
+        android:id="@+id/myListView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+
+</LinearLayout>
