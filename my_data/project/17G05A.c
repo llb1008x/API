@@ -271,3 +271,40 @@
 
 }
 
+
+
+
+/*debug*/
+{
+						17G05A(71%)			W909(69%)  			G1605A(70%)
+	关机充电电流:		0.1A~0.3A		0.6A~0.75A			0.75A~0.85A
+	座充充电电流：		0.1A~0.3A		0.6A~0.8A			0.8A~0.9A
+	USB充电电流：		0.1A~0.3A		0.2A~0.3A			0.2A~0.3A
+	
+	USB没有电流是串口地接到了电源地，拔掉串口后有电流，但应该不是这个原因吧
+	
+	没有电池是充电电流小的原因吗？
+	
+	{
+		Average Input Current Regulation (AICR) : 0.1A to 3.25A in 50mA steps
+	
+		CHG_ILIM :Input current limit setting input. A resistor is connected from CHG_ILIM pin
+		to ground to set the maximum input current limit. The actual input current
+		limit is the lower value set through the CHG_ILIM pin and IAICR register
+		bits.
+
+		IAICR
+
+	
+	}
+	
+
+
+	
+	
+	
+	
+	
+
+}
+
