@@ -1,7 +1,5 @@
 
 
-
-
 双芯片管理充电MT6355和RT5081
 /*MT6355*/
 {
@@ -9,7 +7,12 @@
 
 
 
+
+
+
 }
+
+
 
 
 
@@ -124,6 +127,9 @@
 	
 	
 	
+	
+	
+函数功能：	
 	mtk_get_dynamic_cv
 	
 	
@@ -140,15 +146,41 @@
 		mtk_switch_charging_init
 		mtk_dual_switch_charging_init
 	
-		mtk_charger.c    charger_driver  mtk_charger_probe--->charger_routine_thread
- 	
-	
 	}
 	
 
+########################################################################################################	
+	去掉了Type-c改成micro USB，接口改了，有些功能应该用不了 (dws文件，gpio表，中断,dtsi文件)
 	
+	dtsi文件:
+	kernel-4.4/archarm64/boot/dts/mediatek/mt6757.dtsi
+	
+	dws文件:
+	vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k57pv1_6mtee_pre/dct/dct/codegen.dws
+	vendor/mediatek/proprietary/bootable/bootloader/lk/target/k57pv1_6mtee_pre/dct/dct/codegen.dws
+	kernel-4.4/drivers/misc/mediatek/dws/mt6757/k57pv1_6mtee_pre.dws
+	
+	
+
 	
  	
+ 	需要用到的gpio			Type-C						mirco USB
+ 	
+ 	USB_ID					23
+ 	DRV_BUS					43
+	GPIO_CHG_EN				100
+	EINT_CHG_STAT			101(EINT)
+	EINT_RT5081_PD_IRQB		8(EINT)	
+	TYPEC_HEADSET_CTRL_EN	86(EINT)
+	
+	
+	switching_charger	I2C_CHANNEL_1		0X6A
+	
+	#1关机充电的流程：
+	
+
+	
+
 	
 	
 	
@@ -157,6 +189,8 @@
 	
    
 }
+
+
 
 
 
@@ -274,8 +308,17 @@
 
 
 
+
+
+
+
+
+
 /*debug*/
 {
+
+
+BUG#1
 						17G05A(71%)			W909(69%)  			G1605A(70%)
 	关机充电电流:		0.1A~0.3A		0.6A~0.75A			0.75A~0.85A
 	座充充电电流：		0.1A~0.3A		0.6A~0.8A			0.8A~0.9A
@@ -283,7 +326,7 @@
 	
 	USB没有电流是串口地接到了电源地，拔掉串口后有电流，但应该不是这个原因吧
 	
-	没有电池是充电电流小的原因吗？
+	没有电池是充电电流小的原因吗？(好吧这个是真实的原因，因为用的假电，所以电量肯定充不进去)
 	
 	{
 		Average Input Current Regulation (AICR) : 0.1A to 3.25A in 50mA steps
@@ -293,9 +336,8 @@
 		limit is the lower value set through the CHG_ILIM pin and IAICR register
 		bits.
 
-		IAICR
+		IAICR:
 
-	
 	}
 	
 
@@ -307,4 +349,12 @@
 	
 
 }
+
+
+
+
+
+
+
+
 

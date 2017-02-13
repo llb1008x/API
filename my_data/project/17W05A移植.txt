@@ -929,20 +929,14 @@ kernel目录下
 
 
 
-
-
 dws文件是否需要改，看看spe和dws文件配置是否正确
 
 
 
-
-
-
-
 	
 	
 	
-6.BUG#67460
+7.BUG#67460
 	
 	修改SD卡的格式为exfat时，插入到测试机后不识别SD卡。
 	
@@ -965,7 +959,7 @@ dws文件是否需要改，看看spe和dws文件配置是否正确
 	
 	
 	
-7.BUG#66789
+8.BUG#66789
 	手机为开机状态，长按电源键11s，手机不会自动重启	
 	hal_kpd.c   keypad.h	gnbj6737t_66_m0_debug_defconfig   gnbj6737t_66_m0_defconfig
 	
@@ -976,6 +970,10 @@ dws文件是否需要改，看看spe和dws文件配置是否正确
 	
 	长按power键,reboot or shudown
 	cust_rtc.h
+
+
+
+
 
 	
 	

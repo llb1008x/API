@@ -293,11 +293,17 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 
 
 
-	移植OTG开关到BBL7515上，USB协议？
 
 
 	在MTK原生代码上移植充电相关的代码？
+	移植了G1605A到17W05A上
 
+
+
+
+	移植OTG开关到BBL7337上
+	OTG开关：
+		GN_BATTERY_OTGCHARGE_SWITCH_SUPPORT
 
 
 
@@ -1027,6 +1033,10 @@ reset有两三秒时间
 
 
 
+
+
+
+
 --->shutdown_gauge
 	电池电压还很高，手机就关机了....
 	这里涉及到几个关机检测策略问题，还有0%检测上报问题
@@ -1164,6 +1174,8 @@ GNSPR#65245
 
 	 原因：
 	 充电宝给手机充电时，充电宝和手机都有对充电电流的检测，当充电快充满时，充电电流很小，充电宝端检测到充电电流很小，就断开充电
+	 
+	 
 
 	 
 }*/
