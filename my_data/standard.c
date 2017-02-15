@@ -1049,3 +1049,21 @@ static void mt_battery_average_method_init(BATTERY_AVG_ENUM type, unsigned int *
 #define spmi_for_each_container_dev(res, spmi_dev)			      \
 	for (res = ((spmi_dev)->dev_node ? &(spmi_dev)->dev_node[0] : NULL);  \
 	     (res - (spmi_dev)->dev_node) < (spmi_dev)->num_dev_node; res++)
+	     
+	     
+18.条件表达式根据en使能与否使用不同的函数，参数是一样的，然后在回掉不同的函数
+ret = (en ? rt5081_pmu_reg_set_bit : rt5081_pmu_reg_clr_bit)
+		(chg_data->chip, RT5081_PMU_REG_CHGCTRL3, RT5081_MASK_ILIM_EN);	 
+		
+		
+static inline int rt5081_pmu_reg_set_bit(struct rt5081_pmu_chip *chip, u8 addr,
+		u8 mask)
+{
+	return rt5081_pmu_reg_update_bits(chip, addr, mask, mask);
+}	
+
+static inline int rt5081_pmu_reg_clr_bit(struct rt5081_pmu_chip *chip, u8 addr,
+		u8 mask)
+{
+	return rt5081_pmu_reg_update_bits(chip, addr, mask, 0x00);
+}	    
