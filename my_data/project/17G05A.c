@@ -427,10 +427,12 @@ BUG#3
 	} CHARGER_TYPE;
 	
 	
-	
-	SDP:主设备，USB口
-	DCP：专用充电器，标准充电器
-	CDP：
+	如何通过USB口检测出是标准充电器和非标准充电器
+	BC1.2中定义的充电类型
+	SDP：标准下行接开口，电脑USB
+	CDP：充电下行接口
+	DCP：标准的座充
+	OCP：other chargng port非标准充电器
 	
 	
 	根据寄存器打印的usb_status
@@ -484,6 +486,56 @@ BUG#3
 	}
 
 
+
+
+
+	
+	
+BUG#4
+	{
+		充电接口检测和充电电流，电压的调节	(现在的问题是充电电流很小)
+		AICR就是input current limit,充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由5081来做；
+		但是只是在插入充电器的时候去做检测，直到拔出充电器再次插入才会再一次检测，同一个充电器不会多次检测输出能力，因为同一个充电器此值肯定是相同的，没必要再检测。	
+		
+		
+		参数：ICHG(P68), fgauge_read_current
+
+		
+		
+		函数：
+		mtk_switch_charging_run
+		
+		
+		文件：
+		定义电池相关参数，当然这些参数有两个方向dtsi(mt6757.dtsi,rt5081.dtsi)，和宏
+		mtk_charging.h 	，mtk_charging_intf.h(快充)
+		#define USB_CHARGER_CURRENT					CHARGE_CURRENT_500_00_MA	/* 500mA */
+		/* #define AC_CHARGER_CURRENT					CHARGE_CURRENT_650_00_MA */
+		#define AC_CHARGER_CURRENT					CHARGE_CURRENT_2050_00_MA
+		#define AC_CHARGER_INPUT_CURRENT				CHARGE_CURRENT_3200_00_MA
+		#define NON_STD_AC_CHARGER_CURRENT			CHARGE_CURRENT_500_00_MA
+		#define CHARGING_HOST_CHARGER_CURRENT       CHARGE_CURRENT_650_00_MA
+		#define APPLE_0_5A_CHARGER_CURRENT          CHARGE_CURRENT_500_00_MA
+		#define APPLE_1_0A_CHARGER_CURRENT          CHARGE_CURRENT_650_00_MA
+		#define APPLE_2_1A_CHARGER_CURRENT          CHARGE_CURRENT_800_00_MA
+		
+		
+		
+		mtk_switch_charging.h,调用不同的算法
+		
+		
+		
+	}
+	
+	
+	
+	
+	调用流程：
+	(mtk_charger.c)mtk_charger_probe: starts 初始化charger_manager结构体，首先是从mtk6757.dtsi 的charger开始对不同成员赋值，如果没有定义就从mtk_charging.h的宏赋值
+	包括一些电池参数和调用充电的算法--->charger_routine_thread,创建一个常用的线程，检查充电与否，充电器的类型，和一些电池参数
+
+	
+	
 	
 	
 	
