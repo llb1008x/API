@@ -351,7 +351,14 @@
 /*debug*/
 {
 		关掉OTG功能
+		
+		
+		
+		提高充电电流，进电池，充电线上的电流
+		温升保护导致的降电流策略
+		温升策略是什么
 
+		charger_thread][name:mtk_switch_charging&]force:0 thermal:-1 -1 setting:3200000 2050000 type:4 usb_unlimited:0 usbif:0 usbsm:0
 
 
 --->代码：
@@ -519,7 +526,32 @@
 		
 		#3函数功能	
 		{
-
+			rt5081_dump_register
+			{
+			
+				ichg		ret = rt5081_get_ichg(chg_dev, &ichg);--->rt5081_find_closest_real_value(RT5081_ICHG_MIN, RT5081_ICHG_MAX,RT5081_ICHG_STEP, reg_ichg);
+				reg_ichg是寄存器上的值，经过ret_val = min + reg_val * step得到最接近真实的值
+				
+				
+				
+				aicr		ret = rt5081_get_aicr(chg_dev, &aicr);
+				chg_status	ret = rt5081_get_charging_status(chg_data, &chg_status);
+				ieoc		ret = rt5081_get_ieoc(chg_data, &ieoc);
+				mivr		ret = rt5081_get_mivr(chg_data, &mivr);
+				cv			ret = rt5081_get_cv(chg_dev, &cv);
+				chg_en		ret = rt5081_is_charging_enable(chg_data, &chg_en);
+				vsys		ret = rt5081_get_adc(chg_data, RT5081_ADC_VSYS, &adc_vsys);
+				vbat		ret = rt5081_get_adc(chg_data, RT5081_ADC_VBAT, &adc_vbat);
+				ibat		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBAT, &adc_ibat);
+				ibus		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBUS, &adc_ibus);
+			
+			}
+			
+			
+			
+			
+			
+			
 	
 			mtk_switch_charging_run
 		
@@ -529,6 +561,8 @@
 			mtk_switch_charging.c定义的充电状态机的各各函数
 		
 			mtk_battery.c force_get_tbat
+			
+			当然重要的是调整充电状态
 		}
 		
 		
@@ -539,7 +573,19 @@
 		#4log关键字
 		
 			ICHG(P68), 察看充电电流
-			fgauge_read_current这个是电量计读出的数据，
+			fgauge_read_current，fgauge_read_IM_current这个是电量计读出的数据，
+			IBAT进电池的电流，IBUS：供电线上的电流
+			
+					
+			更改log的等级
+			{
+				在mtk_battery.c
+		
+				FG_daemon_log_level
+		
+				gFG_daemon_log_level
+			}
+		
 	
 
 
@@ -556,7 +602,7 @@
 
 
 
-
+ 	
 
 
 
@@ -564,17 +610,15 @@
 	
 	调用流程：
 	{
-		(
-		
-		
-		mtk_charger.c)mtk_charger_probe: starts 初始化charger_manager结构体，首先是从mtk6757.dtsi 的charger开始对不同成员赋值，如果没有定义就从mtk_charging.h的宏赋值
-		包括一些电池参数和调用充电的算法--->(mtk_switch_charging.c)选择不同的充电算法,mtk_switch_charging_init,从rt5081.dtsi获取一些参数，然后调用不同的函数指针--->
-		创建一个常用的线程charger_routine_thread 检查充电与否，充电器的类型，和一些电池参数-->(mtk_battery_intf.c)battery_get_bat_current,获取充电电流--->(mtk_battery_hal.c)
-		bm_ctrl_cmd定义了一些调用fuelgauge的函数指针--->charger_update_data获取电量计的状态，某种温度下，再调用force_get_tbat--->charger_check_status检测充电器的状态，
-		都是基于battery thermal protection进行的检测
+		(mtk_charger.c)mtk_charger_probe: starts 初始化charger_manager结构体，首先是从mtk6757.dtsi 的charger开始对不同成员赋值，如果没有定义就从mtk_charging.h的宏赋值
+		包括一些电池参数和调用充电的算法--->(mtk_switch_charging.c)选择不同的充电算法,mtk_switch_charging_init,从rt5081.dtsi(里面的一些参数是从rt5081_pmu_core.c获取匹配，
+		然后再到不同的项里面匹配)获取一些参数，然后调用不同的函数指针--->创建一个常用的线程charger_routine_thread 检查充电与否，充电器的类型，和一些电池参数-->
+		(mtk_battery_intf.c)battery_get_bat_current,获取充电电流--->(mtk_battery_hal.c)bm_ctrl_cmd定义了一些调用fuelgauge的函数指针--->charger_update_data获取电量计的状态，
+		某种温度下，再调用force_get_tbat--->charger_check_status检测充电器的状态，都是基于battery thermal protection进行的检测
 	
 	}
-	
+	rt5081.dtsi参数在rt5081_pmu*的of_device_id里面获取的
+	meter,table：这两个都是电量计算的相关参数
 	
 
 

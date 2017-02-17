@@ -1067,3 +1067,36 @@ static inline int rt5081_pmu_reg_clr_bit(struct rt5081_pmu_chip *chip, u8 addr,
 {
 	return rt5081_pmu_reg_update_bits(chip, addr, mask, 0x00);
 }	    
+
+
+19.都去寄存器的值，mask，shift
+掩码是为了读多少位，位移是为了将读出的数据方便处理
+static int rt5081_get_aicr(struct charger_device *chg_dev, u32 *aicr)
+{
+	int ret = 0;
+	u8 reg_aicr = 0;
+	struct rt5081_pmu_charger_data *chg_data =
+		dev_get_drvdata(&chg_dev->dev);
+
+	ret = rt5081_pmu_reg_read(chg_data->chip, RT5081_PMU_REG_CHGCTRL3);
+	if (ret < 0)
+		return ret;
+
+	reg_aicr = (ret & RT5081_MASK_AICR) >> RT5081_SHIFT_AICR;
+	*aicr = rt5081_find_closest_real_value(RT5081_AICR_MIN, RT5081_AICR_MAX,
+		RT5081_AICR_STEP, reg_aicr);
+
+	return ret;
+}
+
+static u32 rt5081_find_closest_real_value(u32 min, u32 max, u32 step,
+	u8 reg_val)
+{
+	u32 ret_val = 0;
+
+	ret_val = min + reg_val * step;
+	if (ret_val > max)
+		ret_val = max;
+
+	return ret_val;
+}
