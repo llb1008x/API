@@ -1,47 +1,32 @@
 #include <stdio.h>
-
-#define TEST_DEFINE
-//#define DATA_CONVERT1
-//#define DATA_CONVERT2
-
-/*
- * #define的用法：
- *定义一个跟行号相关的变量
- */
-
-//为什么不能直接定义为DD(A)  BB(A,__LINE__)
-#if defined(TEST_DEFINE)
-
-#define BB(B,C) B##C
-#define AA(B,C) BB(B,C)
-#define DD(A)   AA(A,__LINE__)
-
-#endif
-
-
+#include <string.h>
 
 int main()
 {
-#if defined(TEST_DEFINE)
-    printf("line--->%d\n",DD(1));
-#endif
-
-#if defined(DATA_CONVERT1)
-    int num=5;
-    float f = (float)num/2;
-    
-    printf("f--->%f\n",f);
-    unsigned int *p = &f;
+	char str1[]="SBBCABCDABABCDABCDABDE";
+	char str2[]="PABCDABD";
 	
-    printf("s1=%x\n",*p);
-#endif
+	//printf("str1->%s\n",str1);
+	//printf("str2->%s\n",str2);
+	
+	int i=0,j=0;
+	
+	for(i=0;i<strlen(str1)-strlen(str2);i++){
+	
+		for(j=0;j<strlen(str2);j++){
+		
+		
+			if( str1[i]!=str2[j])
+					break;
+			
+			if(j==strlen(str2)-1){
+				
+				printf("i->%d,j->%d\n",i,j);
+				return 0;
+			}
+						
+		}
+	}
 
-
-#if defined(DATA_CONVERT2)
-	unsigned int i = x;
-	unsigned int *p = &x;
-	printf("x=%f,i=0x%x,p_x=0x%x\n",x,i,*p);
-#endif
-
-    return 0;
+	return 0;
 }
