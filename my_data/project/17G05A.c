@@ -340,209 +340,281 @@
 
 
 
+
+
+
+
+
+
+
+
 /*debug*/
 {
-
-
-BUG#1
-						17G05A(71%)			W909(69%)  			G1605A(70%)
-	关机充电电流:		0.1A~0.3A		0.6A~0.75A			0.75A~0.85A
-	座充充电电流：		0.1A~0.3A		0.6A~0.8A			0.8A~0.9A
-	USB充电电流：		0.1A~0.3A		0.2A~0.3A			0.2A~0.3A
-	
-	USB没有电流是串口地接到了电源地，拔掉串口后有电流，但应该不是这个原因吧
-	
-	没有电池是充电电流小的原因吗？(好吧这个是真实的原因，因为用的假电，所以电量肯定充不进去)
-	
-	{
-		Average Input Current Regulation (AICR) : 0.1A to 3.25A in 50mA steps
-	
-		输入电流的限制CHG_ILIM :Input current limit setting input. A resistor is connected from CHG_ILIM pin
-		to ground to set the maximum input current limit. The actual input current
-		limit is the lower value set through the CHG_ILIM pin and IAICR register
-		bits.
-
-	}
-	
-	
-	
-
-BUG#2
-	充电能识别接口类型，座充有充电，USB无充电电流，对比将Type-C修改为micro USB的代码
-	去掉一下的宏
-	CONFIG_TCPC_CLASS=y
-	CONFIG_USB_POWER_DELIVERY=y
-	CONFIG_TCPC_RT5081=y
-	CONFIG_DUAL_ROLE_USB_INTF=y
-	
-	
-	
-	
---->&1充电能识别接口类型，座充有充电，USB无充电电流	
-	系统启动阶段电流比较大
-	
-	rt5081_enable_chg_type_det	rt5081使能检测充电器，能进行接口类型的检测，Type-C,BC1.2检测--->rt5081_enable_chgdet_flow循环检测充电器
-	
-	mtk_is_charger_on plug in
-	
-	
-	
-	
---->&2对比将Type-C修改为micro USB的代码
-	mt6757.dtsi
-	k57pv1_6mtee_pre_debug_defconfig
-	k57pv1_6mtee_pre.dws
-	lk的codegen.dws
-	
-	
-	
-	
-	
-BUG#3
-
-	电池初始电压3.71V  电量14%  座充0.75A，USB没有电流
-	标准充电器和非标准充电器检测，以前是在pmic上检测，现在是在rt5081上检测
-	
-	
-
-	
-	
-	充电器接口类型检测要修改P75要检测USB status	0x27
-	rt5081_pmu_attachi_irq_handler这个中断回调函数会进行USB状态检测，判断是充电器还是USB   P76
-	
-	Device Type					0x22
-	
-	
-	上层充电器的类型
-	typedef enum {
-		CHARGER_UNKNOWN = 0,
-		STANDARD_HOST,		/* USB : 450mA */
-		CHARGING_HOST,
-		NONSTANDARD_CHARGER,	/* AC : 450mA~1A */非标准充电器
-		STANDARD_CHARGER,	/* AC : ~1A */			标准充电器
-		APPLE_2_1A_CHARGER,	/* 2.1A apple charger */
-		APPLE_1_0A_CHARGER,	/* 1A apple charger */
-		APPLE_0_5A_CHARGER,	/* 0.5A apple charger */
-		WIRELESS_CHARGER,
-	} CHARGER_TYPE;
-	
-	
-	如何通过USB口检测出是标准充电器和非标准充电器
-	BC1.2中定义的充电类型
-	SDP：标准下行接开口，电脑USB
-	CDP：充电下行接口
-	DCP：标准的座充
-	OCP：other chargng port非标准充电器
-	
-	
-	根据寄存器打印的usb_status
-	000: No VBUS
-	001: VBUS flow is under going
-	
-	010: SDP (by input pin of (sVBUSPG_syn
-	& sCHGDETB & DCDTB)=1)
-	011: SDP NSTD (by input pin of
-	(sVBUSPG_syn & sCHGDETB &
-	DCDT)=1)
-	100: DCP (by input pin of sVBUSGP_syn
-	& CHGDET & sDCPORT_CHD)
-	101: CDP (by input pin of sVBUSGP_syn
-	& CHGDET & sCDPORT_CHD)
-	
-	110: reserved
-	111: reserved
-	
-	
-
-	RT5081定义的充电器检测类型
-	enum rt5081_pmu_chg_type {
-		RT5081_CHG_TYPE_NOVBUS = 0,				//0:NOVBUS
-		RT5081_CHG_TYPE_UNDER_GOING,			//1 001:
-		RT5081_CHG_TYPE_SDP,					//2 010:
-		RT5081_CHG_TYPE_SDPNSTD,				//3 011:
-		RT5081_CHG_TYPE_DCP,					//4 100:
-		RT5081_CHG_TYPE_CDP,					//5 101:
-		RT5081_CHG_TYPE_MAX,					//6 110:
-	};
-	
-	
-	
-	switch (usb_status) {
-	case RT5081_CHG_TYPE_SDP:
-		chg_data->chg_type = STANDARD_HOST;
-		break;
-	case RT5081_CHG_TYPE_SDPNSTD:
-		chg_data->chg_type = NONSTANDARD_CHARGER;
-		break;
-	case RT5081_CHG_TYPE_CDP:
-		chg_data->chg_type = CHARGING_HOST;
-		break;
-	case RT5081_CHG_TYPE_DCP:
-		chg_data->chg_type = STANDARD_CHARGER;
-		break;
-	default:
-		chg_data->chg_type = CHARGER_UNKNOWN;
-		break;
-	}
+		关掉OTG功能
 
 
 
+--->代码：
 
-
+		#1编译的宏:
+			充电能识别接口类型，座充有充电，USB无充电电流，对比将Type-C修改为micro USB的代码
+		去掉一下的宏
+		CONFIG_TCPC_CLASS=y
+		CONFIG_USB_POWER_DELIVERY=y
+		CONFIG_TCPC_RT5081=y
+		CONFIG_DUAL_ROLE_USB_INTF=y
+		
+			快充定义的宏	
+		CONFIG_MTK_PUMP_EXPRESS_PLUS_20_SUPPORT
+		CONFIG_MTK_PUMP_EXPRESS_PLUS_30_SUPPORT
 	
 	
-BUG#4
-	{
-		充电接口检测和充电电流，电压的调节	(现在的问题是充电电流很小)
-		AICR就是input current limit,充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由5081来做；
-		但是只是在插入充电器的时候去做检测，直到拔出充电器再次插入才会再一次检测，同一个充电器不会多次检测输出能力，因为同一个充电器此值肯定是相同的，没必要再检测。	
+	
+			充电器接口类型检测要修改P75要检测USB status	0x27
+		rt5081_pmu_attachi_irq_handler这个中断回调函数会进行USB状态检测，判断是充电器还是USB   P76
+	
+		Device Type					0x22
+	
+	
+	
+		#2变量
+		上层充电器的类型
+		typedef enum {
+			CHARGER_UNKNOWN = 0,
+			STANDARD_HOST,		/* USB : 450mA */
+			CHARGING_HOST,
+			NONSTANDARD_CHARGER,	/* AC : 450mA~1A */非标准充电器
+			STANDARD_CHARGER,	/* AC : ~1A */			标准充电器
+			APPLE_2_1A_CHARGER,	/* 2.1A apple charger */
+			APPLE_1_0A_CHARGER,	/* 1A apple charger */
+			APPLE_0_5A_CHARGER,	/* 0.5A apple charger */
+			WIRELESS_CHARGER,
+		} CHARGER_TYPE;
+	
+	
+	
+		RT5081定义的充电器检测类型
+		enum rt5081_pmu_chg_type {
+			RT5081_CHG_TYPE_NOVBUS = 0,				//0:NOVBUS
+			RT5081_CHG_TYPE_UNDER_GOING,			//1 001:
+			RT5081_CHG_TYPE_SDP,					//2 010:
+			RT5081_CHG_TYPE_SDPNSTD,				//3 011:
+			RT5081_CHG_TYPE_DCP,					//4 100:
+			RT5081_CHG_TYPE_CDP,					//5 101:
+			RT5081_CHG_TYPE_MAX,					//6 110:
+		};
+	
+	
+		如何通过USB口检测出是标准充电器和非标准充电器
+		BC1.2中定义的充电类型
+		SDP：标准下行接开口，电脑USB
+		CDP：充电下行接口
+		DCP：标准的座充
+		OCP：other chargng port非标准充电器
+	
+	
+		根据寄存器打印的usb_status
+		000: No VBUS
+		001: VBUS flow is under going
+	
+		010: SDP (by input pin of (sVBUSPG_syn
+		& sCHGDETB & DCDTB)=1)
+		011: SDP NSTD (by input pin of
+		(sVBUSPG_syn & sCHGDETB &
+		DCDT)=1)
+		100: DCP (by input pin of sVBUSGP_syn
+		& CHGDET & sDCPORT_CHD)
+		101: CDP (by input pin of sVBUSGP_syn
+		& CHGDET & sCDPORT_CHD)
+	
+		110: reserved
+		111: reserved
+	
+	
+	
+		switch (usb_status) {
+		case RT5081_CHG_TYPE_SDP:
+			chg_data->chg_type = STANDARD_HOST;
+			break;
+		case RT5081_CHG_TYPE_SDPNSTD:
+			chg_data->chg_type = NONSTANDARD_CHARGER;
+			break;
+		case RT5081_CHG_TYPE_CDP:
+			chg_data->chg_type = CHARGING_HOST;
+			break;
+		case RT5081_CHG_TYPE_DCP:
+			chg_data->chg_type = STANDARD_CHARGER;
+			break;
+		default:
+			chg_data->chg_type = CHARGER_UNKNOWN;
+			break;
+		}
 		
 		
-		参数：ICHG(P68), fgauge_read_current
+				
+		battery_meter_hal.h 定义的电量计能执行的函数指针
+		typedef enum {
+			BATTERY_METER_CMD_HW_FG_INIT,
 
-		
-		
-		函数：
-		mtk_switch_charging_run
-		
-		
-		文件：
+			BATTERY_METER_CMD_GET_HW_FG_CURRENT,	/* fgauge_read_current */
+			BATTERY_METER_CMD_GET_HW_FG_CURRENT_SIGN,	/*  */
+			BATTERY_METER_CMD_GET_HW_FG_CAR,	/* fgauge_read_columb */
+
+			BATTERY_METER_CMD_HW_RESET,	/* FGADC_Reset_SW_Parameter */
+
+			BATTERY_METER_CMD_GET_ADC_V_BAT_SENSE,
+			BATTERY_METER_CMD_GET_ADC_V_I_SENSE,
+			BATTERY_METER_CMD_GET_ADC_V_BAT_TEMP,
+			BATTERY_METER_CMD_GET_ADC_V_CHARGER,
+
+			BATTERY_METER_CMD_GET_HW_OCV,
+			BATTERY_METER_CMD_DUMP_REGISTER,
+			BATTERY_METER_CMD_SET_COLUMB_INTERRUPT,
+			BATTERY_METER_CMD_GET_BATTERY_PLUG_STATUS,
+			BATTERY_METER_CMD_GET_HW_FG_CAR_ACT,	/* fgauge_read_columb */
+			BATTERY_METER_CMD_SET_LOW_BAT_INTERRUPT,
+			BATTERY_METER_CMD_GET_LOW_BAT_INTERRUPT_STATUS,
+			BATTERY_METER_CMD_GET_REFRESH_HW_OCV,
+			BATTERY_METER_CMD_GET_IS_HW_OCV_READY,
+
+			BATTERY_METER_CMD_SET_META_CALI_CURRENT,
+			BATTERY_METER_CMD_META_CALI_CAR_TUNE_VALUE,
+			BATTERY_METER_CMD_GET_ZCV_INT_HW_OCV,
+
+			BATTERY_METER_CMD_NUMBER
+		} BATTERY_METER_CTRL_CMD;
+
+
+
+
+		mtk_switch_charging.c调用不同的算法
+			info->algorithm_data = swch_alg;
+			info->do_algorithm = mtk_switch_charging_run;
+			info->plug_in = mtk_switch_charging_plug_in;
+			info->plug_out = mtk_switch_charging_plug_out;
+			info->do_charging = mtk_switch_charging_do_charging;
+			info->do_event = charger_dev_event;
+			info->change_current_setting = mtk_switch_charging_current;
+
+
 		定义电池相关参数，当然这些参数有两个方向dtsi(mt6757.dtsi,rt5081.dtsi)，和宏
-		mtk_charging.h 	，mtk_charging_intf.h(快充)
-		#define USB_CHARGER_CURRENT					CHARGE_CURRENT_500_00_MA	/* 500mA */
-		/* #define AC_CHARGER_CURRENT					CHARGE_CURRENT_650_00_MA */
-		#define AC_CHARGER_CURRENT					CHARGE_CURRENT_2050_00_MA
-		#define AC_CHARGER_INPUT_CURRENT				CHARGE_CURRENT_3200_00_MA
-		#define NON_STD_AC_CHARGER_CURRENT			CHARGE_CURRENT_500_00_MA
-		#define CHARGING_HOST_CHARGER_CURRENT       CHARGE_CURRENT_650_00_MA
-		#define APPLE_0_5A_CHARGER_CURRENT          CHARGE_CURRENT_500_00_MA
-		#define APPLE_1_0A_CHARGER_CURRENT          CHARGE_CURRENT_650_00_MA
-		#define APPLE_2_1A_CHARGER_CURRENT          CHARGE_CURRENT_800_00_MA
+			mtk_charging.h 	，mtk_charging_intf.h(快充)
+			#define USB_CHARGER_CURRENT					CHARGE_CURRENT_500_00_MA	/* 500mA */
+			/* #define AC_CHARGER_CURRENT					CHARGE_CURRENT_650_00_MA */
+			#define AC_CHARGER_CURRENT					CHARGE_CURRENT_2050_00_MA
+			#define AC_CHARGER_INPUT_CURRENT				CHARGE_CURRENT_3200_00_MA
+			#define NON_STD_AC_CHARGER_CURRENT			CHARGE_CURRENT_500_00_MA
+			#define CHARGING_HOST_CHARGER_CURRENT       CHARGE_CURRENT_650_00_MA
+			#define APPLE_0_5A_CHARGER_CURRENT          CHARGE_CURRENT_500_00_MA
+			#define APPLE_1_0A_CHARGER_CURRENT          CHARGE_CURRENT_650_00_MA
+			#define APPLE_2_1A_CHARGER_CURRENT          CHARGE_CURRENT_800_00_MA
+
+
+
+		电池计电量计算的相关参数是在哪个文件
+		mtk_battery_meter.h ,mtk_battery_meter_table.h
+
+
+
 		
-		
-		
-		mtk_switch_charging.h,调用不同的算法
-		
-		
-		
-	}
+		#3函数功能	
+		{
+
 	
+			mtk_switch_charging_run
+		
+		
+			(mtk_battery_hal.c) fgauge_read_current，读取充电的电量和一些算法处理
+		
+			mtk_switch_charging.c定义的充电状态机的各各函数
+		
+			mtk_battery.c force_get_tbat
+		}
+		
+		
+		设置充电电流，充电电压，充电器的检测
+
+
+		
+		#4log关键字
+		
+			ICHG(P68), 察看充电电流
+			fgauge_read_current这个是电量计读出的数据，
 	
-	
+
+
+
+--->文档
+
+		这里有几个概念AICR，MIVR怎么设置的
+			AICR就是input current limit,充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由5081来做；
+		但是只是在插入充电器的时候去做检测，直到拔出充电器再次插入才会再一次检测，同一个充电器不会多次检测输出能力，因为同一个充电器此值肯定是相同的，没必要再检测
+			MIVR就是根据充电器的供电能力，设置最低的充电电压，如果电压小于这个值就降电流不降电压
+
+
+		gpio，dws，dtsian 文件在preloader,lk,kernel三个阶段的配置
+
+
+
+
+
+
+
+--->逻辑
 	
 	调用流程：
-	(mtk_charger.c)mtk_charger_probe: starts 初始化charger_manager结构体，首先是从mtk6757.dtsi 的charger开始对不同成员赋值，如果没有定义就从mtk_charging.h的宏赋值
-	包括一些电池参数和调用充电的算法--->charger_routine_thread,创建一个常用的线程，检查充电与否，充电器的类型，和一些电池参数
+	{
+		(
+		
+		
+		mtk_charger.c)mtk_charger_probe: starts 初始化charger_manager结构体，首先是从mtk6757.dtsi 的charger开始对不同成员赋值，如果没有定义就从mtk_charging.h的宏赋值
+		包括一些电池参数和调用充电的算法--->(mtk_switch_charging.c)选择不同的充电算法,mtk_switch_charging_init,从rt5081.dtsi获取一些参数，然后调用不同的函数指针--->
+		创建一个常用的线程charger_routine_thread 检查充电与否，充电器的类型，和一些电池参数-->(mtk_battery_intf.c)battery_get_bat_current,获取充电电流--->(mtk_battery_hal.c)
+		bm_ctrl_cmd定义了一些调用fuelgauge的函数指针--->charger_update_data获取电量计的状态，某种温度下，再调用force_get_tbat--->charger_check_status检测充电器的状态，
+		都是基于battery thermal protection进行的检测
+	
+	}
+	
+	
+
+
+
+
+
+--->测试场景
 
 	
+
+	#1
+	{
+		
+							17G05A(71%)			W909(69%)  			G1605A(70%)
+		关机充电电流:		0.1A~0.3A		0.6A~0.75A			0.75A~0.85A
+		座充充电电流：		0.1A~0.3A		0.6A~0.8A			0.8A~0.9A
+		USB充电电流：		0.1A~0.3A		0.2A~0.3A			0.2A~0.3A
+	
+		USB没有电流是串口地接到了电源地，拔掉串口后有电流，但应该不是这个原因吧
+	
+		没有电池是充电电流小的原因吗？(好吧这个是真实的原因，因为用的假电，所以电量肯定充不进去)
 	
 	
+	}
 	
 	
+	#2
+	{
+		手机功耗大，开机过程能达到1A，息屏200mA~300mA,而USB充电电流太小，最后充的没有耗的多
 	
-	
+	}
 	
 
+
+	充电头				5V/2A				5V/1A				9V/2A
+		
+	
+	
+	
+	
 }
 
 

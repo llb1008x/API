@@ -1,6 +1,3 @@
-/*****************************************************************************************
- *compare cin ,cin.getline
- * **********************************************************************/
 #include <iostream>
 #include <string.h>
 
@@ -8,17 +5,17 @@ using namespace std;
 
 int main()
 {
-    char str1[100];
-    char str2[100];
+    char str1[10],str2[10];
 
-    memset(str1,100,0);
-    memset(str2,100,0);
+    memset(str1,10,0);
+    memset(str2,10,0);
 
-    cin>>str1;
-    cin.getline(str2,100);
-    
-    cout<<str2<<endl;
-    cout<<str1<<endl;
-    
+    cin.getline(str1,10);
+    cin.getline(str2,10);
+   
+    cout<<"str1"<<str1<<endl;
+    cout<<"str2"<<str2<<endl;
+
+
     return 0;
 }
