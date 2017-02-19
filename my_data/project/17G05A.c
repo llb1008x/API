@@ -351,6 +351,7 @@
 /*debug*/
 {
 		关掉OTG功能
+		P36
 		
 		
 		
@@ -533,7 +534,6 @@
 				reg_ichg是寄存器上的值，经过ret_val = min + reg_val * step得到最接近真实的值
 				
 				
-				
 				aicr		ret = rt5081_get_aicr(chg_dev, &aicr);
 				chg_status	ret = rt5081_get_charging_status(chg_data, &chg_status);
 				ieoc		ret = rt5081_get_ieoc(chg_data, &ieoc);
@@ -547,6 +547,8 @@
 			
 			}
 			
+			
+			rt5081_enable_hidden_mode 这个跟Type-C功能相关
 			
 			
 			
