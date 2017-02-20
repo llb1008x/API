@@ -264,6 +264,9 @@
 		
 		然后才能git fetch ，git merge 
 		
+		 origin/bbl7515a_camp_main_dev
+
+		
 		
 		repo forall -vcp git branch  -avv
 	
@@ -276,6 +279,9 @@
 
 		第一次提交之前通过hook使每次提交生成change ID	
 		repo_19.9.0.151 forall  -c  "scp  -p  -P  29418 lilubao@19.9.0.151:hooks/commit-msg  .git/hooks/"
+		
+		
+		6.更新代码有关APK的目录怎么处理？
 
 
 
