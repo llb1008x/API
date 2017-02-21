@@ -266,8 +266,7 @@
 		
 		 origin/bbl7515a_camp_main_dev
 
-		
-		
+
 		repo forall -vcp git branch  -avv
 	
 		

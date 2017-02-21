@@ -112,6 +112,7 @@ USB：
 	USB协通讯议--深入理解 
 	http://blog.csdn.net/myarrow/article/details/8484113
 	
+	
 	USB电池充电基础：应急指南
 	https://www.maximintegrated.com/cn/app-notes/index.mvp/id/4803
 
