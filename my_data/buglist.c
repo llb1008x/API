@@ -63,6 +63,7 @@
 transplant代码移植相关：
 /*{
 
+#1
 GNSPR#53551  	电源管理：关机充电动画改善（移植充电显示相关的，BBL7332的hd720图标，S8的代码）
 代码不多，也没什么变化，主要是细节（图片的差异用beyond compare，rules.mk里图片加进去的数组下标要对应，
 编译烧版本要知道烧哪了，是否编译进去了）
@@ -162,7 +163,6 @@ GNSPR#53551  	电源管理：关机充电动画改善（移植充电显示相关
 	gionee/alps_drv/vendor/mediatek/proprietary/external/charger/common.cpp:	#if defined(CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT) 
 	gionee/alps_drv/vendor/mediatek/proprietary/external/ipod/ipodcommon.cpp:	#if defined(CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT) 
 	gionee/alps_drv/vendor/mediatek/proprietary/external/ipod/bootlogo.cpp:	#if defined(CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT) 
-
 
 
 	/*
@@ -291,24 +291,19 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 }
 	
 
-
-
-
-
-
+#2	17W05A移植.txt
 	在MTK原生代码上移植充电相关的代码？
 	移植了G1605A到17W05A上，移植完了
 
 
 
-
-
-
+#3
 	移植OTG开关到BBL7337上
 	相关的宏开关：
 	
 		GN_BATTERY_OTGCHARGE_SWITCH_SUPPORT
 		
+		这个宏是不需要的，7515OTG反向充电提示
 		GN_BATTERY_OTGCHARGE_NOTIFY_ENABLE
 		
 		"OTG SWITCH"
@@ -318,7 +313,7 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 		
 		
 	项目脚本：
-		gnbj6750_66_m_debug_defconfig	
+		gnbj6750_66_m_debug_defconfig	脚本里面不用加入编译的宏开关
 		
 		充电芯片不一样，充电算法也不一样
 		GM2.0	,bq24196
@@ -331,13 +326,12 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 		
 		gpio引脚配置，iddig_gpio是23?
 		{
-			init.mt6755.rc,gnbj6755_66t_m.dts,gnbj6755_66_m.dts,xhci-mtk-driver.c,musb_init.c,
-			battery_common.h,battery_common.c,xhci-mtk-driver.c,charging.h,battery_common.c,
+			init.mt6755.rc,gnbj6755_66t_m.dts,gnbj6755_66_m.dts
+			,xhci-mtk-driver.c,musb_init.c,
+			battery_common.h,battery_common.c,xhci-mtk-driver.c,charging.h,
 			com_android_server_AmigoServerManagerService.cpp,AmigoServerManager.java
 			
-			battery_common.c 
-		
-			remote_pinctrl
+			battery_common.c  7337是battery_common_fg_20.c
 		
 			#if defined(CONFIG_MTK_BQ24196_SUPPORT)
 			//GioneeDrv GuoJianqiu 20160425 modify for OTG function begin
@@ -410,9 +404,6 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/misc/mediatek/mu3d/drv/musb_init.c:833:		//Gionee GuoJianqiu 201601026 modify for OTG SWITCH begin
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/misc/mediatek/mu3d/drv/musb_init.c:845:		//Gionee GuoJianqiu 201601026 modify for OTG SWITCH end		
 				
-				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/misc/mediatek/include/mt-plat/battery_common.h:367://Gionee GuoJianqiu 201601026 modify for OTG SWITCH begin
-				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/misc/mediatek/include/mt-plat/battery_common.h:373://Gionee GuoJianqiu 201601026 modify for OTG SWITCH end
-				
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/power/mediatek/battery_common.c:103://Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/power/mediatek/battery_common.c:110://Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/power/mediatek/battery_common.c:458:		//Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
@@ -429,28 +420,6 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/power/mediatek/battery_common.c:5055:		//Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/power/mediatek/battery_common.c:5057:		//Gionee GuoJianqiu 201601026 modify for OTG SWITCH begin
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/power/mediatek/battery_common.c:5061:		//Gionee GuoJianqiu 201601026 modify for OTG SWITCH end
-				
-				./code/driver/drv_common/kernel-3.18/drivers/misc/mediatek/xhci/xhci-mtk-driver.c:150:	//Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/misc/mediatek/xhci/xhci-mtk-driver.c:156:	//Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/misc/mediatek/xhci/xhci-mtk-driver.c:417:	//Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/misc/mediatek/xhci/xhci-mtk-driver.c:421:	//Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/misc/mediatek/xhci/xhci-mtk-driver.c:434:	//Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/misc/mediatek/xhci/xhci-mtk-driver.c:438:	//Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/misc/mediatek/include/mt-plat/charging.h:577://Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/misc/mediatek/include/mt-plat/charging.h:596://Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:103://Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:110://Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:458:		//Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:464:		//Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:1814://Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:1945://Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:2892:	//Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:2898:	//Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:3474:		//Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:3483:		//Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:5009:		//Gionee GuoJianqiu 20160704 modify for OTG SWITCH begin
-				./code/driver/drv_common/kernel-3.18/drivers/power/mediatek/battery_common.c:5013:		//Gionee GuoJianqiu 20160704 modify for OTG SWITCH end
-
 
 				
 				./code/alps/public/ROM/frameworks/base/services/core/jni/com_android_server_AmigoServerManagerService.cpp:116:/*< Gionee yinlf Otg_Charge 20160702 begin*/
@@ -463,7 +432,6 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 				./code/alps/public/ROM/frameworks/base/core/java/android/os/amigoserver/AmigoServerManager.java:116:    public static final int NODE_TYPE_OTG_CHARGE = 61;                          ///sys/devices/platform/battery/Otg_Charge_State
 				./code/alps/public/ROM/frameworks/base/core/java/android/os/amigoserver/AmigoServerManager.java:117:    /*Gionee yinlf OTG_CHARGE 20160702 end >*/		
 		
-
 		}
 								
 				./code/driver/project_common/BBL7516_DRV_COMMON/kernel-3.18/drivers/misc/mediatek/include/mt-plat/mt6755/include/mach/mt_charging.h:115://Gionee GuoJianqiu 20160704 modify for OTG SWITCH end

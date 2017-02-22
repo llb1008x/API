@@ -1100,3 +1100,9 @@ static u32 rt5081_find_closest_real_value(u32 min, u32 max, u32 step,
 
 	return ret_val;
 }
+
+
+20.在linux或者android下创建一个system 节点(扩展device节点)
+
+
+
