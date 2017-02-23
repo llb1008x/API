@@ -535,20 +535,38 @@
 				
 				
 				aicr		ret = rt5081_get_aicr(chg_dev, &aicr);
-				chg_status	ret = rt5081_get_charging_status(chg_data, &chg_status);
 				ieoc		ret = rt5081_get_ieoc(chg_data, &ieoc);
 				mivr		ret = rt5081_get_mivr(chg_data, &mivr);
-				cv			ret = rt5081_get_cv(chg_dev, &cv);
-				chg_en		ret = rt5081_is_charging_enable(chg_data, &chg_en);
-				vsys		ret = rt5081_get_adc(chg_data, RT5081_ADC_VSYS, &adc_vsys);
-				vbat		ret = rt5081_get_adc(chg_data, RT5081_ADC_VBAT, &adc_vbat);
-				ibat		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBAT, &adc_ibat);
-				ibus		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBUS, &adc_ibus);
 			
+				chg_status	ret = rt5081_get_charging_status(chg_data, &chg_status);
+				获取充电状态
+				cv			ret = rt5081_get_cv(chg_dev, &cv);
+				恒压充电的电压
+				chg_en		ret = rt5081_is_charging_enable(chg_data, &chg_en);
+				充电使能
+				vsys		ret = rt5081_get_adc(chg_data, RT5081_ADC_VSYS, &adc_vsys);
+				系统的负载电压
+				vbat		ret = rt5081_get_adc(chg_data, RT5081_ADC_VBAT, &adc_vbat);
+				电池的开路电压
+				ibat		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBAT, &adc_ibat);
+				进入电池的电流
+				ibus		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBUS, &adc_ibus);
+				线上的充电电流
 			}
 			
 			
 			rt5081_enable_hidden_mode 这个跟Type-C功能相关
+			
+			
+			mtk_battery.c force_get_tbat
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			
 			
@@ -562,9 +580,11 @@
 		
 			mtk_switch_charging.c定义的充电状态机的各各函数
 		
-			mtk_battery.c force_get_tbat
+			
 			
 			当然重要的是调整充电状态
+			
+			
 		}
 		
 		
