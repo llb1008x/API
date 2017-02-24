@@ -1105,4 +1105,50 @@ static u32 rt5081_find_closest_real_value(u32 min, u32 max, u32 step,
 20.在linux或者android下创建一个system 节点(扩展device节点)
 
 
+21.快充算法
+int mtk_pe20_init(struct charger_manager *pinfo)
+{
+	int ret = 0;
+
+	wake_lock_init(&pinfo->pe2.suspend_lock, WAKE_LOCK_SUSPEND,
+		"PE+20 TA charger suspend wakelock");
+	mutex_init(&pinfo->pe2.access_lock);
+	mutex_init(&pinfo->pe2.pmic_sync_lock);
+
+	pinfo->pe2.ta_vchr_org = 5000000;
+	pinfo->pe2.idx = -1;
+	pinfo->pe2.vbus = 5000000;
+	pinfo->pe2.to_check_chr_type = true;
+	pinfo->pe2.is_enabled = true;
+
+	pinfo->pe2.profile[0].vbat = 3400000;
+	pinfo->pe2.profile[1].vbat = 3500000;
+	pinfo->pe2.profile[2].vbat = 3600000;
+	pinfo->pe2.profile[3].vbat = 3700000;
+	pinfo->pe2.profile[4].vbat = 3800000;
+	pinfo->pe2.profile[5].vbat = 3900000;
+	pinfo->pe2.profile[6].vbat = 4000000;
+	pinfo->pe2.profile[7].vbat = 4100000;
+	pinfo->pe2.profile[8].vbat = 4200000;
+	pinfo->pe2.profile[9].vbat = 4300000;
+
+	pinfo->pe2.profile[0].vchr = 8000000;
+	pinfo->pe2.profile[1].vchr = 8500000;
+	pinfo->pe2.profile[2].vchr = 8500000;
+	pinfo->pe2.profile[3].vchr = 9000000;
+	pinfo->pe2.profile[4].vchr = 9000000;
+	pinfo->pe2.profile[5].vchr = 9000000;
+	pinfo->pe2.profile[6].vchr = 9500000;
+	pinfo->pe2.profile[7].vchr = 9500000;
+	pinfo->pe2.profile[8].vchr = 10000000;
+	pinfo->pe2.profile[9].vchr = 10000000;
+
+	ret = charger_dev_set_pe20_efficiency_table(pinfo->chg1_dev);
+	if (ret != 0)
+		pr_err("%s: use default table, %d\n", __func__, ret);
+
+	return 0;
+}
+
+
 

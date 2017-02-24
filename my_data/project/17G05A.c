@@ -362,6 +362,13 @@
 		charger_thread][name:mtk_switch_charging&]force:0 thermal:-1 -1 setting:3200000 2050000 type:4 usb_unlimited:0 usbif:0 usbsm:0
 
 
+
+
+
+
+
+
+
 --->代码：
 
 		#1编译的宏:
@@ -493,18 +500,6 @@
 		} BATTERY_METER_CTRL_CMD;
 
 
-
-
-		mtk_switch_charging.c调用不同的算法
-			info->algorithm_data = swch_alg;
-			info->do_algorithm = mtk_switch_charging_run;
-			info->plug_in = mtk_switch_charging_plug_in;
-			info->plug_out = mtk_switch_charging_plug_out;
-			info->do_charging = mtk_switch_charging_do_charging;
-			info->do_event = charger_dev_event;
-			info->change_current_setting = mtk_switch_charging_current;
-
-
 		定义电池相关参数，当然这些参数有两个方向dtsi(mt6757.dtsi,rt5081.dtsi)，和宏
 			mtk_charging.h 	，mtk_charging_intf.h(快充)
 			#define USB_CHARGER_CURRENT					CHARGE_CURRENT_500_00_MA	/* 500mA */
@@ -521,6 +516,53 @@
 
 		电池计电量计算的相关参数是在哪个文件
 		mtk_battery_meter.h ,mtk_battery_meter_table.h
+		
+		
+		rt5081提供的函数指针
+		static struct charger_ops rt5081_chg_ops = {
+			/* Normal charging */
+			.plug_out = rt5081_plug_out,
+			.plug_in = rt5081_plug_in,
+			.dump_registers = rt5081_dump_register,
+			.enable = rt5081_enable_charging,
+			.get_charging_current = rt5081_get_ichg,
+			.set_charging_current = rt5081_set_ichg,
+			.get_input_current = rt5081_get_aicr,
+			.set_input_current = rt5081_set_aicr,
+			.get_constant_voltage = rt5081_get_cv,
+			.set_constant_voltage = rt5081_set_cv,
+			.kick_wdt = rt5081_kick_wdt,
+			.set_mivr = rt5081_set_mivr,
+			.is_charging_done = rt5081_is_charging_done,
+			.get_zcv = rt5081_get_zcv,
+
+			/* Safety timer */
+			.enable_safety_timer = rt5081_enable_safety_timer,
+			.is_safety_timer_enabled = rt5081_is_safety_timer_enable,
+
+			/* Power path */
+			.enable_powerpath = rt5081_enable_power_path,
+			.is_powerpath_enabled = rt5081_is_power_path_enable,
+
+			/* Charger type detection */
+			.enable_chg_type_det = rt5081_enable_chg_type_det,
+
+			/* OTG */
+			.enable_otg = rt5081_enable_otg,
+			.set_boost_current_limit = rt5081_set_otg_current_limit,
+			.enable_discharge = rt5081_enable_discharge,
+
+			/* PE+/PE+20 */
+			.send_ta_current_pattern = rt5081_set_pep_current_pattern,
+			.set_pe20_efficiency_table = rt5081_set_pep20_efficiency_table,
+			.send_ta20_current_pattern = rt5081_set_pep20_current_pattern,
+			.set_ta20_reset = rt5081_set_pep20_reset,
+			.enable_cable_drop_comp = rt5081_enable_cable_drop_comp,
+
+			/* ADC */
+			.get_tchg_adc = rt5081_get_tchg,
+			.get_ibus_adc = rt5081_get_ibus,
+		};
 
 
 
@@ -555,22 +597,63 @@
 			}
 			
 			
+			mtk_switch_charging.c定义的充电状态机的各各函数
+			（根据从dtsi文件传过来的配置选用不同的充电算法），最后很多的ops都是调用到了rt5081上
+			{
+				mtk_switch_charging.c调用不同的算法
+				info->algorithm_data = swch_alg;
+				info->do_algorithm = mtk_switch_charging_run;
+				info->plug_in = mtk_switch_charging_plug_in;
+				info->plug_out = mtk_switch_charging_plug_out;
+				info->do_charging = mtk_switch_charging_do_charging;
+				info->do_event = charger_dev_event;
+				info->change_current_setting = mtk_switch_charging_current;
+				
+				
+			
+				mtk_switch_charging_init	初始化充电调用相关的函数指针
+			-->	
+				mtk_switch_charging_run
+			
+			
+				swchg_turn_on_charging 		
+				充电使能检测swchgalg->state充电器的状态，启动pe20算法mtk_pe20_start_algorithm，设置充电电流swchg_select_charging_current_limit
+				swchg_select_cv设定恒压充电的电压，首先是动态获取电压，然后设定充电电压
+				
+				
+			
+			}
+			
+			上面有pep，pep20，pep30三种 ，但是pep30目前还不支持
+			{
+				dts文件，项目脚本宏这三个谁起作用
+				
+				MTK_PUMP_EXPRESS_PLUS_20_SUPPORT = no
+				MTK_PUMP_EXPRESS_PLUS_30_SUPPORT = no
+				MTK_PUMP_EXPRESS_PLUS_SUPPORT = no
+				MTK_PUMP_EXPRESS_SUPPORT = no
+				
+				enable_pe_plus;
+				enable_pe_2;			
+				enable_pe_3;
+				
+				关了enable就能升压，开了enable_pe_2就不能升压
+			
+			}
+			
+			
+			
+			
+			charger_manager调用的几个函数指针
+			
+			
+			
+			
+			
 			rt5081_enable_hidden_mode 这个跟Type-C功能相关
 			
 			
 			mtk_battery.c force_get_tbat
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			
 	
 			mtk_switch_charging_run
@@ -578,9 +661,6 @@
 		
 			(mtk_battery_hal.c) fgauge_read_current，读取充电的电量和一些算法处理
 		
-			mtk_switch_charging.c定义的充电状态机的各各函数
-		
-			
 			
 			当然重要的是调整充电状态
 			
@@ -624,6 +704,7 @@
 
 
 
+		
  	
 
 
@@ -636,7 +717,7 @@
 		包括一些电池参数和调用充电的算法--->(mtk_switch_charging.c)选择不同的充电算法,mtk_switch_charging_init,从rt5081.dtsi(里面的一些参数是从rt5081_pmu_core.c获取匹配，
 		然后再到不同的项里面匹配)获取一些参数，然后调用不同的函数指针--->创建一个常用的线程charger_routine_thread 检查充电与否，充电器的类型，和一些电池参数-->
 		(mtk_battery_intf.c)battery_get_bat_current,获取充电电流--->(mtk_battery_hal.c)bm_ctrl_cmd定义了一些调用fuelgauge的函数指针--->charger_update_data获取电量计的状态，
-		某种温度下，再调用force_get_tbat--->charger_check_status检测充电器的状态，都是基于battery thermal protection进行的检测
+		某种温度下，再调用force_get_tbat--->charger_check_status检测充电器的状态，都是基于battery thermal protection进行的检测--->kpoc_power_off_check应该是关机充电的检测
 	
 	}
 	rt5081.dtsi参数在rt5081_pmu*的of_device_id里面获取的
