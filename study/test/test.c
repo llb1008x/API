@@ -1,27 +1,25 @@
 #include <stdio.h>
+#include <time.h>
+#include <string.h>
 
-int main()
+clock_t start,stop;
+
+double duration;
+
+int main(int argc,char *argv[])
 {
-	printf("hello world\n");
-	
-	int n=9;
-	printf(n>5?"yes\n":"no\n");
-	
-	
-	char s[] = "hello world";  
-	char t[] = "aeiou";  
-	int i, j, len;  
-	for (i = len = 0; s[i]; i++) {  
-		for (j = 0; t[j]; j++) {  
-		    if (s[i] == t[j])  
-		        break;  
-		}  
-		if (!t[j])  
-		    s[len++] = s[i];  
-	}  
-	s[len] = 0;  
-	printf(s); 
-	printf("\n"); 
+
+	start=clock();
+
+	int i=atoi(argv[1]);
+	while(i)
+		i--;	
+					;
+	stop=clock();
+
+	duration=(double)(stop-start)/CLOCKS_PER_SEC;
+
+	printf("duration--->%lf\n",duration);
 
 	return 0;
 }
