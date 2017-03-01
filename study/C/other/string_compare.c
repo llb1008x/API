@@ -8,10 +8,10 @@
 int main()
 {
 	char str1[]="SBBCABCDABABCDABCDABDE";
-	char str2[]="ABC";
+	char str2[]="AB";
 	
-	//printf("str1->%s\n",str1);
-	//printf("str2->%s\n",str2);
+	printf("str1->%s\n",str1);
+	printf("str2->%s\n",str2);
 	printf("sizeof(str1)-->%d\n",sizeof(str1));
 	printf("sizeof(str2)-->%d\n",sizeof(str2));
     

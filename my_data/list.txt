@@ -186,11 +186,12 @@ other：
 	http://www.elecfans.com/dianyuan/404455.html
 	
 	
-	 cin、cin.get()、getline()（讲解的很详细）
+	cin、cin.get()、getline()（讲解的很详细）
 	http://blog.csdn.net/xuexiacm/article/details/8101859
 
 
-
+	eMMC分区详解
+	http://blog.sina.com.cn/s/blog_71fdf1f00102v5c2.html
 
 
 
