@@ -567,7 +567,15 @@
 
 
 
-
+		创建的相关设备节点在哪个目录下：mtk_charger_setup_files
+		/proc/mtk_battery_cmd
+		
+		
+		
+		
+		相关的设备节点
+		/sys/devices/platform/battery/Otg_Charge_Switch
+		
 
 
 
@@ -654,15 +662,37 @@
 				enable_pe_3;
 				
 				关了enable就能升压，开了enable_pe_2就不能升压
+				
+				
+				if (mtk_pe20_init(info) < 0)
+					info->enable_pe_2 = false;
+
+				if (mtk_pe30_init(info) == false)
+					info->enable_pe_3 = false;
+					
+					
+				mtk_pe20_check_charger
+				
+				if (!pinfo->enable_hv_charging) {
+				pr_info("%s: hv charging is disabled\n", __func__);
+				if (pe20->is_connect) {
+					pe20_leave(pinfo);
+					pe20->to_check_chr_type = true;
+				}
+					return ret;
+				}
+
+				if (pinfo->enable_pe_2 != true)
+					return -ENOTSUPP;	
 			
+			
+				PL_VERSION
 			}
 			
 			
 			
 			
 			charger_manager调用的几个函数指针
-			
-			
 			
 			
 			
@@ -687,6 +717,8 @@
 		设置充电电流，充电电压，充电器的检测
 
 
+		
+		
 		
 		#4log关键字
 		

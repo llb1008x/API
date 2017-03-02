@@ -280,7 +280,8 @@
 		repo_19.9.0.151 forall  -c  "scp  -p  -P  29418 lilubao@19.9.0.151:hooks/commit-msg  .git/hooks/"
 		
 		
-		6.更新代码有关APK的目录怎么处理？
+		6.更新代码有关APK的目录怎么处理
+		
 
 
 
