@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-#if  1
+#if    0
 void PrintFun(int N)
 {
     int i;

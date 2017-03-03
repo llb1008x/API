@@ -149,6 +149,15 @@
 
 
 
+
+
+
+
+
+
+
+
+
 /*RT5081*/
 {
 集成的功能很多
@@ -515,6 +524,10 @@
 
 		电池计电量计算的相关参数是在哪个文件
 		mtk_battery_meter.h ,mtk_battery_meter_table.h
+		pmic_throttling_dlpt.c读电池客制化参数，mtk_battery_property.h
+		
+		
+		
 		
 		
 		rt5081提供的函数指针
