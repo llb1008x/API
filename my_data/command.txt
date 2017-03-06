@@ -99,6 +99,10 @@
 	
 	打开串口log打印开关
 	adb shell setprop persist.uartconsole.enable 1
+	
+	
+	打印上层main.log
+	adb  shell logcat -b main -v threadtime >error_log1.txt
 
 
 

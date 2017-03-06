@@ -1524,6 +1524,201 @@ FAQ18845
 
 
 
+
+
+
+GNSPR#70216
+	mmi测试导致的充电失败
+	
+	OTG开关的工作流程：
+	(battery_common_fg_20.c)show_otg_charge_switch_State,底层驱动提供给上层的节点，上层写值后通过调用这里向下调用，有两个状态位
+	gn_otg_charge_switch_State，otg_charge_state；判断接受到的otg_charge_state状态是否为1，与gn_otg_charge_switch_State状态是否一样
+	->(usb20_host.c)打开还是关闭这里的open和close函数之重点,关于中断使能，控制逻辑还要理解->mt_usb_ext_iddig_int当有otg中断来的时候
+	调用musb_id_pin_work,对应的工作队列 ->musb_is_host判断插入的usb是host还是devices->musb_start配置一些usb传输的信息，改变usb状态信息，
+	将usb主设备转变成从设备->switch_int_to_device设置iddig的中断使能，完成转变成从设备->工作队列任务完成
+	
+	为什么要设置vbus
+	
+开OTG使能	
+	[ 1778.094714] <1>.(1)[3202:Binder_10][name:battery_common_fg_20&]show_otg_charge_switch_State = 0
+	[ 1778.202733] <1>.(1)[1647:Binder_1][name:usb20_host&]****before gn_Open_Otg_Irq!
+	[ 1778.312694] <1>.(1)[1647:Binder_1][name:usb20_host&][MUSB]gn_Open_Otg_Irq 751: iddig_state = 1
+	[ 1778.352742] <1>.(1)[1647:Binder_1][name:usb20_host&][MUSB]gn_Open_Otg_Irq 759: gn_Open_Otg_Irq is done
+	[ 1778.353909] <1>.(1)[1647:Binder_1][name:battery_common_fg_20&]store_otg_charge_switch_State = 1
+
+
+	[ 1782.082073] <0>-(0)[0:swapper/0][name:usb20_host&][MUSB]mt_usb_ext_iddig_int 500: id pin interrupt assert
+	[ 1782.472966] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]musb_id_pin_work 412: work start, is_host=0, boot mode(0)
+	[ 1782.474333] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]musb_is_host 271: will mask PMIC charger detection
+	[ 1782.475602] <0>.(0)[8137:kworker/0:0][name:usb20&][MUSB]mt_usb_enable 292: <0,0>,<4,4,3,3>
+	[ 1782.476687] <0>.(0)[8137:kworker/0:0][name:usb20&][MUSB]mt_usb_enable 313: enable UPLL before connect
+	[ 1782.477830] <0>.(0)[8137:kworker/0:0][name:usb20&][MUSB]vcore_hold 154: before releasing
+	[ 1782.478838] <0>.(0)[8137:kworker/0:0][name:usb20&][MUSB]vcore_hold 157: after releasing
+	[ 1782.487633] <0>.(0)[8137:kworker/0:0][name:usb20&][MUSB]vcore_hold 163: hold VCORE ok
+	[ 1782.501709] <0>.(0)[8137:kworker/0:0][name:usb20_phy&][MUSB]HQA_special 22: HQA, 0x18, before:86
+	[ 1782.502961] <0>.(0)[8137:kworker/0:0][name:usb20_phy&][MUSB]HQA_special 26: HQA, 0x18, after:86
+	[ 1782.504054] <0>.(0)[8137:kworker/0:0][name:usb20_phy&][MUSB]hs_slew_rate_cal 271: [USBPHY]slew calibration:FM_OUT =326,x=4221,value=4
+	[ 1782.505550] <0>.(0)[8137:kworker/0:0][name:usb20_phy&][MUSB]usb_phy_recover 644: usb recovery success
+	[ 1782.506695] <0>.(0)[8137:kworker/0:0][name:usb20&][MUSB]mt_usb_enable 328: <4,4,4,3>
+
+	[ 1782.507664] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]musb_is_host 289: iddig_state = 0
+	[ 1782.508733] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]musb_is_host 326: usb_is_host = 1
+	[ 1782.509807] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]musb_id_pin_work 425: musb is as host
+	[ 1782.511989] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]mt_usb_set_vbus 91: mt65xx_usb20_vbus++,is_on=1
+	[ 1782.625000] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]musb_id_pin_work 446: force PHY to idle, 0x6d=3f, 0x6c=11
+	[ 1782.631378] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]musb_id_pin_work 457: force PHY to host mode, 0x6d=3f, 0x6c=2d
+	[ 1782.633531] <0>.(0)[8137:kworker/0:0][name:musb_hdrc&][MUSB]musb_start 1221: start, is_host=1 is_active=0
+	[ 1782.634807] <0>.(0)[8137:kworker/0:0][name:usb20&][MUSB]mt_usb_enable 292: <1,1>,<5,4,4,3>
+	[ 1782.635877] <0>.(0)[8137:kworker/0:0][name:musb_hdrc&][MUSB]musb_start 1286: set ignore babble MUSB_ULPI_REG_DATA=89
+	[ 1782.637236] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]switch_int_to_device 362: switch_int_to_device is done
+	[ 1782.638566] <0>.(0)[8137:kworker/0:0][name:usb20_host&][MUSB]musb_id_pin_work 487: work end, is_host=1
+
+	[ 1782.804798] <0>-(0)[8137:kworker/0:0][name:musb_hdrc&][MUSB]musb_stage0_irq 967: MUSB_INTR_CONNECT (b_idle)
+	[ 1782.804816] <0>-(0)[8137:kworker/0:0][name:musb_qmu&]QMU_WARN,<musb_disable_q_all 55>, disable_q_all
+	[ 1782.805098] <0>-(0)[8137:kworker/0:0][name:musb_hdrc&][MUSB]musb_stage0_irq 1042: CONNECT (a_host) devctl 3d
+	
+	
+关闭OTG使能
+	[ 1783.421102] <0>.(0)[211:mtk charger_hv_][name:battery_common_fg_20&][upmu_is_chr_det] Charger exist but USB is host
+	[ 1784.426584] <0>.(0)[211:mtk charger_hv_][name:battery_common_fg_20&][upmu_is_chr_det] Charger exist but USB is host
+	[ 1784.734018] <0>.(0)[933:batterywarning][name:battery_common_fg_20&][Battery] show_BatteryNotify : 0
+	[ 1785.435856] <0>.(0)[211:mtk charger_hv_][name:battery_common_fg_20&][upmu_is_chr_det] Charger exist but USB is host
+	[ 1785.912684] <2>.(2)[2884:Binder_A][name:usb20_host&]****before gn_Close_Otg_Irq!
+	[ 1785.913612] <2>.(2)[2884:Binder_A][name:usb20_host&][MUSB]gn_Close_Otg_Irq 695: iddig_state = 0
+	[ 1785.914715] <1>-(1)[0:swapper/1][name:usb20_host&][MUSB]mt_usb_ext_iddig_int 500: id pin interrupt assert
+	[ 1786.312716] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_id_pin_work 412: work start, is_host=1, boot mode(0)
+	[ 1786.314066] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_is_host 271: will mask PMIC charger detection
+	[ 1786.315340] <1>.(1)[6996:kworker/1:4][name:usb20&][MUSB]mt_usb_enable 292: <1,1>,<6,4,4,3>
+	[ 1786.316415] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_is_host 289: iddig_state = 0
+	[ 1786.317484] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_is_host 317: will unmask PMIC charger detection
+	[ 1786.318774] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_is_host 326: usb_is_host = 0
+	[ 1786.319840] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_id_pin_work 425: musb is as device
+	[ 1786.321262] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_id_pin_work 465: devctl is 3d
+	[ 1786.322349] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]mt_usb_set_vbus 91: mt65xx_usb20_vbus++,is_on=0
+	[ 1786.327596] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_id_pin_work 478: force PHY to idle, 0x6d=3f, 0x6c=11
+	[ 1786.328928] <1>.(1)[6996:kworker/1:4][name:usb20&][MUSB]mt_usb_disable 340: <1,1>,<6,5,4,3>
+	[ 1786.330809] <1>.(1)[6996:kworker/1:4][name:usb20_phy&][MUSB]usb_phy_savecurrent 536: usb save current success
+	[ 1786.332041] <1>.(1)[6996:kworker/1:4][name:usb20&][MUSB]mt_usb_disable 358: <6,5,4,4>
+	[ 1786.333122] <1>-(1)[6996:kworker/1:4][name:usb20&][MUSB]vcore_release 195: musb lock get, release it, mtk_musb:ffffffc0b5efc308
+	[ 1786.346376] <1>.(1)[6996:kworker/1:4][name:usb20&][MUSB]vcore_release 202: release VCORE ok
+	[ 1786.348502] <1>.(1)[6996:kworker/1:4][name:musb_hdrc&][MUSB]musb_stop 1357: HDRC disabled
+	[ 1786.349825] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]switch_int_to_host 380: switch_int_to_host is done
+	[ 1786.351234] <1>.(1)[6996:kworker/1:4][name:usb20_host&][MUSB]musb_id_pin_work 487: work end, is_host=0
+	[ 1786.352618] <1>.(1)[0:swapper/1][name:usb20&][MUSB]musb_do_idle 248: otg_state b_idle
+
+	
+	
+	gn_otg_charge_switch_State：上层写设备节点，传下来的状态
+	gn_otg_charge_switch_Closing这个是为了关闭开关后让检测引脚看成是高电平实际上是低电平
+	iddig_state：iddig引脚的状态
+	otg_charge_state：otg充电状态
+	
+	
+	
+	
+	void gn_Close_Otg_Irq(void)
+	{
+		int iddig_state = 1;
+		pr_notice("****before gn_Close_Otg_Irq!\n");	
+	#ifdef ID_PIN_USE_EX_EINT
+		#ifdef CONFIG_OF
+		#if defined(CONFIG_MTK_LEGACY)
+		iddig_state = mt_get_gpio_in(iddig_pin);
+		#else
+		iddig_state = __gpio_get_value(iddig_pin);
+		#endif
+		DBG(0, "iddig_state = %d\n", iddig_state);
+
+		if(iddig_state)
+		{
+			//Gionee GuoJianqiu 201601026 modify for GNSPR #70216 begin
+			gn_otg_charge_switch_Closing = KAL_TRUE;
+			//Gionee GuoJianqiu 201601026 modify for GNSPR #70216 end
+			disable_irq(usb_iddig_number);
+			irq_set_irq_type(usb_iddig_number, IRQF_TRIGGER_LOW);
+			msleep(10);
+			pinctrl_select_state(pinctrl, pinctrl_iddig_close);
+			msleep(20);
+		}
+		else
+		{
+			gn_otg_charge_switch_Closing = KAL_TRUE;
+			irq_set_irq_type(usb_iddig_number, IRQF_TRIGGER_LOW);
+			msleep(500);
+			pinctrl_select_state(pinctrl, pinctrl_iddig_close);
+			msleep(100);
+		}
+
+		/*
+		disable_irq(usb_iddig_number);
+		irq_set_irq_type(usb_iddig_number, IRQF_TRIGGER_LOW);
+		msleep(10);
+		if(!iddig_state)
+		{
+		gn_musb_id_pin_work();
+		msleep(300);
+		}
+		pinctrl_select_state(pinctrl, pinctrl_iddig_close);
+		if(iddig_state)
+			msleep(20);
+		else
+			msleep(200);
+		*/
+		#endif
+	#endif
+		DBG(0, "gn_Close_Otg_Irq is done\n");
+	}
+
+
+
+	void gn_Open_Otg_Irq(void)
+	{
+		int iddig_state = 1;
+		pr_notice("****before gn_Open_Otg_Irq!\n");	
+	#ifdef ID_PIN_USE_EX_EINT
+		#ifdef CONFIG_OF		
+		pinctrl_select_state(pinctrl, pinctrl_iddig);
+		msleep(100);
+		gn_otg_charge_switch_Closing = KAL_FALSE;
+		irq_set_irq_type(usb_iddig_number, IRQF_TRIGGER_LOW);
+		//Gionee GuoJianqiu 201601026 modify for GNSPR #70216 begin
+		irq_set_irq_type(usb_iddig_number, IRQF_TRIGGER_LOW);
+		//Gionee GuoJianqiu 201601026 modify for GNSPR #70216 end
+		enable_irq(usb_iddig_number);	
+		//Gionee GuoJianqiu 201601026 modify for GNSPR #70216 begin
+		enable_irq(usb_iddig_number);	
+		DBG(0, "gn_Set_Otg_Irq again!!\n");
+		//Gionee GuoJianqiu 201601026 modify for GNSPR #70216 end
+	
+		#if defined(CONFIG_MTK_LEGACY)
+		iddig_state = mt_get_gpio_in(iddig_pin);
+		#else
+		iddig_state = __gpio_get_value(iddig_pin);
+		#endif
+		DBG(0, "iddig_state = %d\n", iddig_state);
+	
+		if(iddig_state)
+			msleep(30);
+		else
+			msleep(350);
+		#endif
+	#endif
+		DBG(0, "gn_Open_Otg_Irq is done\n");
+	}
+	#endif
+	//Gionee GuoJianqiu 201601026 modify for OTG SWITCH end
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
 }*/
 
 
@@ -2204,6 +2399,26 @@ SS：高优先级--->温度的调控，处理算法，  h.thermal相关的内容
 	2.1800s定期唤醒（30min），防睡死，1%检测中断
 
 充电状态下BAT_thread几个线程10s唤醒一次
+
+
+
+
+
+
+android正常的启动，关机，重启流程但是这些只是kernel_log
+AmigoGlobalActions
+
+
+MMC,EMI,emmc?
+PTP,MTP?
+seLinux
+ARCH_RESET register mtk_restart_handler  ok!!!!
+
+
+
+
+
+
 
 
 
