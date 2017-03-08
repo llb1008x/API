@@ -422,6 +422,12 @@ void fill_rect_with_content(void *fill_addr, RECT_REGION_T rect, void *src_addr,
 				./code/driver/project_common/BBL7515_DRV_COMMON/kernel-3.18/drivers/power/mediatek/battery_common.c:5061:		//Gionee GuoJianqiu 201601026 modify for OTG SWITCH end
 
 				
+				"/sys/devices/platform/battery/Otg_Charge_Switch",?
+				"/sys/devices/platform/battery/Otg_Charge_State",
+				NODE_TYPE_OTG_CHARGE_SWITCH,?
+				public static final int NODE_TYPE_OTG_CHARGE_SWITCH = 61;  ?
+				
+				
 				./code/alps/public/ROM/frameworks/base/services/core/jni/com_android_server_AmigoServerManagerService.cpp:116:/*< Gionee yinlf Otg_Charge 20160702 begin*/
 				./code/alps/public/ROM/frameworks/base/services/core/jni/com_android_server_AmigoServerManagerService.cpp:117:"/sys/devices/platform/battery/Otg_Charge_State",
 				./code/alps/public/ROM/frameworks/base/services/core/jni/com_android_server_AmigoServerManagerService.cpp:118:/* Gionee yinlf Otg_Charge 20160702 end >*/
@@ -480,6 +486,18 @@ power待机功耗相关的
 	对待这类问题要有个完整的判断逻辑：
 
 	正常待机问题（分场景），待机电流问题（底电流，开数据的电流3G，4G），电池续航问题(一系列场景下手机使用时间)
+	
+	
+	
+	处理待机问题，需要提供mobile log and netlog(如果有打开数据连接或者WIFI), MTK 处理一般是使用PowerMonitor.
+	测试前
+	adb shell dumpsys batterystats --reset
+	adb shell dumpsys batterystats --enable full-wake-history
+	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_1.log
+	测试后：
+	adb bugreport > bugreport.txt
+	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_2.log
+	adb shell ps -t > ps.txt
 	
 
 	ttyC0 是不是也跟modem相关？
@@ -2405,6 +2423,7 @@ SS：高优先级--->温度的调控，处理算法，  h.thermal相关的内容
 
 
 
+
 android正常的启动，关机，重启流程但是这些只是kernel_log
 AmigoGlobalActions
 
@@ -2413,6 +2432,7 @@ MMC,EMI,emmc?
 PTP,MTP?
 seLinux
 ARCH_RESET register mtk_restart_handler  ok!!!!
+kpd_mod
 
 
 

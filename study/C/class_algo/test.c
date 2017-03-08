@@ -1,25 +1,51 @@
 #include <stdio.h>
-#include <time.h>
-#include <string.h>
+#include <stdlib.h>
 
-clock_t start,stop;
 
-double duration;
-
-int main(int argc,char *argv[])
+int MaxSum(int A[],int N)
 {
+	int This_Sum,Max_Sum;
+	int i;
 
-	start=clock();
+	This_Sum=Max_Sum=0;
+	for(i=0;i<N;i++){
+	
+		This_Sum += A[i];
 
-	int i=atoi(argv[1]);
-	while(i)
-		i--;	
-					;
-	stop=clock();
+		if(This_Sum>Max_Sum){
+					
+			Max_Sum=This_Sum;
+		}
+		if(This_Sum<0)
+			This_Sum=0;
+	}
 
-	duration=(double)(stop-start)/CLOCKS_PER_SEC;
+	return Max_Sum;
+}
 
-	printf("duration--->%lf\n",duration);
+
+
+
+
+int main()
+{
+	//printf("hello world\n");
+
+	int num,i,t;
+	scanf("%d",&num);
+	
+	int *p=malloc(sizeof(int)*num);
+	
+	for(i=0;i<num;i++){
+	
+		scanf("%d",p+i);
+	}
+
+
+	t=MaxSum(p,num);
+
+	printf("%d\n",t);
+
 
 	return 0;
 }
