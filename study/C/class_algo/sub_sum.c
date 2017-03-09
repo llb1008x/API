@@ -9,7 +9,7 @@
 
 #include<stdio.h>
 
-#define		NUM			8
+//#define		NUM			8
 
 /***************************************
  *方案一
@@ -79,6 +79,8 @@ int MaxSum2(int A[],int N)
 
 
 
+
+
 /*****************************************
  *方案四：在线处理
  ****************************************/
@@ -111,10 +113,10 @@ int main()
 {
 	printf("hello world\n");
 
-	int A[]={4.-3,5,-2,-1,2,6,-2};
+	int A[]={4.-3,5,-2,-1,2,6,-2,4,-3};
 	int t;
 	
-	t=MaxSum4(A,NUM);
+	t=MaxSum4(A,sizeof(A)/sizeof(int));
 
 	printf("MaxSum4-->%d\n",t);
 

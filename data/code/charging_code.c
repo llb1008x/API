@@ -12,6 +12,7 @@
 	这些bc11就是指BC1.1协议
 	检测充电器类型根据BC1.1协议来的，给D+一个电压，检测D-上的电压，如果是低电平非标准充电；如果电压相同，标准充电；
 	有一定的分压，专用的或其他类型的充电器。
+	
 	int hw_charger_type_detection(void)
 	{
 		CHARGER_TYPE charger_tye = CHARGER_UNKNOWN;
