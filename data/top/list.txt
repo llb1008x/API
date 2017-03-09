@@ -1,0 +1,274 @@
+
+查找的资料：
+http://www.imooc.com/qadetail/198875?lastmedia=1
+
+
+linux内核：
+
+	list_for_each_entry 
+	http://blog.csdn.net/xubin341719/article/details/7098611
+
+
+	linux内核中的GPIO系统之（1）：软件框架 
+	http://blog.csdn.net/loongembedded/article/details/49466637
+
+
+	linux 内核分析之list_head
+	http://www.cnblogs.com/riky/archive/2006/12/28/606242.html
+
+
+	Linux 内存的布局 
+	http://blog.csdn.net/maotianwang/article/details/11370849
+
+
+	linux  thermal体系框架
+	http://kernel.meizu.com/linux-thermal-framework-intro.html
+
+
+	Linux动态频率调节系统CPUFreq 
+	http://blog.chinaunix.net/uid-20321537-id-4049149.html
+
+
+	linux下的tty设备
+	http://blog.csdn.net/goodluckwhh/article/details/13368279
+	
+	
+
+
+
+
+
+
+
+
+
+
+battery：
+
+	android 4.4 电池电量管理底层分析(C\C++层) 
+	http://blog.csdn.net/daweibalang717/article/details/41446993
+
+
+	android 4.4 电池电量显示分析（低电量提醒与电池图标）Java 层 
+	http://blog.csdn.net/daweibalang717/article/details/40615453
+
+
+	MT6589充电模块浅析
+	http://blog.csdn.net/wn360459196/article/details/11031073
+
+
+	如何让电源为电池充电提供最大功率
+	http://www.21ic.com/app/power/201409/601764.htm
+
+
+	Linux的电源管理架构 
+	http://blog.csdn.net/u012719256/article/details/52692395
+
+
+	高通8X16电池BMS算法（一） 
+	http://blog.csdn.net/yanleizhouqing/article/details/51592243
+
+
+	Linux电源管理相关的一些列文章（涉及面很广）
+	http://www.wowotech.net/sort/pm_subsystem
+
+
+	看完变高手 高通Quick Charge 2.0从入门到精通
+	http://www.cnbeta.com/articles/387057.htm
+
+
+
+
+
+
+
+
+
+
+USB：
+
+	USB OTG插入检测识别
+	http://blog.csdn.net/uranus_wm/article/details/9838847
+
+
+	USB眼图：
+	http://blog.csdn.net/vvcumt/article/details/38852347
+
+
+	BC1.1标准 
+	http://blog.csdn.net/zhaoguowei2010/article/details/8970319
+
+
+	USB协 USB协通讯议--深入理解 通讯议--深入理解 
+	http://blog.csdn.net/myarrow/article/details/8484113
+
+
+	一个USB驱动
+	http://wenku.baidu.com/link?url=KiEUVHKjGGMkWxGSiJ9eND2QIstcPxj_tmDILEjAT-tMrpTTZQm-nUbZgP_qABC93NSjhPGGDU4-LecGC6xqKRD04Tf_2dUlIQxbemB18hu
+
+
+	USB&nbsp;Type-C
+	http://blog.csdn.net/fouweng/article/details/53435528
+
+
+	USB协通讯议--深入理解 
+	http://blog.csdn.net/myarrow/article/details/8484113
+	
+	
+	USB电池充电基础：应急指南
+	https://www.maximintegrated.com/cn/app-notes/index.mvp/id/4803
+
+
+
+
+
+
+
+
+other：
+
+	手机主叫的信道流程与Modem Log简单分析
+	http://blog.csdn.net/zx249388847/article/details/52637563
+
+
+	GSM modem,GSM modem的组成/原理/分类/作
+	http://www.elecfans.com/baike/bandaoti/bandaotiqijian/20100323203212.html
+
+
+	ubuntu完美搭建git服务器：
+	http://blog.csdn.net/tommy_wxie/article/details/38779667
+
+
+	高通骁龙410C开发板基础知识
+	http://blog.csdn.net/sungod612/article/details/52698754
+
+
+	ubuntu下配置git和github初体验
+	http://blog.chinaunix.net/uid-24782829-id-3183604.html
+
+
+	配置vim
+	git clone https://github.com/chxuan/vimplus.git
+
+
+	linux下安装google protobuf（详细） 
+	http://blog.csdn.net/xiexievv/article/details/47396725
+
+
+	Google Protobuf的安装、配置、以及简单demo编译
+	http://blog.csdn.net/allenlinrui/article/details/10098809
+
+
+	Google Protobuf开发指南
+	https://my.oschina.net/macwe/blog/157862
+
+
+	高通平台开发一系列文章
+	http://blog.csdn.net/LoongEmbedded/article/category/5611401/1
+
+
+	linux公社资料分享
+	http://linux.linuxidc.com/
+	用户名与密码都是www.linuxidc.com
+
+
+	使用fastboot命令刷机流程详解
+	http://blog.chinaunix.net/uid-31390529-id-5753369.html
+
+
+	**SSH协议介绍 
+	http://blog.csdn.net/macrossdzh/article/details/5691924
+	
+	
+	git rebase命令
+	http://gitbook.liuhui998.com/4_2.html
+	
+	
+	无线充电IC
+	http://www.elecfans.com/dianyuan/404455.html
+	
+	
+	cin、cin.get()、getline()（讲解的很详细）
+	http://blog.csdn.net/xuexiacm/article/details/8101859
+
+
+	eMMC分区详解
+	http://blog.sina.com.cn/s/blog_71fdf1f00102v5c2.html
+
+
+	Android关机流程解析 
+	http://blog.csdn.net/mirkerson/article/details/24322181
+	
+	
+	深入解析Android关机
+	http://mobile.51cto.com/aprogram-418981.htm
+
+
+
+
+集中解决一些问题:
+
+1.安装java开环境，编译android
+  openjdk-7-jdk安装，
+
+  首先安装过程中要用到ppa，相当于个人的软件库。
+  Ubuntu PPA软件源的介绍与使用  
+  http://blog.csdn.net/baidu_22502417/article/details/46683549
+  但是安装过程中出现了这个问题：＂sudo: add-apt-repository: command not fou＂, 
+  是缺少必要的软件依赖包：
+  sudo apt-get install python-software-properties
+  sudo apt-get install software-properties-common
+  下载密钥：86F44E2A
+
+  安装android studio
+  下载软件安装包：android studio 中文网 http://www.android-studio.org/
+
+	llb@llb-pc:~$ curl https://dl-ssl.google.com/dl/googlesource/git-repo/repo >~/bin/repo
+	  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+	Dload  Upload   Total   Spent    Left  Speed
+	0     0    0     0    0     0      0      0 --:--:--  0:05:00 --:--:--     0
+	curl: (28) Connection timed out after 300017 milliseconds
+	改为下面的：google被墙了
+	curl "http://php.webtutor.pl/en/wp-content/uploads/2011/09/repo" > ~/bin/repo
+
+
+	repo下载国内链接android源码：
+	http://blog.csdn.net/ldld1717/article/details/52462869
+	编译android源码make version版本不对
+
+	make版本不符合要求，不能编译android的解决方法
+	http://blog.csdn.net/lr2131/article/details/45673603./configure
+
+	但是都要sudo
+	make
+	make install
+	要有root权限
+
+	android开发环境搭建
+	http://blog.csdn.net/evenness/article/details/16116027
+
+	============================================
+	Checking build tools versions...
+	************************************************************
+	You are attempting to build with the incorrect version
+	of java.
+	 
+	Your version is: Picked up _JAVA_OPTIONS:   -Dawt.useSystemAAFontSettings=gasp.
+	The correct version is: Java SE 1.6.
+	 
+	Please follow the machine setup instructions at
+		http://source.android.com/source/download.html
+		************************************************************
+
+	这个要在设置java环境变量的地方加上unset 。。。
+	这是因为deepin 操作系统的原因
+
+
+
+
+
+2.双硬盘(固态硬盘+机械硬盘)，安装双系统(win7+ubuntu)
+
+
+
+
