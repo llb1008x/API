@@ -1,0 +1,85 @@
+PLplot Release 5.13.0 (N.B. the wording below will be substantially
+changed if the next release is a bugfix one, i.e., 5.12.1).
+
+This is a release of the PLplot plotting package. It represents the
+ongoing best efforts of the PLplot development community (roughly ???
+commits since the last release) to improve this package, and it is the
+only version of PLplot that we attempt to support.  Releases in the
+5.x.y series should be available several times per year.
+
+Note that PLplot has been continuously developed since 1986 so it has
+accumulated a lot of cruft since that time that we are now slowing
+dealing with to improve the lot of both new users and new members of
+the development team.  As a result virtually every PLplot release has
+some backwards incompatibilities introduced to help clean it up so
+please pay careful attention to the OFFICIAL NOTICES FOR USERS below
+where we document such incompatibilities to make life easier
+for those who have prior experience with older PLplot releases.
+
+If you encounter a problem with this release that is not already
+documented on our bug tracker, then please send bug reports to PLplot
+developers via our mailing lists (preferred for initial discussion of
+issues) at <http://sourceforge.net/p/plplot/mailman/>. If it turns out
+no quick resolution is possible via mailing-list discussion, then the
+issue should be placed on our bug tracker at
+<http://sourceforge.net/p/plplot/bugs/>.
+
+This software is primarily distributed under the LGPL.  See the
+Copyright file for the licensing details.
+________________________________________________________________
+
+CONTENTS
+
+1. OFFICIAL NOTICES FOR USERS
+
+1.1 CMake version compatibility
+
+2. Improvements relative to the previous release
+
+2.1 Bug fixes
+
+3. PLplot testing
+________________________________________________________________
+
+1. OFFICIAL NOTICES FOR USERS
+
+1.1 CMake version compatibility
+
+Our build system is implemented using CMake.  The minimum version of
+CMake we allow is 3.0.2 on Linux and 3.6.2 on all other platforms.
+(And it is likely we will bump those minimum versions to at least
+3.7.0 for our next release.)
+
+This particular PLplot release has been comprehensively tested for
+CMake versions 3.0.2 through 3.7.0 on a variety of platforms (see
+<http://sourceforge.net/p/plplot/wiki/Testing_PLplot/#Testing%20Reports>).
+So if your CMake version is <= 3.7.0 and satisfies the above minimum
+CMake version requirement there is an excellent chance that our build
+system will work well.  Furthermore, if you try later CMake versions
+as they are released during the life of this PLplot release, our build
+system might continue to work well because CMake has an excellent
+reputation for preserving backwards compatibility.  But if you get
+build-system trouble for versions of CMake greater than 3.7.0, the
+first thing you should try is the well-tested CMake-3.7.0.
+
+________________________________________________________________
+
+2. Improvements relative to the previous release
+
+2.1 Bug fixes
+
+The bug fixes in this release are noted in the ??? commit messages
+collected in ChangeLog.release.
+
+________________________________________________________________
+
+3. PLplot testing
+
+Comprehensive tests of this release are documented in
+<http://sourceforge.net/p/plplot/wiki/Testing_PLplot/#Testing%20Reports>
+and
+<https://sourceforge.net/p/plplot/wiki/Testing_PLplot/#Fortran%20Testing%20Reports>.
+In addition, developers and users who have used the git master tip
+version for all their plotting needs during this release cycle have
+provided additional important testing of this release of PLplot.
+________________________________________________________________
