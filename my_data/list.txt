@@ -31,6 +31,8 @@ linux内核：
 
 	linux下的tty设备
 	http://blog.csdn.net/goodluckwhh/article/details/13368279
+	
+	
 
 
 
@@ -193,6 +195,13 @@ other：
 	eMMC分区详解
 	http://blog.sina.com.cn/s/blog_71fdf1f00102v5c2.html
 
+
+	Android关机流程解析 
+	http://blog.csdn.net/mirkerson/article/details/24322181
+	
+	
+	深入解析Android关机
+	http://mobile.51cto.com/aprogram-418981.htm
 
 
 

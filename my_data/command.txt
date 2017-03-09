@@ -101,7 +101,12 @@
 	adb shell setprop persist.uartconsole.enable 1
 	
 	
-	打印上层main.log
+	打印上层main_log,system_log
+	adb  shell logcat -b main 
+	adb  shell logcat -b system
+	
+	
+	
 	adb  shell logcat -b main -v threadtime >error_log1.txt
 
 
