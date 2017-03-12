@@ -1,0 +1,12 @@
+5、输入一个数，将这个数的奇数位重新组合成一个数，其中高位数依然处于高位，
+低位数处于低位。
+实例：  input:345389
+        output:439
+int Getnum(int input, int output)
+{
+
+}
+void main()
+{
+
+}

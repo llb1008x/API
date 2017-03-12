@@ -1,0 +1,9 @@
+将字符串中所有字母 都替换成该字符ascii+5,大于z的从a开始   
+如：
+输入 "ab"
+输出："fg"
+
+void  change(char *Input, char *Output)
+{
+
+}

@@ -1,0 +1,33 @@
+比较两个数组，要求从数组最后一个元素开始逐个元素向前比较，如果2个数组
+长度不等，则只比较较短长度数组个数元素。请编程实现上述比较，并返回比较
+中发现的不相等元素的个数
+比如：
+数组{1,3,5}和数组{77,21,1,3,5}按题述要求比较，不相等元素个数为0
+数组{1,3,5}和数组{77,21,1,3,5,7}按题述要求比较，不相等元素个数为3
+? 要求实现函数：
+intarray_compare(int len1, int array1[], int len2, int array2[])
+【输入】int len1：输入被比较数组1的元素个数；
+int array1[]：输入被比较数组1；
+int len2：输入被比较数组2的元素个数；
+int array2[]：输入被比较数组2；
+【输出】无
+【返回】不相等元素的个数，类型为int
+? 示例
+1）输入：int array1[] = {1,3,5}，int len1 = 3，
+int array2[] = {77,21,1,3,5}，int len2 = 5
+函数返回：0
+2）输入：int array1[] = {1,3,5}，int len1 = 3，
+int array2[] = {77,21,1,3,5,7}，int len2 = 6
+函数返回：３
+#include<stdlib.h>
+#include<stdio.h>
+#include<string.h>
+intarray_compare(int len1, int array1[], int len2, int array2[])
+{
+int count=0;
+for( ;len1>=0&&len2>=0 ;len1--,len2--)
+{
+if(array1[len1-1]==array2[len2-1])
+{
+count++;
+}

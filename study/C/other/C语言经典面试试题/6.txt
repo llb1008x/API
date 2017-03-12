@@ -1,0 +1,13 @@
+6、输入一个字符串，将字符串中大写转成小写，过滤掉不是字母的字符
+实例：
+ 输入：  ABCabc124#
+ 输出：  abcabc
+void translate(char *p)
+{
+
+}
+void main()
+{
+
+}
+ 

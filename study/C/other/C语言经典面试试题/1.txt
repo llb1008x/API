@@ -1,0 +1,13 @@
+1、程序实现目标：输入1~20的数字n，求n以内数据的阶乘之和。
+1! + 2! + 3! +......+n! = ?
+
+void GetCount(int Num ,float pOutput[])
+{
+
+}
+void main()
+{
+    float pNumber[2] = {0};
+    Number = 20;
+    GetCount(Number ,pNumber);
+}
