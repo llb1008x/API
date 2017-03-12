@@ -204,6 +204,9 @@ other：
 	http://mobile.51cto.com/aprogram-418981.htm
 
 
+	Linux中gdb 查看core堆栈信息 
+	http://blog.csdn.net/suxinpingtao51/article/details/12072559
+
 
 
 集中解决一些问题:
