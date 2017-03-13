@@ -1,22 +1,22 @@
-10¡¢Í¨¹ý¼üÅÌÊäÈëÒ»´®Ð¡Ð´×ÖÄ¸(a~z)×é³ÉµÄ×Ö·û´®¡£Çë±àÐ´Ò»¸ö×Ö·û´®¹ýÂË³ÌÐò£¬Èô×Ö·û´®ÖÐ³öÏÖ¶à¸öÏàÍ¬µÄ×Ö·û£¬½«·ÇÊ×´Î³öÏÖµÄ×Ö·û¹ýÂËµô¡£
-±ÈÈç×Ö·û´®¡°abacacde¡±¹ýÂË½á¹ûÎª¡°abcde¡±¡£
+10ã€é€šè¿‡é”®ç›˜è¾“å…¥ä¸€ä¸²å°å†™å­—æ¯(a~z)ç»„æˆçš„å­—ç¬¦ä¸²ã€‚è¯·ç¼–å†™ä¸€ä¸ªå­—ç¬¦ä¸²è¿‡æ»¤ç¨‹åºï¼Œè‹¥å­—ç¬¦ä¸²ä¸­å‡ºçŽ°å¤šä¸ªç›¸åŒçš„å­—ç¬¦ï¼Œå°†éžé¦–æ¬¡å‡ºçŽ°çš„å­—ç¬¦è¿‡æ»¤æŽ‰ã€‚
+æ¯”å¦‚å­—ç¬¦ä¸²â€œabacacdeâ€è¿‡æ»¤ç»“æžœä¸ºâ€œabcdeâ€ã€‚
  
-ÒªÇóÊµÏÖº¯Êý£º 
+è¦æ±‚å®žçŽ°å‡½æ•°ï¼š 
 void stringFilter(const char *pInputStr, long lInputLen, char *pOutputStr);
  
-¡¾ÊäÈë¡¿ pInputStr£º  ÊäÈë×Ö·û´®
-         lInputLen£º  ÊäÈë×Ö·û´®³¤¶È         
-¡¾Êä³ö¡¿ pOutputStr£º Êä³ö×Ö·û´®£¬¿Õ¼äÒÑ¾­¿ª±ÙºÃ£¬ÓëÊäÈë×Ö·û´®µÈ³¤£»
+ã€è¾“å…¥ã€‘ pInputStrï¼š  è¾“å…¥å­—ç¬¦ä¸²
+         lInputLenï¼š  è¾“å…¥å­—ç¬¦ä¸²é•¿åº¦         
+ã€è¾“å‡ºã€‘ pOutputStrï¼š è¾“å‡ºå­—ç¬¦ä¸²ï¼Œç©ºé—´å·²ç»å¼€è¾Ÿå¥½ï¼Œä¸Žè¾“å…¥å­—ç¬¦ä¸²ç­‰é•¿ï¼›
  
-¡¾×¢Òâ¡¿Ö»ÐèÒªÍê³É¸Ãº¯Êý¹¦ÄÜËã·¨£¬ÖÐ¼ä²»ÐèÒªÓÐÈÎºÎIOµÄÊäÈëÊä³ö
+ã€æ³¨æ„ã€‘åªéœ€è¦å®Œæˆè¯¥å‡½æ•°åŠŸèƒ½ç®—æ³•ï¼Œä¸­é—´ä¸éœ€è¦æœ‰ä»»ä½•IOçš„è¾“å…¥è¾“å‡º
  
-Ê¾Àý 
-ÊäÈë£º¡°deefd¡±        Êä³ö£º¡°def¡±
-ÊäÈë£º¡°afafafaf¡±     Êä³ö£º¡°af¡±
-ÊäÈë£º¡°pppppppp¡±     Êä³ö£º¡°p¡±
+ç¤ºä¾‹ 
+è¾“å…¥ï¼šâ€œdeefdâ€        è¾“å‡ºï¼šâ€œdefâ€
+è¾“å…¥ï¼šâ€œafafafafâ€     è¾“å‡ºï¼šâ€œafâ€
+è¾“å…¥ï¼šâ€œppppppppâ€     è¾“å‡ºï¼šâ€œpâ€
 */
  
-/* mainº¯ÊýÒÑ¾­Òþ²Ø£¬ÕâÀï±£Áô¸øÓÃ»§µÄ²âÊÔÈë¿Ú£¬ÔÚÕâÀï²âÊÔÄãµÄÊµÏÖº¯Êý£¬¿ÉÒÔµ÷ÓÃprintf´òÓ¡Êä³ö*/
-/* µ±Ç°Äã¿ÉÒÔÊ¹ÓÃÆäËû·½·¨²âÊÔ£¬Ö»Òª±£Ö¤×îÖÕ³ÌÐòÄÜÕýÈ·Ö´ÐÐ¼´¿É */
-/* ¸Ãº¯ÊýÊµÏÖ¿ÉÒÔÈÎÒâÐÞ¸Ä£¬µ«ÊÇ²»Òª¸Ä±äº¯ÊýÔ­ÐÍ¡£Ò»¶¨Òª±£Ö¤±àÒëÔËÐÐ²»ÊÜÓ°Ïì*/
+/* mainå‡½æ•°å·²ç»éšè—ï¼Œè¿™é‡Œä¿ç•™ç»™ç”¨æˆ·çš„æµ‹è¯•å…¥å£ï¼Œåœ¨è¿™é‡Œæµ‹è¯•ä½ çš„å®žçŽ°å‡½æ•°ï¼Œå¯ä»¥è°ƒç”¨printfæ‰“å°è¾“å‡º*/
+/* å½“å‰ä½ å¯ä»¥ä½¿ç”¨å…¶ä»–æ–¹æ³•æµ‹è¯•ï¼Œåªè¦ä¿è¯æœ€ç»ˆç¨‹åºèƒ½æ­£ç¡®æ‰§è¡Œå³å¯ */
+/* è¯¥å‡½æ•°å®žçŽ°å¯ä»¥ä»»æ„ä¿®æ”¹ï¼Œä½†æ˜¯ä¸è¦æ”¹å˜å‡½æ•°åŽŸåž‹ã€‚ä¸€å®šè¦ä¿è¯ç¼–è¯‘è¿è¡Œä¸å—å½±å“*/
  

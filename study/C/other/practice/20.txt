@@ -1,7 +1,7 @@
-20.��Сд��ת��
-����һ���ַ����������еĴ�дת��ΪСд��Сдת��Ϊ��д�����˵�����ĸ���ַ���
-�� �����롰aBcd Ef��
-       ���  ��AbCDrF��
+20.大小写互转，
+给定一个字符串，把其中的大写转换为小写，小写转换为大写，过滤掉非字母的字符。
+如 ：输入“aBcd Ef”
+       输出  “AbCDrF”
 
 int toChangeChar(char* str, int lenth, char* des)
 {

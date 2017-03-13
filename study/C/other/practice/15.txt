@@ -1,4 +1,4 @@
-15、把一个字符串数组倒置过来
+15銆佹妸涓�涓瓧绗︿覆鏁扮粍鍊掔疆杩囨潵
 #include<string.h>
 #define MAX 100
 reverse(const char *in, int len,char *out)

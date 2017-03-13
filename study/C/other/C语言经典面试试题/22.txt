@@ -1,7 +1,0 @@
-22.求输入数字的公因子，
-输入到Poutput数组中，返回Poutput数组，返回Poutput的长度，iLen为输入的个数。
-
-int dev（int *input, int Len, int *pout）
-{
-
-}

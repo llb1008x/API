@@ -1,7 +1,7 @@
-22.ÇóÊäÈëÊı×ÖµÄ¹«Òò×Ó£¬
-ÊäÈëµ½PoutputÊı×éÖĞ£¬·µ»ØPoutputÊı×é£¬·µ»ØPoutputµÄ³¤¶È£¬iLenÎªÊäÈëµÄ¸öÊı¡£
+22.æ±‚è¾“å…¥æ•°å­—çš„å…¬å› å­ï¼Œ
+è¾“å…¥åˆ°Poutputæ•°ç»„ä¸­ï¼Œè¿”å›Poutputæ•°ç»„ï¼Œè¿”å›Poutputçš„é•¿åº¦ï¼ŒiLenä¸ºè¾“å…¥çš„ä¸ªæ•°ã€‚
 
-int dev£¨int *input, int Len, int *pout£©
+int devï¼ˆint *input, int Len, int *poutï¼‰
 {
 
 }
