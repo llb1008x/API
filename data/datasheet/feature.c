@@ -148,4 +148,7 @@ chown system system /sys/devices/platform/battery/Switch_Charging_Value
         KAL_TRUE  = 1,
     } kal_bool;
 
+
+关于充电截止之后状态的改变
+
 }

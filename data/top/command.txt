@@ -48,6 +48,7 @@
 
     手机正常的log在/sdcard/mtklog下（死机log在/data/anr下）
 	adb pull  /sdcard/mtklog   /home/llb/project/DEBUG/
+	adb pull  /sdcard/GNLogs   /home/llb/project/DEBUG/
 
 
     手机功耗问题导出电池和相关的参数：

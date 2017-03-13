@@ -103,10 +103,8 @@
 		channel 34是与WCN通信，告知wifi当前modem所使用频段。
 		
 		channel 6&42是modem的专用通道，打开modem.log就会有此类唤醒
-		
-		
-		
-		
+
+	
 		55是跟volte相关
 		
 		基本上，上述3个channel的跟modem的网络唤醒有关。

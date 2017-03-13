@@ -255,10 +255,6 @@
 		}
 
 
-
-
-
-
 		static void battery_pump_express_charger_check(void)
 		{
 			if (KAL_TRUE == ta_check_chr_type &&
@@ -429,7 +425,138 @@
 		}
 
 
+
+		//控制电时使能
+		static void pchr_turn_on_charging(void)
+		{
+		#if !defined(CONFIG_MTK_JEITA_STANDARD_SUPPORT)
+			BATTERY_VOLTAGE_ENUM cv_voltage;
+		#endif
+			unsigned int charging_enable = KAL_TRUE;
+
+		#if defined(CONFIG_MTK_DUAL_INPUT_CHARGER_SUPPORT)
+			if (KAL_TRUE == BMT_status.charger_exist)
+				charging_enable = KAL_TRUE;
+			else
+				charging_enable = KAL_FALSE;
+		#endif
+
+			if (BMT_status.bat_charging_state == CHR_ERROR) {
+				battery_log(BAT_LOG_CRTI, "[BATTERY] Charger Error, turn OFF charging !\n");
+
+				charging_enable = KAL_FALSE;
+
+			} else if ((g_platform_boot_mode == META_BOOT) || (g_platform_boot_mode == ADVMETA_BOOT)) {
+				battery_log(BAT_LOG_CRTI,
+						"[BATTERY] In meta or advanced meta mode, disable charging.\n");
+				charging_enable = KAL_FALSE;
+			} else {
+				/*HW initialization */
+				battery_charging_control(CHARGING_CMD_INIT, NULL);
+
+				battery_log(BAT_LOG_FULL, "charging_hw_init\n");
+
+		#if defined(CONFIG_MTK_PUMP_EXPRESS_PLUS_SUPPORT)
+				battery_pump_express_algorithm_start();
+		#endif
+
+				/* Set Charging Current */
+				if (get_usb_current_unlimited()) {
+					if (batt_cust_data.ac_charger_input_current != 0)
+						g_temp_input_CC_value = batt_cust_data.ac_charger_input_current;
+					else
+						g_temp_input_CC_value = batt_cust_data.ac_charger_current;
+
+					g_temp_CC_value = batt_cust_data.ac_charger_current;
+					battery_log(BAT_LOG_FULL,
+							"USB_CURRENT_UNLIMITED, use batt_cust_data.ac_charger_current\n");
+				//GioneeDrv GuoJianqiu 20151223 modify for platform change begin
+				}
+		#ifndef CONFIG_MTK_SWITCH_INPUT_OUTPUT_CURRENT_SUPPORT
+				else if (g_bcct_flag == 1) {
+					select_charging_current_bcct();
+
+					battery_log(BAT_LOG_CRTI, "[BATTERY] select_charging_current_bcct !\n");
+				} else {
+					select_charging_current();
+
+					battery_log(BAT_LOG_CRTI, "[BATTERY] select_charging_current !\n");
+				}
+		#else
+				else if (g_bcct_flag == 1 || g_bcct_input_flag == 1) {
+				//GioneeDrv GuoJianqiu 20151223 modify for platform change end
+					select_charging_current();
+					select_charging_current_bcct();
+					battery_log(BAT_LOG_FULL, "[BATTERY] select_charging_curret_bcct !\n");
+				} else {
+					select_charging_current();
+					battery_log(BAT_LOG_FULL, "[BATTERY] select_charging_curret !\n");
+				}
+		#endif
+				battery_log(BAT_LOG_CRTI,
+						"[BATTERY] Default CC mode charging : %d, input current = %d\r\n",
+						g_temp_CC_value, g_temp_input_CC_value);
+				if (g_temp_CC_value == CHARGE_CURRENT_0_00_MA
+					|| g_temp_input_CC_value == CHARGE_CURRENT_0_00_MA) {
+
+					charging_enable = KAL_FALSE;
+
+					battery_log(BAT_LOG_CRTI,
+							"[BATTERY] charging current is set 0mA, turn off charging !\r\n");
+				} else {
+					battery_charging_control(CHARGING_CMD_SET_INPUT_CURRENT,
+								&g_temp_input_CC_value);
+					battery_charging_control(CHARGING_CMD_SET_CURRENT, &g_temp_CC_value);
+
+					/*Set CV Voltage */
+		#if !defined(CONFIG_MTK_JEITA_STANDARD_SUPPORT)
+					//GioneeDrv GuoJianqiu 20160429 modify for platform change begin
+					if (batt_cust_data.high_battery_voltage_support)
+						cv_voltage = BATTERY_VOLT_04_400000_V;
+					else
+						cv_voltage = BATTERY_VOLT_04_200000_V;
+
+					#ifdef CONFIG_MTK_DYNAMIC_BAT_CV_SUPPORT
+					//GioneeDrv GuoJianqiu 20160429 modify for platform change end
+					cv_voltage = get_constant_voltage() * 1000;
+					battery_log(BAT_LOG_CRTI, "[BATTERY][BIF] Setting CV to %d\n", cv_voltage / 1000);
+					#endif
+					battery_charging_control(CHARGING_CMD_SET_CV_VOLTAGE, &cv_voltage);
+
+					#if defined(CONFIG_MTK_HAFG_20)
+					g_cv_voltage = cv_voltage;
+					#endif
+		#endif
+				}
+			}
+
+			/* enable/disable charging */
+			battery_charging_control(CHARGING_CMD_ENABLE, &charging_enable);
+
+			battery_log(BAT_LOG_CRTI, "[BATTERY] pchr_turn_on_charging(), enable =%d !\r\n",	//Gionee GuoJianqiu 20150318 modify for fix bugs
+					charging_enable);
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
 
 
 
