@@ -1,0 +1,12 @@
+3、程序实现目标：输入n个字符串，将各个字符串排序后的结果按顺序输出。
+
+实例：n = 4，
+输入："abhhhhddffg"
+      "sd23354675"
+      "adssfdhsafs"
+      "sdabc"
+
+输出："sdabc"
+      "sd23354675"     
+      "adssfdhsafs"
+      "abhhhhddffg"

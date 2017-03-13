@@ -81,4 +81,71 @@
         unsigned int ZCV;
     } PMU_ChargerStruct;
 
+
+
+
+
+
+
+
+
+
+
+
+
+**************************************************************************************************
+--->system node
+//Gionee LiLuBao 20170309 modify for switch charging value begin
+#define GN_BATTERY_SWITCH_CHARGING
+#if defined(GN_BATTERY_SWITCH_CHARGING)
+kal_bool gn_switch_charging_State=KAL_FALSE;
+static ssize_t show_Switch_Charging_Value(struct device *dev,struct device_attribute *attr, char *buf)
+{
+	battery_log(BAT_LOG_CRTI, "show gn_switch_charging_State = %d\n", gn_switch_charging_State);    
+    return sprintf(buf, "%u\n", gn_switch_charging_State);
+}
+
+static ssize_t store_Switch_Charging_Value(struct device *dev,struct device_attribute *attr, const char *buf, size_t size)
+{
+	int rv;
+	
+	rv = kstrtouint(buf, 0, &gn_switch_charging_State);
+	if (rv != 0)
+	{
+		battery_log(BAT_LOG_CRTI, "  bad argument, echo [enable] > Switch_Charging_Value! gn_switch_charging_State = %d\n", gn_switch_charging_State);
+		return -EINVAL;
+	}
+
+	
+	battery_log(BAT_LOG_CRTI, "store gn_switch_charging_State = %d\n", gn_switch_charging_State); 
+
+	return size;
+}
+
+static DEVICE_ATTR(Switch_Charging_Value, 0664, show_Switch_Charging_Value, store_Switch_Charging_Value);
+#endif
+//Gionee LiLuBao 20170309 modify for switch charging value end
+
+
+--->probe
+//Gionee LiLuBao 20170309 modify for switch charging begin
+#if defined(GN_BATTERY_SWITCH_CHARGING)
+ret_device_file = device_create_file(&(dev->dev), &dev_attr_Switch_Charging_Value);
+#endif
+//Gionee LiLuBao 20170309 modify for switch charging end
+
+
+--->init.mt6735.c
+# Gionee LiLuBao 20170310 modify for switch charging value begin
+chown system system /sys/devices/platform/battery/Switch_Charging_Value
+# Gionee LiLuBao 20170310 modify for switch charging value end 
+
+
+
+
+    typedef enum {
+        KAL_FALSE = 0,
+        KAL_TRUE  = 1,
+    } kal_bool;
+
 }

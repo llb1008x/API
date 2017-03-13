@@ -1,0 +1,9 @@
+在一个数组中，找出满足 2的N次方的元素。
+
+输入：{8,7,9,45，4}
+输出 {8，4}
+
+void find(int input[], int nNum ,int output[])
+{
+
+}

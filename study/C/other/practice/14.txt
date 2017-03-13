@@ -1,0 +1,24 @@
+14、输入一字符串，里面含有0~9的元素，例如001113335551，处理这个字符串，得到一个新的字符串
+这个字符串为，0213335311，即对于相邻的相同元素，将其写为元素+出现次数的格式。
+例如：
+输入：001113335551
+输出：0213335311
+
+
+#include "stdafx.h"
+#Include <string.h>
+#include<iostream>
+using namespace std;
+void getstring(char *input, char *output)
+{
+
+}
+
+void main()
+{
+char st[] = "001113335551";
+cout<<*st<<endl;
+char out[strlen(st)+1] = {0};
+getstring(st, out);
+cout<<*st;
+}
