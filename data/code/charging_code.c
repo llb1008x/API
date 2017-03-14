@@ -426,7 +426,7 @@
 
 
 
-		//控制电时使能
+		//控制充电使能
 		static void pchr_turn_on_charging(void)
 		{
 		#if !defined(CONFIG_MTK_JEITA_STANDARD_SUPPORT)
