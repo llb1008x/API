@@ -212,6 +212,23 @@ other：
 	http://www.cnblogs.com/zyanrong/p/5661114.html
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 集中解决一些问题:
 
 1.安装java开环境，编译android

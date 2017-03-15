@@ -16,8 +16,6 @@
 
 
 
-
-
 {
    MT6351芯片的接口 charging_hw_bw25896.c
 
@@ -156,7 +154,15 @@ Q：
 }
 
 
+
+
+
+
+
+
+/*qualcomm高通相关*/
 {
+
   1.pm8998,pm8005,and pmi8998_power_management_ics_design_guidelines.pdf
   PM8998，PM8005作为pmic子系统供电管理的核心
   PMI8998管理系统供电的接口，充电，SMB1381充电
@@ -215,8 +221,6 @@ CC管脚上必须有一个下拉至GND的电阻Rd。此切换动作必须由CC L
   Power source mode
 
   Dead or Weak Battery Mode
-
-
 
 }
 

@@ -219,12 +219,6 @@
 	APK后台发送数据的Posix_connect Debug
 	CLMDA_MD是modem跟AP沟通桥梁
 	
-	
-	
-	
-
-
-
 }
 
 
