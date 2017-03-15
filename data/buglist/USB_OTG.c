@@ -358,15 +358,4 @@ GNSPR#70216
 	#endif
 	//Gionee GuoJianqiu 201601026 modify for OTG SWITCH end
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-
 }
