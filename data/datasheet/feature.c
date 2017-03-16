@@ -155,8 +155,7 @@ chown system system /sys/devices/platform/battery/Switch_Charging_Value
 
 /*type-C接口上添加OTG开关*/
 {
-
-    13560  20626
-    
+   (pi5usb30216.c)pi5usb_i2c_probe,在I2C总线上注册一个设备申请中断，创建一个内核线程pi5usb_event_handler->pi5usb_event_handler
+   中断来了，就读写寄存器，根据寄存器的不同位判断处于什么状态->pi5usb_try_snk，当有设备插入的时候 
     
 }
