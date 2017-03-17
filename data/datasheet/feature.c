@@ -231,12 +231,62 @@ OTG的引脚 ，怎么在设备树里面添加状态，哪个是控制OTG状态�
 
 
 
+    pi5usb type-C的操作流程
+    1. INTB asserted LOW, indicating Type-C port status change.
+    将电平拉低检测type-C引脚的状态
+    2. Processor first masks PI5USB30216A interrupt by writing a ‘1’ to Bit 0 of Control Register(0x02). INTB returned
+    Hi-Z.
+    通过掩码返回中断的状态
+    3. Delay 30ms.
+    延时
+    4. Processor then read Register(0x01), Control Register (0x02), Interrupt Register(0x03) and CC Status
+    Register(0x04). Interrupt Register(0x03) indicates if an attach or detach event was detected. All interrupt flags in
+    Interrupt Register will be cleared after the I2C read action. CC Status Register(0x04) is used to determine plugin
+    details and charging profile. Processor can configure the power and USB channels according to information in
+    CC Status Register.
+    0x01:只读寄存器
+    0x02:控制寄存器
+    0x03:中断
+    0x04:CC状态寄存器
+    当读了I2C的值之后就会清零
+    5. Processor unmask PI5USB30216A interrupt by writing a ‘0’ to Bit 0 of Address 0x02 before ending the interrupt
+    service routine
+    在执行中断工作函数的之后会操作掩码，然后结束中断工作函数
 
-    Bus 003 Device 093: ID 271d:0c03 
+    控制type-C使能来使能OTG开关，主要思路应该是这个，就是将电平拉高关闭使能，同时I2C也不能控制
+    PI5USB30216A is reset only by Power-On Reset (POR). When ENB is float or is pulled high, PI5USB30216 is
+    disabled and its I2C is not accessible. Whenever users pull low ENB to enable part, PI5USB30216A should be reset
+    through below I2C sequence:
+
+    type-C的两种工作状态
+    1. In DRP mode, PI5USB30216A is reset by writing Reg[0x02]=01h, then delay 30ms followed by writing
+    Reg[0x02]=04h/0Ch/14h. Please see Figure 6a.
+    DRP模式就是从主设备模式，下行口
+    2. In Source/DFP mode, PI5USB30216A is reset by writing Reg[0x02]=01h, then delay 30ms followed by writing
+    Reg[0x02]=02h/0Ah/12h. Please see Figure 6b.
+    DFP双端口模式，主从设备可以切换
+    3. In Sink/UFP mode, PI5USB30216A is reset by writing Reg[0x02]=05h, then delay 30ms followed by writing
+    Reg[0x02]=00h/20h. Please see Figure 6c
+    UFP：从设备模式，上行口
+
+
+
+
+    所以这里有几个关键地方：
+    1.是控制iddig引脚中断使能，还是上面讲的写寄存器，让中断跟I2C都失效
+    中断是哪个？原始代码应该是USB检测的中断，
+    usb20.h 里面定义
+    #define IDDIG_EINT_PIN (GPIO_OTG_IDDIG_EINT_PIN & ~(0x80000000))
+    
+    2.一个是USB3.0，一个时USB2.0代码结构不一样
+    USB2.0->usb20_host.c           USB3.0->xhci-mtk-driver.c
+    3.设备节点的创建和控制
+    4.完备的代码逻辑
 
 
 
     pinctrl_usbc, en_output0，en_output1，client_global
+    中断42
 
     secure boot;签名版的相关操作；服务器版本本地单编替换
     

@@ -1006,6 +1006,8 @@ MTK_FG: 1.[FGADC_UI_FG]FG version:150329 (FG% 100,UI% 96,tracking Time 0,Qmax_T_
 --->所以问题最后的原因是(这个问题还要思考一下)：
 	跟软件上电池的容量设定有关,电池充到3800mAh就认为是充满了，
 	还有就是充电的截止电流
+	然后这边还有另一个问题就是正常放电
+
 
 	charging_hw_bq24158.c文件里面，charging_hw_init
 
