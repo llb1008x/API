@@ -987,7 +987,7 @@ class main
 
 
 
-11.充电问题
+11.充电过早截止
 	现象：
 	1、从1%开始充电。19秒后电量下降到0%，继续充电8分钟后电量才恢复到1%
 	2、充电到96%时电流就已经截止，继续充电4分钟后电量才到100%，应该先充电到100%再电流截止。
@@ -1003,7 +1003,11 @@ class main
 	BAT_BatteryFullAction，charging_full_check
 MTK_FG: 1.[FGADC_UI_FG]FG version:150329 (FG% 100,UI% 96,tracking Time 0,Qmax_T_0mAH 4093, I 745, Iavg 1229, T 27, Tavg 27, RTC=96)
 
+--->所以问题最后的原因是(这个问题还要思考一下)：
+	跟软件上电池的容量设定有关,电池充到3800mAh就认为是充满了，
+	还有就是充电的截止电流
 
+	charging_hw_bq24158.c文件里面，charging_hw_init
 
 
 

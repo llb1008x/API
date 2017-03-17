@@ -294,6 +294,28 @@
 		
 		
 		6.更新代码有关APK的目录怎么处理
+		git clean -dxf 
+		git reset HEAD
+		git checkout .	
+
+
+		7.海外，深圳代码构建的方式
+		android代码下载：
+		mkdir ~/alps
+		cd ~/alps
+		./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest -b android_mtk_l_6753_65c_mp3 -m master.xml
+		./repo_19.9.0.151 sync --no-tags
+		./repo_19.9.0.151 start master --all
+
+		cd ../gionee_packages_apk_amigo_3.1
+		./repo_19.9.0.151 init -u ssh://lilubao@19.9.0.151:29418/manifest.git -b gionee_packages_apk_amigo_3.1 -m BBL7505_master.xml
+		./repo_19.9.0.151 sync --no-tags
+		./repo_19.9.0.151 start master --all
+		下载完成后，结构必须是：
+		.
+		├── alps
+		│   └── android_mtk_l_6753_65c_mp3
+		└── gionee_packages_apk_amigo_3.1
 		
 
 
@@ -367,8 +389,6 @@
 
 
 	 	烧写user版本要签名(烧签名版本的是在window环境下)
-
-
 
 
 		**编译android原生代码相关的命令(这个要实践，搭建android开发环境，编译原生代码)

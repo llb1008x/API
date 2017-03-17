@@ -219,6 +219,9 @@ OTG的引脚 ，怎么在设备树里面添加状态，哪个是控制OTG状态�
 //		pi5usb_write(client, 0x4);
     }
 
+
+
+
     
     2.OTG的工作流程：
     (pi5usb30216.c)pi5usb_i2c_probe,在I2C总线上注册一个设备申请中断，创建一个内核线程pi5usb_event_handler->pi5usb_event_handler ,
@@ -226,12 +229,14 @@ OTG的引脚 ，怎么在设备树里面添加状态，哪个是控制OTG状态�
     就执行这个，按意思来说应该说是等待设备准备好状态，有延时同时读取不同的寄存器判断,是否有热插拔或者其他外设
 
 
-    owner:liusixi
 
 
 
+    Bus 003 Device 093: ID 271d:0c03 
 
 
+
+    pinctrl_usbc, en_output0，en_output1，client_global
 
     secure boot;签名版的相关操作；服务器版本本地单编替换
     
