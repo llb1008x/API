@@ -974,19 +974,16 @@ dws文件是否需要改，看看spe和dws文件配置是否正确
 
 
 
-9.写号失败，因为电量计初始化的原因，等待patch
-
-
-
+9.写号失败，因为电量计初始化的原因
+电量计初始化的位置不对
+-- service fuelgauged /system/bin/fuelgauged
+++ service fuelgauged /vendor/bin/fuelgauged
+class main
 
 
 
 
 10.关机充电的中文logo改成英文logo
-
-
-
-
 
 
 
@@ -997,11 +994,14 @@ dws文件是否需要改，看看spe和dws文件配置是否正确
 
 	分析：
 
-12.OTG问题
-	现象：
-	1.插入OTG线，灭屏待机电流实测75mA超标（≤65mA），功耗超标	
-	2.OTG连接配测机，选择查看图片时，测试选择相机导入程序，界面显示黑屏无法预览，见附图
- 
+
+	1%~2%用了2min 所以第一个问题应该是电池电压较低导致充电开始时间长
+
+	第二个问题充电截止，电量达到95%就截止了，充电应该先达到100%，然后电池电压达到多少V就截止
+	所以这是后的问题是充电截止代码里在哪里，是怎么控制的
+
+	BAT_BatteryFullAction，charging_full_check
+MTK_FG: 1.[FGADC_UI_FG]FG version:150329 (FG% 100,UI% 96,tracking Time 0,Qmax_T_0mAH 4093, I 745, Iavg 1229, T 27, Tavg 27, RTC=96)
 
 
 
