@@ -273,20 +273,63 @@ OTG的引脚 ，怎么在设备树里面添加状态，哪个是控制OTG状态�
 
 
     所以这里有几个关键地方：
-    1.是控制iddig引脚中断使能，还是上面讲的写寄存器，让中断跟I2C都失效
-    中断是哪个？原始代码应该是USB检测的中断，
+    1.控制iddig引脚中断使能，还是上面讲的写寄存器，让中断跟I2C都失效
+    中断是哪个？原始代码应该是USB检测的中断，实际不是
     usb20.h 里面定义
-    #define IDDIG_EINT_PIN (GPIO_OTG_IDDIG_EINT_PIN & ~(0x80000000))
+    //#define IDDIG_EINT_PIN (GPIO_OTG_IDDIG_EINT_PIN & ~(0x80000000))
+
+    OTG中断使能是iddig引脚，iddig引脚是哪个？
+    中断62
+
+    otg_cc_flag和suspend_flag功能有点重合， 但是应该是逻辑控制的关键  
+
+
+    设备节点创建的有问题？？，而这个节点跟下面的平台也有关系
     
-    2.一个是USB3.0，一个时USB2.0代码结构不一样
+
+
+
+
+    2.一个是USB3.0，一个是USB2.0代码结构不一样
     USB2.0->usb20_host.c           USB3.0->xhci-mtk-driver.c
+    所以这时后要对比两个平台的特性，和工作方式
+
+
+
     3.设备节点的创建和控制
     4.完备的代码逻辑
 
 
+    S8  通过设备树操作GPIO
+    关闭iddig中断使能
+    pinctrl_select_state(pinctrl_usbc, en_output1);
+    打开iddig中断使能
+    pinctrl_select_state(pinctrl_usbc, en_output0);
+    pi5usb_reset_i2c(client);
 
-    pinctrl_usbc, en_output0，en_output1，client_global
-    中断42
+
+    7505 直接控制GPIO
+    关闭iddig中断使能
+    mt_set_gpio_mode(PI5USB_RESET_PIN, PI5USB_RESET_PIN_MODE);
+	mt_set_gpio_dir(PI5USB_RESET_PIN, GPIO_DIR_OUT);
+	mt_set_gpio_out(PI5USB_RESET_PIN, 1);
+    suspend_flag = 1;
+
+    打开iddig中断使能
+    mt_set_gpio_mode(PI5USB_RESET_PIN, PI5USB_RESET_PIN_MODE);
+	mt_set_gpio_dir(PI5USB_RESET_PIN, GPIO_DIR_OUT);
+	mt_set_gpio_out(PI5USB_RESET_PIN, 0);
+	pi5usb_reset_i2c(client);
+	suspend_flag = 0;
+
+
+
+
+    这几个变量都不需要
+    //pinctrl_usbc, en_output0，en_output1，client_global
+
+    
+
 
     secure boot;签名版的相关操作；服务器版本本地单编替换
     
