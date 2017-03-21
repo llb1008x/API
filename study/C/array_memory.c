@@ -7,7 +7,7 @@ int main()
 {
 	int a=2;
 	int b=3;
-	int array[2];
+	int array[3];
 	
 	array[0]=1;
 	array[1]=10;
@@ -27,7 +27,7 @@ int main()
 		printf("*p->%d\n",p[i]);
 	}
 	
-//gdb  x/3d   	地址
+//gdb  x/3d   	起始地址
 	
 	return 0;
 }
