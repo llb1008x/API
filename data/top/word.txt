@@ -1,3 +1,4 @@
+
 strategic:战略性的;战略（上）的;有战略意义的;至关重要的
 A lot of ground has been covered in unpacking the issues central to achieving this market-led strategic change
 
@@ -38,5 +39,47 @@ n.
 vt.
 拍卖;竞卖
 An auction is a public sale where goods are sold to the person who offers the highest price.
+
+
+********************************************************************************************
+resemblance:
+n,相似，形似;外表，外观;相似物，相似点;肖像
+There was a remarkable resemblance between him and Pete...
+
+dialect:
+n.
+方言，土语;语调;[语]语支;专业用语
+In the fifties, many Italians spoke only local dialect...
+
+premiere:
+n.
+首映
+vi.&vt.
+初次公演，首次露面
+adj.
+首要的，至上的
+The film opened with a star-studded premiere last night
+
+
+fluid:
+n.
+液体，流体
+adj.
+流体的，流动的，流体的，液体的;易变的，不固定的;（动作、设计、音乐等）流畅优美的
+The situation is extremely fluid and it can be changing from day to day.
+
+demography:
+n.
+人口统计学
+adj.
+人口统计学的
+Demography is the analysis of population variables. 
+
+
+背：
+To those who fancy historical stories ,the animation provides another way to learn 
+chinese history ,Yet the series doesn't pay much attention to historical details
+
+
 
 
