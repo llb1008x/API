@@ -1165,8 +1165,6 @@ charging_hw_bq24158: bq24158充电芯片支持的功能
 	
 	
 	
-	
-	
 	2.打印debug log的等级，log控制的开关
 	
 	battery_meter_fg_20.c
@@ -1188,9 +1186,6 @@ charging_hw_bq24158: bq24158充电芯片支持的功能
 	
 	
 	
-
-
-
 
 
 

@@ -123,6 +123,10 @@ USB：
 
 		USB驱动调试
 		http://blog.csdn.net/liuqz2009/article/details/7886461
+
+
+		USB 枚举过程详解 
+		http://blog.csdn.net/zoosenpin/article/details/29795849
 	}
 
 

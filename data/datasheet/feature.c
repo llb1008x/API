@@ -53,6 +53,24 @@
     1.创建设备节点state,down,up;state控制开关打开关闭，down控制下限，up控制上限
 
     2.打开state，可以往上下限中写入值，当然这个值要经过判断
+    默认值条件
+    gn_switch_charging_down=60；
+    gn_switch_charging_up=100;
+    gn_switch_charging_down <  gn_switch_charging_up 
+    
+    3.充电使能那边检测控制充电的状态，在满足条件的状态下充电，不满足不充电
+    条件：满足标充，开关打开
+        a.低于阈值，充电
+        b.高于阈值，停止充电
+        c.介于阈值之间，如果是充电之后达到这个条件的继续充电，如果手机本来电量就是介于之间则不充电
+
+    还有就是手机插着线的时候的判断   
+    手机电量低于阈值的时候不会自动充电 
+
+
+    4.上报的逻辑状态涉及哪些状态量 
+    最简单的一种办法就是上报充电状态为错误
+    BMT_status.bat_charging_state == CHR_ERROR;  
 
 
 
@@ -268,10 +286,19 @@ OTG的引脚 ，怎么在设备树里面添加状态，哪个是控制OTG状态�
     otg_cc_flag：
     suspend_flag：
 
-    还有另一点就是OTG开关是为了解决IO腐蚀，所以开关关的时候要使iddig引脚为低电平
-    开关打开的时候，让中断触发方式改为高电平触发，iddig设置成低
+    {
+        还有另一点就是OTG开关是为了解决IO腐蚀，所以开关关的时候要使iddig引脚为低电平
+        开关打开的时候，让中断触发方式改为高电平触发，iddig设置成低
 
-    所以现在的问题就是关闭开关的时候iddig电平情况
+        所以现在的问题就是关闭开关的时候iddig电平情况
+        开关的状态和iddig ，CC1，CC2电平的变化
+
+        关于type-c最重要的是控制CC1，CC2引脚
+        OTG开关打开的时候插入线时CC1，CC2有方波信号，循环检测，插OTG的时候CC为0.38V电压。
+        关闭开关的时候CC引脚为低电平，此时虽然iddig引脚为高电平，但是不在尾座上腐蚀不到，不会有影响
+    }
+
+
 
 
     两种解决方案：直接触发中断，改变电平触发方式（模拟假插入，拔除）
@@ -284,9 +311,9 @@ OTG的引脚 ，怎么在设备树里面添加状态，哪个是控制OTG状态�
 
 
     4.设备节点的创建和控制
-    软链接？
-
-   
+    软链接
+    symlink /sys/bus/i2c/devices/3-001d		/otg 
+    chown system system /otg/otg_mode
 
 
 
@@ -312,14 +339,6 @@ OTG的引脚 ，怎么在设备树里面添加状态，哪个是控制OTG状态�
 	mt_set_gpio_out(PI5USB_RESET_PIN, 0);
 	pi5usb_reset_i2c(client);
 	suspend_flag = 0;
-
-
-
-
-    这几个变量都不需要
-    //pinctrl_usbc, en_output0，en_output1，client_global
-
-    
 
 
     secure boot;签名版的相关操作；服务器版本本地单编替换
