@@ -47,7 +47,8 @@
 
 
     手机正常的log在/sdcard/mtklog下（死机log在/data/anr下）
-	adb pull  /sdcard/mtklog   /home/llb/project/DEBUG/
+	adb pull  /sdcard/mtklog/mobilelog    /home/llb/project/DEBUG/
+	
 	adb pull  /sdcard/GNLogs   /home/llb/project/DEBUG/
 
 
@@ -467,6 +468,11 @@
 		sudo fdisk  /dev/sdb 对相应的磁盘进行操作
 
 
+		文件管理进程
+		ps -A | grep nautilus
+
+
+
 
 7.通过ftp挂在烧写服务器上的rom(当然也可以用文件系统直接登陆，拷贝rom包到本地)
 
@@ -542,3 +548,15 @@ bt 显示函数堆栈
 
 f 进入哪个函数堆栈
 
+
+10.usb抓包
+都要管理员权限：
+mount -t debugfs none /sys/kernel/debug
+
+modprobe usbmon
+
+查看当前的USB device：
+cat  /sys/kernel/debug/usb/devices
+
+要想开始监听 全部 Bus 上的全部USB数据包：
+cat  /sys/kernel/debug/usb/usbmon/0u

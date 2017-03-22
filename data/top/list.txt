@@ -86,37 +86,64 @@ battery：
 
 
 USB：
-
-	USB OTG插入检测识别
-	http://blog.csdn.net/uranus_wm/article/details/9838847
-
-
-	USB眼图：
-	http://blog.csdn.net/vvcumt/article/details/38852347
+	相关的协议：
+	{
+		BC1.1标准 
+		http://blog.csdn.net/zhaoguowei2010/article/details/8970319
 
 
-	BC1.1标准 
-	http://blog.csdn.net/zhaoguowei2010/article/details/8970319
-
-
-	USB协 USB协通讯议--深入理解 通讯议--深入理解 
-	http://blog.csdn.net/myarrow/article/details/8484113
-
-
-	一个USB驱动
-	http://wenku.baidu.com/link?url=KiEUVHKjGGMkWxGSiJ9eND2QIstcPxj_tmDILEjAT-tMrpTTZQm-nUbZgP_qABC93NSjhPGGDU4-LecGC6xqKRD04Tf_2dUlIQxbemB18hu
-
-
-	USB&nbsp;Type-C
-	http://blog.csdn.net/fouweng/article/details/53435528
-
-
-	USB协通讯议--深入理解 
-	http://blog.csdn.net/myarrow/article/details/8484113
+		USB协 USB协通讯议--深入理解 通讯议--深入理解 
+		http://blog.csdn.net/myarrow/article/details/8484113
 	
-	
-	USB电池充电基础：应急指南
-	https://www.maximintegrated.com/cn/app-notes/index.mvp/id/4803
+	}
+
+
+
+	基础内容：
+	{
+		USB电池充电基础：应急指南
+		https://www.maximintegrated.com/cn/app-notes/index.mvp/id/4803
+
+
+		USB OTG插入检测识别
+		http://blog.csdn.net/uranus_wm/article/details/9838847
+
+
+		USB眼图：
+		http://blog.csdn.net/vvcumt/article/details/38852347
+
+
+		一个USB驱动
+		http://wenku.baidu.com/link?url=KiEUVHKjGGMkWxGSiJ9eND2QIstcPxj_tmDILEjAT-tMrpTTZQm-nUbZgP_qABC93NSjhPGGDU4-LecGC6xqKRD04Tf_2dUlIQxbemB18hu
+
+
+		USB 枚举过程详解 
+		http://blog.csdn.net/zoosenpin/article/details/29795849
+
+
+		USB驱动调试
+		http://blog.csdn.net/liuqz2009/article/details/7886461
+	}
+
+
+
+	type-c:
+	{
+		
+		USB&nbsp;Type-C
+		http://blog.csdn.net/fouweng/article/details/53435528
+
+
+		USB TYPE-C
+		http://blog.sina.com.cn/s/blog_63f7b4540102wch4.html
+
+
+		USB Type C的基本原理
+		http://blog.csdn.net/zoosenpin/article/details/49963031
+
+
+	}
+
 
 
 
