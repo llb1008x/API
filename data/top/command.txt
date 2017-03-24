@@ -103,7 +103,7 @@
 	
 	
 	打开串口log打印开关
-	adb shell setprop persist.uartconsole.enable 1
+	
 	
 	
 	打印上层main_log,system_log
@@ -119,6 +119,9 @@
 
 
 2.fastboot常用命令(这写命令是G1602A烧写相关的文件，相关命令还要重新看)：
+进入fastboot模式
+adb reboot-bootloader
+
 	fastboot flash modem NON-HLOS.bin
 	fastboot flash splash splash.img
 	fastboot flash sbl1 sbl1.mbn
@@ -372,7 +375,7 @@
 		./TmakeGionee  G1605A  -p  vendor/mediatek/proprietary/external/libshowlogo/
 		推送到手机bin下
 
-		    adb remount （重新挂载系统分区，使系统分区重新可写，不然无法将文件，bin推送到system/bin）
+		adb remount （重新挂载系统分区，使系统分区重新可写，不然无法将文件，bin推送到system/bin）
 		adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/bin/kpoc_charger   system/bin/
 		adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/lib/libshowlogo.so  system/lib/
 

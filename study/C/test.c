@@ -9,10 +9,7 @@
 #include<stdio.h>
 #include <ctype.h>
 
-void ungetch(int )
-{
-	
-}
+void ungetch(int );
 
 /******************************************
  *功能：实现getint函数
