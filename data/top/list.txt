@@ -243,6 +243,13 @@ other：
 	http://www.cnblogs.com/zyanrong/p/5661114.html
 
 
+	linux内核中打印栈回溯信息 - dump_stack()函数分析 
+	http://blog.csdn.net/jasonchen_gbd/article/details/45585133
+
+
+	内核符号表的生成和查找过程 
+	http://blog.csdn.net/jasonchen_gbd/article/details/44025681
+
 
 
 

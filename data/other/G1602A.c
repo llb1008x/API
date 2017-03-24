@@ -152,21 +152,14 @@ Dear All，
 
 
 
+4.熟悉G1602A的代码
 
 
 
 
+5.功耗问题
 
-3.OTG开关
-难度越来越大
 
-phy-msm-usb.c
-qpnp-smbcharger.c
-
-	1.初始化的数据是从哪获取的，哪个文件获取的
-	默认配置从msm8976.dtsi获取
-
-	2.关于OTG的一些初始化
 
 
 
