@@ -157,8 +157,44 @@ Dear All，
 
 
 
+
 5.功耗问题
 分析功耗问题+那个重启电量显示问题
+
+功耗问题分析
+
+wakeup
+msm_otg     	3		3		0		0		149458		188097		149458		649781		0
+
+USER      PID   PPID  VSIZE  RSS  PRIO  NICE  RTPRI SCHED  PCY WCHAN              PC  NAME
+
+SCHED       cpr
+
+
+msm_otg
+
+<3>[  469.817543] msm_otg 78db000.usb: OTG PM resume
+
+
+
+RTC_WAKEUP
+
+ Pending alarm batches
+
+ Top Alarms:
+
+ Alarm Stats:
+
+ Sync adapters for UserInfo
+
+ DUMP OF
+
+ DUMP OF SERVICE       打印各种service的状态
+
+ wake_lock
+
+ PM: suspend
+
 
 
 

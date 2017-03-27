@@ -61,7 +61,7 @@
 	{
 	
 		adb shell "setprop persist.adb.tcp.port 5555"
-		adb tcpip 5555
+		
 
 		Disconnect the device from the PC USB, and do the following from your command prompt using adb over WiFi (replace "192.168.68.167" with your device's IP address):
 

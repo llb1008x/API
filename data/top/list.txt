@@ -250,6 +250,9 @@ other：
 	内核符号表的生成和查找过程 
 	http://blog.csdn.net/jasonchen_gbd/article/details/44025681
 
+	slab内存管理介绍
+	http://blog.chinaunix.net/uid-9185047-id-445227.html
+
 
 
 
