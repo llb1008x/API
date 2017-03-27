@@ -1,5 +1,20 @@
 
 
+
+
+[   41.649879] <1>.(2)[251:charger_thread][name:mtk_switch_charging&]mtk_switch_charging_run [1]
+[   41.649889] <1>.(2)[251:charger_thread][name:mtk_switch_charging&]force:0 thermal:-1 -1 setting:500000 500000 type:1 usb_unlimited:0 usbif:0 usbsm:2
+[   41.649907] <1>.(2)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: _rt5081_set_aicr: 500000mA over TA's cap, can only be 150000mA
+[   41.649919] <1>.(2)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: _rt5081_set_aicr: aicr = 150000 (0x01)
+[   41.651908] <1>.(2)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: _rt5081_set_ichg: ichg = 500000 (0x04)
+[   41.653247] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_set_ieoc: ieoc = 250000 (0x03)
+[   41.654893] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 1
+[   41.656417] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: _rt5081_set_cv: bat voreg = 4400000 (0x32)
+[   41.656649] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 1
+[   41.661635] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
+
+
+
 双芯片管理充电MT6355和RT5081
 
 /*GM3.0*/

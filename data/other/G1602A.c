@@ -158,10 +158,20 @@ Dear All，
 
 
 
-5.功耗问题
-分析功耗问题+那个重启电量显示问题
 
-功耗问题分析
+
+5.功耗问题分析
+
+***
+ 根据bugreport.txt分析
+ DUMP OF SERVICE       打印各种service的状态
+
+ Statistics since last charge 从上次开始时电池的一些数据
+
+ Estimated power use (mAh):评估电池电量的使用情况
+
+
+
 
 wakeup
 msm_otg     	3		3		0		0		149458		188097		149458		649781		0
@@ -170,12 +180,11 @@ USER      PID   PPID  VSIZE  RSS  PRIO  NICE  RTPRI SCHED  PCY WCHAN            
 
 SCHED       cpr
 
+IPA_WS这个也是跟网络相关的
 
 msm_otg
 
 <3>[  469.817543] msm_otg 78db000.usb: OTG PM resume
-
-
 
 RTC_WAKEUP
 
@@ -189,13 +198,25 @@ RTC_WAKEUP
 
  DUMP OF
 
- DUMP OF SERVICE       打印各种service的状态
+ DUMP OF SERVICE
+
+Pending Wakeup Sources
+
+DIAG_WS
+
 
  wake_lock
 
  PM: suspend
 
 
+
+
+GNSPR#73303
+	现象：
+	充满电恢复出厂设置后，插一张联通卡，开启数据业务，后台运行所有应用，待机13小时14min耗电35%
+
+	原因：
 
 
 
