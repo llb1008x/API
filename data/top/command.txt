@@ -245,7 +245,8 @@ adb reboot-bootloader
 		从命令格式，可以看到git-rebae命令至少需要一个参数，那就是，这个参数可以是一个分支名称，也可以是一次有效的commit。
 		
 		
-			
+		15.git clone gitserver:/L09_BBT5201A_MT6572TDV1.MP.P34_JB3_130428
+		ssh GerritServer			
 
 
 

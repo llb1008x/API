@@ -162,13 +162,18 @@ Dear All，
 
 5.功耗问题分析
 
-***
+->
  根据bugreport.txt分析
  DUMP OF SERVICE       打印各种service的状态
 
  Statistics since last charge 从上次开始时电池的一些数据
 
  Estimated power use (mAh):评估电池电量的使用情况
+
+->
+ 根据wakeupsource.txt 分析
+name   active_count  event_count  wakeup_count	expire_count  active_since	total_time	max_time  last_change	prevent_suspend_time
+主要是wakeup_count,active_since
 
 
 
@@ -209,6 +214,9 @@ DIAG_WS
 
  PM: suspend
 
+7515
+ R12_APXGPT1_EVENT_B
+
 
 
 
@@ -219,6 +227,88 @@ GNSPR#73303
 	原因：
 
 
+
+
+
+
+
+
+代码：
+qpnp-fg.c定义了几个wakeup source
+
+
+
+fg_probe
+
+/**
+ * struct wakeup_source - Representation of wakeup sources
+ *
+ * @total_time: Total time this wakeup source has been active.
+ * @max_time: Maximum time this wakeup source has been continuously active.
+ * @last_time: Monotonic clock when the wakeup source's was touched last time.
+ * @prevent_sleep_time: Total time this source has been preventing autosleep.
+ * @event_count: Number of signaled wakeup events.
+ * @active_count: Number of times the wakeup sorce was activated.
+ * @relax_count: Number of times the wakeup sorce was deactivated.
+ * @expire_count: Number of times the wakeup source's timeout has expired.
+ * @wakeup_count: Number of times the wakeup source might abort suspend.
+ * @active: Status of the wakeup source.
+ * @has_timeout: The wakeup source has been activated with a timeout.
+ */
+struct wakeup_source {
+	const char 		*name;
+	struct list_head	entry;
+	struct rcu_head		rcu;
+	spinlock_t		lock;
+	struct timer_list	timer;
+	unsigned long		timer_expires;
+	ktime_t total_time;
+	ktime_t max_time;
+	ktime_t last_time;
+	ktime_t start_prevent_time;
+	ktime_t prevent_sleep_time;
+	unsigned long		event_count;
+	unsigned long		active_count;
+	unsigned long		relax_count;
+	unsigned long		expire_count;
+	unsigned long		wakeup_count;
+	bool			active:1;
+	bool			autosleep_enabled:1;
+};
+
+/**
+ * struct callback_head - callback structure for use with RCU and task_work
+ * @next: next update requests in a list
+ * @func: actual update function to call after the grace period.
+ */
+struct callback_head {
+	struct callback_head *next;
+	void (*func)(struct callback_head *head);
+};
+#define rcu_head callback_head
+
+fh_probe定义的几个工作函数
+INIT_DELAYED_WORK(&chip->update_jeita_setting, update_jeita_setting);
+INIT_DELAYED_WORK(&chip->update_sram_data, update_sram_data_work);			***
+INIT_DELAYED_WORK(&chip->update_temp_work, update_temp_data);				***
+INIT_DELAYED_WORK(&chip->check_empty_work, check_empty_work);
+INIT_WORK(&chip->rslow_comp_work, rslow_comp_work);
+INIT_WORK(&chip->fg_cap_learning_work, fg_cap_learning_work);
+INIT_WORK(&chip->batt_profile_init, batt_profile_init);
+INIT_DELAYED_WORK(&chip->check_sanity_work, check_sanity_work);
+INIT_WORK(&chip->ima_error_recovery_work, ima_error_recovery_work);
+INIT_WORK(&chip->dump_sram, dump_sram);
+INIT_WORK(&chip->status_change_work, status_change_work);					***
+INIT_WORK(&chip->cycle_count_work, update_cycle_count);
+INIT_WORK(&chip->battery_age_work, battery_age_work);
+INIT_WORK(&chip->update_esr_work, update_esr_value);
+INIT_WORK(&chip->set_resume_soc_work, set_resume_soc_work);
+INIT_WORK(&chip->sysfs_restart_work, sysfs_restart_work);
+INIT_WORK(&chip->init_work, delayed_init_work);
+INIT_WORK(&chip->charge_full_work, charge_full_work);
+INIT_WORK(&chip->gain_comp_work, iadc_gain_comp_work);
+INIT_WORK(&chip->bcl_hi_power_work, bcl_hi_power_work);
+INIT_WORK(&chip->cc_soc_store_work, cc_soc_store_work);
 
 
 
