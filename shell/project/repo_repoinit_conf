@@ -3,7 +3,7 @@
 # 此自动化编译脚本仅适用于android平台，且使用git版本控制软件的项目
 # SCM ---- 刘小惠
 #===================================================================
-VERSION_NUMBER="2.2"
+VERSION_NUMBER="2.3"
 PROJECT_PATH=""
 PRJO_PATH_TAG=0
 PROJECT_NAME=""
@@ -56,7 +56,7 @@ function copyReviewScript()
 	pwd
 	local username=$(git config user.email|awk -F "@gionee.com" '{printf("%s",$1)}')
 	echo "username:${username}"	
-	gitdir=$(git rev-parse --git-dir); scp -p -P 29418 ${username}@10.8.10.19:hooks/commit-msg ${gitdir}/hooks/
+	gitdir=$(git rev-parse --git-dir); scp -r -p -P 29418 ${username}@10.8.10.19:hooks/ ${gitdir}
 	popd >~/null
 	done < <( find . -path "*.repo" -prune -o -name .git -print )
 }

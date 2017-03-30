@@ -323,6 +323,57 @@ adb reboot-bootloader
 		└── gionee_packages_apk_amigo_3.1
 		
 
+		hi all：
+          为了方便后续维护、代码同步，智能机项目的gionee目录和modem目录开启代码修改注释和提交注释的检查机制。
+        具体检查项：
+		1. 使用git提交代码的时候commit信息规范：
+
+			提交分类  #ID 描述
+
+			提交分类：  Fixed、Revert
+
+			#ID： ID为redmine系统中问题的ID，此处可以为多个#ID,#ID
+
+			描述：简短说明。
+
+			示例：
+--->		git commit -m "Fixed #ID 问题描述"
+			git commit -m "Fixed #ID,#ID,#ID 问题描述"
+
+		2. 对文本类型的代码文件修改，必须有gionee注释，并且请按照下面的规则：
+			注释符Gionee  <Module>  <Auther>  <date>  描述  结束符
+
+		注释符：//、#、/**/、<!-- -->。请结合文件类型选择。
+
+				Module：以Amigo_、GN_BSP_、GN_Oversea_、gn_by_开头和Bug。
+
+				Auther：修改代码的作者的Email ID(后缀就不要了)
+
+				Date： 修改代码的日期。如20161115（2016-11-15也可以）
+
+		描述：add for CR 或者modify for CR 或者 remove for CR 等（不管怎么描述请带上Bug号）。
+
+		结束符： begin 或者 end 表示结尾
+
+		注意：北京的 Module选择gn_by_
+
+		示例：#Gionee <gn_by_scm> <ranyi> <2017-01-02> add for #5678 begin 
+
+--->	#Gionee <gn_by_charging> <lilubao> <2017-01-02> add for  begin
+
+
+		3. 如果以上两个规则都不满足，则将无法正常push代码，请各位尤其注意。
+
+		如有疑问请联系 赖洪浩。
+
+		需求：
+					1.新下载项目更新repo脚本2.3
+						http://10.8.0.20/redmine/attachments/download/16110/repo_init_env_sv2.3.7z
+					2.已经下载的项目在.git同级目录执行  
+						scp -r -p -P 29418 xxx@10.8.10.19:hooks/ .git
+
+--->   	scp -r -p -P 29418 lilubao@10.8.10.19:hooks/ .git
+
 
 
 
