@@ -968,9 +968,10 @@ dws文件是否需要改，看看spe和dws文件配置是否正确
 	CONFIG_ONEKEY_REBOOT_OTHER_MODE=y
 	
 	home键one，组合键two
-	
+
+	cust_rtc.h	
 	长按power键,reboot or shudown
-	cust_rtc.h
+	
 
 
 

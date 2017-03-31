@@ -177,8 +177,6 @@
 
 
 
-
-
 	e.功耗测试的标准：（但是感觉有些有问题）
 	1.移动运营商的电流为9ma，电信运营商的电流为9mA，联通运营商的电流为16mA
 	2.计算公式：电流（ma）×时间（H）=Mah
@@ -189,6 +187,7 @@
 	5.如果手机开启飞行模式进行待机，直接以5ma的电流进行计算
 	  如待机12小时的耗电量为：（5×12）÷6020≈1%
 	6.耗电量算法根据实际项目要求为主，这里仅供参考。
+
 
 	测试前注意事项：
 	1.高通平台的手机，测试充电，耗电相关项目时，LOG只开前两项，一定不能开启QXDM LOG；
@@ -218,6 +217,34 @@
 	
 	APK后台发送数据的Posix_connect Debug
 	CLMDA_MD是modem跟AP沟通桥梁
+
+
+	1，金立推送( com.gionee.cloud.gpe)产生耗电的原因。
+    	心跳机制，在网络正常的情况下且有推送开关处于开启状态，金立推送为保持和服务器的长连接默认会6分钟发送一次心跳，受Alarm对齐后会10分钟发送一次心跳。
+    每次都会申请wakelock，每次持有时间大概10-20毫秒，这样肯定会产生耗电的。
+	2， 待机测试功耗问题
+		将所有金立推送的开关关闭后，金立推送将不会产生耗电。
+
+
+
+    分析功耗一些相关的文件导出步骤.
+	开启mobile log 和 netlog，并按如下步骤抓取相关log
+
+    测试 前打开USB调试
+    adb shell dumpsys batterystats --reset
+    adb shell dumpsys batterystats --enable full-wake-history
+    adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_1.log
+
+    adb shell dumpsys batterystats > battersystats_1.log
+
+    测试 后：
+
+    adb bugreport > bugreport.txt
+    adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_2.log
+    adb shell ps -t > ps.txt
+
+    adb shell dumpsys batterystats > battersystats_2.log
+
 	
 }
 

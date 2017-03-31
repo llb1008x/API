@@ -1,5 +1,15 @@
 
 
+
+
+healthd线程
+17G05A的mmi测试
+电池维护
+
+keyboard 的目录
+/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/input/keyboard
+
+
 1.充电失败
   现象：
 	1.充电暂停，瞬间恢复
@@ -159,8 +169,21 @@ Dear All，
 
 
 
+5.OTG开关
 
-5.功耗问题分析
+OTg工作流程
+(qpnp-smbcharger.c) usbid_change_handler,id pin发生中断，调用这个回调函数，读写寄存器，判断iddig引脚是否为低 -> smbchg_vfloat_adjust_check,
+充电器的动态电压调节检查，先smbchg_stay_awake唤醒充电器的理由是要进行动态电压调节检查，之后还要进行一些参数的检查，还需要看  ->
+msm_otg_phy_irq_handler
+
+
+
+
+
+
+
+
+6.功耗问题分析
 
 ->
  根据bugreport.txt分析
