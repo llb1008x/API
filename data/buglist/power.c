@@ -17,9 +17,6 @@
    
    deepidle是什么
 
-
-   功耗问题->金立推送造成的原因，邮件，qq群里给的原因，锁屏
-
 }
 
 
@@ -35,15 +32,7 @@
 	正常待机问题（分场景），待机电流问题（底电流，开数据的电流3G，4G），电池续航问题(一系列场景下手机使用时间)
 	
 	
-	处理待机问题，需要提供mobile log and netlog(如果有打开数据连接或者WIFI), MTK 处理一般是使用PowerMonitor.
-	测试前
-	adb shell dumpsys batterystats --reset
-	adb shell dumpsys batterystats --enable full-wake-history
-	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_1.log
-	测试后：
-	adb bugreport > bugreport.txt
-	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_2.log
-	adb shell ps -t > ps.txt
+
 
 }
 
