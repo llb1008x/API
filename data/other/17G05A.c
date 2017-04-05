@@ -1,20 +1,4 @@
 
-
-
-
-[   41.649879] <1>.(2)[251:charger_thread][name:mtk_switch_charging&]mtk_switch_charging_run [1]
-[   41.649889] <1>.(2)[251:charger_thread][name:mtk_switch_charging&]force:0 thermal:-1 -1 setting:500000 500000 type:1 usb_unlimited:0 usbif:0 usbsm:2
-[   41.649907] <1>.(2)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: _rt5081_set_aicr: 500000mA over TA's cap, can only be 150000mA
-[   41.649919] <1>.(2)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: _rt5081_set_aicr: aicr = 150000 (0x01)
-[   41.651908] <1>.(2)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: _rt5081_set_ichg: ichg = 500000 (0x04)
-[   41.653247] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_set_ieoc: ieoc = 250000 (0x03)
-[   41.654893] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 1
-[   41.656417] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: _rt5081_set_cv: bat voreg = 4400000 (0x32)
-[   41.656649] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 1
-[   41.661635] <1>.(0)[251:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
-
-
-
 双芯片管理充电MT6355和RT5081
 
 /*GM3.0*/
@@ -122,52 +106,9 @@
 	./drivers/power/mediatek/linear_charging.c:753:#if (CONFIG_MTK_GAUGE_VERSION == 20)
 	./drivers/power/mediatek/linear_charging.c:1140:			#if (CONFIG_MTK_GAUGE_VERSION == 20)
 	./drivers/power/mediatek/charger/Makefile:27:ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-	
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*MT6355*/
-{
-
-
-
-
-
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -875,21 +816,81 @@
 	电池电压4.0V但是电量只有1%，也可能是电池断电导致RTC没有存储
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
 
 
+
+
+
+
+
+
+
+
+
+
+/*debug*/
+{
+	1.关闭软件关机重启
+
+	(kpd.c)kpd_pwrkey_pmic_handler  -> kpd_pmic_pwrkey_hal -> 
+
+
+	keypad_dts_data对应这几个数据成员，而这几个数据成员可能跟powerkey有关
+	u32 kpd_sw_pwrkey;
+	u32 kpd_hw_pwrkey;
+	u32 kpd_sw_rstkey;
+	u32 kpd_hw_rstkey;
+
+
+G1605A上定义的
+	/* boot type definitions */
+enum boot_mode_t {
+	NORMAL_BOOT = 0,
+	META_BOOT = 1,
+	RECOVERY_BOOT = 2,
+	SW_REBOOT = 3,
+	FACTORY_BOOT = 4,
+	ADVMETA_BOOT = 5,
+	ATE_FACTORY_BOOT = 6,
+	ALARM_BOOT = 7,
+#if defined(CONFIG_MTK_KERNEL_POWER_OFF_CHARGING)
+	KERNEL_POWER_OFF_CHARGING_BOOT = 8,
+	LOW_POWER_OFF_CHARGING_BOOT = 9,
+#endif
+	DONGLE_BOOT = 10,
+	UNKNOWN_BOOT
+};
+
+
+
+typedef enum {
+    BR_POWER_KEY = 0,
+    BR_USB,
+    BR_RTC,
+    BR_WDT,
+    BR_WDT_BY_PASS_PWK,
+    BR_TOOL_BY_PASS_PWK,
+    BR_2SEC_REBOOT,
+    BR_UNKNOWN,
+    BR_KERNEL_PANIC,
+    BR_WDT_SW,
+    BR_WDT_HW
+} boot_reason_t;
+
+
+
+17G05A上定义
+char g_boot_reason[][16]= {"power_key","usb",
+							"rtc","wdt",
+							"wdt_by_pass_pwk",
+							"tool_by_pass_pwk",
+							"2sec_reboot","unknown",
+							"kernel_panic","reboot",
+							"watchdog"};
+
+
+}
 
 
 
