@@ -1,21 +1,5 @@
 
 
-
-
-healthd线程
-17G05A的mmi测试
-电池维护
-功耗问题->金立推送造成的原因，邮件，qq群里给的原因，锁屏
-17G05A的软件关机
-电量计不准的机器
-
-
-
-
-keyboard 的目录
-/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/input/keyboard
-
-
 1.充电失败
   现象：
 	1.充电暂停，瞬间恢复

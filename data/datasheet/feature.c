@@ -340,7 +340,4 @@ OTG的引脚 ，怎么在设备树里面添加状态，哪个是控制OTG状态�
 	pi5usb_reset_i2c(client);
 	suspend_flag = 0;
 
-
-    secure boot;签名版的相关操作；服务器版本本地单编替换
-    
 }
