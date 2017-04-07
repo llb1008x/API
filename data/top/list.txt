@@ -250,12 +250,17 @@ other：
 	内核符号表的生成和查找过程 
 	http://blog.csdn.net/jasonchen_gbd/article/details/44025681
 
+
 	slab内存管理介绍
 	http://blog.chinaunix.net/uid-9185047-id-445227.html
 
 
+	常见手机定位方式浅谈
+	http://www.cnblogs.com/syfwhu/p/5084115.html
 
 
+	cdmaLocation与gsmlocation的区别 lbs定位 
+	http://blog.csdn.net/chengyingzhilian/article/details/7310977
 
 
 

@@ -879,7 +879,7 @@ typedef enum {
 } boot_reason_t;
 
 
-
+reason=6，mode=0
 17G05A上定义
 char g_boot_reason[][16]= {"power_key","usb",
 							"rtc","wdt",
