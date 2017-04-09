@@ -263,6 +263,9 @@ other：
 	http://blog.csdn.net/chengyingzhilian/article/details/7310977
 
 
+	深入MTK平台bootloader启动之【 Pre-loader -> Lk】分析笔记 
+	http://blog.csdn.net/forever_2015/article/details/53000643
+
 
 
 

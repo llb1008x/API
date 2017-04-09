@@ -76,17 +76,38 @@
 
 功耗要注意的几个地方
 {
+-->	分析功耗一些相关的文件导出步骤.
+	开启mobile log 和 netlog，并按如下步骤抓取相关log
+
+    测试 前打开USB调试
+    adb shell dumpsys batterystats --reset
+    adb shell dumpsys batterystats --enable full-wake-history
+    adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_1.log
+
+    adb shell dumpsys batterystats > battersystats_1.log
+
+    测试 后：
+
+    adb bugreport > bugreport.txt
+    adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_2.log
+    adb shell ps -t > ps.txt
+
+    adb shell dumpsys batterystats > battersystats_2.log
+
+
+
+-->
 	a.首先明确是否有modem log，c2kmdlog文件，modem log 特别耗电，而且占空间然后察看modem log的时间变化。
 	c2kmdlog文件应该是记录传输的数据，recycle_config，modem log会经常唤醒系统，导致系统没有睡下去，所以耗电量肯定高，
 	开始那几个谁开的modem log耗电四五十的。
 
 	modem常用的几个信道，哪些跟耗电密切相关的？
 	{
-		channel 10是AT交互，AT command需要结合radio.log,一般都是网络变化
+		*channel 10是AT交互，AT command需要结合radio.log,一般都是网络变化
 		
 		channel 14是读写nvram,需要结合modem.log
 		
-		channel 20代表网络连接需要结合main.log
+		*channel 20代表网络连接需要结合main.log，这个比较多通常是apk数据交互频繁
 		
 		channel 32modem读取AP属性如sim卡gpio的状态
 		
@@ -103,27 +124,13 @@
 		42是modem log开关
 		20是流量
 
+		常见的几个唤醒源：pwrkey按power键产生的
+		EINT：这部分包括pmic的唤醒(pwrkey/charger/RTC,alarm/wifi EINT/C2K EINT)
+		conn2Ap:,wcn chip的唤醒，包括BT/wifi/GPS等
+		CLMDA_MD/CCIFO_MD,modem同AP的通道
 	}
 	
-	常见的几个唤醒源：pwrkey?
-	EINT：这部分包括pmic的唤醒(pwrkey/charger/RTC,alarm/wifi EINT/C2K EINT)
-	conn2Ap:,wcn chip的唤醒，包括BT/wifi/GPS等
-	CLMDA_MD/CCIFO_MD,modem同AP的通道
-	
-	搜索PM: suspend查找唤醒时间
-	
-
-
-
-
-	b.抓取battersystats.log和wakeup_sources.log，以及导出mobile log；
-	这两个文件对于功耗的分析很重要，系统个部分耗电多少，持有锁，唤醒...
-	抓取方法：
-	adb shell dumpsys batterystats > battersystats.log
-	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
-
-
-
+	检索PM: suspend查找唤醒时间对应entry和exit
 
 	c.比较关键的两个log文件batterystats.log和kernel.log
 		batterystats.log记录系统耗电的过程
@@ -133,7 +140,8 @@
 
 		2.wake lock 应用是否长时间占用锁
 		wake up alarm, wake up by 
-		以上两个都有一个限度，什么样才属于过度，什么样在合理范围内?
+		以上两个都有一个限度，什么样才属于过度，什么样在合理范围内
+		唤醒次数时候频繁，时间间隔是否较长且有一定的规律
 
 		3.系统是否被经常被应用唤醒
 		在sys.log目录下，搜索alarm 
@@ -142,7 +150,7 @@
 		kernel部分的统计思路是：
 		1. 搜索"wake up by"关键字，只看kworker或是system_server进程打印的
 		2. 如果是EINT event的话，要接着搜索"is pending"关键字，找到是哪个EINT
-		EINT是外部中断，GPT是什么？
+		EINT是外部中断，GPT是什么：ENIT很多时候是应用，而
 		3. 如果CLDMA event的话，要接着搜索"wakeup source"关键字，找到是哪个channel			
 		4. 计算时间的话，从wakeup event后面的第一个PM: suspend exit到后面第一个PM: suspend entry之间的时间差
 
@@ -151,8 +159,14 @@
 		2. 只查找type为0和type为2的alarm
 		3. 过滤package name做统计
 
+		查找唤醒的软件：
+		1.wake up byEINT,是什么pending的
+		2.然后在sys.log上搜索最近的alarm点，察看唤醒源是什么
+		
+		数据交互很频繁的时候可以在main.log中搜索Posix_connect Debug
+		这个可以看出apk的数据发送情况
 	
-	
+
 	
 	d.常见的待机电流:
 	极致省电模式电流：5mA以上
@@ -163,12 +177,12 @@
 	正常的待机电流小于20mA，所以超过20mA有异常
 	这些只是一部分的待机电流
 
-	待机功耗，待机电流就你们问题多
-
-
 
 	e.功耗测试的标准：（但是感觉有些有问题）
 	1.移动运营商的电流为9ma，电信运营商的电流为9mA，联通运营商的电流为16mA
+		电信卡：9.7MA      待机11小时      若超过4%不正常
+		移动卡：9.3MA      待机 11小时      若超过4%不正常
+		联通卡：18.5MA    待机11小时      若超过6%不正常
 	2.计算公式：电流（ma）×时间（H）=Mah
 	  如联通卡待机12小时耗电量为：（16×12）÷6020=3%
 	3.如果手机插双卡，就在单卡的基础上电流加2ma；
@@ -201,12 +215,8 @@
 
 
 
-	f:查找唤醒的软件
-	1.wake up byEINT,是什么pending的
-	2.然后在sys.log上搜索最近的alarm点，察看唤醒源是什么
-	
-	APK后台发送数据的Posix_connect Debug
-	CLMDA_MD是modem跟AP沟通桥梁
+
+	金立推送产生的功耗高问题：
 
 
 	1，金立推送( com.gionee.cloud.gpe)产生耗电的原因。
@@ -217,23 +227,20 @@
 
 
 
-    分析功耗一些相关的文件导出步骤.
-	开启mobile log 和 netlog，并按如下步骤抓取相关log
 
-    测试 前打开USB调试
-    adb shell dumpsys batterystats --reset
-    adb shell dumpsys batterystats --enable full-wake-history
-    adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_1.log
 
-    adb shell dumpsys batterystats > battersystats_1.log
+	qq群讨论
 
-    测试 后：
+	1602上出现的锁屏引起的电流变高，功耗高：
+		屏更新在待机过程中如果没有更新，可能在待机过程中请求更新，有联网操作，出现异常
+		
+		
+	@刂立 耗电正常和不正常的差异，从对比log可以看出，不正常的手机，应用联网时间比较长，这些都是应用的行为，
+	虽然待机条件都一样，应用不一定就表现的完全一样，比如说某个应用某个时间点唤醒系统并且联网了，
+	其他手机就不一定这个时间点也做同样的事情。
+	应用唤醒及联网是由应用本身功能决定的，若要弄清楚为什么有的OK有的不行，就需要应用去做对比分析了。		
 
-    adb bugreport > bugreport.txt
-    adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources_2.log
-    adb shell ps -t > ps.txt
 
-    adb shell dumpsys batterystats > battersystats_2.log
 
 	
 }
