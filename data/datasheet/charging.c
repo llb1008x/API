@@ -15,7 +15,6 @@
 -->linux时钟系统（这个不是不想看，有点困难）
 
 
-
 {
    MT6351芯片的接口 charging_hw_bw25896.c
 
@@ -27,26 +26,18 @@
    init.mt6735.rc系统初始化用到的，创建一些设备节点，赋值一定的权限，配置节点，和其他初始化要用到的init文件
    batterymonitor.cpp上层管理的
    
+	/sys/kernel/debug/   有一系列调试的点
+	usb   wakeupsource
+	这些点就是dump打印出来的文件
 
+	pmic子系统和battery_meter都要初始化完成才可以充电
 
-		/sys/kernel/debug/   有一系列调试的点
-		usb   wakeupsource
-		这些点就是dump打印出来的文件
-	
-	
-		pmic子系统和battery_meter都要初始化完成才可以充电
-	
-	
-		linux  mount 的用法？
-	
-	
-	
-		功耗，降电流问题
-		飞行模式下的电流是否异常；应用是否经常唤醒，唤醒源；隔离大的驱动模块，看各各部分耗电是否异常；gpio的配置问题，不工作时的suspend模式，
-		gpio引脚是否被上拉导致一直在耗电，probe函数。suspend,resume
-	
-		android drone： android 无人机
-		access point：桥接器，访问节点
+	功耗，降电流问题
+	飞行模式下的电流是否异常；应用是否经常唤醒，唤醒源；隔离大的驱动模块，看各各部分耗电是否异常；gpio的配置问题，不工作时的suspend模式，
+	gpio引脚是否被上拉导致一直在耗电，probe函数。suspend,resume
+
+	android drone： android 无人机
+	access point：桥接器，访问节点
 
 }
 
@@ -158,8 +149,6 @@ Q：
 
 
 
-
-
 /*qualcomm高通相关*/
 {
 
@@ -214,8 +203,6 @@ CC管脚上必须有一个下拉至GND的电阻Rd。此切换动作必须由CC L
   手机端发送几个升降时序，充电器端回应一定的时序则是QC3.0，否则是QC2.0
 
 
-
-
   Power Sink Mode流程太长... 
 
   Power source mode
@@ -228,21 +215,7 @@ CC管脚上必须有一个下拉至GND的电阻Rd。此切换动作必须由CC L
   尝试启动QC 9V（启动成功）->0.5s后尝试输入大电流(2A)->如果发现电源不足18W，就会进行第二次
   批量脉冲电流探测模式->3s后，根据探测结果限制输入电流为一个值，开始正式快速充电
 
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -540,69 +513,13 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 
 
 
-	
-
 	座充充电阶段：
 	USB充电阶段比座充阶段，应该多了USB枚举，识别的接口不一样，充电电流不一样
-
-
-
 
 	简化：
 	底层IC--》pmic驱动--》power_supply子系统监听底层的状态，统一不同IC上报的值，healthd进程监听batterystatus--》有uevent事件，update读取各各路径下电池参数的值
 
 	--》binder机制--》batteryservice通过广播发布消息，需要的对电池做相应的操作	
-	
-	
-	{
-		底层涉及三个方面：硬件IC(ADC)，fuel_gauge,pmic子系统
-
-		中间层：power_supply子系统
-
-		上层：batterymonitor，batteryservice
-
-
-		底层硬件
-
-		pmic子系统
-
-		powe_supply子系统
-
-		batterymonitor
-
-		batteryservice
-
-	}
-
-
-
-
-
---->battery_driver，battery_meter_driver 几个重要的驱动启动，工作过程
-
-
-
-   
-
-	2.power_supply子系统
-
-	3.各种场景
-		温升导致的降电流
-		打电话导致的降电流
-		关机充电
-		OTG反向充电
-		低电保护
-
-    4.大的场景
-	  标准充电
-	  快速充电
-	  无线充电
-	  非标准充电
-	  USB BC1.2协议
-
-
-    5.移植G1605A充电代码
-
 
 
 }

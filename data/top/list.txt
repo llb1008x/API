@@ -267,8 +267,12 @@ other：
 	http://blog.csdn.net/forever_2015/article/details/53000643
 
 
+	AGPS定位基本原理浅析
+	http://www.cnblogs.com/magicboy110/archive/2010/12/12/1903927.html
 
 
+	显示LOGD打印信息的方法 
+	http://blog.csdn.net/batoom/article/details/6259468
 
 
 

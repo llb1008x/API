@@ -56,7 +56,7 @@
     默认值条件
     gn_switch_charging_down=60；
     gn_switch_charging_up=100;
-    gn_switch_charging_down <  gn_switch_charging_up 
+    gn_switch_charging_down <  gn_switch_charging_up  ||  gn_switch_charging_up > 100 
     
     3.充电使能那边检测控制充电的状态，在满足条件的状态下充电，不满足不充电
     条件：满足标充，开关打开
@@ -64,13 +64,16 @@
         b.高于阈值，停止充电
         c.介于阈值之间，如果是充电之后达到这个条件的继续充电，如果手机本来电量就是介于之间则不充电
 
-    还有就是手机插着线的时候的判断   
-    手机电量低于阈值的时候不会自动充电 
-
 
     4.上报的逻辑状态涉及哪些状态量 
     最简单的一种办法就是上报充电状态为错误
     BMT_status.bat_charging_state == CHR_ERROR;  
+
+    5.现在的问题是充电充到上限之后可以停止充电，但是因为上报的是error状态，而这个状态在之后电量下降到下限之后
+    并没有重新充电(状态为error，所以会停止充电)
+        所以这里需要在检测到电量低于下限的时候将充电状态改变为CHR_PRE，使其不会保持为error，可以恢复充电，同时
+    电池充到上限的时候一些计数变量应该重置    
+
 
 
 

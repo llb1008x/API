@@ -3,8 +3,8 @@
 **************************************************************************************/
 
 
-
 ->/*mtk*/
+G1605A
 {
 	底层对硬件操作最好能和芯片手册对应这看
 
@@ -538,19 +538,65 @@
 		}
 
 
+}
 
 
 
 
-
-
-
-
+17G05A
+{
+		rt5081_dump_register
+		{
+		
+			ichg		ret = rt5081_get_ichg(chg_dev, &ichg);--->rt5081_find_closest_real_value(RT5081_ICHG_MIN, RT5081_ICHG_MAX,RT5081_ICHG_STEP, reg_ichg);
+			reg_ichg是寄存器上的值，经过ret_val = min + reg_val * step得到最接近真实的值
+			
+			aicr		ret = rt5081_get_aicr(chg_dev, &aicr);
+			ieoc		ret = rt5081_get_ieoc(chg_data, &ieoc);
+			mivr		ret = rt5081_get_mivr(chg_data, &mivr);
+		
+			chg_status	ret = rt5081_get_charging_status(chg_data, &chg_status);
+			获取充电状态
+			cv			ret = rt5081_get_cv(chg_dev, &cv);
+			恒压充电的电压
+			chg_en		ret = rt5081_is_charging_enable(chg_data, &chg_en);
+			充电使能
+			vsys		ret = rt5081_get_adc(chg_data, RT5081_ADC_VSYS, &adc_vsys);
+			系统的负载电压
+			vbat		ret = rt5081_get_adc(chg_data, RT5081_ADC_VBAT, &adc_vbat);
+			电池的开路电压
+			ibat		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBAT, &adc_ibat);
+			进入电池的电流
+			ibus		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBUS, &adc_ibus);
+			线上的充电电流
+		}
+		
+		
+		mtk_switch_charging.c定义的充电状态机的各各函数
+		（根据从dtsi文件传过来的配置选用不同的充电算法），最后很多的ops都是调用到了rt5081上
+		{
+			mtk_switch_charging.c调用不同的算法
+			info->algorithm_data = swch_alg;
+			info->do_algorithm = mtk_switch_charging_run;
+			info->plug_in = mtk_switch_charging_plug_in;
+			info->plug_out = mtk_switch_charging_plug_out;
+			info->do_charging = mtk_switch_charging_do_charging;
+			info->do_event = charger_dev_event;
+			info->change_current_setting = mtk_switch_charging_current;
+			
+			mtk_switch_charging_init	初始化充电调用相关的函数指针
+		-->	
+			mtk_switch_charging_run
+		
+			swchg_turn_on_charging 		
+			充电使能检测swchgalg->state充电器的状态，启动pe20算法mtk_pe20_start_algorithm，设置充电电流swchg_select_charging_current_limit
+			swchg_select_cv设定恒压充电的电压，首先是动态获取电压，然后设定充电电压
+			
+		}
 
 
 
 }
-
 
 
 
@@ -688,11 +734,6 @@
 						"otst3";
 		};
 	};
-
-
-
-
-
 
 
 

@@ -1,377 +1,12 @@
+/*********************************************************************************
+		毕业后第一份工作的第一个正式项目，一定要认真细致负责，做好每一个环节
+**********************************************************************************/
 
-双芯片管理充电MT6355和RT5081
 
-/*GM3.0*/
+/*重要的概念*/
 {
-	step:
-		1.测试调整库仑计参数car_tune_value
-		2.调整电池参数，导入battery_prop.dtsi
-		3.导入电池曲线ZCV table battery_table.dtsi
-		4.Rfg？
-		
-		
-	电量计检测的NTC电阻10k，47k	
-		
-		
-		
-	定义了GM3.0的地方
-	./arch/arm64/configs/k57pv1_6mtee_pre_debug_defconfig:377:CONFIG_MTK_GAUGE_VERSION=30
-	./arch/arm64/configs/k57pv1_6mtee_pre_defconfig:361:CONFIG_MTK_GAUGE_VERSION=30
-	./arch/arm64/boot/dts/mediatek/mt6757.dtsi:1216:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/xhci/xhci-mtk-driver.c:36:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/xhci/xhci-mtk-driver.c:69:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/xhci/xhci-mtk-driver.c:102:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/xhci/xhci-mtk-driver.c:115:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/xhci/xhci-mtk-driver.c:354:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/xhci/xhci-mtk-driver.c:460:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/xhci/xhci-mtk-driver.c:507:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/xhci/xhci-mtk-driver.h:62:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/rtc/mtk_rtc_common.c:221:#if (CONFIG_MTK_GAUGE_VERSION != 30)
-	./drivers/misc/mediatek/mu3d/drv/musb_core.h:48:#if (CONFIG_MTK_GAUGE_VERSION != 30)
-	./drivers/misc/mediatek/mu3d/drv/musb_core.h:51:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/Makefile:128:	ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:30:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:55:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:266:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:328:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:338:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:391:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:568:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:667:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:822:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:1335:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:1493:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/coolers/mtk_cooler_bcct_v1.c:1501:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/thermal/common/thermal_zones/mtk_ts_battery.c:198:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/usb_c/tcpc/inc/tcpm.h:774:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/usb_c/tcpc/inc/tcpm.h:782:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/usb_c/tcpc/inc/tcpm.h:796:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/usb_c/tcpc/inc/mtk_direct_charge_vdm.h:73:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/usb_c/tcpc/inc/mtk_direct_charge_vdm.h:171:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/usb_c/tcpc/inc/mtk_direct_charge_vdm.h:273:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/usb_c/tcpc/mtk_direct_charge_vdm.c:179:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/usb_c/tcpc/tcpm.c:900:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/usb_c/tcpc/tcpm.c:916:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/include/mt-plat/mt6757/include/mach/mtk_battery_meter.h:60:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/misc/mediatek/include/mt-plat/battery_common.h:350:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/misc/mediatek/include/mt-plat/battery_meter.h:84:#if (CONFIG_MTK_GAUGE_VERSION == 10)
-	./drivers/misc/mediatek/include/mt-plat/battery_meter.h:155:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/misc/mediatek/include/mt-plat/battery_meter.h:346:#if (CONFIG_MTK_GAUGE_VERSION == 10)
-	./drivers/misc/mediatek/include/mt-plat/battery_meter.h:353:#if (CONFIG_MTK_GAUGE_VERSION == 10)
-	./drivers/misc/mediatek/include/mt-plat/battery_meter.h:357:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/misc/mediatek/include/mt-plat/battery_meter.h:424:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/misc/mediatek/include/mt-plat/charging.h:55:#if (CONFIG_MTK_GAUGE_VERSION != 30)
-	./drivers/misc/mediatek/pmic/mtk_battery_adc_intf.c:32:#if defined(CONFIG_POWER_EXT) || (CONFIG_MTK_GAUGE_VERSION != 30)
-	./drivers/misc/mediatek/pmic/rt5081/Makefile:1:ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-	./drivers/misc/mediatek/pmic/rt5081/Makefile:17:ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-	./drivers/misc/mediatek/pmic/mt6355/v1/Makefile:11:ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-	./drivers/misc/mediatek/pmic/mt6355/v1/pmic_throttling_dlpt.c:67:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/pmic/mt6355/v1/pmic_throttling_dlpt.c:229:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/pmic/mt6355/v1/pmic_throttling_dlpt.c:1307:		#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/pmic/mt6355/v1/pmic_throttling_dlpt.c:2106:	#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/pmic/mt6355/v1/pmic_irq.c:299:#if (CONFIG_MTK_GAUGE_VERSION != 30)
-	./drivers/misc/mediatek/pmic/mt6355/v1/pmic_irq.c:609:#if (CONFIG_MTK_GAUGE_VERSION != 30)
-	./drivers/misc/mediatek/pmic/mt6355/v1/pmic_irq.c:631:#if (CONFIG_MTK_GAUGE_VERSION != 30)
-	./drivers/misc/mediatek/power/mt6757/Makefile:29:ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-	./drivers/misc/mediatek/power/mt6757/pmic.c:101:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:29:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:38:#endif /* CONFIG_MTK_GAUGE_VERSION */
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:69:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:81:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:288:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:298:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:313:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:332:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:363:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:373:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:390:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:403:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:416:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:420:#endif /* CONFIG_MTK_GAUGE_VERSION == 30 */
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:427:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:436:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:468:#if CONFIG_MTK_GAUGE_VERSION == 30
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:479:#endif /* CONFIG_MTK_GAUGE_VERSION == 30 */
-	./drivers/misc/mediatek/power/mt6757/rt_pd_manager.c:523:#if CONFIG_MTK_GAUGE_VERSION == 20
-	./drivers/power/mediatek/Makefile:20:ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-	./drivers/power/mediatek/Makefile:23:else ifeq ($(CONFIG_MTK_GAUGE_VERSION),20)
-	./drivers/power/mediatek/Makefile:29:ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-	./drivers/power/mediatek/switch_charging.c:88:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/power/mediatek/switch_charging.c:326:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/power/mediatek/switch_charging.c:1031:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/power/mediatek/switch_charging.c:1123:#if (CONFIG_MTK_GAUGE_VERSION != 20)
-	./drivers/power/mediatek/battery_meter_fg_20.c:1717:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/power/mediatek/linear_charging.c:119:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/power/mediatek/linear_charging.c:185:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/power/mediatek/linear_charging.c:753:#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/power/mediatek/linear_charging.c:1140:			#if (CONFIG_MTK_GAUGE_VERSION == 20)
-	./drivers/power/mediatek/charger/Makefile:27:ifeq ($(CONFIG_MTK_GAUGE_VERSION),30)
-
-
-}
-
-
-
-
-
-/*RT5081*/
-{
-集成的功能很多
-	
-	RT5081的几个基本功能：
-	switching battery charger ;USB Type-C &&Power Delivery (PD) controller;
-	dual Flash LED current sources;a RGB LED driver;a backlight WLED driver;
-	a display bias driver and a general LDO for portable devices.
-
-		
-	UVP < VDDA <OVP
-
-
-	MRSTB pin to manually reset the hardware or registers
-	这个应该是复位功能
-	
-	switching charger 有三种模式：
-	charge mode, boost mode (OTG-Boost),and high-impedance mode.
-	high-impedance mode:高阻抗模式为了降低功耗，产生极低的电流
-	
-	charge mode :
-	Minimum Input Voltage Regulation (MIVR):最小输入电压的控制
-	为了阻止输入电压因充电器供电能力不足而下降
-
-
+	充电器类型检测
 	{
-	   Strobe Mode ：选通模式
-
-	   BMC Power Delivery protocol
-
-	   CHG_VMID：从这个引脚提供电流
-	
-	   0.1A到3.25A的输入电流管理
-
-	   OTG输出电压4.42V到5.58V，输出电流2A
-
-	   电池电压在2.3V到3.8V低电保护，会启动升压操作
-
-	   17V，21V，25V，29V四档过压保护
-
-	   900mA，1200mA,1500mA,1800mA四档过流保护
-	}
-
-
-
-
-
-
-
-代码：
-	/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/pmic/rt5081/
-	
-	
-	
-	按照移植17W05A的思路应该包括一下几部分：
-	1.charger能充电，三个阶段的dws配置是否正确，初始化是否有问题
-	2.OTG功能使能
-	3.关机充电logo
-	4.fuelgauge电量计的移植
-	
-	
-	打印寄存器信息在哪，调用哪个函数
-	rt5081充电相关的几个中断			P98
-	enum rt5081_pmu_charger_irqidx {
-		RT5081_CHG_IRQIDX_CHGIRQ1 = 0,
-		RT5081_CHG_IRQIDX_CHGIRQ2,
-		RT5081_CHG_IRQIDX_CHGIRQ3,
-		RT5081_CHG_IRQIDX_CHGIRQ4,
-		RT5081_CHG_IRQIDX_CHGIRQ5,
-		RT5081_CHG_IRQIDX_CHGIRQ6,
-		RT5081_CHG_IRQIDX_QCIRQ,
-		RT5081_CHG_IRQIDX_DICHGIRQ7,
-		RT5081_CHG_IRQIDX_OVPCTRLIRQ,
-		RT5081_CHG_IRQIDX_MAX,
-	};
-	
-	
-	RT5081定义的充电器检测类型
-	enum rt5081_pmu_chg_type {
-		RT5081_CHG_TYPE_NOVBUS = 0,
-		RT5081_CHG_TYPE_UNDER_GOING,
-		RT5081_CHG_TYPE_SDP,
-		RT5081_CHG_TYPE_SDPNSTD,
-		RT5081_CHG_TYPE_DCP,
-		RT5081_CHG_TYPE_CDP,
-		RT5081_CHG_TYPE_MAX,
-	};
-	
-	
-	
-	
-	进行充电器类型检测时调用的是mtk_chg_type_det.c，没有调用battery_common_fg_20.c
-	根据makfile选项应该是用 CONFIG_MTK_GAUGE_VERSION  GM3.0
-	函数调用时检测的充电器类型
-	typedef enum {
-		CHARGER_UNKNOWN = 0,
-		STANDARD_HOST,		/* USB : 450mA */
-		CHARGING_HOST,
-		NONSTANDARD_CHARGER,	/* AC : 450mA~1A */
-		STANDARD_CHARGER,	/* AC : ~1A */
-		APPLE_2_1A_CHARGER,	/* 2.1A apple charger */
-		APPLE_1_0A_CHARGER,	/* 1A apple charger */
-		APPLE_0_5A_CHARGER,	/* 0.5A apple charger */
-		WIRELESS_CHARGER,
-	} CHARGER_TYPE;
-	
-	
-	
-	
-	
-	
-函数功能：	
-	mtk_get_dynamic_cv
-	
-	
-	
-	battery_get_bat_current_sign这个应该是fuelgauge在读取寄存器g_fg_is_charging，读取IC是充电(负)还是放电(正)
-	
-	底层一些操作接口在rt5081_pmu_charger.c定义
-	
-	
-	
-	charger_manager是专门的管理充电器的子系统？
-	{	
-		单充电芯片还是双充电芯片工作：919是单充电芯片
-		mtk_switch_charging_init
-		mtk_dual_switch_charging_init
-		
-		
-	
-	}
-	
-	
-	
-	
-	
-	
-
-########################################################################################################	
-	去掉了Type-c改成micro USB，接口改了，有些功能应该用不了 (dws文件，gpio表，中断,dtsi文件)
-	
-	dtsi文件:
-	kernel-4.4/archarm64/boot/dts/mediatek/mt6757.dtsi
-	
-	dws文件:
-	vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k57pv1_6mtee_pre/dct/dct/codegen.dws
-	vendor/mediatek/proprietary/bootable/bootloader/lk/target/k57pv1_6mtee_pre/dct/dct/codegen.dws
-	kernel-4.4/drivers/misc/mediatek/dws/mt6757/k57pv1_6mtee_pre.dws
-	
-	
-
-	
- 	
- 	需要用到的gpio			Type-C						mirco USB
- 	
- 	USB_ID					23
- 	DRV_BUS					43
-	GPIO_CHG_EN				100
-	EINT_CHG_STAT			101(EINT)
-	EINT_RT5081_PD_IRQB		8(EINT)	
-	TYPEC_HEADSET_CTRL_EN	86(EINT)
-	
-	
-	switching_charger	I2C_CHANNEL_1		0X6A
-	
-*****************************************************************************************************************	
-	
-	
-	
-	
-	
-	
-	#1关机充电的流程：
-	
-
-	
-
-	
-	
-	
-	
-	
-	
-   
-}
-
-
-
-
-
-
-
-
-/*debug*/
-{
-		关掉OTG功能
-		P36
-		
-		
-		
-		提高充电电流，进电池，充电线上的电流
-		温升保护导致的降电流策略
-		温升策略是什么
-
-		charger_thread][name:mtk_switch_charging&]force:0 thermal:-1 -1 setting:3200000 2050000 type:4 usb_unlimited:0 usbif:0 usbsm:0
-
-
-
-
-
-
-
-
-
---->代码：
-
-		#1编译的宏:
-			充电能识别接口类型，座充有充电，USB无充电电流，对比将Type-C修改为micro USB的代码
-		去掉一下的宏
-		CONFIG_TCPC_CLASS=y
-		CONFIG_USB_POWER_DELIVERY=y
-		CONFIG_TCPC_RT5081=y
-		CONFIG_DUAL_ROLE_USB_INTF=y
-		
-		快充定义的宏	
-		CONFIG_MTK_PUMP_EXPRESS_PLUS_20_SUPPORT
-		CONFIG_MTK_PUMP_EXPRESS_PLUS_30_SUPPORT
-	
-	
-	
-		充电器接口类型检测要修改P75要检测USB status	0x27
-		rt5081_pmu_attachi_irq_handler这个中断回调函数会进行USB状态检测，判断是充电器还是USB   P76
-	
-		Device Type					0x22
-	
-	
-	
-	
-	
-	
-	
-	
-		#2变量
-		上层充电器的类型
-		typedef enum {
-			CHARGER_UNKNOWN = 0,
-			STANDARD_HOST,		/* USB : 450mA */
-			CHARGING_HOST,
-			NONSTANDARD_CHARGER,	/* AC : 450mA~1A */非标准充电器
-			STANDARD_CHARGER,	/* AC : ~1A */			标准充电器
-			APPLE_2_1A_CHARGER,	/* 2.1A apple charger */
-			APPLE_1_0A_CHARGER,	/* 1A apple charger */
-			APPLE_0_5A_CHARGER,	/* 0.5A apple charger */
-			WIRELESS_CHARGER,
-		} CHARGER_TYPE;
-	
-	
-	
 		RT5081定义的充电器检测类型
 		enum rt5081_pmu_chg_type {
 			RT5081_CHG_TYPE_NOVBUS = 0,				//0:NOVBUS
@@ -382,8 +17,21 @@
 			RT5081_CHG_TYPE_CDP,					//5 101:
 			RT5081_CHG_TYPE_MAX,					//6 110:
 		};
-	
-	
+		
+		函数调用时检测的充电器类型
+		typedef enum {
+			CHARGER_UNKNOWN = 0,
+			STANDARD_HOST,		/* USB : 450mA */
+			CHARGING_HOST,
+			NONSTANDARD_CHARGER,/* AC : 450mA~1A */
+			STANDARD_CHARGER,	/* AC : ~1A */
+			APPLE_2_1A_CHARGER,	/* 2.1A apple charger */
+			APPLE_1_0A_CHARGER,	/* 1A apple charger */
+			APPLE_0_5A_CHARGER,	/* 0.5A apple charger */
+			WIRELESS_CHARGER,
+		} CHARGER_TYPE;
+
+
 		如何通过USB口检测出是标准充电器和非标准充电器
 		BC1.2中定义的充电类型
 		SDP：标准下行接开口，电脑USB
@@ -391,46 +39,62 @@
 		DCP：标准的座充
 		OCP：other chargng port非标准充电器
 	
-	
-		根据寄存器打印的usb_status
-		000: No VBUS
-		001: VBUS flow is under going
-	
-		010: SDP (by input pin of (sVBUSPG_syn
-		& sCHGDETB & DCDTB)=1)
-		011: SDP NSTD (by input pin of
-		(sVBUSPG_syn & sCHGDETB &
-		DCDT)=1)
-		100: DCP (by input pin of sVBUSGP_syn
-		& CHGDET & sDCPORT_CHD)
-		101: CDP (by input pin of sVBUSGP_syn
-		& CHGDET & sCDPORT_CHD)
-	
-		110: reserved
-		111: reserved
-	
-	
-	
-		switch (usb_status) {
-		case RT5081_CHG_TYPE_SDP:
-			chg_data->chg_type = STANDARD_HOST;
-			break;
-		case RT5081_CHG_TYPE_SDPNSTD:
-			chg_data->chg_type = NONSTANDARD_CHARGER;
-			break;
-		case RT5081_CHG_TYPE_CDP:
-			chg_data->chg_type = CHARGING_HOST;
-			break;
-		case RT5081_CHG_TYPE_DCP:
-			chg_data->chg_type = STANDARD_CHARGER;
-			break;
-		default:
-			chg_data->chg_type = CHARGER_UNKNOWN;
-			break;
-		}
+	}
+
+
+	boot_reason
+	{
+		enum boot_reason_t {
+			BR_POWER_KEY = 0,	//按power键导致的重启
+			BR_USB,
+			BR_RTC,
+			BR_WDT,
+			BR_WDT_BY_PASS_PWK,
+			BR_TOOL_BY_PASS_PWK,
+			BR_2SEC_REBOOT,	   //长按power键关机两秒内松手
+			BR_UNKNOWN
+		};
+
+
+	}
+
+
+	AICR，MIVR
+	{
+		AICR:input current limit,充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由5081来做；
+	  但是只是在插入充电器的时候去做检测，直到拔出充电器再次插入才会再一次检测，同一个充电器不会多次检测输出能力，因为同一个充电器此值肯定是相同的，没必要再检测
+	  MIVR就是根据充电器的供电能力，设置最低的充电电压，如果电压小于这个值就降电流不降电压
+
+	}
+
+
+
+	相关的宏和gpio
+	{
+		type-c定义的宏
+		CONFIG_TCPC_CLASS=y
+		CONFIG_USB_POWER_DELIVERY=y
+		CONFIG_TCPC_RT5081=y
+		CONFIG_DUAL_ROLE_USB_INTF=y
 		
+		快充定义的宏	
+		CONFIG_MTK_PUMP_EXPRESS_PLUS_20_SUPPORT
+		CONFIG_MTK_PUMP_EXPRESS_PLUS_30_SUPPORT
+
+		USB_ID					23
+		DRV_BUS					43
+		GPIO_CHG_EN				100
+		EINT_CHG_STAT			101(EINT)
+		EINT_RT5081_PD_IRQB		8(EINT)	
+		TYPEC_HEADSET_CTRL_EN	86(EINT)
 		
-				
+		switching_charger	I2C_CHANNEL_1		0X6A
+
+	}
+
+
+	相关的函数接口
+	{
 		battery_meter_hal.h 定义的电量计能执行的函数指针
 		typedef enum {
 			BATTERY_METER_CMD_HW_FG_INIT,
@@ -464,28 +128,6 @@
 		} BATTERY_METER_CTRL_CMD;
 
 
-		定义电池相关参数，当然这些参数有两个方向dtsi(mt6757.dtsi,rt5081.dtsi)，和宏
-			mtk_charging.h 	，mtk_charging_intf.h(快充)
-			#define USB_CHARGER_CURRENT					CHARGE_CURRENT_500_00_MA	/* 500mA */
-			/* #define AC_CHARGER_CURRENT					CHARGE_CURRENT_650_00_MA */
-			#define AC_CHARGER_CURRENT					CHARGE_CURRENT_2050_00_MA
-			#define AC_CHARGER_INPUT_CURRENT				CHARGE_CURRENT_3200_00_MA
-			#define NON_STD_AC_CHARGER_CURRENT			CHARGE_CURRENT_500_00_MA
-			#define CHARGING_HOST_CHARGER_CURRENT       CHARGE_CURRENT_650_00_MA
-			#define APPLE_0_5A_CHARGER_CURRENT          CHARGE_CURRENT_500_00_MA
-			#define APPLE_1_0A_CHARGER_CURRENT          CHARGE_CURRENT_650_00_MA
-			#define APPLE_2_1A_CHARGER_CURRENT          CHARGE_CURRENT_800_00_MA
-
-
-
-		电池计电量计算的相关参数是在哪个文件
-		mtk_battery_meter.h ,mtk_battery_meter_table.h
-		pmic_throttling_dlpt.c读电池客制化参数，mtk_battery_property.h
-		
-		
-		
-		
-		
 		rt5081提供的函数指针
 		static struct charger_ops rt5081_chg_ops = {
 			/* Normal charging */
@@ -503,326 +145,67 @@
 			.set_mivr = rt5081_set_mivr,
 			.is_charging_done = rt5081_is_charging_done,
 			.get_zcv = rt5081_get_zcv,
-
 			/* Safety timer */
 			.enable_safety_timer = rt5081_enable_safety_timer,
 			.is_safety_timer_enabled = rt5081_is_safety_timer_enable,
-
 			/* Power path */
 			.enable_powerpath = rt5081_enable_power_path,
 			.is_powerpath_enabled = rt5081_is_power_path_enable,
-
 			/* Charger type detection */
 			.enable_chg_type_det = rt5081_enable_chg_type_det,
-
 			/* OTG */
 			.enable_otg = rt5081_enable_otg,
 			.set_boost_current_limit = rt5081_set_otg_current_limit,
 			.enable_discharge = rt5081_enable_discharge,
-
 			/* PE+/PE+20 */
 			.send_ta_current_pattern = rt5081_set_pep_current_pattern,
 			.set_pe20_efficiency_table = rt5081_set_pep20_efficiency_table,
 			.send_ta20_current_pattern = rt5081_set_pep20_current_pattern,
 			.set_ta20_reset = rt5081_set_pep20_reset,
 			.enable_cable_drop_comp = rt5081_enable_cable_drop_comp,
-
 			/* ADC */
 			.get_tchg_adc = rt5081_get_tchg,
 			.get_ibus_adc = rt5081_get_ibus,
 		};
-
-
-
-
-
-		创建的相关设备节点在哪个目录下：mtk_charger_setup_files
-		/proc/mtk_battery_cmd
-		
-		
-		
-		
-		相关的设备节点
-		/sys/devices/platform/battery/Otg_Charge_Switch
-		
-
-
-
-
-
-
-
-
-
-		
-		#3函数功能	
-		{
-			rt5081_dump_register
-			{
-			
-				ichg		ret = rt5081_get_ichg(chg_dev, &ichg);--->rt5081_find_closest_real_value(RT5081_ICHG_MIN, RT5081_ICHG_MAX,RT5081_ICHG_STEP, reg_ichg);
-				reg_ichg是寄存器上的值，经过ret_val = min + reg_val * step得到最接近真实的值
-				
-				
-				aicr		ret = rt5081_get_aicr(chg_dev, &aicr);
-				ieoc		ret = rt5081_get_ieoc(chg_data, &ieoc);
-				mivr		ret = rt5081_get_mivr(chg_data, &mivr);
-			
-				chg_status	ret = rt5081_get_charging_status(chg_data, &chg_status);
-				获取充电状态
-				cv			ret = rt5081_get_cv(chg_dev, &cv);
-				恒压充电的电压
-				chg_en		ret = rt5081_is_charging_enable(chg_data, &chg_en);
-				充电使能
-				vsys		ret = rt5081_get_adc(chg_data, RT5081_ADC_VSYS, &adc_vsys);
-				系统的负载电压
-				vbat		ret = rt5081_get_adc(chg_data, RT5081_ADC_VBAT, &adc_vbat);
-				电池的开路电压
-				ibat		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBAT, &adc_ibat);
-				进入电池的电流
-				ibus		ret = rt5081_get_adc(chg_data, RT5081_ADC_IBUS, &adc_ibus);
-				线上的充电电流
-			}
-			
-			
-			mtk_switch_charging.c定义的充电状态机的各各函数
-			（根据从dtsi文件传过来的配置选用不同的充电算法），最后很多的ops都是调用到了rt5081上
-			{
-				mtk_switch_charging.c调用不同的算法
-				info->algorithm_data = swch_alg;
-				info->do_algorithm = mtk_switch_charging_run;
-				info->plug_in = mtk_switch_charging_plug_in;
-				info->plug_out = mtk_switch_charging_plug_out;
-				info->do_charging = mtk_switch_charging_do_charging;
-				info->do_event = charger_dev_event;
-				info->change_current_setting = mtk_switch_charging_current;
-				
-				
-			
-				mtk_switch_charging_init	初始化充电调用相关的函数指针
-			-->	
-				mtk_switch_charging_run
-			
-			
-				swchg_turn_on_charging 		
-				充电使能检测swchgalg->state充电器的状态，启动pe20算法mtk_pe20_start_algorithm，设置充电电流swchg_select_charging_current_limit
-				swchg_select_cv设定恒压充电的电压，首先是动态获取电压，然后设定充电电压
-				
-				
-			
-			}
-			
-			
-			
-			
-			
-			
-			上面有pep，pep20，pep30三种 ，但是pep30目前还不支持
-			{
-				dts文件，项目脚本宏这三个谁起作用
-				
-				MTK_PUMP_EXPRESS_PLUS_20_SUPPORT = no
-				MTK_PUMP_EXPRESS_PLUS_30_SUPPORT = no
-				MTK_PUMP_EXPRESS_PLUS_SUPPORT = no
-				MTK_PUMP_EXPRESS_SUPPORT = no
-				
-				enable_pe_plus;
-				enable_pe_2;			
-				enable_pe_3;
-				
-				关了enable就能升压，开了enable_pe_2就不能升压
-				
-				
-				if (mtk_pe20_init(info) < 0)
-					info->enable_pe_2 = false;
-
-				if (mtk_pe30_init(info) == false)
-					info->enable_pe_3 = false;
-					
-					
-				mtk_pe20_check_charger
-				
-				if (!pinfo->enable_hv_charging) {
-				pr_info("%s: hv charging is disabled\n", __func__);
-				if (pe20->is_connect) {
-					pe20_leave(pinfo);
-					pe20->to_check_chr_type = true;
-				}
-					return ret;
-				}
-
-				if (pinfo->enable_pe_2 != true)
-					return -ENOTSUPP;	
-			
-			
-				PL_VERSION
-			}
-			
-			
-			
-			
-			charger_manager调用的几个函数指针
-			
-			
-			
-			rt5081_enable_hidden_mode 这个跟Type-C功能相关
-			
-			
-			mtk_battery.c force_get_tbat
-			
-	
-			mtk_switch_charging_run
-		
-		
-			(mtk_battery_hal.c) fgauge_read_current，读取充电的电量和一些算法处理
-		
-			
-			当然重要的是调整充电状态
-			
-			
-		}
-		
-		
-		设置充电电流，充电电压，充电器的检测
-
-
-		
-		
-		
-		#4log关键字
-		
-			ICHG(P68), 察看充电电流
-			fgauge_read_current，fgauge_read_IM_current这个是电量计读出的数据，
-			IBAT进电池的电流，IBUS：供电线上的电流
-			
-					
-			更改log的等级
-			{
-				在mtk_battery.c
-		
-				FG_daemon_log_level
-		
-				gFG_daemon_log_level
-			}
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-
-
---->文档
-
-		这里有几个概念AICR，MIVR怎么设置的
-			AICR就是input current limit,充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由5081来做；
-		但是只是在插入充电器的时候去做检测，直到拔出充电器再次插入才会再一次检测，同一个充电器不会多次检测输出能力，因为同一个充电器此值肯定是相同的，没必要再检测
-			MIVR就是根据充电器的供电能力，设置最低的充电电压，如果电压小于这个值就降电流不降电压
-
-
-		gpio，dws，dtsian 文件在preloader,lk,kernel三个阶段的配置
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---->逻辑
-	
-	调用流程：
-	{
-		(mtk_charger.c)mtk_charger_probe: starts 初始化charger_manager结构体，首先是从mtk6757.dtsi 的charger开始对不同成员赋值，如果没有定义就从mtk_charging.h的宏赋值
-		包括一些电池参数和调用充电的算法--->(mtk_switch_charging.c)选择不同的充电算法,mtk_switch_charging_init,从rt5081.dtsi(里面的一些参数是从rt5081_pmu_core.c获取匹配，
-		然后再到不同的项里面匹配)获取一些参数，然后调用不同的函数指针--->创建一个常用的线程charger_routine_thread 检查充电与否，充电器的类型，和一些电池参数-->
-		(mtk_battery_intf.c)battery_get_bat_current,获取充电电流--->(mtk_battery_hal.c)bm_ctrl_cmd定义了一些调用fuelgauge的函数指针--->charger_update_data获取电量计的状态，
-		某种温度下，再调用force_get_tbat--->charger_check_status检测充电器的状态，都是基于battery thermal protection进行的检测--->kpoc_power_off_check应该是关机充电的检测
-	
 	}
-	rt5081.dtsi参数在rt5081_pmu*的of_device_id里面获取的
-	meter,table：这两个都是电量计算的相关参数
-	
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---->测试场景
-
-	
-
-	#1
+	log搜索关键字
 	{
+
+
 		
-							17G05A(71%)		W909(69%)  		G1605A(70%)
-		关机充电电流:		0.1A~0.3A		0.6A~0.75A			0.75A~0.85A
-		座充充电电流：		0.1A~0.3A		0.6A~0.8A			0.8A~0.9A
-		USB充电电流：		0.1A~0.3A		0.2A~0.3A			0.2A~0.3A
-	
-		USB没有电流是串口地接到了电源地，拔掉串口后有电流，但应该不是这个原因吧
-	
-		没有电池是充电电流小的原因吗？(好吧这个是真实的原因，因为用的假电，所以电量肯定充不进去)
-	
-	
 	}
-	
-	
-	#2
-	{
-		手机功耗大，开机过程能达到1A，息屏200mA~300mA,而USB充电电流太小，最后充的没有耗的多
-	
-	}
-	
 
-	#3
-	ac_charger_current = <2500000>;
-	ac_charger_input_current = <2800000>;
 
-	充电头				5V/2A					5V/1A						9V/2A
-						1.8A~1.89A(5.4V)		1.0A~1.1A(5.23V)
-	
-	#4电量显示不准
-	电池电压4.0V但是电量只有1%，也可能是电池断电导致RTC没有存储
-	
-	
+
 }
 
 
 
 
 
+/*调用流程，代码逻辑*/
+{
+	(mtk_charger.c)mtk_charger_probe: starts 初始化charger_manager结构体，首先是从mtk6757.dtsi 的charger开始对不同成员赋值，如果没有定义就从
+	
+	mtk_charging.h的宏赋值包括一些电池参数和调用充电的算法--->(mtk_switch_charging.c)选择不同的充电算法,mtk_switch_charging_init,从rt5081.dtsi
+	
+	(里面的一些参数是从rt5081_pmu_core.c获取匹配，然后再到不同的项里面匹配)获取一些参数，然后调用不同的函数指针--->创建一个常用的线程charger_routine_thread
+	 
+	检查充电与否，充电器的类型，和一些电池参数-->(mtk_battery_intf.c)battery_get_bat_current,获取充电电流--->(mtk_battery_hal.c)bm_ctrl_cmd
+	
+	定义了一些调用fuelgauge的函数指针--->charger_update_data获取电量计的状态，某种温度下，再调用force_get_tbat--->charger_check_status检测充电器的状态，
+	
+	都是基于battery thermal protection进行的检测--->kpoc_power_off_check应该是关机充电的检测
 
+
+
+rt5081.dtsi参数在rt5081_pmu*的of_device_id里面获取的
+meter,table：这两个都是电量计算的相关参数
+}
+
+	
 
 
 
@@ -835,7 +218,6 @@
 
 	(kpd.c)kpd_pwrkey_pmic_handler  -> kpd_pmic_pwrkey_hal -> 
 
-
 	keypad_dts_data对应这几个数据成员，而这几个数据成员可能跟powerkey有关
 	u32 kpd_sw_pwrkey;
 	u32 kpd_hw_pwrkey;
@@ -844,7 +226,7 @@
 
 
 G1605A上定义的
-	/* boot type definitions */
+/* boot type definitions */
 enum boot_mode_t {
 	NORMAL_BOOT = 0,
 	META_BOOT = 1,
@@ -861,7 +243,6 @@ enum boot_mode_t {
 	DONGLE_BOOT = 10,
 	UNKNOWN_BOOT
 };
-
 
 
 typedef enum {
@@ -890,10 +271,102 @@ char g_boot_reason[][16]= {"power_key","usb",
 							"watchdog"};
 
 
+/*******************************************************************************************************************/
+	2.充电电流太小
+	#1
+	{
+		
+							17G05A(71%)		W909(69%)  		G1605A(70%)
+		关机充电电流:		0.1A~0.3A		0.6A~0.75A			0.75A~0.85A
+		座充充电电流：		0.1A~0.3A		0.6A~0.8A			0.8A~0.9A
+		USB充电电流：		0.1A~0.3A		0.2A~0.3A			0.2A~0.3A
+	
+		USB没有电流是串口地接到了电源地，拔掉串口后有电流，但应该不是这个原因吧
+	
+		没有电池是充电电流小的原因吗？(好吧这个是真实的原因，因为用的假电，所以电量肯定充不进去)
+	}
+	
+	#2
+	{
+		手机功耗大，开机过程能达到1A，息屏200mA~300mA,而USB充电电流太小，最后充的没有耗的多
+	
+	}
+	
+	#3
+	ac_charger_current = <2500000>;
+	ac_charger_input_current = <2800000>;
+
+	充电头				5V/2A					5V/1A						9V/2A
+						1.8A~1.89A(5.4V)		1.0A~1.1A(5.23V)
+	
+	
+
+/****************************************************************************************************************/
+	3.mmi测试
+	mmi测试代码宏
+	{
+		GN_RW_GN_MMI_BACKUP_TO_PRODUCTINFO=yes
+		GN_RO_GN_GNROMVERNUMBER=GIONEE ROM5.0.16
+		GN_APK_MMI_SUPPORT_BJ=yes
+		GN_APK_AUTOMMI_SUPPORT=yes
+	}
+
+	一是添加BAT_BatteryPresentCurrent，类似mt_battery_update_EM，看mmi测试界面是否有充电部分
+
+	二是根据着mmi测试宏包含的代码
+
+
+
+
+
+
+
+/****************************************************************************************************************/
+	4.快充升压问题
+
+
+
 }
 
 
 
+
+
+
+
+/*涉及到的一些文件*/
+{
+dtsi文件:
+	kernel-4.4/archarm64/boot/dts/mediatek/mt6757.dtsi  ，rt5081.dtsi  , mt6355.dtsi
+	
+dws文件:
+	vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k57pv1_6mtee_pre/dct/dct/codegen.dws
+	vendor/mediatek/proprietary/bootable/bootloader/lk/target/k57pv1_6mtee_pre/dct/dct/codegen.dws
+	kernel-4.4/drivers/misc/mediatek/dws/mt6757/k57pv1_6mtee_pre.dws
+
+
+电池参数相关的文件
+		mt6757.dtsi,rt5081.dtsi
+		mtk_charging.h ，mtk_charging_intf.h(快充)
+		mtk_battery_meter.h ,mtk_battery_meter_table.h
+		pmic_throttling_dlpt.c读电池客制化参数，mtk_battery_property.h
+
+
+GM3.0 定义的宏CONFIG_MTK_GAUGE_VERSION=30
+		./arch/arm64/configs/k57pv1_6mtee_pre_debug_defconfig:377:CONFIG_MTK_GAUGE_VERSION=30
+		./arch/arm64/configs/k57pv1_6mtee_pre_defconfig:361:CONFIG_MTK_GAUGE_VERSION=30
+		./arch/arm64/boot/dts/mediatek/mt6757.dtsi:1216:#if (CONFIG_MTK_GAUGE_VERSION == 30)
+
+
+rt5081的目录
+	/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/pmic/rt5081/
+	
+
+keyboard 的目录
+/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/input/keyboard/mediatek/mt6757
+
+
+}
 
 
 
