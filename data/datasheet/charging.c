@@ -495,21 +495,23 @@ R_PROFILE_STRUCT r_profile_t2[] = {
 --->USB充电阶段
     do_chrdet_int_task（）充电器插入触发的中断，检测--->upmu_is_chr_det（）充电器端检测，充电器是否正常--->wakeup_fg_algo（） FG_CHARGING ,FG_RESUME
 	
-	唤醒电量计算，重置参数--->mt_battery_charger_detect_check()对充电器的检测--->mt_battery_type_detection()充电器类型的检测--->charging_get_charger_type
+	唤醒电量计算，重置参数-->mt_battery_charger_detect_check()对充电器的检测-->mt_battery_type_detection()充电器类型的检测-->charging_get_charger_type
 	
-	通过宏传递函数指针，调用相应的函数，IC--->mt_usb_connect()如果充电器的类型是stand_host或者charging_host就连接USB--->mt_battery_update_status（）连接USB后就对电池当前的状态进行检测,
+	通过宏传递函数指针，调用相应的函数，IC--->mt_usb_connect()如果充电器的类型是stand_host或者charging_host就连接USB--->mt_battery_update_status（）
 	
-	通过一系列的设备节点wireless_main,ac_main,usb_main等节点写值这些上报的值进入power_supply子系统处理，power_supply_changed()改变节点的值--->回调函数。input=nl_data_handler--->
+	连接USB后就对电池当前的状态进行检测,通过一系列的设备节点wireless_main,ac_main,usb_main等节点写值这些上报的值进入power_supply子系统处理，
 	
-	bmd_ctrl_cmd_from_user,nl_send_to_user上层子系统接受到uevent事件，然后发送命令--->两层通过封装的数据结构（忘了skb？还是）这些数据都是Pmu_chargerstruct这个结构体封装完成
-
-	从msg_fgd_cnd分离参数给pmu_hargerstruct赋值，一段很长的switch_case语句：init_flag电量计初始化是否完成，bat_is_chager_exist，baton_count三次循环检测=0，存在
-
-	Icharging,battery_meter_get_charging_current获取电流以前是软件算法取平均，现在通过IC读取电量的值.....--->而这个上报的检测，现在通过一个healthd的进程监听pmic子系统
-
-	的状态（监听是epoll不是socket）--->mainloop 一个while(1)循环检测，状态有变化上报状态update（）--->batterymonitor读取不同路径下各种电池属性的值--->batteryserivice java
-
-	层，对整个android系统的电源进行管理
+	power_supply_changed()改变节点的值--->回调函数。input=nl_data_handler--->bmd_ctrl_cmd_from_user,nl_send_to_user上层子系统接受到uevent事件，
+	
+	然后发送命令--->两层通过封装的数据结构（忘了skb？还是）这些数据都是Pmu_chargerstruct这个结构体封装完成从msg_fgd_cnd分离参数给pmu_hargerstruct赋值，
+	
+	一段很长的switch_case语句：init_flag电量计初始化是否完成，bat_is_chager_exist，baton_count三次循环检测=0，存在
+	
+	Icharging,battery_meter_get_charging_current获取电流以前是软件算法取平均，现在通过IC读取电量的值.....--->而这个上报的检测，现在通过一个healthd的进程监听
+	
+	pmic子系统的状态（监听是epoll不是socket）--->mainloop 一个while(1)循环检测，状态有变化上报状态update（）--->batterymonitor读取不同路径下各种电池属性的值
+	
+	--->batteryserivice java层，对整个android系统的电源进行管理
 
 
 

@@ -928,15 +928,10 @@ kernel目录下
 
 项目脚本	
 
-
-
 dws文件是否需要改，看看spe和dws文件配置是否正确
 
 
 
-	
-	
-	
 7.BUG#67460
 	
 	修改SD卡的格式为exfat时，插入到测试机后不识别SD卡。
@@ -950,16 +945,7 @@ dws文件是否需要改，看看spe和dws文件配置是否正确
 	fat32支持但是exfat格式是不支持的
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 8.BUG#66789
 	手机为开机状态，长按电源键11s，手机不会自动重启	
 	hal_kpd.c   keypad.h	gnbj6737t_66_m0_debug_defconfig   gnbj6737t_66_m0_defconfig
@@ -985,6 +971,7 @@ class main
 
 
 10.关机充电的中文logo改成英文logo
+更换了图片
 
 
 
@@ -1009,11 +996,25 @@ MTK_FG: 1.[FGADC_UI_FG]FG version:150329 (FG% 100,UI% 96,tracking Time 0,Qmax_T_
 	还有就是充电的截止电流
 	然后这边还有另一个问题就是正常放电
 
-
 	charging_hw_bq24158.c文件里面，charging_hw_init
 
 
 
+12.减少充电相关的冗余log，但是要保留重要的log，fuelgauged
+	1.首先确定有哪些log
+	kenel里面先改log等级，然后保留修改几个重要的log，还要了解healthed 
+	{
+		fuelgauged->battery_meter_fg_20.c
+		healthd ->batterymonitor.cpp
+		hps_main->mt_hotplug_strategy_algo.c
+		//cfinteractive->mt_cpufreq.c
+		bat_routine_thr
+		pmic
+	}
+	
+	
+
+
 
 
 
@@ -1029,8 +1030,7 @@ MTK_FG: 1.[FGADC_UI_FG]FG version:150329 (FG% 100,UI% 96,tracking Time 0,Qmax_T_
 
 	
 	
-	
-	1.几个宏未定义对应的回调函数，以后对比导入几个空函数，先注掉
+1.几个宏未定义对应的回调函数，以后对比导入几个空函数，先注掉
 	{
 		CHARGING_CMD_SET_VINDPM,
 		CHARGING_CMD_SET_VBUS_OVP_EN,
@@ -1061,9 +1061,6 @@ MTK_FG: 1.[FGADC_UI_FG]FG version:150329 (FG% 100,UI% 96,tracking Time 0,Qmax_T_
 		CHARGING_CMD_SET_IRCMP_VOLT_CLAMP,
 	
 	}
-	
-	
-	
 	
 charging.h	
 	
