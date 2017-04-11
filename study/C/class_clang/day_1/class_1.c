@@ -26,12 +26,7 @@ int Old_to_Day(int old)
 *********************************************/
 int power(int num,int n)
 {
-    int i,temp=num;
-    for(i=0;i<n;i++){
-
-        num  *= temp;
-        printf("num->%d\n",num);
-    }
+    
 
     return num;
 }

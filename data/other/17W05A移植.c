@@ -1008,9 +1008,38 @@ MTK_FG: 1.[FGADC_UI_FG]FG version:150329 (FG% 100,UI% 96,tracking Time 0,Qmax_T_
 		healthd ->batterymonitor.cpp
 		hps_main->mt_hotplug_strategy_algo.c
 		//cfinteractive->mt_cpufreq.c
-		bat_routine_thr
+		bat_routine_thr->battery_common_fg_20.c
 		pmic
 	}
+
+
+
+
+
+关于手机启动阶段的性能优化和分析
+	可以通过bootprof文件看启动阶段的时间
+
+	PMS ready到WMS enablescreen停止开机动画阶段的时间为:
+
+
+
+
+
+rtc_spare_reg[0] = {16412, 127, 8}
+u16 hal_rtc_get_spare_register(rtc_spare_enum cmd)
+{
+	u16 tmp_val;
+
+	if (cmd >= 0 && cmd < RTC_SPAR_NUM) {
+		hal_rtc_xinfo("rtc_spare_reg[%d] = {%d, %d, %d}\n", cmd,
+			      rtc_spare_reg[cmd][RTC_REG], rtc_spare_reg[cmd][RTC_MASK],
+			      rtc_spare_reg[cmd][RTC_SHIFT]);
+		tmp_val = rtc_read(rtc_spare_reg[cmd][RTC_REG]);
+		tmp_val = (tmp_val >> rtc_spare_reg[cmd][RTC_SHIFT]) & rtc_spare_reg[cmd][RTC_MASK];
+		return tmp_val;
+	}
+	return 0;
+
 	
 	
 
