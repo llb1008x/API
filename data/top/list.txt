@@ -275,6 +275,10 @@ other：
 	http://blog.csdn.net/batoom/article/details/6259468
 
 
+	Android框架理解之USB 
+	http://blog.csdn.net/u011279649/article/details/15497991
+
+
 
 
 

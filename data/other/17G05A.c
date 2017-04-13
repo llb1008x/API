@@ -214,7 +214,7 @@ meter,table：这两个都是电量计算的相关参数
 
 /*debug*/
 {
-	1.关闭软件关机重启
+1.关闭软件关机重启
 
 	(kpd.c)kpd_pwrkey_pmic_handler  -> kpd_pmic_pwrkey_hal -> 
 
@@ -270,39 +270,39 @@ char g_boot_reason[][16]= {"power_key","usb",
 							"kernel_panic","reboot",
 							"watchdog"};
 
+修改：
+pmic_mt6355.c  
+	PMIC_enable_long_press_reboot函数设置寄存器MT6355_TOP_RST_MISC相应的位为0
+
+hal_kpd.c
+	long_press_reboot_function_init_pmic函数，改变宏定义或者设置寄存器
+
+
+分析：
+最后是pmic这边将pwrkey的软件重启关闭了，但是pwrkey还有一根线连接到了rt5081上，而rt5081的CHG_QONB 
+引脚长按15s会断开同系统侧的供电，所以引起了重启动作
+CHG_QONB low time to enable full system reset 
+
+rt5081这边可以选择路径直接将充电器电给电池还是系统，
+所以最后的解决办法是断开pwrey同rt5081的连接
+
+搜索的关键字主要是boot方面的，而mtk搜索的是[PMIC]just_rst = 0
 
 /*******************************************************************************************************************/
-	2.充电电流太小
-	#1
-	{
-		
-							17G05A(71%)		W909(69%)  		G1605A(70%)
-		关机充电电流:		0.1A~0.3A		0.6A~0.75A			0.75A~0.85A
-		座充充电电流：		0.1A~0.3A		0.6A~0.8A			0.8A~0.9A
-		USB充电电流：		0.1A~0.3A		0.2A~0.3A			0.2A~0.3A
-	
-		USB没有电流是串口地接到了电源地，拔掉串口后有电流，但应该不是这个原因吧
-	
-		没有电池是充电电流小的原因吗？(好吧这个是真实的原因，因为用的假电，所以电量肯定充不进去)
-	}
-	
-	#2
-	{
-		手机功耗大，开机过程能达到1A，息屏200mA~300mA,而USB充电电流太小，最后充的没有耗的多
-	
-	}
-	
-	#3
-	ac_charger_current = <2500000>;
-	ac_charger_input_current = <2800000>;
+2.充电电流太小
+	充电电流太小：标准充电器（1.9A） USB充电（500mA）
 
-	充电头				5V/2A					5V/1A						9V/2A
-						1.8A~1.89A(5.4V)		1.0A~1.1A(5.23V)
+(mtk_chg_type_det.c)  mt_charger_probe	重要的mt_charger初始化
 	
 	
+
+
+
+
+
 
 /****************************************************************************************************************/
-	3.mmi测试
+3.mmi测试
 	mmi测试代码宏
 	{
 		GN_RW_GN_MMI_BACKUP_TO_PRODUCTINFO=yes
