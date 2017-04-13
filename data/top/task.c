@@ -52,12 +52,28 @@ mtk_charger.c
         10.rt5081_plug_in
         rt5081检测到充电器插入所要进行的动作
 
-mt_charger.c
+mtk_charger.c
         11.battery_callback
         对电池状态变化上报给power_supply子系统
 
-        11.rt5081_enable_charging
+        12.rt5081_enable_charging                               0x12
         充电使能，这个充电使能只是简单的对寄存器使用set或者clear，置位或者清空
+
+        13.rt5081_enable_ilim
+        充电电流是否限制
+
+mtk_switch_charging.c
+        14.mtk_switch_charging_run
+        运行充电正常的状态机，这些数据的初始化应该在init内
+
+        15.mtk_switch_chr_cc
+        恒流充电模式
+
+        /* turn on LED */
+	    swchg_turn_on_charging(info);
+
+
+
 
 
 
@@ -72,6 +88,133 @@ RT5081_PMU_REG_CHGCTRL2这个寄存器写1可以将充电线上的电直接提�
 1. TE (0x12, bit[4]) : If this bit is enabled, the power path
 will be turned off, and the buck of the charger will keep
 providing power to the system
+
+设置点电流跟aicr这个变量相关
+{
+    AICR:Average Input Current Regulation (AICR) : 0.1A to
+    3.25A in 50mA steps
+
+    控制的寄存器：0x13
+    Average Input Current Regulation (AICR) levels (0x13,
+    bit[7:2]) and output charge current (ICHG) (0x17, bit[7:2])
+    are all user-programmable.
+
+    通过I2C接口控制
+    The AICR current setting is programmed via the I2C 
+    interface. For example, AICR 100mA Mode limits the input 
+    current to 100mA, and AICR 500mA Mode to 500mA. If 
+    not needed, this function can be disabled. The AICR 
+    current levels are in the range of 100mA to 3250mA with a 
+    resolution of 50mA. 
+
+    这个接口是设置充电电流的
+    _rt5081_set_aicr
+
+
+}
+
+
+
+这几个量应该是设置充电限流相关的
+struct charger_data {
+	int force_charging_current;
+	int thermal_input_current_limit;
+	int thermal_charging_current_limit;
+	int input_current_limit;
+	int charging_current_limit;
+	int disable_charging_count;
+};
+
+
+struct charger_manager {
+	bool init_done;
+	const char *algorithm_name;
+	struct platform_device *pdev;
+	void	*algorithm_data;
+	int usb_state;
+	bool usb_unlimited;     <---这个量应该跟USB限流有关的
+
+	struct charger_device *chg1_dev;
+	struct notifier_block chg1_nb;
+	struct charger_data chg1_data;
+	struct charger_consumer *chg1_consumer;
+
+	struct charger_device *chg2_dev;
+	struct notifier_block chg2_nb;
+	struct charger_data chg2_data;
+
+	CHARGER_TYPE chr_type;
+	bool can_charging;
+
+	int (*do_algorithm)(struct charger_manager *);
+	int (*plug_in)(struct charger_manager *);
+	int (*plug_out)(struct charger_manager *);
+	int (*do_charging)(struct charger_manager *, bool en);
+	int (*do_event)(struct notifier_block *nb, unsigned long event, void *v);
+	int (*change_current_setting)(struct charger_manager *);
+
+	/*notify charger user*/
+	struct srcu_notifier_head evt_nh;
+	/*receive from battery*/
+	struct notifier_block psy_nb;
+
+	/* common info */
+	int battery_temperature;
+
+	/* sw jeita */
+	bool enable_sw_jeita;
+	struct sw_jeita_data sw_jeita;
+
+	/* dynamic_cv */
+	bool enable_dynamic_cv;
+
+	bool cmd_discharging;
+	bool safety_timeout;
+	bool vbusov_stat;
+
+	/* battery warning */
+	unsigned int notify_code;
+	unsigned int notify_test_mode;
+
+	/* battery thermal protection */
+	struct battery_thermal_protection_data thermal;
+
+	/* dtsi custom data */
+	struct charger_custom_data data;
+
+	bool enable_sw_safety_timer;
+	bool enable_pe_plus;
+
+	/* High voltage charging */
+	bool enable_hv_charging;
+
+	/* pe 2.0 */
+	bool enable_pe_2;
+	struct mtk_pe20 pe2;
+
+	/* pe 3.0 */
+	bool enable_pe_3;
+	struct mtk_pe30 pe3;
+	struct charger_device *dc_chg;
+
+	/* thread related */
+	struct hrtimer charger_kthread_timer;
+	struct fgtimer charger_kthread_fgtimer;
+
+	struct wake_lock charger_wakelock;
+	struct mutex charger_lock;
+	spinlock_t slock;
+	unsigned int polling_interval;
+	bool charger_thread_timeout;
+	wait_queue_head_t  wait_que;
+	bool charger_thread_polling;
+};
+
+
+
+
+
+
 
 }
 
