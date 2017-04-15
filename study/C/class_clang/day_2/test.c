@@ -16,6 +16,10 @@ int main()
 
     printf("%o,%x,%#x\n",t1,t2,t3);
 
+    char t='abc';
+    int a='abc';
+    printf("t->%c,%d,a->%c,%d\n",t,t,a,a);
+
     return 0;
 }
 
