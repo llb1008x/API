@@ -14,8 +14,20 @@
 mmi测试：加入充电测试选项
 
 
+
+
+
 充电电流太小：标准充电器（1.9A） USB充电（500mA）
 {
+->2017.4.14
+    {
+         标准充电器（1.6A） USB充电（450mA）
+         修改了：
+         MTK_PUMP_EXPRESS_PLUS_20_SUPPORT = yes
+         mivr = <4400000>;	/* uV 4500000->4400000*/
+    }
+   
+
 
 rt5081_pmu_irq_.c    
     2.rt5081_pmu_irq_handler
@@ -27,7 +39,7 @@ rt5081_pmu_charger.c
     rt5081_pmu_ovpctrl_uvp_evt_irq_handler
 
     3.rt5081_pmu_attachi_irq_handler
-    这个应该是rt5081接受到中断后，就是接口插入的
+    这个应该是rt5081接受到中断后，就是接口插入的动作还有一个rt5081_pmu_detachi_irq_handler是接口把出的动作
 
         4.rt5081_inform_psy_changed
         将检测到的信息上报到power_supply子系统
@@ -89,9 +101,13 @@ RT5081_PMU_REG_CHGCTRL2这个寄存器写1可以将充电线上的电直接提�
 will be turned off, and the buck of the charger will keep
 providing power to the system
 
+
+
 设置点电流跟aicr这个变量相关
-{
-    AICR:Average Input Current Regulation (AICR) : 0.1A to
+{   
+    这几个概念有必要理解一下
+
+->  AICR:Average Input Current Regulation (AICR) : 0.1A to
     3.25A in 50mA steps
 
     控制的寄存器：0x13
@@ -110,6 +126,38 @@ providing power to the system
     这个接口是设置充电电流的
     _rt5081_set_aicr
 
+
+-> aicl:average input current levels
+        When IAICR set to large current and the VBUS drop to VMIVR
+    level, AICL measurement will decrease IAICR level step by step
+    automatically until VBUS voltage is large than AICL threshold
+    voltage
+
+
+
+->mivr: Minimum Input Voltage Regulation 
+    MIVR是通过代码直接设置的，当Vbus电压小于此值就会自动减少充电电流,用来维持充电电压在阈值之上，
+    如果电压低于阈值(UVLO)可能就不能充电了  
+
+    可以通过I2C接口控制，调控范围3.9V~13.4V  
+    控制的寄存器：0x16  
+
+    ->vmir:input MIVR threshold setting，就是上面那个设定的最低的值，低于这个值就触发条件
+    但是 最低不能低于4.5V，因为电池电压充满在4.4V左右，如果设低了，永远充不满
+
+
+->Enable Bits for Charger
+    充电使能控制的三个寄存器：
+    1.CFO_EN
+    2.CHG_EN
+    3.HZ
+
+* (4) Disable MIVR IRQ -> enable direct charge
+ *     Enable MIVR IRQ -> disable direct charge
+
+
+    info->enable_dynamic_cv = true；
+    mtk_get_dynamic_cv
 
 }
 
@@ -238,6 +286,10 @@ struct charger_manager {
 
 
 马达振动
+
+
+关掉OTG功能
+
 
 
 电池曲线的导入    

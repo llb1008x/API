@@ -449,8 +449,8 @@ adb reboot-bootloader
 
 		**编译android原生代码相关的命令(这个要实践，搭建android开发环境，编译原生代码)
 
-
-
+		更改编译项目脚本
+		device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
 
 
 
