@@ -152,12 +152,42 @@ providing power to the system
     2.CHG_EN
     3.HZ
 
-* (4) Disable MIVR IRQ -> enable direct charge
- *     Enable MIVR IRQ -> disable direct charge
+Use MIVR to enable/disable power path
+    Disable MIVR IRQ -> enable direct charge
+    Enable MIVR IRQ -> disable direct charge
 
 
+**************************************************************************************
     info->enable_dynamic_cv = true；
     mtk_get_dynamic_cv
+
+   ？“所以这时候要看MIVR中断是否触发，触发后AICL是否也对应着改变了？”
+    Do AICL in a workqueue after receiving MIVR IRQ
+    rt5081_run_aicl
+
+
+    If PE20/30 is connected, do not run AICL
+    就是说如果是PE20那就不会执行AICL，所以在PE20 connect的代码里肯定有关闭AICL的
+
+
+    Read USB STATUS(0x27) instead of device type(0x22)
+    to check charger type
+    通过读USB的status判断插入的充电器的类型
+
+
+    ？hidden_mode_lock这个锁包含的代码做了哪些事
+    ？rt5081_enable_hidden_mode，这是干什么用的
+    {
+     hidden_mode跟这几个寄存器相关，而这几个寄存器是跟type-c和usb pd有关
+     PD Part Register Detail Description
+
+        #define RT5081_PMU_REG_HIDDENPASCODE1	(0x07)
+        #define RT5081_PMU_REG_HIDDENPASCODE2	(0x08)
+        #define RT5081_PMU_REG_HIDDENPASCODE3	(0x09)
+        #define RT5081_PMU_REG_HIDDENPASCODE4	(0x0A)
+    }
+
+    RT5081_PMU_REG_LG_CONTROL新加的
 
 }
 
@@ -258,6 +288,26 @@ struct charger_manager {
 	bool charger_thread_polling;
 };
 
+默认的值
+/* These default values will be used if there's no property in dts */
+static struct rt5081_pmu_charger_desc rt5081_default_chg_desc = {
+	.ichg = 2000000,		/* uA */
+	.aicr = 500000,			/* uA */
+	.mivr = 4400000,		/* uV */
+	.cv = 4350000,			/* uA */
+	.ieoc = 250000,			/* uA */
+	.safety_timer = 12,		/* hour */
+#ifdef CONFIG_MTK_BIF_SUPPORT
+	.ircmp_resistor = 0,		/* uohm */
+	.ircmp_vclamp = 0,		/* uV */
+#else
+	.ircmp_resistor = 25000,	/* uohm */
+	.ircmp_vclamp = 32000,		/* uV */
+#endif
+	.dc_wdt = 4000000,		/* us */
+	.en_te = true,
+	.en_wdt = true,
+};
 
 
 
