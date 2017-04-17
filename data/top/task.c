@@ -26,6 +26,12 @@ mmi测试：加入充电测试选项
          MTK_PUMP_EXPRESS_PLUS_20_SUPPORT = yes
          mivr = <4400000>;	/* uV 4500000->4400000*/
     }
+
+->2017.4.16
+    {
+        根据MTK最新的RT5081版本做了修改
+        电流还是有问题，比较小
+    }    
    
 
 
@@ -164,6 +170,9 @@ Use MIVR to enable/disable power path
    ？“所以这时候要看MIVR中断是否触发，触发后AICL是否也对应着改变了？”
     Do AICL in a workqueue after receiving MIVR IRQ
     rt5081_run_aicl
+    /* Enable MIVR IRQ ，stop AICL*/
+	ret = rt5081_pmu_reg_clr_bit(chg_data->chip,
+		RT5081_PMU_CHGMASK1, RT5081_MASK_CHG_MIVRM);
 
 
     If PE20/30 is connected, do not run AICL
