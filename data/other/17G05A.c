@@ -292,8 +292,21 @@ rt5081这边可以选择路径直接将充电器电给电池还是系统，
 2.充电电流太小
 	充电电流太小：标准充电器（1.9A） USB充电（500mA）
 
-(mtk_chg_type_det.c)  mt_charger_probe	重要的mt_charger初始化
+_rt5081_set_aicr这个是设置电流的，dts文件中是设置初始化的值，但是关于充电电流的设置它是每次插入充电器的时候检测
+不断提高充电电流step by step,直到达到最大能力，拔除的时候就将aicr这个值清零，所以每次充电电流都会重新检测充电能力
+但是aicr这个值不是很准确，有一定的误差
+
+ rt5081_pmu_charger: _rt5081_set_aicr: 500000mA over TA's cap, can only be 300000mA
+
+if (chg_data->aicr_limit != -1 && uA > chg_data->aicr_limit) {
+	dev_err(chg_data->dev,
+		"%s: %dmA over TA's cap, can only be %dmA\n",
+		__func__, uA, chg_data->aicr_limit);
+	uA = chg_data->aicr_limit;
+}
 	
+mivr这个值最低在4.3~4.4V之间，电池电压在4.3V左右，而电池的充电电流是根据充电器电压和电池电压之间的电压差，决定
+
 	
 
 
