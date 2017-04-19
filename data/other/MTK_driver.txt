@@ -1,0 +1,699 @@
+MTK 平台驱动
+
+一、Display
+1.lcm 相关概念
+1.1) MIPI接口：一共有三种接口：DBI(也做CPU或MCU接口)、DPI(也叫RGB接口)、DSI.
+在使用DSI接口时，目前75/77都只支持到2条data lane，加上一条clock lane.
+使用DPI接口时，根据LCM IC支持的情况，可以选择16bus、18bus传输RGB格式文件，在GPIO部分分为R、G、B分别对应 8个GPIO(GPIO20~46期间)，客户采用DPI接口需要根据选择的bus方式进行配置，推荐RGB端口全部配置为对应的复选模 式，并设置为OUT输出。
+采用DBI接口，有两种模式选择，一种是选择共用DPI的bus脚 +DPI控制线，另一种是共用nand data pin+CPU 控制线。
+
+
+1.2) DSI接口有两种sync 模式：video mode和command mode，其中video mode是BB端一直刷数据到LCM，cmd mode是在有数 据更新时刷数据到LCM GRAM中)
+和DSI command mode相比，video mode 是需要实时传输image data到lcm端，DSI 的refresh rate决定了lcm的refresh rate。
+
+
+1.3)EDS机制：
+92平台LCM driver中定义了esd_check和esd_recovery的接口，但ESD线程不工作。
+目前在MT6589之前平台，video mode的ESD实现有三种模式，分别是：ext TE(外部TE信号检测)、int TE(内部TE信号检 测)、non cout clk
+
+
+不同ESD方式需要注意的方面
+a) int TE和ext TE的检测，都不需要实现lcm_esd_check函数，而需要实现lcm_esd_recover函数。
+   non cont clk则不需要实现lcm_esd_check函数和lcm_esd_recover函数，而只需要在上面 params中配置为TRUE即可
+b) ext TE的实现，需要LCM外接TE pin到BB端，同时在inital code中配置寄存器打开TE信号的输出 (一般是写0x35寄存器，具体需要和LCM IC FAE确认)
+
+
+1.4)HDMI/MHL:
+目前我司HDMI/MHL的相关code和driver都是有集成在codebase中的，要使用的话，只需要只需要在对应的 ProjectConfig.mk文件中开启，并且在dct中配置好对应的引脚定义即可。
+以下以MHL为例：
+ProjectConfig中配置：
+MTK_HDMI_SUPPORT=yes #表明开启HDMI/MHL功能
+CUSTOM_KERNEL_HDMI=Sii8338 #表明配置为MHL的IC型号
+
+
+1.4)TE 信号：
+大部分TE问题是由于没有正常开启TE所导致，首先检查TE是否开启。
+89平台使用内部TE，lcm driver中只需要在init过程中打开LCM TE即可，一般是写0x35寄存器，部分IC需要额外写其他 寄存器，可与FAE确认。
+检查TE是否正常开启，如果是工版，则可使用如下方式打开fps的log,查看TE信息：
+adb shell
+cd sys/kernel/debug
+echo fps:on>mtkfb
+然后查看mtklog, 搜索“FPS”，若看到等待TE时间为0， 表示TE未正常开启，需要与LCM IC的FAE进一步确认开启流程 。
+若TE已经成功开启，依然有Teering现象，可从如下方面思考分析。
+1)是否使用了竖屏横用，导致对GRAM的读写方向不一致，一般会出现斜线切屏现象。
+2)是否clock速度过低，FPS低于LCM自刷新率的1/2？
+3)是否clock速率过快，超过LCM的自刷新率，导致写GRAM时可能从后面赶上读，导致Teering发生。
+
+
+1.5)HS/LP:
+HS:high speed ， clock切为HS模式，高速模式。
+LP:low power，低电平
+有些LCM在开机的时候，如果使用LP下发init code，可能会不准确或者导致花屏等问题，这时候需要使用HS mode发送init code，比如三星的某款OLED（D53D6EA8061V-Amoled）。
+continuous clock/no-continuous clock模式
+
+
+1.6)dithering:
+抖动显示技术：
+MT6572 如所用lcm不支持RGB888 color format, 显示效果差需要开启dithering的。
+
+
+1.7)其他概念：
+AAL:BB端CABC（即AAL），为1种方式控制背光
+continuous clock/Non-continuous clock ： Switch clock lane from HS to LP
+
+
+2.LCM时钟配置
+MT6582 LCM Driver中配置：params->dsi.PLL_CLOCK = 234；
+计算方法：
+
+
+展频开关：
+如果MIPI Clock对RF/WCN产生干扰，并且在尝试寻找相应的频点依然无法解除 EMI，可以尝试做Frequency Hopping；
+82平台默认打开展频开关，不同于72/89平台，将展频的开关以及展频幅度的选择 ，都开放到LCM Driver中，以如下为例：
+params->dsi.ssc_range =4;
+params->dsi.ssc_disable = 0;
+代表：展频打开，ssc_range = 4%
+
+
+3.AAL与CABC背光选择(两种方式控制背光)：
+参考[FAQ05966]
+89平台支持BB端CABC（即AAL）或LCM端CABC方式控制背光，两种方式使用方法如下
+【BB端CABC（即AAL）】
+   - 打开功能，向MTK申请patch，并在ProjectConfig.mk中打开MTK_AAL_SUPPORT = yes
+【LCM端CABC】
+- 对于Video Mode，ALPS.JB2.MP.V1.3(包括1.3)之前的版本，请向MTK申请patch
+   - lcm driver中实现set_backlight接口
+   - cust_leds.c（包括lk与kernel中的两支文件）设置如下
+
+
+4. 调整Display 消耗的BW（bandwidth带宽）方法：
+•LCM driver建议如下：
+–MIPI的clock 尽量低，建议60fps
+–For DSI Video mode，建议不要使用burst mode(比较能吃BW)
+params->dsi.mode = BURST_VDO_MODE;
+–Video mode的时序，blank 区间(如VBP/VFP/HBP/HFP)尽量少(当然也需要满足LCM
+module的spec)
+
+
+5.DSI video mode相关参数配置方法：
+对应配置文件：\alps\mediatek\custom\common\kernel\lcm\xxxx.c中lcm_get_params()函数
+1,data lane每帧回LP11（Low Power state，dp，dn都为高电平）,clk一直HS（ High Speed），对应配置：
+params->dsi.cont_clock=1;
+params->dsi.clk_lp_per_line_enable=0;
+2,data lane每一行回一次LP11，clk lane每一帧回一次LP，对应配置：
+params->dsi.cont_clock=0;
+params->dsi.clk_lp_per_line_enable=0;
+3，data lane和clk lane都是每行回一次LP11，对应配置：
+params->dsi.cont_clock=0;
+params->dsi.clk_lp_per_line_enable=1;
+
+
+
+
+6.LCM CABC 配置
+参考[FAQ12413]
+
+
+7.MHL 卡顿问题
+
+
+8.ESD机制各个平台的差异：
+对于89/72/82等新平台，Display架构做了调整，ESD的实现方式与之前的75/77等平台稍有差异。
+对于之前75/77平台，可以参考FAQ03210及FAQ05163.
+新旧架构下，主要是DSI Video Mode下ESD方式不一样。
+之前的架构下Video Mode的屏采用检测外部TE或者内部TE来做ESD Check，因此需要在lcm driver中配置相应的参数。
+新架构下不支持外部TE或内部TE来做ESD check, lcm_get_params中关于esd的参数不用再配置。
+如lcm_int_te_monitor、lcm_int_te_period、lcm_ext_te_monitor等无需配置。
+[SOLUTION]
+新的Display架构下，DSI Video Mode及DSI Command Mode都采用读寄存器的方式来进行esd check.
+因此都只需要在lcm driver中实现esd_check和esd_recover函数即可。
+对于具体读取哪些寄存器来进行esd check，需要与屏厂确认。
+ESD实现后如果出现每两秒闪屏的问题，可以按如下流程处理：
+1. 首先检查esd check中是否添了过多的log信息或者有delay操作，建议先去掉所有log测试。
+2. 如果依然出现每两秒闪屏，可参考FAQ05680和FAQ05681进行处理。
+
+
+
+
+9.DBI/DPI接口的GPIO的配置情况
+DBI：DBI接口分为串行和并行两种。由lcm_params->ctrl这个参数控制。
+LCM_CTRL_SERIAL_DBI/LCM_CTRL_PARALLEL_DBI
+
+
+1.)如果是serial类型的，是通过MT6572 datasheet里面的0x14012028 DBI_SCNF (DBI Serial Interface Configuration Register)这个寄存器来config串行接口。比如使用LSDI还是LSDA,LSCK上升沿还是下降沿发送数据 ，LSCK在没有数据的时候是LOW/HIGH.
+配置几个GPIO pin：LSCE0B(相当于数据使能信号，低电平有效), LSCK, LSDA/LSDI(传送command时用),DBI[XX:0](传 送data时用)
+CSS,CSH：chip select setup time/chip select hold time
+(这两个时间之内是不会传数据的，Invalid data)
+2.)如果是Parallel类型的,
+配置几个GPIO pin：LPCE0B(相当于CS信号，低电平有效), LPA0（RS信号，MTK平台上面和CS信号是同步的）, LCD CLK，LPWRB/LPRDB(类似数据使能信号)和DBI[XX:0](复用DPI的data pin，传送data和command时用)
+写的时候用LPWRB，读的时候用LPRDB
+有C2WS和C2WH两个变量：chip selection to write setup time和chip selection to write hold time
+同理C2RS和C2RH.
+硬件连接：
+DBI Parallel类型：BB端需要打开LRDB、LWRB、LPA0 pin脚复用功能，并连接到LCM的RD、WR、RS
+DBI serial类型: BB端需要打开LSCE0B、LSCK、LSDA/LSDI pin脚复用功能, 并连接到LCM的CSX, SCL, SDA/DOUT/DIN
+lcm Driver里面变量write wait state time，是处于wait状态的时间。比如大于等于C2WS，参考MT6572 datasheet PAGE1659原理图
+note:89和72的DBI的clock都是不可调整的，都是130Mhz.
+但是如果需要调整DBI的FPS的话，可以调整C2WS/C2WH/WST,分别对应write_setup/write_hold/write_wait
+
+
+DPI:
+使用DPI接口时，根据LCM IC支持的情况，可以选择16bus、18bus传输RGB格式文件，在GPIO部分分为R、G、B分别对应 8个GPIO(GPIO20~46期间)，客户采用DPI接口需要根据选择的bus方式进行配置，推荐RGB端口全部配置为对应的复选模式，并设置为OUT输出。
+同时DPI的接口需要BB端打开DPIHSYNC、DPIVSYNC、DPIDE、DPICK复用功能，并分别连接到对应的LCM控制端
+另注：
+其实DPI和DBI一样，都是可以通过lcm_params->ctrl这个变量来控制是使用Parallel还是serial还是GPIO的类型来下 command。
+但是一般DPI都会选择使用LCM_CTRL_SERIAL_DBI这个类型，因为DPI的屏，DB[17..0]只是会用来做数据传输，控制线是 会通过LSDA/LSDI传输。
+
+
+10.LCM Porting时如何配置Clock
+clock配置方法：
+lcm driver中配置clock有不同的方式，曾经使用过的配置方法有如下几种：
+Type1: 配置倍频与分频参数：dsi.pll_div1(倍频)， dsi.pll_div2(分频)--- (适用于75/77等之前的平台)
+Type2: 配置倍频与分频参数：dsi.pll_fbk_div(倍频)， dsi.pll_div1 & dsi.pll_div2 (分频)---(适用于89/72等前 期版本)
+Type3: 直接配置clock lane频率：dsi.PLL_CLOCK(前期配置成枚举值，后期将直接配置成对应的频率常数值)----(适 用于89/72/82...)
+
+
+
+
+11.如何使用PMIC的LDO方式供给LCM端 1.8/2.8v的电压
+参考[FAQ10038]
+1. 如何在开机阶段使用PMIC的LDO方式供给LCM端1.8/2.8v的电压？
+2. 如何在suspend/resume的时候，断掉/供给LCM端1.8/2.8v的电压？
+
+
+1. )在开机的时候，建议在preloader或者LK阶段就通过PMIC的LDO方式来给LCM端上电，
+比如可以在alps\mediatek\platform\mt6589\preloader\src\drivers\mtk_pmic_6320.c文件里面的 pmic6320_init函数中做上电1.8/2.8v的操作。
+AOSP版本mtk_pmic_6320.c的路径 ：alps/bootable/bootloader/preloader/platform/mt6572/src/drivers/mtk_pmic_6320.c
+下面是在LK阶段的上电/掉电方法：
+使用upmu_common.c文件里面API来分别控制每一个LDO_VGPX.
+比如:
+upmu_set_rg_vgp6_vosel用来控制上电的电压值；
+upmu_set_rg_vgp6_en用来控制enable VGP6这个pin
+
+
+2. )因为在suspend/resume的时候，kernel都是跑起来的，所以上电/掉电 1.8/2.8v的操作都应该放在kernel里面。
+下面是在kernel里面的上电/掉电方法,在kernel里面有统一的上电/掉电的接口函数： 上电接口函数：hwPowerOn 掉电接口函数hwPowerDown
+以下以PMIC6320的VGP6为例。
+请在您要上电的文件#include <mach/mt_pm_ldo.h> 上电请调用 hwPowerOn，掉电请调用hwPowerDown
+hwPowerOn(MT65XX_POWER_LDO_VGP6, VOL_2800, "ldo_test");
+bool hwPowerDown(MT65XX_POWER_LDO_VGP6, "ldo_test");
+
+
+12.如何拉低并保持LCM RESET PIN脚为低 电平
+平台默认RESET PIN脚输出为高平的，如果一定需要拉低，可以配置RESET PIN脚为GPIO模式，再通过GPIO方式拉低。
+使用mediatek/dct目录下的DCT工具，使用其打开custom/XXX/kernel/dct/dct目录下的DWS文件，将GPIO131配置成 0:GPIO131. 
+对GPIO PIN脚的控制有如下一些方法：
+lcm_util.set_gpio_mode(GPIO131, GPIO_MODE_00);
+lcm_util.set_gpio_dir(GPIO131,GPIO_DIR_OUT);
+lcm_util.set_gpio_out(GPIO131,0);
+
+
+13.如何调节MIPI接口驱动能力
+在使用DBI、DPI的MIPI接口时，可以在lcm_get_params函数中设置参数 io_driving_current的值来配置IO的驱动电流（6589上面不支持） 
+DSI的MIPI接口，不支持IO驱动电路的调节 ，其可选值的大小可以在lcm_drv.h看到定义。
+其可选值的大小可以在lcm_drv.h看到定义：
+typedef enum{
+}LCM_DRIVING_CURRENT;
+该值的会在lcd_drv.c文件中写到寄存器中：
+LCD_STATUS LCD_Set_DrivingCurrent();
+
+
+14.如何通过检测外部TE实现esd check的 功能
+在72/82/92的JB/KK版本，我们都是通过读取esd寄存器的方式实现esd check，但是由于esd  check的时候会切换到cmd mode去读，所以屏的玻璃存在最大1帧时间的等待，如果这个vdo 
+mode屏的玻璃延时等待时间较小（小于切换的时间），就会出现闪屏，所以不能使用读esd寄存器 的方式做esd check。 
+如果这个屏有 external TE管脚的话，可以通过检测ext.TE的方式来做esd check，具体原理 为：把原来的esd流程全部关闭，启动一个新的线程，循环检测外部TE中断，如果检测失败，就
+recovery。
+新的esd流程里面需要做三件事：
+1)         物理连接一根外部TE pin，然后在dws文件里面配置一个GPIO口为DSI_TE模式。
+2)         在DSI初始化的时候，注册该ext.TE的irq处理函数，收到中断则设置irq_flag为TRUE。
+3)         启动线程定时去wait flag==1，如果超时，则做esd recovery。
+
+
+15.如何配置DSI时钟频率
+1、)DSI vdo mode下的数据速率data_rate的大致计算公式为： Data rate= (Height+VSA+VBP+VFP)*(Width+HSA+HBP+HFP)* total_bit_per_pixel*frame_per_second/total_lane_num 
+2、)DSI cmd mode下的数据速率data_rate的大致计算公式为： Data rate= width*height*1.2* total_bit_per_pixel*frame_per_second/total_lane_num 
+参数注释：
+data_rate ： 表示的是数据速率
+width，height  ：屏幕分辨率
+VSA VBP VFP ：DSI vdo mode的vertical porch配置参数
+HSA HBP HFP ：DSI vdo mode的horizontal porch配置参数
+total_bit_per_pixel ：表示的是一个pixel需要用几个bit来表示，比如RGB565的话 就是16个bit 
+frame_per_second ：就是我们通常看到的fps，叫做帧率，表示每秒发送多少个帧 ，一般是60帧每秒 
+total_lane_num ：表示的是data lane的对数。
+
+
+3、)DSI采用的是双边采样，则clk等于数据速率的一半，因此： clk=data_rate/2
+有两种配置clk的方式，第一种方式配置四个参数得到，第二种配置方式直接配置频 率，建议采用第二种。 
+第一种方式，通过div分频倍频实现，各个平台略有差异，但是原理基本一致，请参 考porting guide，如下举例89平台: 
+   params->dsi.pll_div1   = ;  //配置范围为0,1,2,3的时候，对应的 div1_real等于1，2，4,4 
+   params->dsi.pll_div2   = ;  //配置范围为0,1,2,3的时候，对应的 div2_real等于1，2，4,4 
+   params->dsi.fbk_div   = ;  //范围 0..63
+   params->dsi.fbk_sel   = ;  //配置范围为0,1,2,3的时候，对应的 fbk_sel_real等于1，2，4,4 
+   输出频率 =26MHz*（fbk_div+1）*(2*fbk_sel_real)/(div1_real*div2_real) 
+第二种方式，直接配置clk大小：
+params->dsi.PLL_CLOCK = LCM_DSI_6589_PLL_CLOCK_234;//这里举例89平台，使用 一个宏，表示配置的clk等于234MHz。但是在89之后的平台，使用直接配置一个频率 
+数字的方式，比如params->dsi.PLL_CLOCK = 234，表示234MHZ）
+4、在lcm porting过程中，这些参数都定义在lcm_drv.h文件中的LCM_DSI_PARAMS结 构体中，随着平台的发展，或许有所不同，但是基本原理都是一致的，如何配置clk的大小，请先根据自己的帧率、像素格式、porch值、屏的分辨率、data lane对数等计算出data_rate，然后计算出clk。
+
+
+16.背光模式设置成 T65XX_LED_MODE_CUST_BLS_PWM，如何修改PWM的工作频率
+前提：cust_leds.c文件里面使用的背光模式是MT65XX_LED_MODE_CUST_BLS_PWM
+MT6582版本工作频率计算公式如下：
+PWM工作频率计算公式：26MHz (clock freq.) / （PWM_CLKDIV+1） / 1024 (period) 26 KHz 
+所以需要修改PWM的工作频率，可以通过修改PWM_CLKDIV，clock freq，或者period的值来达到修 改PWM的工作频率的效果。 
+以下的三种方法可以任选1～2种来达到想要的PWM工作频率：
+1.  修改分频参数方法，修改config_data里面的第二个参数：
+{"lcd-backlight",     MT65XX_LED_MODE_CUST_BLS_PWM, (int)disp_bls_set_backlight,{0, 1, 0, 0, 0}} //设置div=1 
+2. 修改clock freq：
+在alps\mediatek\platform\mt6582\kernel\drivers\dispsys\ddp_bls.c文件的 disp_bls_init和disp_bls_config函数中设置CLK_CFG_1这个寄存器的值，来选择合适的时钟源，加入如下代码： 
+mt65xx_reg_sync_writel(DRV_Reg32(CLK_CFG_1) | (0x00000003), CLK_CFG_1); //设置156 MHz的时钟源 
+
+
+转载请注明出处：http://blog.csdn.net/cbk861110/article/details/40931835
+
+二、Driver - Battery Charging
+1.充电方式
+a.PMIC直接充电：驱动代码位于：
+mediatek\platform\mt6592\kernel\drivers\power\charging_hw_pmic.c
+b.switch charge方式充电（switch charger是功率转换型的芯片）。驱动代码位于：
+mediatek\platform\mt6592\kernel\drivers\power\charging_hw_xxxx.c
+比如：fan5405 对应的文件就是charging_hw_fan5405.c
+            bq24158对应的文件就是charging_hw_bq24158.c
+具体配置位于：
+MTK_FAN5405_SUPPORT=no
+MTK_FASTBOOT_SUPPORT=no
+
+
+2.driver中mdelay() 与msleep()的区别使用：
+在Ｌinux Ｄriver开发中，经常要用到延迟函数：msleep，mdelay／udelay．
+虽然msleep和mdelay都有延迟的作用，但他们是有区别的．
+1.)对于模块本身
+mdelay是忙等待函数，在延迟过程中无法运行其他任务．这个延迟的时间是准确的．是需要等待多少时间就会真正等待多少时间．
+msleep是休眠函数，它不涉及忙等待．你如果是msleep(１０)，那实际上延迟的时间，大部分时候是要多于１０ms的，是个不定的时间值．
+他们的差异，平时我也讲的出来，可是真正用起来的时候，就忘记了．曾在两个driver的i2c的code中，需要用到delay函数，而我用了msleep函数，一直Ｉ２Ｃ速度超慢．而我又不知道哪里出了问题，我潜意识中，认为我只delay了１ms，可是，实际上是十几毫秒．
+2.)对于系统：
+mdelay() 会占用cpu资源，导致其他功能此时也无法使用cpu资源。
+msleep() 则不会占住cpu资源，其他模块此时也可以使用cpu资源。
+delay函数是忙则等待，占用CPU时间；而sleep函数使调用的进程进行休眠。
+3.)udelay() mdelay() ndelay() 区别：
+udelay(); mdelay(); ndelay();实现的原理本质上都是忙等待，ndelay和mdelay都是通过udelay衍生出来的。
+我们使用这些函数的实现往往会碰到编译器的警告implicit declaration of function 'udelay'，这往往是由于头文件的使用不当造成的。
+在include/asm-***/delay.h中定义了udelay（），而在include/linux/delay.h中定义了mdelay和ndelay.
+udelay一般适用于一个比较小的delay，如果你填的数大于2000，系统会认为你这个是一个错误的delay函数，因此如果需要2ms以上的delay需要使用mdelay函数。
+4.)msleep，ssleep区别：
+休眠单位不同
+5.)秒的单位
+ms是毫秒=0.001秒
+us是微秒=0.000001秒
+ns是纳秒=0.000000001秒
+
+
+3.如何配置关机充电（KPOC）中的 长按开机时间
+ file path:alps/mediatek/platform/mt6589/kernel/drivers/power/pmic_mt6320.c
+   modify #define LONG_PWRKEY_PRESS_TIME 2000*1000000
+
+
+4.电池充电报警克制化
+手机充电出现异常的报警主要有：
+1. 充电电压超过正常允许的电压范围
+2. 电池温度超过允许的电池温度
+3. 长时间的超过1A的大电流充电
+4. 电池电压超过允许的电池电压范围
+5. 总的充电时间超过24hr.
+配置文件：alps\mediatek\custom\{project}\kernel\battery\battery\cust_battery.h
+与上述5个报警相对应的宏：
+#define BATTERY_NOTIFY_CASE_0001
+#define BATTERY_NOTIFY_CASE_0002
+#define BATTERY_NOTIFY_CASE_0003
+#define BATTERY_NOTIFY_CASE_0004
+#define BATTERY_NOTIFY_CASE_0005
+
+
+5.如何读取及设置PMIC registers
+1)进入工程模式，读取和设置
+拨号界面 ----------输入*#*# 3646633#*#* 进入工程模式 power ------ pmu ------ pmu register
+或则 hardware testing ----- power ------ pmu ------ pmu register ，所有读写都是16进制
+2)程序运行时，如何通过ADB cmd 获取及设置pmic registers？
+adb shell cd /sys/devices/platform/mt-pmic
+
+
+6.关于功耗问题：
+1)第三方apk引起的，先予以排除；
+2)wake up by RTC：kernel_log中查找wake up by RTC，分析唤醒源；
+3)wake up by CCIF_MD：
+4)wake up by EINT
+7.高温高压后如何恢复充电
+参考[FAQ10404]
+在充电的过程中，如果出现高温或者高压的情况下， 系统会停止充电， 当温度或者充电器的电压值恢复正常后，如何恢复充电。
+
+转载请注明出处：http://blog.csdn.Net/cbk861110/article/details/40931835
+
+
+三、Driver input system
+1.如何添加新的kernel模块：
+参考 [FAQ08517]
+(1)create new folder
+alps\mediatek\custom\common\kernel\newdevice\device_a
+-->notice need create 2 folder: newdevice\device_a
+(2) copy your code in device_a（code can not include makefile file）
+(3) Add CUSTOM_KERNEL_NEWDEVICE=device_a to projectconfig.mk
+(4) compiling kernel
+
+
+2.时钟周期和时钟频率的换算问题
+F代表频率,单位是Hz; T代表周期，单位是s
+频率等于一除以周期, 写成公式就是： F (Hz) = 1 / T (s) ,
+所以倒过来就有周期等于一除以频率，写成公式就是：T = 1 / F
+120MHZ = 120x10^6HZ
+所以 T = 1/(120x10^6) = 8.3 x 10^(-9) s = 8.3ns
+
+
+执行时间/时钟周期 = 周期数
+执行时间*时钟频率 = 周期数
+时钟周期 = 1/时钟频率
+举例说明：
+dws中的Keypress_Perio是消抖周期，基准时钟是32K。如果是1024个周期，则消抖时间是32ms；
+即：消抖时间 =(1/32000)*1024 s =0.032s =32ms
+
+
+3.触摸屏的供电配置
+VDD VGP 供电区别
+
+
+4.TP上实现虚拟按键功能：
+参考[FAQ02518]
+添加tp的virtual key，需在tp对应的头文件中添加如下设置：
+1.定义宏TPD_HAVE_BUTTON；
+2.定义TPD_BUTTON_HEIGHT，TPD_KEY_COUNT，TPD_KEYS和TPD_KEYS_DIM，分别用于定义button被识 别的纵向坐标，button的个数，对应的功能键，和每个功能键的坐标。
+配置示例：
+#define TPD_HAVE_BUTTON
+#define TPD_BUTTON_HEIGHT 480 //这个不小于LCD的分辨率的height
+#define TPD_KEY_COUNT 4
+#define TPD_KEYS {KEY_MENU, KEY_HOME, KEY_BACK, KEY_SEARCH}
+#define TPD_KEYS_DIM {{40,500,40,60},{120,500,40,60},{200,500,40,60},{280,500,40,60}}
+其中，{40,500,40,60}对应了KEY_MENU的坐标, (40,50)是该key center的坐标，40是该键的宽度 ，60是该键的高度
+3.button定义初始化成功后，通过adb shell，可以在/sys/board_properties/virtualkeys.mtk- tpd中看到这些button的定义
+
+
+5.TP虚拟按键背光灯时间控制：
+adjust powermanagerservice.java define LONG_KEYLIGHT_DELAY value
+
+
+6.I2C传输数据速率设定方式：
+在进行i2c 传输前设置，i2c_client->timing = timing_number;
+备注：
+1.当设备不支持快速mode timing_number <= 100;
+2.当设备支持快速mode timing_number <= 400;
+
+
+转载请注明出处：http://blog.csdn.net/cbk861110/article/details/40931835
+
+四、Driver - Misc
+1.关于MTK平台支持的耳机:
+一般手机（包括Nokia、三星等）是：L、R、MIC、GND。
+小米、iPhone、HTC等是：L、R、GND、MIC。
+MTK 平台目前支持第一种：L、R、MIC、GND。 （对于一般3线制耳机MTK也支持）。
+
+
+2.DCT配置GPIO的设置/初 始化：
+1)当配置GPIO时，有的有勾选M0~M7中的两个，甚至有的还需要勾选勾选多个？最后GPIO配置成了 哪个功能呢？ 
+     (1) GPIO在系统初始化后的mode是由Def.Mode这一栏决定的。 
+     (2) 如果勾选了M0-M7中的某些项，则会生成类似  #define GPIO_UART_UTXD4_PIN_M_GPIO GPIO_MODE_00 
+           这样的宏定义，在code中可以直接使用。
+     (3) 但是系统初始化后的mode还是以Def.Mode这一栏的选择为准。
+2)当配置成NC的gpio实际开机后是个什么状态？
+     通常是Mode 0，GPIO Mode，输入模式，使能内部下拉。
+3) 修改了DCT中的GPIO Setting后，怎样编译？ 
+  ./mk [Project_Name] new preloader
+  ./mk [Project_Name] new uboot/lk
+  ./mk [Project_Name] new kernel
+  ./mk [Project_Name] bootimage
+4)MT6589的dct配置的参数是在代码的哪个地方生效？ 
+      LK中生效， 具体位置如下：mediatek/platform/mt6589/lk/mt_gpio_init.c 函数为void platform_early_init(void)-->    mt_gpio_set_default();
+
+
+3. 读取和修改GPIO配置参数的 ADB命令
+
+
+4.耳机检测
+82以及之后的平台，请一定要用EINT+ACCDET方式进行耳机检测。
+
+
+5.Headset accdet常用宏：
+在accdet.c和accdet_custome.h为了实现一些功能有用到很多宏开关,把目前相应的宏开关介绍如下 : 
+1: ACCDET_EINT
+   是否启用了外部中断来侦测是否有耳机插入和拔出
+2: ACCDET_MULTI_KEY_FEATURE
+   是否支持使用A/D来侦测key,这里要注意的是即使耳机只有一个key若是在89的平台也需打开此宏 开关 
+3: ACCDET_LOW_POWER
+当插入三段耳机6s后自动关闭micbias,达到省电的目的
+以上三个宏可以看成一个宏
+4: ACCDET_28v_MODE
+  在我们内部有一个switch是针对外部耳机是用2.8还是1.9V的切换开关，美标的是2.8V, 国标的是 1.9V 
+5: ACCDET_PIN_RECOGNIZATION
+  美标的插孔识别国标的耳机,国标的耳机识别美标的插孔,目前这个功能还没有实现,此宏不能打开
+6:  ACCDET_SHORT_PLUGOUT_DEBOUNCE
+    ACCDET_SHORT_PLUGOUT_DEBOUNCE_CN   25
+   拔出耳机后有时候图标会再弹出后在消失, 主要解决类似bug
+7: ACCDET_PIN_SWAP
+美标的插孔识别国标的耳机，这个时候需要借助accdet的一个上拉电阻，当有这种情形的时候AB一 直为0,达到检测到的目的，当然也有误判的时候, 4段耳机按住按键插入后会有误判
+
+
+6.如何配置PMIC 上的RST_KEY
+alps/mediatek/custom/$PRJ/kernel/kpd/kpd/mtk_kpd.h
+配成 vol- :
+#define KPD_PMIC_RSTKEY_MAP KEY_VOLUMEDOWN
+配成 home key:
+#define KPD_PMIC_RSTKEY_MAP KEY_HOME
+
+
+7.怎样添加一个自定义的LED灯
+1. 修改如下两个文件：
+alps/mediatek/custom/common/kernel/leds/inc/cust_leds.h
+enum mt65xx_led_type 
+{
+MT65XX_LED_TYPE_RED = 0,
+... ...
+MT65XX_LED_TYPE_LCD,
+MT65XX_LED_TYPE_ABC, // Add a new LED type
+MT65XX_LED_TYPE_TOTAL,
+};
+alps/mediatek/custom/YOUR_PRJ/kernel/leds/mt65xx/cust_leds.c
+static struct cust_mt65xx_led cust_led_list[MT65XX_LED_TYPE_TOTAL] = { 
+{"red",               MT65XX_LED_MODE_NONE, -1,{0}},
+{"lcd-backlight",     MT65XX_LED_MODE_CUST, (int)Cust_SetBacklight,{0}},
+// Set LED params, Please refer to <Driver all in One>
+{"abc-backlight", MT65XX_LED_MODE_CUST, (int)Cust_SetBacklight_abc,{0}},
+};
+
+
+8.BB端PWM FIFO mode配置参数说 明
+
+
+9.如何配置UART1/UART4为Log输 出端口? 
+mediatek\source\external\mhal\src\custom\common\preloader\inc\cust_bldr.h
+#define CFG_LOG_BAUDRATE 921600
+#define CFG_UART_LOG (UART1)
+可以修改如下宏定义切换log输出口：
+mediatek/custom/project_name/preloader/inc/cust_bldr.h：  CFG_UART_LOG  定义为 1 or 4
+
+
+如何修改UART输出数据的波特率
+有以下3个地方分别控制不同的部分的波特率
+1.  设置  preloader  波特率，这里不会设置到uboot和kernel
+文件为mediatek/custom/proj/preloader/inc/cus_bldr.h
+#define CFG_LOG_BAUDRATE (115200)
+2.   修改uboot 波特率
+mediatek/custom/proj/uboot/inc/configs/ubconfigs.h
+#define CFG_LOG_BAUDRATE (115200)
+3.  修改kernel 波特率
+mediatek/config/mt6575/autoconfig/kconfig/platform
+CONFIG_CMDLINE="console=ttyMt3, 115200"
+
+
+10.如何通过adb shell命令 调试Vibrator
+下面的命令是用于调试，请试着用它找出你想要的时间和震动强度。 1000毫秒 = 1秒
+adb shell "echo 1000 > /sys/devices/virtual/timed_output/vibrator/enable"
+
+
+
+
+11.ACCDET模块耳机检测的原理
+ACCDET内部有两个比较器，会根据传入的电压判断并产生中断。ACCDET的输入电压即耳机 MIC PIN
+的电压，内部比较器的输出分别对应A/B两个寄存器。
+ACCDET内部两个比较器的Vref分别是1.77V和0.4V(硬件决定的，不能修改)，所以，对应的电压有 3个范围: 
+1.77V-1.9V: 未插入耳机的状态(AB=B11)
+0.4V-1.77V: 插入4段式(有Mic)耳机时的状态(AB = B01)
+0-0.4V : 插入3段式耳机时的状态,或者4段式按键按下时的状态(AB = B00)
+耳机的状态会保存到ACCDET的寄存器中,当电压在任意2个范围间切换时,状态发生变化,ACCDET产生
+中断,中断处理中读取状态寄存器的值,并根据状态的变化做相应的处理.
+
+
+12.如何调整不同sensor驱动的 加载顺序
+在mt6575_devs.c /mt6577_devs.c 文件内  mt6577_board_init函数，修改不同设备的 注册顺序。 
+如
+platform_device_register(&sensor_alsps);
+platform_device_register(&sensor_gsensor);
+调整上述的注册顺序，即可调整驱动中probe的加载顺序。
+
+
+13.SIM1和SIM2两个卡槽交换：
+修改modem的相关代码, 请做如下修改, 即可交换SIM1 SIM2 Modem:
+icc_switchControl_al.c(MOLY\driver\storage\sim\src)
+kal_bool sim_physicalSlotChanged = KAL_TRUE;
+
+
+转载请注明出处：http://blog.csdn.net/cbk861110/article/details/40931835
+
+五、FM
+1，FM支持哪些音频方式
+Line in模拟方式和I2S数字方式。
+硬件工程师要确定原理图上选择的是哪种方式，然后进行如下配置。
+l  Line in
+MTK_FM_RX_AUDIO=FM_ANALOG_INPUT
+MTK_FM_TX_AUDIO=FM_ANALOG_OUTPUT
+l  I2S
+MTK_FM_RX_AUDIO=FM_DIGTAL_INPUT
+MTK_FM_TX_AUDIO=FM_DIGTAL_OUTPUT
+使用dws配置I2S管脚，可以参考FAQ03803中的配置进行。
+
+
+2.fm如何打开支持50K的feature
+修改alps/mediatek/config/[Project]/ProjectConfig.mk文件中的MTK_FM_50KHZ_SUPPORT变量。
+设置MTK_FM_50KHZ_SUPPORT=yespatch
+
+
+3.如何修改6620/6626/6628的FM RSSI门限
+RSSI: Receive Signal Strength Indicator 接收信号强度指示
+Rx: Recieived power 接收功率
+两者意思一样，具体指（前向或者反向）接收机接收到信道带宽上的宽带接收功率。实际上中，前向链路接收机（指手机）接收到的通常用Rx表示，反向链路接收机（指基站侧）通常用反向RSSI表示。
+
+
+4.如何关闭RDS
+由于没有宏用来切换RDS的开启与关闭，直接修改上层APK上的接口isRDSSupported即可。
+RDS是数字广播系统,主要在欧洲运用很广泛.它的主要作用是这样的:它有一个优先权的设定特点.你可以设定你喜欢的电台频道,如体育,新闻或军事等,当你的机子收到你所设定的频道信号时,机子正在工作的内容会中止,转而播出这方面的信息.它是数字可字母显示的,没有声音.还有一种功能就是警告中断,当路面有事故发生(如堵车等),电台会播送信号,机子收到就会显示出来,你就可以走别的路了.一般在欧洲的车载电子设备中要求要有这个RDS功能.
+
+
+5.FM调试文档
+alps\mediatek\config\$Project\ProjectConfig.mk
+alps\mediatek\config\$Project \autoconfig\kconfig\project
+这两支文件中和fm相关的变量设置，例如MTK_FM_SUPPORT、MTK_FM_CHIP、
+CONFIG_MTK_FM（这个变量十分重要，决定FM模块是否编译）。
+1.1          JNI层编译
+编译命令：mk $project mm mediatek\external\fmradio\
+1.1.1     alps\mediatek\external\fmradio\Android.mk负责产生linux文件系统中
+/system/etc/firmware下的fm的bin文件，目前只针对6628。
+1.1.2     alps\mediatek\external\fmradio\fmr\Android.mk负责产生libfmjni.so和libfmar1000.so、
+libfmmt6616.so、libfmmt6620.so、libfmmt6626.so、libfmmt6626.so、libfmmt6628.so。
+1.1.3     alps\mediatek\external\fmradio\custom\Android.mk负责产生libfmcust.so。
+1.2          Kernel层编译
+编译命令：
+l  MT6620         mk $project n k mediatek\kernel\drivers\combo\drv_fm
+l  MT6628/6626 mk $project n k mediatek\kernel\drivers\fmradio
+1.2.1     MT6620
+1.2.1.1    alps\mediatek\kernel\drivers\combo\Makefile
+1.2.1.2    alps\mediatek\kernel\drivers\combo\drv_fm\Makefile
+1.2.1.3    alps\mediatek\kernel\drivers\combo\drv_fm\public\Makefile
+1.2.1.4    alps\mediatek\kernel\drivers\combo\drv_fm\private\Makefile
+1.2.2     MT6626+MT6628
+1.2.2.1    alps\mediatek\kernel\drivers\fmradio\Makefile
+1.2.2.2    alps\mediatek\kernel\drivers\fmradio\private\Makefile
+FM加载驱动ko文件导致的问题
+        正常模式：alps\mediatek\config\$project \ init.project.rc
+Meta模式：alps\mediatek\config\$project \meta_init.project.rc
+工厂模式：alps\mediatek\custom\$project \factory\init.rc
+主要是在相关的init文件中加载FM的文件和编译FM driver产生的ko是否一致。
+
+
+六、Camera
+1.MT6575上mclk设为 26Mhz时，占空比不是50%
+MT6575上26Mhz mclk设置后占空比不是50%, 量到为61.7%.
+
+
+2.Camera上电开 power(DVDD, AVDD, IOVDD)之间间隔时间太长
+
+
+3.如何配置 lens
+首先需要向sensor的vendor了解，使用的sensor是否内嵌lens的driver IC
+如OV5640和MT9P017就是内嵌lens driver ic的。内嵌lens driver ic，即直接操作sensor的寄存器去推lens。
+若sensor没有内嵌lens的driver IC，则需要向模组厂了解，模组是否外挂了lens的driver IC，driver IC的型号是什么。我们codebase里的FM50AF下的代码，对应了AD5820的driver ic。如果您的模组包的也是这颗lens driver IC，则直接配置为fm50af即可；如果是其他型号的driver IC，您也可以尝试使用AD5820的驱动（注意把device address改过来）
+有些sensor自带AF算法。如ov3640是一颗含AF core的sensor，即它自己能够做AF算法。因为YUV+AF要求sensor本身是能自己做AF算法的，所以不是每颗YUV sensor都是支持自动对焦的。如果您使用的sensor含有AF CORE，且您希望使用sensor自己的AF算法来对焦，即可配置为sensordrive，但需要您参照文档
+ALPS_YUV+AF_customization_and_application_note（请在DMS上搜这篇文档看）对sensor driver做针对AF功能的修改。
+
+
+4.使用 FM50AF 之外的 Lens Driver的修改
+由于root process & global writeable file已经在非PRC（中华人民共和国）地区被强制要求，因此ALPS.ICS2.MP 版本及之后版本对root权限方面做了要求，这个要求对于Camera的影响就是，如果使用 FM50AF 之外的lens driver，需要在 init.rc 文件中增加对新Lens driver权限和用户方面的修改 
+例如增加了 XXXAF 这个lens driver 需要修改文件 mediatek\config\mt65XX\init.rc 
+添加下面二行
+chmod 0660 /dev/XXXAF
+chown system camera /dev/XXXAF
+添加后如下
+#Camera
+chmod 0666 /dev/camera-sysram
+chmod 0666 /dev/camera-isp
+chmod 0660 /dev/camera-eis
+chmod 0660 /dev/camera-fdvt
+chmod 0666 /dev/camera-resmgr
+chmod 0660 /dev/kd_camera_hw
+chmod 0660 /dev/kd_camera_flashlight
+chmod 0660 /dev/FM50AF
+chmod 0660 /dev/XXXAF
+chown system camera /dev/camera-sysram
+chown system camera /dev/camera-isp
+chown system camera /dev/camera-eis
+chown system camera /dev/camera-fdvt
+chown system camera /dev/camera-resmgr
+chown system camera /dev/kd_camera_hw
+chown system camera /dev/kd_camera_flashlight
+chown system camera /dev/FM50AF
+chown system camera /dev/XXXAF
+
+
+5.如何修改I2C speed
+Mediatek\custom\common\kernel\imgsensor\src\kd_sensorlist.c
+iWriteReg()中最前面加上g_pstI2Cclient->timing，表示设置I2C的速度
+如果不设置，为默认值100K ，
+比如想将I2C的speed设置为400K，可将g_pstI2Cclient->timing设置为400K
+
+
+6.如何打开或者关闭闪光 灯
+打开/关闭闪光灯可以通过如下配置（两种方法） ：
+1.    在alps/mediatek/config/pjt/ProjectConfig.mk 文件中，按照如下配置
+CUSTOM_HAL_FLASHLIGHT = constant_flashlight #dummy_flashlight
+CUSTOM_KERNEL_FLASHLIGHT = constant_flashlight   #dummy_flashlight
+
+
+2.    在feature table中把flash相关的feature 打开/关闭
+RAW sensor 涉及的文件
+1）    alps\mediatek\custom\project name\hal\camera\camera 目录下cfg_ftbl_custom_raw_main.h
+2）    alps\mediatek\custom\common\hal\camera\camera 目录下cfg_ftbl_custom_raw_main.h
+3）    alps\mediatek\source\external\mhal\src\core\drv\6575\isp目录下cfg_ftbl_raw_sceneindep.h
+YUV sensor 涉及的文件
+1）    alps\mediatek\custom\project name\hal\camera\camera 目录下cfg_ftbl_custom_yuv_main.h
+2）    alps\mediatek\custom\common\hal\camera\camera 目录下cfg_ftbl_custom_yuv_main.h
+3）    alps\mediatek\custom\common\hal\imgsensor\xxx_yuv目录下cfg_ftbl_xxx_yuv.h
+规则：优先级，1) > 2) > 3)，即如果project name下相应的的文件，则只需要在相应的文件中打开flash相关的 feature，如果没有，则在2）中的文件打开/关闭：
+#if 1//0
+   //  Flash Light
+   CONFIG_FEATURE(FID_AE_STROBE,
+       BY_DEFAULT(FLASHLIGHT_FORCE_OFF),
+       FLASHLIGHT_AUTO, FLASHLIGHT_FORCE_ON, FLASHLIGHT_FORCE_OFF
+   )
+#endif
+
+
+7.如何控制mclk的开关
+由于mclk在sensor上电之前就已经开了，如果不满足sensor spec中上电时序要求，可在开sensor power之前将mclk先 关闭，然后再需要时再打开，如何控制mclk的开关呢？ 
+
+
+可调用void mt_isp_mclk_ctrl(int en) API去控制, (mediate\platform\mt6575\kernel\core\mt6575_isp.c)
+
+
+8.如何调整闪光灯在 auto模式下的打闪阈值
+参考[FAQ03033]
+修改camera_ae_plinetable_xxx_mt657X.h文件注释为u4StrobeTrigerBV的值，例如下面代码
+static strAETable g_AE_CaptureTable =（
+20,    //u4StrobeTrigerBV
+）；
+
+这一行， 这个值越大越容易打闪，越小越不容易打闪。

@@ -57,7 +57,14 @@ mmi测试：加入充电测试选项
 
 按键，按键功能正常，先熟悉一下大致的工作流程
 {
-    keypad interface
+    
+->1 按键属于input子系统，先熟悉一下input子系统
+
+    mtk键盘的名字mtk_kpd  
+    相关定义的dtsi文件cust_kpd_8167.dtsi
+    aw9523b这是键盘使用的芯片
+
+
 
 
 }
