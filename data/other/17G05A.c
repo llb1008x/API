@@ -5,6 +5,100 @@
 
 /*重要的概念*/
 {
+		这几个概念有必要理解一下
+	{   
+		
+
+	->  AICR:Average Input Current Regulation (AICR) : 0.1A to
+		3.25A in 50mA steps
+		充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由5081来做；
+	  但是只是在插入充电器的时候去做检测，直到拔出充电器再次插入才会再一次检测，同一个充电器不会多次检测输出能力，
+	  因为同一个充电器此值肯定是相同的，没必要再检测
+
+		控制的寄存器：0x13
+		Average Input Current Regulation (AICR) levels (0x13,
+		bit[7:2]) and output charge current (ICHG) (0x17, bit[7:2])
+		are all user-programmable.
+
+		通过I2C接口控制
+		The AICR current setting is programmed via the I2C 
+		interface. For example, AICR 100mA Mode limits the input 
+		current to 100mA, and AICR 500mA Mode to 500mA. If 
+		not needed, this function can be disabled. The AICR 
+		current levels are in the range of 100mA to 3250mA with a 
+		resolution of 50mA. 
+
+		这个接口是设置充电电流的
+		_rt5081_set_aicr
+
+
+	-> aicl:average input current levels
+			When IAICR set to large current and the VBUS drop to VMIVR
+		level, AICL measurement will decrease IAICR level step by step
+		automatically until VBUS voltage is large than AICL threshold
+		voltage
+
+
+
+	->mivr: Minimum Input Voltage Regulation 
+		MIVR是通过代码直接设置的，当Vbus电压小于此值就会自动减少充电电流,用来维持充电电压在阈值之上，
+		如果电压低于阈值(UVLO)可能就不能充电了  
+
+		可以通过I2C接口控制，调控范围3.9V~13.4V  
+		控制的寄存器：0x16  
+
+		->vmir:input MIVR threshold setting，就是上面那个设定的最低的值，低于这个值就触发条件
+		但是 最低不能低于4.5V，因为电池电压充满在4.4V左右，如果设低了，永远充不满
+
+
+	Use MIVR to enable/disable power path
+		Disable MIVR IRQ -> enable direct charge
+		Enable MIVR IRQ -> disable direct charge
+
+
+
+
+	**************************************************************************************
+		info->enable_dynamic_cv = true；
+		mtk_get_dynamic_cv
+
+	？“所以这时候要看MIVR中断是否触发，触发后AICL是否也对应着改变了？”
+		Do AICL in a workqueue after receiving MIVR IRQ
+		rt5081_run_aicl
+		/* Enable MIVR IRQ ，stop AICL*/
+		ret = rt5081_pmu_reg_clr_bit(chg_data->chip,
+			RT5081_PMU_CHGMASK1, RT5081_MASK_CHG_MIVRM);
+
+
+		If PE20/30 is connected, do not run AICL
+		就是说如果是PE20那就不会执行AICL，所以在PE20 connect的代码里肯定有关闭AICL的
+
+
+		Read USB STATUS(0x27) instead of device type(0x22)
+		to check charger type
+		通过读USB的status判断插入的充电器的类型
+
+
+		？hidden_mode_lock这个锁包含的代码做了哪些事
+		？rt5081_enable_hidden_mode，这是干什么用的
+		{
+		hidden_mode跟这几个寄存器相关，而这几个寄存器是跟type-c和usb pd有关
+		PD Part Register Detail Description
+
+			#define RT5081_PMU_REG_HIDDENPASCODE1	(0x07)
+			#define RT5081_PMU_REG_HIDDENPASCODE2	(0x08)
+			#define RT5081_PMU_REG_HIDDENPASCODE3	(0x09)
+			#define RT5081_PMU_REG_HIDDENPASCODE4	(0x0A)
+		}
+
+		RT5081_PMU_REG_CHGCTRL2这个寄存器写1可以将充电线上的电直接提供给系统不给电池
+		1. TE (0x12, bit[4]) : If this bit is enabled, the power path
+		will be turned off, and the buck of the charger will keep
+		providing power to the system
+
+	}
+
+
 	充电器类型检测
 	{
 		RT5081定义的充电器检测类型
@@ -54,20 +148,17 @@
 			BR_2SEC_REBOOT,	   //长按power键关机两秒内松手
 			BR_UNKNOWN
 		};
-
-
 	}
 
-
-	AICR，MIVR
-	{
-		AICR:input current limit,充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由5081来做；
-	  但是只是在插入充电器的时候去做检测，直到拔出充电器再次插入才会再一次检测，同一个充电器不会多次检测输出能力，因为同一个充电器此值肯定是相同的，没必要再检测
-	  MIVR就是根据充电器的供电能力，设置最低的充电电压，如果电压小于这个值就降电流不降电压
-
-	}
-
-
+	这几个量应该是设置充电限流相关的
+	struct charger_data {
+		int force_charging_current;
+		int thermal_input_current_limit;
+		int thermal_charging_current_limit;
+		int input_current_limit;
+		int charging_current_limit;
+		int disable_charging_count;
+	};
 
 	相关的宏和gpio
 	{
@@ -89,7 +180,6 @@
 		TYPEC_HEADSET_CTRL_EN	86(EINT)
 		
 		switching_charger	I2C_CHANNEL_1		0X6A
-
 	}
 
 
@@ -128,7 +218,7 @@
 		} BATTERY_METER_CTRL_CMD;
 
 
-		rt5081提供的函数指针
+		rt5081_pmu_charger.c  rt5081_chg_ops  rt5081提供的函数接口
 		static struct charger_ops rt5081_chg_ops = {
 			/* Normal charging */
 			.plug_out = rt5081_plug_out,
@@ -199,16 +289,32 @@
 	
 	都是基于battery thermal protection进行的检测--->kpoc_power_off_check应该是关机充电的检测
 
-
-
 rt5081.dtsi参数在rt5081_pmu*的of_device_id里面获取的
 meter,table：这两个都是电量计算的相关参数
+
+
+充电器插入：
+	（rt5081_pmu_charger.c）rt5081_pmu_ovpctrl_uvp_d_evt_irq_handler 这段走的是非type-c接口 -> rt5081_pmu_attachi_irq_handler
+    
+	这个应该是rt5081接受到中断后，就是接口插入的动作还有一个rt5081_pmu_detachi_irq_handler是接口把出的动作 -> rt5081_inform_psy_changed
+    
+	将检测到的信息上报到power_supply子系统 -> (mtk_charger.c)mtk_charger_int_handler, mt_charger对应的中断回调函数 -> _wake_up_charger
+    
+	唤醒mt_charger -> rt5081_enable_chgdet_flow 进行USB充电使能的检测 -> rt5081_set_usbsw_state 设置USB的状态
+
+    mtk_is_charger_on->mtk_is_charger_in-> (rt5081_pmu_charger.c) rt5081_plug_in rt5081检测到充电器插入所要进行的动作
+
+	(mtk_charger.c) battery_callback 对电池状态变化上报给power_supply子系统 -> rt5081_enable_charging (0x12) 充电使能，
+	
+	这个充电使能只是简单的对寄存器使用set或者clear，置位或者清空 -> rt5081_enable_ilim 充电电流是否限制 -> (mtk_switch_charging.c)
+
+    mtk_switch_charging_run运行充电正常的状态机，这些数据的初始化应该在init内 -> mtk_switch_chr_cc恒流充电模式
+
+    ->swchg_turn_on_charging(info)充电使能
+
 }
 
 	
-
-
-
 
 
 
@@ -291,12 +397,15 @@ rt5081这边可以选择路径直接将充电器电给电池还是系统，
 /*******************************************************************************************************************/
 2.充电电流太小
 	充电电流太小：标准充电器（1.9A） USB充电（500mA）
+	实际只有 标充1.6A~1.8A ，USB充电400mA~460mA
 
 _rt5081_set_aicr这个是设置电流的，dts文件中是设置初始化的值，但是关于充电电流的设置它是每次插入充电器的时候检测
 不断提高充电电流step by step,直到达到最大能力，拔除的时候就将aicr这个值清零，所以每次充电电流都会重新检测充电能力
-但是aicr这个值不是很准确，有一定的误差
+但是aicr这个值不是很准确，有一定的误差，并把最大值赋值给aicr_limit，
+chg_data->aicr_limit = aicr;
+dev_info(chg_data->dev, "%s: OK, aicr upper bound = %dmA\n", __func__,aicr / 1000);
 
- rt5081_pmu_charger: _rt5081_set_aicr: 500000mA over TA's cap, can only be 300000mA
+rt5081_pmu_charger: _rt5081_set_aicr: 500000mA over TA s cap, can only be 300000mA
 
 if (chg_data->aicr_limit != -1 && uA > chg_data->aicr_limit) {
 	dev_err(chg_data->dev,
@@ -305,11 +414,108 @@ if (chg_data->aicr_limit != -1 && uA > chg_data->aicr_limit) {
 	uA = chg_data->aicr_limit;
 }
 	
-mivr这个值最低在4.3~4.4V之间，电池电压在4.3V左右，而电池的充电电流是根据充电器电压和电池电压之间的电压差，决定
+mivr这个值最低在4.3~4.4V之间，电池电压在4.3V左右，而电池的充电电流是根据充电器电压和电池电压之间的电压差决定的，
+MIVR是根据充电器的供电能力，设置最低的充电电压，如果电压小于这个值就降电流不降电压，保持充电电压的稳定，而mivr<4.3V
+的话电池永远充不满
 
-	
+
+这个是每次有充电器插入的时候都会调用的工作函数，这个函数很关键
+static int rt5081_run_aicl(struct rt5081_pmu_charger_data *chg_data)
+{
+	int ret = 0;
+	u32 mivr = 0, aicl_vth = 0, aicr = 0;
+
+	dev_info(chg_data->dev, "%s\n", __func__);
+
+	ret = rt5081_get_mivr(chg_data, &mivr);
+	if (ret < 0)
+		goto out;
+
+	/* Check if there's a suitable AICL_VTH */
+	aicl_vth = mivr + 200000;
+	if (aicl_vth > RT5081_AICL_VTH_MAX) {
+		dev_info(chg_data->dev, "%s: no suitable VTH, vth = %d\n",
+			__func__, aicl_vth);
+		ret = -EINVAL;
+		goto out;
+	}
+
+	ret = rt5081_set_aicl_vth(chg_data, aicl_vth);
+	if (ret < 0)
+		goto out;
+
+	/* Clear AICL measurement IRQ */
+	rt5081_chg_irq_clr_flag(chg_data,
+		&chg_data->irq_flag[RT5081_CHG_IRQIDX_CHGIRQ5],
+		RT5081_MASK_CHG_AICLMEASI);
+		
+//Gionee <gn_by_charging> <lilubao> <20170416> add for platform begin
+	mutex_lock(&chg_data->pe_access_lock);
+	mutex_lock(&chg_data->aicr_access_lock);
+
+	/* Set AICR to max */
+	ret = _rt5081_set_aicr(chg_data, RT5081_AICR_MAX);
+	if (ret < 0)
+		goto unlock_out;
+//Gionee <gn_by_charging> <lilubao> <20170416> add for platform end		
+
+	ret = rt5081_pmu_reg_set_bit(chg_data->chip, RT5081_PMU_REG_CHGCTRL14,
+		RT5081_MASK_AICL_MEAS);
+	if (ret < 0)
+		goto unlock_out;
+
+	ret = wait_event_interruptible_timeout(chg_data->wait_queue,
+		chg_data->irq_flag[RT5081_CHG_IRQIDX_CHGIRQ5] & RT5081_MASK_CHG_AICLMEASI,
+		msecs_to_jiffies(2500));
+	if (ret <= 0) {
+		dev_err(chg_data->dev, "%s: wait AICL time out, ret = %d\n",
+			__func__, ret);
+		ret = -EIO;
+		goto unlock_out;
+	}
+
+	ret = rt5081_get_aicr(chg_data->chg_dev, &aicr);
+	if (ret < 0)
+		goto unlock_out;
+
+	chg_data->aicr_limit = aicr;
+	dev_info(chg_data->dev, "%s: OK, aicr upper bound = %dmA\n", __func__,
+		aicr / 1000);
+
+unlock_out:
+	mutex_unlock(&chg_data->aicr_access_lock);
+//Gionee <gn_by_charging> <lilubao> <20170416> add for platform begin	
+	mutex_unlock(&chg_data->pe_access_lock);
+//Gionee <gn_by_charging> <lilubao> <20170416> add for platform end	
+out:
+	return ret;
+}
 
 
+
+修改：
+	//Gionee <gn_by_charging> <lilubao> <20170414> add for modify charging begin
+	mivr = <4400000>;	/* uV 4500000->4400000*/
+	//Gionee <gn_by_charging> <lilubao> <20170414> add for modify charging end
+
+	//Gionee <gn_by_charging> <lilubao> <20170418> add for charging change begin	
+	/*chg_data->aicr_limit = aicr;
+	dev_info(chg_data->dev, "%s: OK, aicr upper bound = %dmA\n", __func__,
+		aicr / 1000);
+	*/	
+	//force setting aicr_limit
+	chg_data->aicr_limit=2050000;
+	//Gionee <gn_by_charging> <lilubao> <20170418> add for charging change end
+	这样做是强制设定aicr_limit避免将最开始尝试的最大电流设为限定值
+
+	//Gionee <gn_by_charging> <lilubao> <20170417> add for charging change begin
+	if (chg_data->aicr_limit != -1 && uA > chg_data->aicr_limit) {
+		dev_err(chg_data->dev,
+			"%s: %dmA over TA's cap, can only be %dmA\n",
+			__func__, uA, chg_data->aicr_limit);
+		uA = chg_data->aicr_limit;
+	}
+	//Gionee <gn_by_charging> <lilubao> <20170417> add for charging change end
 
 
 

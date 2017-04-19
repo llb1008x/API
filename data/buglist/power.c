@@ -167,6 +167,9 @@
 		
 		数据交互很频繁的时候可以在main.log中搜索Posix_connect Debug
 		这个可以看出apk的数据发送情况
+
+		onWakeLockAcquired
+		onWakeLockReleased
 	
 
 	
