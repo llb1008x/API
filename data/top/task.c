@@ -57,21 +57,178 @@ mmi测试：加入充电测试选项
 
 按键，按键功能正常，先熟悉一下大致的工作流程
 {
-    
-->1 按键属于input子系统，先熟悉一下input子系统
+--->1.按键属于input子系统，所以有必要熟悉这个子系统的工作流程
+cat/proc/bus/input/devices
+{
+    I: Bus=0019 Vendor=0000 Product=0000 Version=0000
+    N: Name="ACCDET"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input0
+    U: Uniq=
+    H: Handlers=gpufreq_ib event0 
+    B: PROP=0
+    B: EV=3
+    B: KEY=40 0 0 0 0 0 0 1000000000 c000000000000 0
 
-    mtk键盘的名字mtk_kpd  
-    相关定义的dtsi文件cust_kpd_8167.dtsi
-    aw9523b这是键盘使用的芯片
+    I: Bus=0019 Vendor=2454 Product=6500 Version=0010
+    N: Name="mtk-kpd"
+    P: Phys=
+    S: Sysfs=/devices/platform/10010000.keypad/input/input1
+    U: Uniq=
+    H: Handlers=gpufreq_ib event1 
+    B: PROP=0
+    B: EV=3
+    B: KEY=1000000 0 b00000000 0 0 1c000000000000 0
 
-    kpd.c
+    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+    N: Name="gf-keys"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input2
+    U: Uniq=
+    H: Handlers=gpufreq_ib event2 
+    B: PROP=0
+    B: EV=3
+    B: KEY=3100000 100040000800 1c168000000000 0
 
-    mtk-kpd.kl
+    I: Bus=0019 Vendor=0000 Product=0000 Version=0000
+    N: Name="aw9523b"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input3
+    U: Uniq=
+    H: Handlers=gpufreq_ib event3 
+    B: PROP=0
+    B: EV=3
+    B: KEY=2000019800100000 40000800 168000000000 4ffc
 
-    
+    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+    N: Name="hwmdata"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input4
+    U: Uniq=
+    H: Handlers=gpufreq_ib event4 
+    B: PROP=0
+    B: EV=5
+    B: REL=6
+
+    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+    N: Name="m_alsps_input"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input5
+    U: Uniq=
+    H: Handlers=gpufreq_ib event5 
+    B: PROP=0
+    B: EV=d
+    B: REL=6
+    B: ABS=101
+
+    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+    N: Name="m_acc_input"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input6
+    U: Uniq=
+    H: Handlers=gpufreq_ib event6 
+    B: PROP=0
+    B: EV=d
+    B: REL=c1
+    B: ABS=107
+
+    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+    N: Name="m_mag_input"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input7
+    U: Uniq=
+    H: Handlers=gpufreq_ib event7 
+    B: PROP=0
+    B: EV=d
+    B: REL=3c9
+    B: ABS=17f
+
+    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+    N: Name="m_step_c_input"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input8
+    U: Uniq=
+    H: Handlers=gpufreq_ib event8 
+    B: PROP=0
+    B: EV=d
+    B: REL=7
+    B: ABS=100
+
+    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+    N: Name="mtk-tpd"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input9
+    U: Uniq=
+    H: Handlers=gpufreq_ib event9 
+    B: PROP=2
+    B: EV=b
+    B: KEY=10 0 0 0 400 0 0 100040000000 0 0
+    B: ABS=263800001000003
+
+    I: Bus=0019 Vendor=0001 Product=0001 Version=0100
+    N: Name="mtk-tpd-kpd"
+    P: Phys=
+    S: Sysfs=/devices/virtual/input/input10
+    U: Uniq=
+    H: Handlers=gpufreq_ib event10 
+    B: PROP=0
+    B: EV=3
+    B: KEY=10 0 0 0 0 0 0 100040000000 0 0
+
+}
+
+
+kpd.c
+     内核创建的设备节点
+     /devices/platform/10010000.keypad/input/input1
+
+    struct keypad_dts_data {
+        u32 kpd_key_debounce;
+        u32 kpd_sw_pwrkey;
+        u32 kpd_hw_pwrkey;
+        u32 kpd_sw_rstkey;
+        u32 kpd_hw_rstkey;
+        u32 kpd_use_extend_type;
+        u32 kpd_hw_map_num;
+        u32 kpd_hw_init_map[72];
+        u32 kpd_pwrkey_eint_gpio;
+        u32 kpd_pwrkey_gpio_din;
+        u32 kpd_hw_dl_key1;
+        u32 kpd_hw_dl_key2;
+        u32 kpd_hw_dl_key3;
+        u32 kpd_hw_recovery_key;
+        u32 kpd_hw_factory_key;
+    }
+
+
+    slide qwerty侧键
+    kpd: key-debounce = 1024, sw-pwrkey = 116, hw-pwrkey = 8, hw-rstkey = 17, sw-rstkey = 115
+
+    键盘相关的宏
+    CONFIG_KEYBOARD_MTK=y
+    CONFIG_ONEKEY_REBOOT_NORMAL_MODE=y
+    CONFIG_ONEKEY_REBOOT_OTHER_MODE=y
+    CONFIG_KPD_PWRKEY_USE_PMIC=y
+    CONFIG_MTK_MRDUMP_KEY=y
+    # CONFIG_KEYBOARD_ATKBD is not set
+
+    键盘的中断回调函数
+    kpd_irq_handler
+
+    调用相关的工作函数
+    kpd_keymap_handler
 
 
 
+
+--->按键IC  aw9523b
+
+
+
+
+
+
+  MTK统计apk发包数量脚本正常使用 
 }
 
 

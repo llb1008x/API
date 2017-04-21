@@ -279,7 +279,9 @@ other：
 	http://blog.csdn.net/batoom/article/details/6259468
 
 
-
+	android6.0按键处理浅析 
+	http://blog.csdn.net/liyanfei123456/article/details/53196693
+	kpd_aee_handler
 
 
 
