@@ -1371,12 +1371,15 @@ PMU_STATUS BAT_BatteryStatusFailAction(void)
 
 void mt_battery_charging_algorithm(void)
 {
+	//Gionee <gn_by_charging> <lilubao> <20170420> add for new feature begin
+	static int switch_status=0;
+	//Gionee <gn_by_charging> <lilubao> <20170420> add for new feature end
+
 	battery_charging_control(CHARGING_CMD_RESET_WATCH_DOG_TIMER, NULL);
 
 	//Gionee <gn_by_charging> <lilubao> <20170416> add for new feature begin
 	#define GN_BATTERY_SWITCH_CHARGING
 	#if defined(GN_BATTERY_SWITCH_CHARGING)
-	static int switch_status=0;
 
 	battery_log(BAT_LOG_CRTI, "111111111111111111111111111111111\n");
 	if( gn_switch_charging_state==KAL_TRUE ){
@@ -1393,25 +1396,24 @@ void mt_battery_charging_algorithm(void)
 						switch_status=1;
 				}else if( (BMT_status.UI_SOC2>gn_switch_charging_down)&&(BMT_status.UI_SOC2<=gn_switch_charging_up) ){
 						
-						if(switch_status==0){
+						if(switch_status!=0){
+
+							battery_log(BAT_LOG_CRTI, "55555555555555555555555555555555555555555555\n");
+							battery_log(BAT_LOG_CRTI, "charging from gn_switch_charging_down ,enable\n");
+							BMT_status.bat_charging_state=CHR_PRE;
+						}else {
+							
 							if(BMT_status.bat_charging_state==CHR_ERROR){
 
-								battery_log(BAT_LOG_CRTI, "5555555555555555555555555555555555555\n");
+								battery_log(BAT_LOG_CRTI, "666666666666666666666666666666666666666666666\n");
 								battery_log(BAT_LOG_CRTI, "discharging from gn_switch_charging_up,disable\n");
 							}else{
 
-								battery_log(BAT_LOG_CRTI, "66666666666666666666666666666666666666666\n");
+								battery_log(BAT_LOG_CRTI, "777777777777777777777777777777777777777777777\n");
 								battery_log(BAT_LOG_CRTI, "first plug in BMT_status.UI_SOC2 in the range ,enable\n");
-								switch_status=1;
 								BMT_status.bat_charging_state=CHR_PRE;
 							}
-						}else {
-							
-							battery_log(BAT_LOG_CRTI, "7777777777777777777777777777777777777777\n");
-							battery_log(BAT_LOG_CRTI, "charging from gn_switch_charging_down ,enable\n");
-							BMT_status.bat_charging_state=CHR_PRE;
 						}
-				
 				}else{
 					battery_log(BAT_LOG_CRTI, "88888888888888888888888888888888888888\n");
 					battery_log(BAT_LOG_CRTI, "charging over the gn_switch_charging_up,disable\n");

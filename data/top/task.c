@@ -64,6 +64,11 @@ mmi测试：加入充电测试选项
     相关定义的dtsi文件cust_kpd_8167.dtsi
     aw9523b这是键盘使用的芯片
 
+    kpd.c
+
+    mtk-kpd.kl
+
+    
 
 
 
