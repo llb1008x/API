@@ -1394,7 +1394,7 @@ void mt_battery_charging_algorithm(void)
 						battery_log(BAT_LOG_CRTI, "the UI_SOC2 below gn_switch_charging_down,enable\n");
 						BMT_status.bat_charging_state=CHR_PRE;
 						switch_status=1;
-				}else if( (BMT_status.UI_SOC2>gn_switch_charging_down)&&(BMT_status.UI_SOC2<=gn_switch_charging_up) ){
+				}else if( (BMT_status.UI_SOC2>=gn_switch_charging_down)&&(BMT_status.UI_SOC2<gn_switch_charging_up) ){
 						
 						if(switch_status!=0){
 
@@ -1414,7 +1414,7 @@ void mt_battery_charging_algorithm(void)
 								BMT_status.bat_charging_state=CHR_PRE;
 							}
 						}
-				}else{
+				}else if(BMT_status.UI_SOC2>=gn_switch_charging_up){
 					battery_log(BAT_LOG_CRTI, "88888888888888888888888888888888888888\n");
 					battery_log(BAT_LOG_CRTI, "charging over the gn_switch_charging_up,disable\n");
 					BMT_status.bat_charging_state=CHR_ERROR;

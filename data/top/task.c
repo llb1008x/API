@@ -217,6 +217,8 @@ kpd.c
 
     调用相关的工作函数
     kpd_keymap_handler
+    
+    /* bit is 1: not pressed, 0: pressed */
 
 
 
