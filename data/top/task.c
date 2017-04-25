@@ -177,6 +177,26 @@ cat/proc/bus/input/devices
 
 }
 
+键盘的代码执行流程：
+
+    (platform.c) platform_init这个是很多平台相关的一个初始化 -> /*init kpd PMIC mode support*/ set_kpd_pmic_mode,是否支持外置键盘
+    -> mtk_kpd_gpio_set设置键盘gpio的控制状态
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
 
 kpd.c
      内核创建的设备节点
@@ -223,12 +243,62 @@ kpd.c
 
 
 
+
 --->按键IC  aw9523b
 
 
 
+  pmic_thread这个线程是干什么用的
+    int pmic_thread_kthread(void *x)
+    {
+        unsigned int i;
+        unsigned int int_status_val = 0;
+        unsigned int pwrap_eint_status = 0;
+        struct sched_param param = {.sched_priority = 98 };
+
+        sched_setscheduler(current, SCHED_FIFO, &param);
+        set_current_state(TASK_INTERRUPTIBLE);
+
+        PMICLOG("[PMIC_INT] enter\n");
+
+        pmic_enable_charger_detection_int(0);
+
+        /* Run on a process content */
+        while (1) {
+            mutex_lock(&pmic_mutex);
+
+            pwrap_eint_status = pmic_wrap_eint_status();
+            PMICLOG("[PMIC_INT] pwrap_eint_status=0x%x\n", pwrap_eint_status);
+
+            pmic_int_handler();
+
+            pmic_wrap_eint_clr(0x0);
+            /*PMICLOG("[PMIC_INT] pmic_wrap_eint_clr(0x0);\n");*/
+
+            for (i = 0; i < ARRAY_SIZE(interrupts); i++) {
+                int_status_val = upmu_get_reg_value(interrupts[i].address);
+                PMICLOG("[PMIC_INT] after ,int_status_val[0x%x]=0x%x\n",
+                    interrupts[i].address, int_status_val);
+            }
 
 
+            mdelay(1);
+
+            mutex_unlock(&pmic_mutex);
+        #if !defined CONFIG_HAS_WAKELOCKS
+            __pm_relax(&pmicThread_lock);
+        #else
+            wake_unlock(&pmicThread_lock);
+        #endif
+
+            set_current_state(TASK_INTERRUPTIBLE);
+            if (g_pmic_irq != 0)
+                enable_irq(g_pmic_irq);
+            schedule();
+        }
+
+        return 0;
+    }
 
   MTK统计apk发包数量脚本正常使用 
 }
