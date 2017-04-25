@@ -180,27 +180,42 @@ cat/proc/bus/input/devices
 键盘的代码执行流程：
 
     (platform.c) platform_init这个是很多平台相关的一个初始化 -> /*init kpd PMIC mode support*/ set_kpd_pmic_mode,是否支持外置键盘
-    -> mtk_kpd_gpio_set设置键盘gpio的控制状态
-
-
-
-
     
+    -> mtk_kpd_gpio_set设置键盘gpio的控制状态 ,这个地方应该是可以使能那些按键然后可以进入factory ，recovery模式 -> platform_boot_status
+    
+    系统启动的原因，powerkey，restart还是wdt引起的启动 -> (keypad.c) mtk_detect_key这个应该是检测主要的那几个物理按键powerkey还是rst之类的
+    
+    -> pmic_detect_homekey 检测powerkey是否按下 -> (boot_mode.c) boot_mode_select启动模式的选择 ...... -> (kpd.c)这个文件应该是键盘相
+    
+    关很重要的代码，kpd_mod_init这个是linux 驱动模块初始化 ->  kpd_pdrv_probe初始化kpd驱动，初始化kpd内存，哪些按键值要上报->kpd_irq_handler
+
+    注册对应的中断回调函数，产生中断后调用注册的工作队列tasklet->kpd_keymap_handler,检测所有的按键，比较按键的状态跟之前是否有变化 -> 
+
+    kpd_aee_handler 对VOLUMEUP，VOLUMEDOWN这两个键是按下还是松开处理并上报状态 -> (hal_kpd.c) mt_eint_register 注册一个中断在powerykey为
+    
+    一个中断的时候，而且这里面是一个dump操作 -> long_press_reboot_function_setting 正常模式还是其他 -> long_press_reboot_function_init_pmic
+    
+    这里是长按powerkey对应什么什么操作重启还是直接关机 -> gn_hall_eint_handler ,kpd_hall_eint_handler 这两个是霍尔开关，控制量实现开关的开闭
+
+    -> aw9523b_mod_init 这是按键相关芯片的初始化 -> aw9523b_pinctrl_probe从dts文件里获取引脚的状态	pinctrl-0 = <&gpio_aw9523b_default>;
+	
+    pinctrl-1 = <&gpio_aw9523b_eint_as_int>; pinctrl-2 = <&gpio_aw9523b_reset_high>; pinctrl-3 = <&gpio_aw9523b_reset_low>;
+
+    这是键盘IC控制的几个引脚的状态 -> aw9523b_i2c_probe 这是挂在I2C总线下的一个设备驱动 -> aw9523b_input_event_init 核心应该是这个，将底层事件上报
+
+    给input子系统，注册设备驱动，可以上报哪些事件  -> set_p0_x_p1_y设置行列 -> aw9523b_init初始化 -> aw9523b_isr中断
 
 
-
-
-
-
-
-
-
-
+   
 
 
 kpd.c
      内核创建的设备节点
-     /devices/platform/10010000.keypad/input/input1
+     platform总线下
+     /sys/devices/platform/10010000.keypad/input/input1
+
+     虚拟文件系统
+     /sys/devices/virtual/input/
 
     struct keypad_dts_data {
         u32 kpd_key_debounce;
@@ -235,72 +250,85 @@ kpd.c
     键盘的中断回调函数
     kpd_irq_handler
 
+
     调用相关的工作函数
     kpd_keymap_handler
     
     /* bit is 1: not pressed, 0: pressed */
 
 
-
-
-
---->按键IC  aw9523b
-
-
-
-  pmic_thread这个线程是干什么用的
-    int pmic_thread_kthread(void *x)
+    static void kpd_keymap_handler(unsigned long data)
     {
-        unsigned int i;
-        unsigned int int_status_val = 0;
-        unsigned int pwrap_eint_status = 0;
-        struct sched_param param = {.sched_priority = 98 };
+        int i, j;
+        bool pressed;
+        u16 new_state[KPD_NUM_MEMS], change, mask;
+        u16 hw_keycode, linux_keycode;
 
-        sched_setscheduler(current, SCHED_FIFO, &param);
-        set_current_state(TASK_INTERRUPTIBLE);
+        kpd_get_keymap_state(new_state);
 
-        PMICLOG("[PMIC_INT] enter\n");
+        wake_lock_timeout(&kpd_suspend_lock, HZ / 2);
 
-        pmic_enable_charger_detection_int(0);
+        for (i = 0; i < KPD_NUM_MEMS; i++) {
+            change = new_state[i] ^ kpd_keymap_state[i];
+            if (!change)
+                continue;
 
-        /* Run on a process content */
-        while (1) {
-            mutex_lock(&pmic_mutex);
+            for (j = 0; j < 16; j++) {
+                mask = 1U << j;
+                if (!(change & mask))
+                    continue;
 
-            pwrap_eint_status = pmic_wrap_eint_status();
-            PMICLOG("[PMIC_INT] pwrap_eint_status=0x%x\n", pwrap_eint_status);
+                hw_keycode = (i << 4) + j;
 
-            pmic_int_handler();
+                if (hw_keycode >= KPD_NUM_KEYS)
+                    continue;
 
-            pmic_wrap_eint_clr(0x0);
-            /*PMICLOG("[PMIC_INT] pmic_wrap_eint_clr(0x0);\n");*/
+                /* bit is 1: not pressed, 0: pressed */
+                pressed = !(new_state[i] & mask);
+                if (kpd_show_hw_keycode)
+                    kpd_print("(%s) HW keycode = %u\n", pressed ? "pressed" : "released", hw_keycode);
 
-            for (i = 0; i < ARRAY_SIZE(interrupts); i++) {
-                int_status_val = upmu_get_reg_value(interrupts[i].address);
-                PMICLOG("[PMIC_INT] after ,int_status_val[0x%x]=0x%x\n",
-                    interrupts[i].address, int_status_val);
+                linux_keycode = kpd_keymap[hw_keycode];
+                if (unlikely(linux_keycode == 0)) {
+                    kpd_print("Linux keycode = 0\n");
+                    continue;
+                }
+                kpd_aee_handler(linux_keycode, pressed);
+                input_report_key(kpd_input_dev, linux_keycode, pressed);
+                input_sync(kpd_input_dev);
+                kpd_print("report Linux keycode = %u\n", linux_keycode);
             }
-
-
-            mdelay(1);
-
-            mutex_unlock(&pmic_mutex);
-        #if !defined CONFIG_HAS_WAKELOCKS
-            __pm_relax(&pmicThread_lock);
-        #else
-            wake_unlock(&pmicThread_lock);
-        #endif
-
-            set_current_state(TASK_INTERRUPTIBLE);
-            if (g_pmic_irq != 0)
-                enable_irq(g_pmic_irq);
-            schedule();
         }
 
-        return 0;
+        memcpy(kpd_keymap_state, new_state, sizeof(new_state));
+        kpd_print("save new keymap state\n");
+        enable_irq(kp_irqnr);
     }
 
-  MTK统计apk发包数量脚本正常使用 
+
+
+
+
+    pmic_thread这个线程是干什么用的？
+
+    linux驱动模块初始化在哪调用的？
+
+    Hang_Detect是什么？
+
+
+    可以通过检索Call trace，察看内存堆栈函数的调用
+
+    accdet是什么
+    这个是耳机检测用的
+
+    MTK统计apk发包数量脚本正常使用 
+
+
+硬件
+--->按键IC  aw9523b  
+kernel-4.4/drivers/input/keyboard/mediatek/aw9523b_gpio
+  
+
 }
 
 

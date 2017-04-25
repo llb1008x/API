@@ -284,8 +284,12 @@ other：
 	kpd_aee_handler
 
 
+	HALL开关介绍 
+	http://blog.csdn.net/wlwl0071986/article/details/9154541
 
 
+	linux驱动学习2（kpd驱动初步分析） 
+	http://blog.csdn.net/jxnu_xiaobing/article/details/16805623
 
 	
 
