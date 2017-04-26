@@ -295,6 +295,10 @@ other：
 	线性谐振传动器（LRA）如何工作
 	http://www.elecfans.com/dianzichangshi/20161114448503.html
 
+
+	Hang Detect 问题分析案例 
+	http://blog.csdn.net/ldinvicible/article/details/51042881
+
 	
 
 
