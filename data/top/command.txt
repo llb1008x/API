@@ -111,11 +111,7 @@
 	adb  shell logcat -b system
 	
 	
-	
 	adb  shell logcat -b main -v threadtime >error_log1.txt
-
-
-
 
 
 2.fastboot常用命令(这写命令是G1602A烧写相关的文件，相关命令还要重新看)：

@@ -16,6 +16,7 @@ Driver -> InputCore -> Eventhandler -> userspace 的顺序到达用户空间传�
 的编程接口。
 
 （3）事件处理层将硬件设备上报的事件分发到用户空间和内核。
+
 三．Input设备驱动编写
 
 在Linux内核中，input设备用input_dev结构体描述，使用input子系统实现输入设备驱动的时候，驱动的核心工作是向系统报告按键、触摸屏、键盘、鼠标等输入事件（event，
@@ -24,16 +25,15 @@ Driver -> InputCore -> Eventhandler -> userspace 的顺序到达用户空间传�
 
 （1）键盘驱动
 
+//这个按钮中断只是简单的将事件上报给input子系统
 static void button_interrupt(int irq, void *dummy, struct pt_regs *fp)
 {
 
     input_report_key(&button_dev, BTN_1, inb(BUTTON_PORT) & 1);
-
     input_sync(&button_dev);
 }
 
- 
-
+//初始化，支持哪些时间，注册中断和中断处理函数
 static int __init button_init(void)
 {
 
@@ -68,7 +68,8 @@ module_exit(button_exit);
 
 set_bit(BTN_0, button_dev.keybit);
 
-分别用来设置设备所产生的事件以及上报的按键值。Struct input_dev中有两个成员，一个是evbit.一个是keybit，分别用表示设备所支持的动作和按键类型。
+分别用来设置设备所产生的事件以及上报的按键值。
+struct input_dev中有两个成员，一个是evbit.一个是keybit，分别用表示设备所支持的动作和按键类型。
 
 2)input_register_device(&button_dev);
 
@@ -84,7 +85,8 @@ set_bit(BTN_0, button_dev.keybit);
 
 5) input_unregister_device（）
 
-    用来注销一个input_dev设备
+用来注销一个input_dev设备
+
 四．Input子系统探幽
 
 （1）input设备注册分析
@@ -99,8 +101,6 @@ int input_register_device(struct input_dev *dev)
     int error;
 
     __set_bit(EV_SYN, dev->evbit);
-
-
 
     init_timer(&dev->timer);
     if (!dev->rep[REP_DELAY] && !dev->rep[REP_PERIOD]) {

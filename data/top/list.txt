@@ -291,6 +291,10 @@ other：
 	linux驱动学习2（kpd驱动初步分析） 
 	http://blog.csdn.net/jxnu_xiaobing/article/details/16805623
 
+
+	线性谐振传动器（LRA）如何工作
+	http://www.elecfans.com/dianzichangshi/20161114448503.html
+
 	
 
 

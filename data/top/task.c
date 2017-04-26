@@ -8,13 +8,22 @@
 /*debug*/
 {
 软件关机重启:解决
+{
+    pwrkey连接了pmic和rt5081，pmic关闭了使能，但是rt5081还有连接
+    在long_press_reboot_function_init_pmic内
 
+//Gionee <gn_by_charging> <lilubao> <20170406> add for change reboot begin
+    //try again to make sure the reg 0x60e set to 0x00
+	ret=pmic_set_register_value(KPD_PMIC_RG_PWRKEY_RST_EN, 0x00);
+	kpd_info("4ret->%d\n",ret);
+	ret=pmic_set_register_value(KPD_PMIC_RG_HOMEKEY_RST_EN, 0x00);
+	kpd_info("5ret->%d\n",ret);
 
+	kpd_info("[PMIC] Reg[0x%x]=0x%x after by lilubao\n",
+			MT6355_TOP_RST_MISC, upmu_get_reg_value(MT6355_TOP_RST_MISC)); 
+//Gionee <gn_by_charging> <lilubao> <20170406> add for change reboot end	
 
-mmi测试：加入充电测试选项
-
-
-
+}
 
 
 充电电流太小：标准充电器（1.9A） USB充电（500mA）：接近设定的值
@@ -53,282 +62,24 @@ mmi测试：加入充电测试选项
         这样做是强制设定aicr_limit避免将最开始尝试的最大电流设为限定值
     }
 
-
-
-按键，按键功能正常，先熟悉一下大致的工作流程
-{
---->1.按键属于input子系统，所以有必要熟悉这个子系统的工作流程
-cat/proc/bus/input/devices
-{
-    I: Bus=0019 Vendor=0000 Product=0000 Version=0000
-    N: Name="ACCDET"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input0
-    U: Uniq=
-    H: Handlers=gpufreq_ib event0 
-    B: PROP=0
-    B: EV=3
-    B: KEY=40 0 0 0 0 0 0 1000000000 c000000000000 0
-
-    I: Bus=0019 Vendor=2454 Product=6500 Version=0010
-    N: Name="mtk-kpd"
-    P: Phys=
-    S: Sysfs=/devices/platform/10010000.keypad/input/input1
-    U: Uniq=
-    H: Handlers=gpufreq_ib event1 
-    B: PROP=0
-    B: EV=3
-    B: KEY=1000000 0 b00000000 0 0 1c000000000000 0
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="gf-keys"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input2
-    U: Uniq=
-    H: Handlers=gpufreq_ib event2 
-    B: PROP=0
-    B: EV=3
-    B: KEY=3100000 100040000800 1c168000000000 0
-
-    I: Bus=0019 Vendor=0000 Product=0000 Version=0000
-    N: Name="aw9523b"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input3
-    U: Uniq=
-    H: Handlers=gpufreq_ib event3 
-    B: PROP=0
-    B: EV=3
-    B: KEY=2000019800100000 40000800 168000000000 4ffc
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="hwmdata"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input4
-    U: Uniq=
-    H: Handlers=gpufreq_ib event4 
-    B: PROP=0
-    B: EV=5
-    B: REL=6
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="m_alsps_input"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input5
-    U: Uniq=
-    H: Handlers=gpufreq_ib event5 
-    B: PROP=0
-    B: EV=d
-    B: REL=6
-    B: ABS=101
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="m_acc_input"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input6
-    U: Uniq=
-    H: Handlers=gpufreq_ib event6 
-    B: PROP=0
-    B: EV=d
-    B: REL=c1
-    B: ABS=107
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="m_mag_input"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input7
-    U: Uniq=
-    H: Handlers=gpufreq_ib event7 
-    B: PROP=0
-    B: EV=d
-    B: REL=3c9
-    B: ABS=17f
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="m_step_c_input"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input8
-    U: Uniq=
-    H: Handlers=gpufreq_ib event8 
-    B: PROP=0
-    B: EV=d
-    B: REL=7
-    B: ABS=100
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="mtk-tpd"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input9
-    U: Uniq=
-    H: Handlers=gpufreq_ib event9 
-    B: PROP=2
-    B: EV=b
-    B: KEY=10 0 0 0 400 0 0 100040000000 0 0
-    B: ABS=263800001000003
-
-    I: Bus=0019 Vendor=0001 Product=0001 Version=0100
-    N: Name="mtk-tpd-kpd"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input10
-    U: Uniq=
-    H: Handlers=gpufreq_ib event10 
-    B: PROP=0
-    B: EV=3
-    B: KEY=10 0 0 0 0 0 0 100040000000 0 0
-
 }
 
-键盘的代码执行流程：
-
-    (platform.c) platform_init这个是很多平台相关的一个初始化 -> /*init kpd PMIC mode support*/ set_kpd_pmic_mode,是否支持外置键盘
-    
-    -> mtk_kpd_gpio_set设置键盘gpio的控制状态 ,这个地方应该是可以使能那些按键然后可以进入factory ，recovery模式 -> platform_boot_status
-    
-    系统启动的原因，powerkey，restart还是wdt引起的启动 -> (keypad.c) mtk_detect_key这个应该是检测主要的那几个物理按键powerkey还是rst之类的
-    
-    -> pmic_detect_homekey 检测powerkey是否按下 -> (boot_mode.c) boot_mode_select启动模式的选择 ...... -> (kpd.c)这个文件应该是键盘相
-    
-    关很重要的代码，kpd_mod_init这个是linux 驱动模块初始化 ->  kpd_pdrv_probe初始化kpd驱动，初始化kpd内存，哪些按键值要上报->kpd_irq_handler
-
-    注册对应的中断回调函数，产生中断后调用注册的工作队列tasklet->kpd_keymap_handler,检测所有的按键，比较按键的状态跟之前是否有变化 -> 
-
-    kpd_aee_handler 对VOLUMEUP，VOLUMEDOWN这两个键是按下还是松开处理并上报状态 -> (hal_kpd.c) mt_eint_register 注册一个中断在powerykey为
-    
-    一个中断的时候，而且这里面是一个dump操作 -> long_press_reboot_function_setting 正常模式还是其他 -> long_press_reboot_function_init_pmic
-    
-    这里是长按powerkey对应什么什么操作重启还是直接关机 -> gn_hall_eint_handler ,kpd_hall_eint_handler 这两个是霍尔开关，控制量实现开关的开闭
-
-    -> aw9523b_mod_init 这是按键相关芯片的初始化 -> aw9523b_pinctrl_probe从dts文件里获取引脚的状态	pinctrl-0 = <&gpio_aw9523b_default>;
-	
-    pinctrl-1 = <&gpio_aw9523b_eint_as_int>; pinctrl-2 = <&gpio_aw9523b_reset_high>; pinctrl-3 = <&gpio_aw9523b_reset_low>;
-
-    这是键盘IC控制的几个引脚的状态 -> aw9523b_i2c_probe 这是挂在I2C总线下的一个设备驱动 -> aw9523b_input_event_init 核心应该是这个，将底层事件上报
-
-    给input子系统，注册设备驱动，可以上报哪些事件  -> set_p0_x_p1_y设置行列 -> aw9523b_init初始化 -> aw9523b_isr中断
 
 
-   
-
-
-kpd.c
-     内核创建的设备节点
-     platform总线下
-     /sys/devices/platform/10010000.keypad/input/input1
-
-     虚拟文件系统
-     /sys/devices/virtual/input/
-
-    struct keypad_dts_data {
-        u32 kpd_key_debounce;
-        u32 kpd_sw_pwrkey;
-        u32 kpd_hw_pwrkey;
-        u32 kpd_sw_rstkey;
-        u32 kpd_hw_rstkey;
-        u32 kpd_use_extend_type;
-        u32 kpd_hw_map_num;
-        u32 kpd_hw_init_map[72];
-        u32 kpd_pwrkey_eint_gpio;
-        u32 kpd_pwrkey_gpio_din;
-        u32 kpd_hw_dl_key1;
-        u32 kpd_hw_dl_key2;
-        u32 kpd_hw_dl_key3;
-        u32 kpd_hw_recovery_key;
-        u32 kpd_hw_factory_key;
-    }
-
-
-    slide qwerty侧键
-    kpd: key-debounce = 1024, sw-pwrkey = 116, hw-pwrkey = 8, hw-rstkey = 17, sw-rstkey = 115
-
-    键盘相关的宏
-    CONFIG_KEYBOARD_MTK=y
-    CONFIG_ONEKEY_REBOOT_NORMAL_MODE=y
-    CONFIG_ONEKEY_REBOOT_OTHER_MODE=y
-    CONFIG_KPD_PWRKEY_USE_PMIC=y
-    CONFIG_MTK_MRDUMP_KEY=y
-    # CONFIG_KEYBOARD_ATKBD is not set
-
-    键盘的中断回调函数
-    kpd_irq_handler
-
-
-    调用相关的工作函数
-    kpd_keymap_handler
-    
-    /* bit is 1: not pressed, 0: pressed */
-
-
-    static void kpd_keymap_handler(unsigned long data)
+键盘
+{
+->2017.4.25
     {
-        int i, j;
-        bool pressed;
-        u16 new_state[KPD_NUM_MEMS], change, mask;
-        u16 hw_keycode, linux_keycode;
+        修改了keyboard的I2C的设备地址跟挂的总线
+        //Gionee <gn_by_charging> <lilubao> <20170425> add for change keypad begin
+        #define AW9523B_DEV_NAME         "aw9523b"
+        #define AW9523B_I2C_NUM		4		// 3->4
+        #define AW9523B_I2C_ADDRESS 0x58	// 0xB0 -> 0x58
+        //Gionee <gn_by_charging> <lilubao> <20170425> add for change keypad end
 
-        kpd_get_keymap_state(new_state);
+        因为framework层还有部分未导入，所以检测到一些未知的键值，出现异常
 
-        wake_lock_timeout(&kpd_suspend_lock, HZ / 2);
-
-        for (i = 0; i < KPD_NUM_MEMS; i++) {
-            change = new_state[i] ^ kpd_keymap_state[i];
-            if (!change)
-                continue;
-
-            for (j = 0; j < 16; j++) {
-                mask = 1U << j;
-                if (!(change & mask))
-                    continue;
-
-                hw_keycode = (i << 4) + j;
-
-                if (hw_keycode >= KPD_NUM_KEYS)
-                    continue;
-
-                /* bit is 1: not pressed, 0: pressed */
-                pressed = !(new_state[i] & mask);
-                if (kpd_show_hw_keycode)
-                    kpd_print("(%s) HW keycode = %u\n", pressed ? "pressed" : "released", hw_keycode);
-
-                linux_keycode = kpd_keymap[hw_keycode];
-                if (unlikely(linux_keycode == 0)) {
-                    kpd_print("Linux keycode = 0\n");
-                    continue;
-                }
-                kpd_aee_handler(linux_keycode, pressed);
-                input_report_key(kpd_input_dev, linux_keycode, pressed);
-                input_sync(kpd_input_dev);
-                kpd_print("report Linux keycode = %u\n", linux_keycode);
-            }
-        }
-
-        memcpy(kpd_keymap_state, new_state, sizeof(new_state));
-        kpd_print("save new keymap state\n");
-        enable_irq(kp_irqnr);
     }
-
-
-
-
-
-    pmic_thread这个线程是干什么用的？
-
-    linux驱动模块初始化在哪调用的？
-
-    Hang_Detect是什么？
-
-
-    可以通过检索Call trace，察看内存堆栈函数的调用
-
-    accdet是什么
-    这个是耳机检测用的
-
-    MTK统计apk发包数量脚本正常使用 
-
-
-硬件
---->按键IC  aw9523b  
-kernel-4.4/drivers/input/keyboard/mediatek/aw9523b_gpio
-  
-
 }
 
 
@@ -338,7 +89,120 @@ kernel-4.4/drivers/input/keyboard/mediatek/aw9523b_gpio
 
 
 
-马达振动
+
+马达效果
+{
+
+->IC:drv2604l
+
+
+{
+    LRA (Linear Resonance Actuator) 线性制动器
+
+    ERM (Eccentric Rotating Mass) 偏转转动惯量
+
+    Back-EMF detection 反电动势检测
+
+    actuator n.激励者； [电脑]执行机构； [电]（电磁铁）螺线管； [机]促动器
+
+    braking  n. 刹车，制动，（用闸）减速；
+            v. 刹（车）( brake的现在分词 )；
+
+    calibration  n. 校准，标准化； 刻度，标度； 测量口径；变形         
+
+
+    The ERM_LRA bit in register 0x1A must be
+    configured to select the type of actuator that the device uses.
+
+    The smart-loop architecture makes the resonant frequency of the LRA available through I2C (see the LRA
+    Resonance Period (Address: 0x22) section)
+
+    A key feature of the DRV2604L is the smart-loop architecture which employs actuator feedback control for both
+    ERMs and LRAs. The feedback control desensitizes the input waveform from the motor-response behavior by
+    providing automatic overdrive and automatic braking.
+
+    The FB_BRAKE_FACTOR[2:0] bits can be adjusted to set the brake factor.
+
+    the start-time characteristic may be different for each actuator, the AUTO_CAL_TIME[1:0] bit can change the duration of the
+    automatic level-calibration routine to optimize calibration performance.
+
+}
+
+
+
+static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)
+这个里面有两个mode ，work和dev，什么意思？
+
+->work_mode
+    #define MODE_REG                    0x01        //也就是说这个是控制震动效果的
+    The DRV2604L device offers multiple ways to launch and control haptic effects. The MODE[2:0] bit in register
+0x01 is used to select the interface mode
+
+    #define MODE_STANDBY_MASK           0x40
+    #define MODE_STANDBY                0x40
+    #define MODE_RESET                  0x80
+    #define DRV2604_MODE_MASK           0x07
+    #define MODE_INTERNAL_TRIGGER       0
+    #define MODE_EXTERNAL_TRIGGER_EDGE  1
+    #define MODE_EXTERNAL_TRIGGER_LEVEL 2
+    #define MODE_PWM_OR_ANALOG_INPUT    3
+    #define MODE_AUDIOHAPTIC            4
+    #define MODE_REAL_TIME_PLAYBACK     5
+    #define MODE_DIAGNOSTICS            6
+    #define AUTO_CALIBRATION            7
+
+->dev_mode
+    #define	WORK_IDLE					0x00
+    #define WORK_RTP			      	0x06
+    #define WORK_CALIBRATION	      	0x07
+    #define WORK_VIBRATOR		      	0x08
+    #define	WORK_PATTERN_RTP_ON			0x09
+    #define WORK_PATTERN_RTP_OFF      	0x0a
+    #define WORK_SEQ_RTP_ON		      	0x0b
+    #define WORK_SEQ_RTP_OFF    	  	0x0c
+    #define WORK_SEQ_PLAYBACK    	  	0x0d
+
+
+    #define DEV_IDLE	                0 // default
+    #define DEV_STANDBY					1
+    #define DEV_READY					2
+
+
+    #define DRV2604L_I2C_BUS_ID         4
+    #define DRV2604L_I2C_ADDR			0x5A
+
+
+
+
+代码调用的流程：
+
+
+
+platform.c
+
+充电器插入的时候会调用马达震动 + 电话震动 + 开机震动
+
+
+
+
+
+
+
+DRV2604L 器件是一款低压触觉驱动器，其闭环致动器控制系统，可为 ERM 和 LRA 提供高质量的触觉反馈。此方案有助于提升致动器在加速度稳定性、启动时间和制动时间方面的
+性能，通过共用的 I2C 兼容总线或 PWM 输入信号即可触发该方案。
+
+DRV2604L 器件集成有足够的 RAM，用户能够预装载超过 100 个定制智能环路架构波形。这些波形可通过 I2C 即时回放，或者也可选择由硬件触发引脚来触发。
+
+此外，主机处理器可利用实时回放模式绕过存储器回放引擎并通过 I2C 从主机直接播放波形。
+
+DRV2604L 器件内部采用智能环路架构，可轻松实现自动谐振 LRA 驱动，以及优化反馈的 ERM 驱动，从而提供自动过驱动和制动。这种智能环路架构可构建简化的输入波形接口，
+并且能够提供可靠的电机控制和稳定的电机性能。此外，DRV2604L 器件还 能够 在 LRA 致动器不产生有效反电动势电压时自动切换至开环系统。当 LRA 产生有效反电动势电压时，
+DRV2604L 器件会自动与 LRA 同步。 DRV2604L 还可以利用内部生成的 PWM 信号实现开环驱动。
+
+
+
+}
+
 
 
 
@@ -346,17 +210,23 @@ kernel-4.4/drivers/input/keyboard/mediatek/aw9523b_gpio
 
 
 关掉OTG功能
+    不注册OTG这个中断
 
 
 
 
-
+mmi测试：加入充电测试选项
 
 
 
 电池曲线的导入    
 
+
+
 }
+
+
+
 
 
 
