@@ -1,0 +1,19 @@
+高精度定时器hrtimer使用步骤：
+1、定义数据结构
+static struct hrtimer  hr_timer;
+static ktime_t ktime;
+
+2、初始化，并设置回调函数
+hrtimer_init(&hr_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+hr_timer.function = key_timerhandler;
+
+3、设置转换时间，并启动定时器
+ktime = ns_to_ktime(1000*1000*1000);
+hrtimer_start(&hr_timer,ktime,HRTIMER_MODE_REL);
+
+4、中途还可以更新修改定时器时间
+ktime = ns_to_ktime(1000*1000*100);/* 100ms */
+hrtimer_add_expires(&hr_timer,ktime);/* update timer */
+
+5、不使用了可以退出定时器
+hrtimer_cancel(&hr_timer);
