@@ -212,10 +212,8 @@ static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_
 
 2.lk跟kernel有个套代码
 
-open_loop ,close_loop
-
 lk阶段
-知道这个函数干了什么？
+知道这个函数干了什么：就是让马达震动一会然后关闭
 void gn_lk_vibrate(void)
 {    
 	printf("%s.\n",__func__);
@@ -247,20 +245,35 @@ void gn_lk_vibrate(void)
 						BIDIR_INPUT_BIDIRECTIONAL|ERM_OpenLoop_Disable|LRA_OpenLoop_Disable|RTP_FORMAT_SIGNED);
 	*/
 
-    //real time payback：0x02 实时的反馈
+    //real time payback：0x02 给这个模式写一个值
 	drv2604l_i2c_write(REAL_TIME_PLAYBACK_REG, 0x5F);
-
+    //进入RTP模式 ， 实时的反馈
 	drv2604l_i2c_write(MODE_REG,MODE_REAL_TIME_PLAYBACK);
 	mdelay(100);
 
+    //让设备进入idle模式
 	drv2604l_i2c_write(MODE_REG,DEV_IDLE);
 
     //set gpio
+    //关闭en使能引脚
 	mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,0);
 }
 
 
-kernel阶段可以做的动作更多
+kernel阶段干的内容很多，
+debug这几个值才会通过
+#define HAPTIC_CMDID_REG_WRITE  	0x09
+#define HAPTIC_CMDID_REG_READ   	0x0a
+#define HAPTIC_CMDID_REG_SETBIT  	0x0b
+
+
+
+
+1.编译一个测试程序，交叉编译器or在vendor下添加一个文件夹，android.mk
+2.echo 应该输出的是一个字符串，但是现在要输出一个数字
+3.还有open_loop ,close_loop这两个内容没有理解
+4.设备节点添加一个ioctl函数可以自己修改使用
+
 
 
 

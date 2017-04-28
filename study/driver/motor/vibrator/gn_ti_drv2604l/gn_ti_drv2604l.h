@@ -27,7 +27,9 @@
 ** =============================================================================
 */
 
+/*
 #include <linux/switch.h>
+
 
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
@@ -41,6 +43,25 @@
 #include <linux/mutex.h>
 #include <linux/cdev.h>
 //#include <linux/earlysuspend.h>
+*/
+
+#include "linux/switch.h"
+
+
+/*
+#ifdef CONFIG_HAS_EARLYSUSPEND
+#include "linux/earlysuspend.h"
+#endif
+*/
+#include "linux/timer.h"
+#include "linux/workqueue.h"
+#include <../../../drivers/staging/android/timed_output.h>
+#include "linux/hrtimer.h"
+#include "linux/wakelock.h"
+#include "linux/mutex.h"
+#include "linux/cdev.h"
+//#include <linux/earlysuspend.h>
+
 
 #define HAPTICS_DEVICE_NAME "DRV2604L"
 
