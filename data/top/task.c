@@ -96,6 +96,7 @@
 ->IC:drv2604l
 
 
+基本概念
 {
     LRA (Linear Resonance Actuator) 线性制动器
 
@@ -110,6 +111,8 @@
 
     calibration  n. 校准，标准化； 刻度，标度； 测量口径；变形         
 
+    resonant adj.洪亮的； 回响的； 共振的； 能共鸣的
+
 
     The ERM_LRA bit in register 0x1A must be
     configured to select the type of actuator that the device uses.
@@ -117,7 +120,7 @@
     The smart-loop architecture makes the resonant frequency of the LRA available through I2C (see the LRA
     Resonance Period (Address: 0x22) section)
 
-    A key feature of the DRV2604L is the smart-loop architecture which employs actuator feedback control for both
+    A key feature of the DRV2604L is the “smart-loop architecture” which employs actuator feedback control for both
     ERMs and LRAs. The feedback control desensitizes the input waveform from the motor-response behavior by
     providing automatic overdrive and automatic braking.
 
@@ -125,6 +128,14 @@
 
     the start-time characteristic may be different for each actuator, the AUTO_CAL_TIME[1:0] bit can change the duration of the
     automatic level-calibration routine to optimize calibration performance.
+
+
+
+
+
+
+[   42.657878] <0>.(0)[947:debuggerd][name:primary_display&][DISP][primary_display_trigger_nolock #4861]ERROR:primary_display_trigger_nolock, skip because primary dipslay is sleep
+
 
 }
 
@@ -167,7 +178,6 @@ static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_
     #define DEV_STANDBY					1
     #define DEV_READY					2
 
-
     #define DRV2604L_I2C_BUS_ID         4
     #define DRV2604L_I2C_ADDR			0x5A
 
@@ -177,13 +187,80 @@ static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_
 代码调用的流程：
 
 
+{
+    充电器插入的时候会调用马达震动 + 电话震动 + 开机震动
 
-platform.c
-
-充电器插入的时候会调用马达震动 + 电话震动 + 开机震动
+  ->开机震动 -> OK   2017.4.27
 
 
 
+  ->插入充电器，进行充电器检测时候会有震动
+    震动使能,插入充电器，震动模式
+
+
+
+
+  ->写一个测试的程序，调用设备节点操作  
+
+
+
+
+
+1.vibrator提供了两套mtk自带的和第三方的
+        CONFIG_GN_BSP_MTK_VIBRATOR_DRV2604L
+        CONFIG_MTK_VIBRATOR
+
+2.lk跟kernel有个套代码
+
+open_loop ,close_loop
+
+lk阶段
+知道这个函数干了什么？
+void gn_lk_vibrate(void)
+{    
+	printf("%s.\n",__func__);
+	
+	unsigned int result_tmp;
+	char reg_address;
+	char reg_data;
+
+    //set gpio，设置drv2604_en引脚输出使能
+	mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,1);
+	mdelay(2);
+
+    //往寄存器0x01写 0 为DEV_IDLE模式，DEV_STANDBY  1， DEV_READY  2
+	drv2604l_i2c_write(MODE_REG,DEV_IDLE);
+
+	//init regs 这两个参数都要在标准化之前设定好
+    //这个是设置额定电压 rated_voltage: 0x16
+	drv2604l_i2c_write(RATED_VOLTAGE_REG, 0x30);
+
+    //超速的钳位电压 ，在闭环操作中这个电压可以超过额定电压 Overdrive Clamp Voltage ：0x17
+  	drv2604l_i2c_write(OVERDRIVE_CLAMP_VOLTAGE_REG,0x53);
+
+	/*drv2604l_set_bits(FEEDBACK_CONTROL_REG,	
+						FEEDBACK_CONTROL_DEVICE_TYPE_MASK|FEEDBACK_CONTROL_FB_BRAKE_MASK|FEEDBACK_CONTROL_LOOP_GAIN_MASK,
+						FEEDBACK_CONTROL_MODE_LRA|FB_BRAKE_FACTOR|LOOP_GAIN);
+
+	drv2604l_set_bits(Control3_REG,	
+						Control3_REG_LOOP_MASK|Control3_REG_FORMAT_MASK,
+						BIDIR_INPUT_BIDIRECTIONAL|ERM_OpenLoop_Disable|LRA_OpenLoop_Disable|RTP_FORMAT_SIGNED);
+	*/
+
+    //real time payback：0x02 实时的反馈
+	drv2604l_i2c_write(REAL_TIME_PLAYBACK_REG, 0x5F);
+
+	drv2604l_i2c_write(MODE_REG,MODE_REAL_TIME_PLAYBACK);
+	mdelay(100);
+
+	drv2604l_i2c_write(MODE_REG,DEV_IDLE);
+
+    //set gpio
+	mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,0);
+}
+
+
+kernel阶段可以做的动作更多
 
 
 
