@@ -15,6 +15,7 @@
 
 int main()
 {
+/*
 	int *p=NULL;
 	int n=0,i=0;
 	printf("请输入:");
@@ -34,6 +35,14 @@ int main()
 		
 	printf("now p->%p\n",p);
 	free(p);
-
+*/
+	int a[3]={1,2,3};
+	int const *b=a;
+	
+	printf("a->%p,b->%p\n",a,b);
+	printf("a+1->%p,b+1->%p\n",a+1,b+1);
+	printf("a[0]->%d,b[0]->%d\n",a[0],*b);
+	printf("a++->%p,b++->%p\n",a++,b++);
+	
 	return 0;
 }

@@ -95,7 +95,6 @@
 
 ->IC:drv2604l
 
-
 基本概念
 {
     LRA (Linear Resonance Actuator) 线性制动器
@@ -129,64 +128,38 @@
     the start-time characteristic may be different for each actuator, the AUTO_CAL_TIME[1:0] bit can change the duration of the
     automatic level-calibration routine to optimize calibration performance.
 
-
-
-
-
-
-[   42.657878] <0>.(0)[947:debuggerd][name:primary_display&][DISP][primary_display_trigger_nolock #4861]ERROR:primary_display_trigger_nolock, skip because primary dipslay is sleep
-
-
 }
 
 
 
 static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)
-这个里面有两个mode ，work和dev，什么意思？
+这个里面有两个mode ，work和dev，什么意思
 
-->work_mode
-    #define MODE_REG                    0x01        //也就是说这个是控制震动效果的
-    The DRV2604L device offers multiple ways to launch and control haptic effects. The MODE[2:0] bit in register
-0x01 is used to select the interface mode
-
-    #define MODE_STANDBY_MASK           0x40
-    #define MODE_STANDBY                0x40
-    #define MODE_RESET                  0x80
-    #define DRV2604_MODE_MASK           0x07
-    #define MODE_INTERNAL_TRIGGER       0
-    #define MODE_EXTERNAL_TRIGGER_EDGE  1
-    #define MODE_EXTERNAL_TRIGGER_LEVEL 2
-    #define MODE_PWM_OR_ANALOG_INPUT    3
-    #define MODE_AUDIOHAPTIC            4
-    #define MODE_REAL_TIME_PLAYBACK     5
-    #define MODE_DIAGNOSTICS            6
-    #define AUTO_CALIBRATION            7
-
-->dev_mode
-    #define	WORK_IDLE					0x00
-    #define WORK_RTP			      	0x06
-    #define WORK_CALIBRATION	      	0x07
-    #define WORK_VIBRATOR		      	0x08
-    #define	WORK_PATTERN_RTP_ON			0x09
-    #define WORK_PATTERN_RTP_OFF      	0x0a
-    #define WORK_SEQ_RTP_ON		      	0x0b
-    #define WORK_SEQ_RTP_OFF    	  	0x0c
-    #define WORK_SEQ_PLAYBACK    	  	0x0d
+dev_mode 这个是马达设备所处的状态，idle闲置中断来了也不会有响应，standby应该是待机模式这个是低功耗随时处在待命模式，中断可以响应
+ready这个应该是active模式了
+#define DEV_IDLE	                0 // default
+#define DEV_STANDBY					1
+#define DEV_READY					2
 
 
-    #define DEV_IDLE	                0 // default
-    #define DEV_STANDBY					1
-    #define DEV_READY					2
+这个是相应的工作模式
+#define	WORK_IDLE					0x00
+#define WORK_RTP			      	0x06
+#define WORK_CALIBRATION	      	0x07
+#define WORK_VIBRATOR		      	0x08
+#define	WORK_PATTERN_RTP_ON			0x09
+#define WORK_PATTERN_RTP_OFF      	0x0a
+#define WORK_SEQ_RTP_ON		      	0x0b
+#define WORK_SEQ_RTP_OFF    	  	0x0c
+#define WORK_SEQ_PLAYBACK    	  	0x0d
 
-    #define DRV2604L_I2C_BUS_ID         4
-    #define DRV2604L_I2C_ADDR			0x5A
+#define DRV2604L_I2C_BUS_ID         4
+#define DRV2604L_I2C_ADDR			0x5A
 
 
 
 
 代码调用的流程：
-
-
 {
     充电器插入的时候会调用马达震动 + 电话震动 + 开机震动
 
@@ -201,6 +174,10 @@ static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_
 
 
   ->写一个测试的程序，调用设备节点操作  
+  2017.5.2
+        写一个测试程序调用/dev/DRV2604L这个节点，
+        read，write，ioctl，写进去正确的数据，产生有效的效果
+        然后写一个ioctl函数 
 
 
 
@@ -209,6 +186,7 @@ static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_
 1.vibrator提供了两套mtk自带的和第三方的
         CONFIG_GN_BSP_MTK_VIBRATOR_DRV2604L
         CONFIG_MTK_VIBRATOR
+
 
 2.lk跟kernel有个套代码
 
@@ -267,12 +245,17 @@ debug这几个值才会通过
 #define HAPTIC_CMDID_REG_SETBIT  	0x0b
 
 
+gn_ti_drv2604l.h
 
 
-1.编译一个测试程序，交叉编译器or在vendor下添加一个文件夹，android.mk
-2.echo 应该输出的是一个字符串，但是现在要输出一个数字
+
 3.还有open_loop ,close_loop这两个内容没有理解
+    开环，闭环的区别，作用
+
+    
 4.设备节点添加一个ioctl函数可以自己修改使用
+
+
 
 
 
@@ -292,6 +275,18 @@ DRV2604L 器件会自动与 LRA 同步。 DRV2604L 还可以利用内部生成�
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

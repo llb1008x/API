@@ -363,10 +363,10 @@ adb reboot-bootloader
 		如有疑问请联系 赖洪浩。
 
 		需求：
-					1.新下载项目更新repo脚本2.3
-						http://10.8.0.20/redmine/attachments/download/16110/repo_init_env_sv2.3.7z
-					2.已经下载的项目在.git同级目录执行  
-						scp -r -p -P 29418 xxx@10.8.10.19:hooks/ .git
+			1.新下载项目更新repo脚本2.3
+				http://10.8.0.20/redmine/attachments/download/16110/repo_init_env_sv2.3.7z
+			2.已经下载的项目在.git同级目录执行  
+				scp -r -p -P 29418 xxx@10.8.10.19:hooks/ .git
 
 --->   	scp -r -p -P 29418 lilubao@10.8.10.19:hooks/ .git
 
@@ -426,6 +426,28 @@ adb reboot-bootloader
 		adb remount （重新挂载系统分区，使系统分区重新可写，不然无法将文件，bin推送到system/bin）
 		adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/bin/kpoc_charger   system/bin/
 		adb push /home/llb/project/PRO/source/G1605A/L28_6737M_65_G1605A_M0.MP1_V2.140.3_160908_ALPS/android_mtk_6737m_65_mp/out/target/product/gnbj6737t_66_m0/system/lib/libshowlogo.so  system/lib/
+		
+		当前项目环境下编写一个测试程序
+		在vendor创建一个目录
+		/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/vendor/mediatek/proprietary/external/motor_test
+		添加Android.mk脚本
+		{
+			LOCAL_PATH := $(call my-dir)
+
+			include $(CLEAR_VARS)
+
+			LOCAL_MODULE_TAGS := optional
+
+			LOCAL_MODULE := moto_test	//要使用的源码文件生成的文件
+
+			LOCAL_SRC_FILES := $(call all-subdir-c-files)
+
+			include $(BUILD_EXECUTABLE)
+		}
+
+		在out目录下生成二进制文件
+		/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/out/target/product/gnbj6757_66_n/system/bin
+
 
 
 		调整log时间
