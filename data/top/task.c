@@ -198,8 +198,33 @@
 
 代码调用的流程：
 {
+lk
+    (platform.c)platform_init 系统平台相关的初始化 -> gn_lk_vibrate 马达震动 -> 输出引脚使能，设置MODE_REG改成相应的模式idle，standby，ready
+    哪种模式然后设置几个量，延时一段时间，然后关闭引脚使能，mode变成ready
 
 
+kernel
+    (gn_ti_drv2604l.c)drv2604l_init，pinctrl初始化引脚状态，往I2C总线上注册驱动->drv2604l_probe芯片驱动相关的初始化，检测I2C是否正常，设置client数据
+    
+    获取dev相关的状态 -> drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)这个是改变马达模式都要调用的
+    
+    一个函数，work_mode,dev_mode -> schedule_timeout_interruptible调用一段时间 -> dev_init_platform_data 平台设备相关的初始化 -> Haptics_init
+
+    震动效果相关的初始化，创建一个字符设备节点，注册几个函数enable ，工作函数vibrator_timer_func -> vibrator_work_routine,传进不同work_mode,dev_mode
+
+    调用不同的震动效果
+
+
+
+
+
+这是振动器的配置
+static struct actuator_data DRV2604L_actuator={
+		.device_type = LRA,
+		.rated_vol = 0x46,
+		.over_drive_vol = 0x7a,
+		.LRAFreq = 235,
+};
 
 
 
@@ -264,11 +289,9 @@ void gn_lk_vibrate(void)
 
 kernel阶段
 
-
-/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/power/mediatek/charger
-/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/vibrator/gn_ti_drv2604l/
-
-
+1.通过write写值进入不同的case，这个就要弄清写什么样的值，如何正确的写进去
+2.或者在原有函数基础上调用自己写的一个函数，ioctl
+ioctl通过写进不同的cmd，传进值，在不同的case里面调用不同的效果
 
 mmi测试有调用马达震动的接口，而ftm*应该是mmi测试相关的源码
 ftm_vibrator.c
