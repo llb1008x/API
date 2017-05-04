@@ -95,6 +95,38 @@
 
 ->IC:drv2604l
 
+调试
+{
+     
+    2017.4.27 	    ok
+    {
+     开机震动 
+        //Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+        mdelay(500);			// 100->500
+        //Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
+    }
+
+
+    2017.5.2        
+    {
+        写一个测试程序调用/dev/DRV2604L这个节点，
+        read，write，ioctl，写进去正确的数据，产生有效的效果
+        然后写一个ioctl函数 
+
+        ioctl函数还没有写
+    }
+
+
+    2017.5.3
+    {
+       ->插入充电器，进行充电器检测时候会有震动
+        震动使能,插入充电器，震动模式   
+
+    }
+      
+
+}
+
 基本概念
 {
     LRA (Linear Resonance Actuator) 线性制动器
@@ -131,53 +163,44 @@
 }
 
 
+重要的控制
+{
+    static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)
+    这个里面有两个mode ，work和dev，什么意思
 
-static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)
-这个里面有两个mode ，work和dev，什么意思
-
-dev_mode 这个是马达设备所处的状态，idle闲置中断来了也不会有响应，standby应该是待机模式这个是低功耗随时处在待命模式，中断可以响应
-ready这个应该是active模式了
-#define DEV_IDLE	                0 // default
-#define DEV_STANDBY					1
-#define DEV_READY					2
+    dev_mode 这个是马达设备所处的状态，idle闲置中断来了也不会有响应，standby应该是待机模式这个是低功耗随时处在待命模式，中断可以响应
+    ready这个应该是active模式了
+    #define DEV_IDLE	                0 // default
+    #define DEV_STANDBY					1
+    #define DEV_READY					2
 
 
-这个是相应的工作模式
-#define	WORK_IDLE					0x00
-#define WORK_RTP			      	0x06
-#define WORK_CALIBRATION	      	0x07
-#define WORK_VIBRATOR		      	0x08
-#define	WORK_PATTERN_RTP_ON			0x09
-#define WORK_PATTERN_RTP_OFF      	0x0a
-#define WORK_SEQ_RTP_ON		      	0x0b
-#define WORK_SEQ_RTP_OFF    	  	0x0c
-#define WORK_SEQ_PLAYBACK    	  	0x0d
+    这个是相应的工作模式
+    #define	WORK_IDLE					0x00
+    #define WORK_RTP			      	0x06
+    #define WORK_CALIBRATION	      	0x07
+    #define WORK_VIBRATOR		      	0x08
+    #define	WORK_PATTERN_RTP_ON			0x09
+    #define WORK_PATTERN_RTP_OFF      	0x0a
+    #define WORK_SEQ_RTP_ON		      	0x0b
+    #define WORK_SEQ_RTP_OFF    	  	0x0c
+    #define WORK_SEQ_PLAYBACK    	  	0x0d
 
-#define DRV2604L_I2C_BUS_ID         4
-#define DRV2604L_I2C_ADDR			0x5A
+    #define DRV2604L_I2C_BUS_ID         4
+    #define DRV2604L_I2C_ADDR			0x5A
+
+
+}
+
 
 
 
 
 代码调用的流程：
 {
-    充电器插入的时候会调用马达震动 + 电话震动 + 开机震动
-
-  ->开机震动 -> OK   2017.4.27
 
 
 
-  ->插入充电器，进行充电器检测时候会有震动
-    震动使能,插入充电器，震动模式
-
-
-
-
-  ->写一个测试的程序，调用设备节点操作  
-  2017.5.2
-        写一个测试程序调用/dev/DRV2604L这个节点，
-        read，write，ioctl，写进去正确的数据，产生有效的效果
-        然后写一个ioctl函数 
 
 
 
@@ -188,7 +211,7 @@ ready这个应该是active模式了
         CONFIG_MTK_VIBRATOR
 
 
-2.lk跟kernel有个套代码
+2.lk和kernel有两套代码
 
 lk阶段
 知道这个函数干了什么：就是让马达震动一会然后关闭
@@ -238,22 +261,69 @@ void gn_lk_vibrate(void)
 }
 
 
-kernel阶段干的内容很多，
-debug这几个值才会通过
-#define HAPTIC_CMDID_REG_WRITE  	0x09
-#define HAPTIC_CMDID_REG_READ   	0x0a
-#define HAPTIC_CMDID_REG_SETBIT  	0x0b
+
+kernel阶段
 
 
-gn_ti_drv2604l.h
+/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/power/mediatek/charger
+/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/vibrator/gn_ti_drv2604l/
 
 
 
-3.还有open_loop ,close_loop这两个内容没有理解
-    开环，闭环的区别，作用
+mmi测试有调用马达震动的接口，而ftm*应该是mmi测试相关的源码
+ftm_vibrator.c
 
-    
-4.设备节点添加一个ioctl函数可以自己修改使用
+这个是往enable节点写value，震动多长时间
+static int write_int(char const* path, int value)
+{
+	int fd;
+
+	if (path == NULL)
+		return -1;
+
+	fd = open(path, O_RDWR);
+	if (fd >= 0) {
+		char buffer[20];
+		int bytes = sprintf(buffer, "%d\n", value);
+		int amt = write(fd, buffer, bytes);
+		close(fd);
+		return amt == -1 ? -errno : 0;
+	}
+
+	LOGE("write_int failed to open %s\n", path);
+	return -errno;
+}
+
+默认是打开mmi测试，震动，也可以手动写值
+static void *update_vibrator_thread_default(void *priv)
+{
+	LOGD("%s: Start\n", __FUNCTION__);
+
+	if(vibrator_time == 0)
+	{
+	do {
+        write_int(VIBRATOR_ENABLE, 8000); // 1 seconds
+		if (vibrator_test_exit)
+			break;
+		sleep(1);
+		} while (1);	
+		write_int(VIBRATOR_ENABLE, 0);
+	}
+	else
+	{
+		LOGD("%s: write vibrator_enable=%d\n", __FUNCTION__, vibrator_time);
+		write_int(VIBRATOR_ENABLE, vibrator_time);
+		sleep(1);
+		write_int(VIBRATOR_ENABLE, 0);
+		LOGD("%s: write vibrator_enable=0\n", __FUNCTION__);
+	}
+
+	pthread_exit(NULL);
+
+	LOGD("%s: Exit\n", __FUNCTION__);
+
+	return NULL;
+}
 
 
 
