@@ -92,11 +92,6 @@
 
 马达效果
 {
-
-->IC:drv2604l
-
-调试
-{
      
     2017.4.27 	    ok
     {
@@ -121,254 +116,201 @@
     {
        ->插入充电器，进行充电器检测时候会有震动
         震动使能,插入充电器，震动模式   
-
+        -> 这个是上层调用的
     }
       
+    2017.5.4
+    {
+        通过ioctl函数可以通过测试程序，直接调用不同的work_mode产生效果
+        vibrator_enable这个是最简单直接的只要调用然后写一个value就能震动
+        drv2604l_change_mode这个是调用马达震动都要调用的函数
 
-}
-
-基本概念
-{
-    LRA (Linear Resonance Actuator) 线性制动器
-
-    ERM (Eccentric Rotating Mass) 偏转转动惯量
-
-    Back-EMF detection 反电动势检测
-
-    actuator n.激励者； [电脑]执行机构； [电]（电磁铁）螺线管； [机]促动器
-
-    braking  n. 刹车，制动，（用闸）减速；
-            v. 刹（车）( brake的现在分词 )；
-
-    calibration  n. 校准，标准化； 刻度，标度； 测量口径；变形         
-
-    resonant adj.洪亮的； 回响的； 共振的； 能共鸣的
-
-
-    The ERM_LRA bit in register 0x1A must be
-    configured to select the type of actuator that the device uses.
-
-    The smart-loop architecture makes the resonant frequency of the LRA available through I2C (see the LRA
-    Resonance Period (Address: 0x22) section)
-
-    A key feature of the DRV2604L is the “smart-loop architecture” which employs actuator feedback control for both
-    ERMs and LRAs. The feedback control desensitizes the input waveform from the motor-response behavior by
-    providing automatic overdrive and automatic braking.
-
-    The FB_BRAKE_FACTOR[2:0] bits can be adjusted to set the brake factor.
-
-    the start-time characteristic may be different for each actuator, the AUTO_CAL_TIME[1:0] bit can change the duration of the
-    automatic level-calibration routine to optimize calibration performance.
-
-}
-
-
-重要的控制
-{
-    static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)
-    这个里面有两个mode ，work和dev，什么意思
-
-    dev_mode 这个是马达设备所处的状态，idle闲置中断来了也不会有响应，standby应该是待机模式这个是低功耗随时处在待命模式，中断可以响应
-    ready这个应该是active模式了
-    #define DEV_IDLE	                0 // default
-    #define DEV_STANDBY					1
-    #define DEV_READY					2
-
-
-    这个是相应的工作模式
-    #define	WORK_IDLE					0x00
-    #define WORK_RTP			      	0x06
-    #define WORK_CALIBRATION	      	0x07
-    #define WORK_VIBRATOR		      	0x08
-    #define	WORK_PATTERN_RTP_ON			0x09
-    #define WORK_PATTERN_RTP_OFF      	0x0a
-    #define WORK_SEQ_RTP_ON		      	0x0b
-    #define WORK_SEQ_RTP_OFF    	  	0x0c
-    #define WORK_SEQ_PLAYBACK    	  	0x0d
-
-    #define DRV2604L_I2C_BUS_ID         4
-    #define DRV2604L_I2C_ADDR			0x5A
-
-
-}
-
-
-
-
-
-代码调用的流程：
-{
-lk
-    (platform.c)platform_init 系统平台相关的初始化 -> gn_lk_vibrate 马达震动 -> 输出引脚使能，设置MODE_REG改成相应的模式idle，standby，ready
-    哪种模式然后设置几个量，延时一段时间，然后关闭引脚使能，mode变成ready
-
-
-kernel
-    (gn_ti_drv2604l.c)drv2604l_init，pinctrl初始化引脚状态，往I2C总线上注册驱动->drv2604l_probe芯片驱动相关的初始化，检测I2C是否正常，设置client数据
-    
-    获取dev相关的状态 -> drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)这个是改变马达模式都要调用的
-    
-    一个函数，work_mode,dev_mode -> schedule_timeout_interruptible调用一段时间 -> dev_init_platform_data 平台设备相关的初始化 -> Haptics_init
-
-    震动效果相关的初始化，创建一个字符设备节点，注册几个函数enable ，工作函数vibrator_timer_func -> vibrator_work_routine,传进不同work_mode,dev_mode
-
-    调用不同的震动效果
-
-
-
-
-
-这是振动器的配置
-static struct actuator_data DRV2604L_actuator={
-		.device_type = LRA,
-		.rated_vol = 0x46,
-		.over_drive_vol = 0x7a,
-		.LRAFreq = 235,
-};
-
-
-
-
-
-
-1.vibrator提供了两套mtk自带的和第三方的
+        1.vibrator提供了两套mtk自带的和第三方的
         CONFIG_GN_BSP_MTK_VIBRATOR_DRV2604L
         CONFIG_MTK_VIBRATOR
 
+        2.lk和kernel有两套代码
+        lk阶段
+        知道这个函数干了什么：就是让马达震动一会然后关闭
+        void gn_lk_vibrate(void)
 
-2.lk和kernel有两套代码
+        kernel阶段
+        1.通过write写值进入不同的case，这个就要弄清写什么样的值，如何正确的写进去
+        2.或者在原有函数基础上调用自己写的一个函数，ioctl
+        ioctl通过写进不同的cmd，传进值，在不同的case里面调用不同的效果
 
-lk阶段
-知道这个函数干了什么：就是让马达震动一会然后关闭
-void gn_lk_vibrate(void)
-{    
-	printf("%s.\n",__func__);
-	
-	unsigned int result_tmp;
-	char reg_address;
-	char reg_data;
 
-    //set gpio，设置drv2604_en引脚输出使能
-	mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,1);
-	mdelay(2);
+        //Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+        #define MOTOR_TEST
+        #if defined(MOTOR_TEST)
 
-    //往寄存器0x01写 0 为DEV_IDLE模式，DEV_STANDBY  1， DEV_READY  2
-	drv2604l_i2c_write(MODE_REG,DEV_IDLE);
+        long dev2604_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+        {
+            struct DRV2604L_data *pDrv2604ldata = (struct DRV2604L_data *)filp->private_data;
+            int value=(int )arg;
+            int cnt=10;
+            
+            printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+            
+            switch(cmd)
+            {
+            // test vibrator_enable	
+            case 1:
+                printk(KERN_ERR"in %s case 1 vibrator_enable ,value->%d\n", __FUNCTION__,value);
+                while(cnt--){
 
-	//init regs 这两个参数都要在标准化之前设定好
-    //这个是设置额定电压 rated_voltage: 0x16
-	drv2604l_i2c_write(RATED_VOLTAGE_REG, 0x30);
+                    vibrator_enable( &(pDrv2604ldata->to_dev),value );
+                    mdelay(500);
+                    vibrator_enable( &(pDrv2604ldata->to_dev),0);
+                    mdelay(300);
+                }
 
-    //超速的钳位电压 ，在闭环操作中这个电压可以超过额定电压 Overdrive Clamp Voltage ：0x17
-  	drv2604l_i2c_write(OVERDRIVE_CLAMP_VOLTAGE_REG,0x53);
+                break;
+                
+            // test drv2604l_change_mode
+            case 2:
+                printk(KERN_ERR"in %s case 2 enable drv2604l_change_mode ,value->%d\n", __FUNCTION__,value);
+                
+                pDrv2604ldata->should_stop = YES;
+                hrtimer_cancel(&pDrv2604ldata->timer);
+                cancel_work_sync(&pDrv2604ldata->vibrator_work);
+                
+                mutex_lock(&pDrv2604ldata->lock);
+                
+                drv2604l_stop(pDrv2604ldata);
+                
+                //wake_lock(&pDrv2604ldata->wklock);
+                
+                drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
+                pDrv2604ldata->vibrator_is_playing = YES;
+                switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_RTP_PLAYBACK);
+                
+                value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
+                hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+                schedule_work(&pDrv2604ldata->vibrator_work);
+                
+                mutex_unlock(&pDrv2604ldata->lock);
 
-	/*drv2604l_set_bits(FEEDBACK_CONTROL_REG,	
-						FEEDBACK_CONTROL_DEVICE_TYPE_MASK|FEEDBACK_CONTROL_FB_BRAKE_MASK|FEEDBACK_CONTROL_LOOP_GAIN_MASK,
-						FEEDBACK_CONTROL_MODE_LRA|FB_BRAKE_FACTOR|LOOP_GAIN);
+                break;
+                
+            // test vibrator_off
+            case 3:
+                printk(KERN_ERR"in %s case 3 enable vibrator_off ,value->%d\n", __FUNCTION__,value);
+                vibrator_off(pDrv2604ldata);
+                break;
 
-	drv2604l_set_bits(Control3_REG,	
-						Control3_REG_LOOP_MASK|Control3_REG_FORMAT_MASK,
-						BIDIR_INPUT_BIDIRECTIONAL|ERM_OpenLoop_Disable|LRA_OpenLoop_Disable|RTP_FORMAT_SIGNED);
-	*/
+            // test play_effect
+            case 4:
+                printk(KERN_ERR"in %s case 4 enable play_effect ,value->%d\n", __FUNCTION__,value);
+                play_effect(pDrv2604ldata);
+                break;
+                
+            // test play_Pattern_RTP
+            case 5:	
+                printk(KERN_ERR"in %s case 5 enable play_Pattern_RTP ,value->%d\n", __FUNCTION__,value);
+                play_Pattern_RTP(pDrv2604ldata);
+                break;
 
-    //real time payback：0x02 给这个模式写一个值
-	drv2604l_i2c_write(REAL_TIME_PLAYBACK_REG, 0x5F);
-    //进入RTP模式 ， 实时的反馈
-	drv2604l_i2c_write(MODE_REG,MODE_REAL_TIME_PLAYBACK);
-	mdelay(100);
+            // test play_Seq_RTP
+            case 6:
+                printk(KERN_ERR"in %s case 6 enable play_Seq_RTP ,value->%d\n", __FUNCTION__,value);
+                play_Seq_RTP(pDrv2604ldata);
+                break;
 
-    //让设备进入idle模式
-	drv2604l_i2c_write(MODE_REG,DEV_IDLE);
+            // test drv2604l_change_mode	
+            case 7:
+                printk(KERN_ERR"in %s case 7 enable drv2604l_change_mode ,value->%d\n", __FUNCTION__,value);
+                
+                pDrv2604ldata->should_stop = YES;
+                hrtimer_cancel(&pDrv2604ldata->timer);
+                cancel_work_sync(&pDrv2604ldata->vibrator_work);
+                
+                mutex_lock(&pDrv2604ldata->lock);
+                
+                drv2604l_stop(pDrv2604ldata);
+                
+                //wake_lock(&pDrv2604ldata->wklock);
+                
+                drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
+                pDrv2604ldata->vibrator_is_playing = YES;
+                switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_RTP_PLAYBACK);
+                
+                value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
+                hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+                schedule_work(&pDrv2604ldata->vibrator_work);
+                
+                mutex_unlock(&pDrv2604ldata->lock);
 
-    //set gpio
-    //关闭en使能引脚
-	mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,0);
+                break;	
+
+            // test drv2604l_change_mode	for work_mode
+            case 8:
+                printk(KERN_ERR"in %s case 8 enable drv2604l_change_mode for work_mode,value->%d\n", __FUNCTION__,value);
+                cnt=10;
+                drv2604l_change_mode(pDrv2604ldata, value, DEV_READY);
+                value = MAX_TIMEOUT;
+                hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+                schedule_work(&pDrv2604ldata->vibrator_work);
+                break;
+
+            default:
+                printk(KERN_ERR"in %s default no cmd\n", __FUNCTION__);
+                break;
+                
+            }
+
+            mutex_unlock(&pDrv2604ldata->lock);
+            printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+
+            return 0;
+        }
+
+        #endif
+        //Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
+    }  
 }
 
 
 
-kernel阶段
-
-1.通过write写值进入不同的case，这个就要弄清写什么样的值，如何正确的写进去
-2.或者在原有函数基础上调用自己写的一个函数，ioctl
-ioctl通过写进不同的cmd，传进值，在不同的case里面调用不同的效果
-
-mmi测试有调用马达震动的接口，而ftm*应该是mmi测试相关的源码
-ftm_vibrator.c
-
-这个是往enable节点写value，震动多长时间
-static int write_int(char const* path, int value)
+调节充电时序状态
 {
-	int fd;
+    2017.5.5
+    {
+        当前完整的重放电所需要的时间，以及电流电压的变化，以及对应三个状态
+        这几个参数可能在头文件中
 
-	if (path == NULL)
-		return -1;
-
-	fd = open(path, O_RDWR);
-	if (fd >= 0) {
-		char buffer[20];
-		int bytes = sprintf(buffer, "%d\n", value);
-		int amt = write(fd, buffer, bytes);
-		close(fd);
-		return amt == -1 ? -errno : 0;
-	}
-
-	LOGE("write_int failed to open %s\n", path);
-	return -errno;
-}
-
-默认是打开mmi测试，震动，也可以手动写值
-static void *update_vibrator_thread_default(void *priv)
-{
-	LOGD("%s: Start\n", __FUNCTION__);
-
-	if(vibrator_time == 0)
-	{
-	do {
-        write_int(VIBRATOR_ENABLE, 8000); // 1 seconds
-		if (vibrator_test_exit)
-			break;
-		sleep(1);
-		} while (1);	
-		write_int(VIBRATOR_ENABLE, 0);
-	}
-	else
-	{
-		LOGD("%s: write vibrator_enable=%d\n", __FUNCTION__, vibrator_time);
-		write_int(VIBRATOR_ENABLE, vibrator_time);
-		sleep(1);
-		write_int(VIBRATOR_ENABLE, 0);
-		LOGD("%s: write vibrator_enable=0\n", __FUNCTION__);
-	}
-
-	pthread_exit(NULL);
-
-	LOGD("%s: Exit\n", __FUNCTION__);
-
-	return NULL;
-}
+        但是现在的问题是充电过程中容易关机，找到关机的原因
+        BOOT_REASON: 0
+        BOOT_MODE: 0
 
 
 
+    }
 
 
+    Applying: Fixed bug 67671
+    No changes - did you forget to use 'git add'?
+    If there is nothing left to stage, chances are that something else
+    already introduced the same changes; you might want to skip this patch.
+
+    When you have resolved this problem run "git rebase --continue".
+    If you would prefer to skip this patch, instead run "git rebase --skip".
+    To check out the original branch and stop rebasing run "git rebase --abort".
 
 
-DRV2604L 器件是一款低压触觉驱动器，其闭环致动器控制系统，可为 ERM 和 LRA 提供高质量的触觉反馈。此方案有助于提升致动器在加速度稳定性、启动时间和制动时间方面的
-性能，通过共用的 I2C 兼容总线或 PWM 输入信号即可触发该方案。
+    It seems that there is already a rebase-apply directory, and
+    I wonder if you are in the middle of another rebase.  If that is the
+    case, please try
+        git rebase (--continue | --abort | --skip)
+    If that is not the case, please
+        rm -fr /home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/gionee/.git/rebase-apply
+    and run me again.  I am stopping in case you still have something
+    valuable there.
 
-DRV2604L 器件集成有足够的 RAM，用户能够预装载超过 100 个定制智能环路架构波形。这些波形可通过 I2C 即时回放，或者也可选择由硬件触发引脚来触发。
-
-此外，主机处理器可利用实时回放模式绕过存储器回放引擎并通过 I2C 从主机直接播放波形。
-
-DRV2604L 器件内部采用智能环路架构，可轻松实现自动谐振 LRA 驱动，以及优化反馈的 ERM 驱动，从而提供自动过驱动和制动。这种智能环路架构可构建简化的输入波形接口，
-并且能够提供可靠的电机控制和稳定的电机性能。此外，DRV2604L 器件还 能够 在 LRA 致动器不产生有效反电动势电压时自动切换至开环系统。当 LRA 产生有效反电动势电压时，
-DRV2604L 器件会自动与 LRA 同步。 DRV2604L 还可以利用内部生成的 PWM 信号实现开环驱动。
 
 
 
 }
-
 
 
 

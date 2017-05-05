@@ -304,7 +304,8 @@ other：
 	http://blog.csdn.net/huangyabin001/article/details/36383031
 
 	
-
+	linux 内核与用户空间通信之netlink使用方法 
+	http://blog.csdn.net/haomcu/article/details/7371835
 
 
 
