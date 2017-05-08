@@ -283,31 +283,67 @@
         BOOT_REASON: 0
         BOOT_MODE: 0
 
-
-
     }
 
 
-    Applying: Fixed bug 67671
-    No changes - did you forget to use 'git add'?
-    If there is nothing left to stage, chances are that something else
-    already introduced the same changes; you might want to skip this patch.
-
-    When you have resolved this problem run "git rebase --continue".
-    If you would prefer to skip this patch, instead run "git rebase --skip".
-    To check out the original branch and stop rebasing run "git rebase --abort".
 
 
-    It seems that there is already a rebase-apply directory, and
-    I wonder if you are in the middle of another rebase.  If that is the
-    case, please try
-        git rebase (--continue | --abort | --skip)
-    If that is not the case, please
-        rm -fr /home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/gionee/.git/rebase-apply
-    and run me again.  I am stopping in case you still have something
-    valuable there.
 
 
+//==============================================================================
+// PMIC define
+//==============================================================================
+typedef enum {
+	AUXADC_LIST_BATADC,     //检测电池
+	AUXADC_LIST_VCDT,       //VCDT：充电电压检测脚
+	AUXADC_LIST_BATTEMP,    //电池温度
+	AUXADC_LIST_BATID,      //battery ID
+	AUXADC_LIST_VBIF,       //应该是跟USB相关的
+	AUXADC_LIST_CHIP_TEMP,  //芯片温度
+	AUXADC_LIST_DCXO,       // 数字温度补偿晶体震荡器
+	AUXADC_LIST_ACCDET,     //耳机检测
+	AUXADC_LISTTSX,        
+	AUXADC_LIST_HP,
+} AUXADC_LIST;
+auxadc定义的采样channel
+
+
+G1605A上电池相关参数在battery_common.h mt_battery_meter.h上，但是17G05A这些参数在哪？
+mtk_charging.h，mtk_battery_meter.h
+
+
+/*****************************************************************************************************
+现在的问题是恒流充电的电流太小，0%关机电压太高，开机充电过程中会出现关机的情况，电量计系数要等电池曲线,关机充电是否有问题
+
+弄清楚battery_probe这个里面几个中断回调函数和创建的线程想干什么
+******************************************************************************************************/
+0%关机电压太高
+{
+    这个应该需要修改电量0%参数
+    mtk_battery_meter.h ，mtk_battery_property.h
+
+    mtk_battery_property.h
+    //Gionee <gn_by_charging> <lilubao> <20170508> add for change charging process begin
+    #define SHUTDOWN_GAUGE0 	  0 	// 1->0			
+    #define SHUTDOWN_GAUGE1_XMINS 1
+    #define SHUTDOWN_GAUGE0_VOLTAGE 	34000	// 35000->34000
+    //Gionee <gn_by_charging> <lilubao> <20170508> add for change charging process end
+}
+
+
+
+调用流程    
+电池相关参数的初始化，这部分跟电池参数相关的应该是之前的meter那一类
+（mtk_battery.c）battery_probe 电池参数的初始化 -> (mtk_battery_hal.c)battery_meter_ctrl = bm_ctrl_cmd,电池电量参数相关计算的一组函数接口
+
+-> fg_custom_init_from_header 从头文件中获得电池参数 -> battery_update_routine,这是一个线程，是负责检测硬件电池参数变化，然后上报给power_supply
+
+根据debug等级可以调整轮训时间 bat_get_debug_level() >= BMLOG_DEBUG_LEVEL -> shutdown_event_handler这个是关机检测执行的回调函数
+
+
+
+
+  
 
 
 }
