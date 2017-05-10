@@ -414,13 +414,14 @@
         //Gionee <gn_by_charging> <lilubao> <20170508> add for change charging process end
     }
 
-
-    恒流充电电流太小只有 1.3~1.6A左右 
+    开机充电过程恒流的充电电流变化不稳定，没有达到预定要求    
     {
-        之前修改的部分没有同步，试试改过之后还是否这样
+        具体说就是刚开始可以达到1.9A，但是充了一段时间后充电电流下降到1.6A左右
 
-        修改之后电流可以达到1.9A但是不是一直这样，然后电流逐渐下降，这不是恒流充电该有的
+
+
     }
+
 
 
 
@@ -430,9 +431,11 @@
 
     -> fg_custom_init_from_header 从头文件中获得电池参数 -> battery_update_routine,这是一个线程，是负责检测硬件电池参数变化，然后上报给power_supply
 
-    根据debug等级可以调整轮训时间 bat_get_debug_level() >= BMLOG_DEBUG_LEVEL -> (mtk_power_misc.c)shutdown_event_handler这个是关机检测执行的回调函数
+    根据debug等级可以调整轮训时间 bat_get_debug_level() >= BMLOG_DEBUG_LEVEL -> 后面是一串中断回调函数，都是跟电量计相关的 -> (mtk_power_misc.c)
+    
+    mtk_power_misc_init ,难道是power相关的misc ，这个地方执行了很多关机条件检测 ，shutdown_event_handler这个是关机检测执行的回调函数 -> 
 
-    -> battery_probe
+     
 
 
     fg这两个中断干什么？
@@ -441,6 +444,7 @@
         fg_iavg_int_lt_handler      FG_IAVG_L_NO
 
         应该是跟high，low相关的
+        电量增加减少变化
     }
 
 
