@@ -308,6 +308,10 @@ other：
 	http://blog.csdn.net/haomcu/article/details/7371835
 
 
+	ARM交叉编译工具链
+	http://www.veryarm.com/cross-tools
+
+
 
 
 

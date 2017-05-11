@@ -414,13 +414,55 @@
         //Gionee <gn_by_charging> <lilubao> <20170508> add for change charging process end
     }
 
+
+
+
     开机充电过程恒流的充电电流变化不稳定，没有达到预定要求    
     {
-        具体说就是刚开始可以达到1.9A，但是充了一段时间后充电电流下降到1.6A左右
+        ****需要定位这些参在哪里改，编译的脚本，需要的文件
+
+        具体说就是刚开始可以达到1.9A，但是充了一段时间后充电电流下降到1.6A左右，开机电压偏高
+
+        1.开机电压偏高 3711mV，电压都上3.7V了，开机电压偏高
+        这个是都去开机时候的电压不是开机要求的临界值
 
 
+        2.充电电流不能稳定在1.8A左右
+
+
+
+
+        3.充电显示达到100%的时候电流还是很大，从这点看出软件设置的电池容量应该比实际的容量小
+        实际情况应该是充电如果达到100%肯定处于恒压阶段，充电电流很小，充电达到100%但是电流很大
+        明显电量没有达到100%，电池设定的容量偏小
+
+        之前17W05A上还有一个BUG是电池很快就截止了，90%~95%就截止，这种情况跟上面相反，电池
+        设定的容量比实际的大
+        mtk_battery_table.h
+
+        {
+            int g_Q_MAX_T0[TOTAL_BATTERY_NUMBER] = { 2946, 2712, 2490, 1965};   // 2946->2800
+            int g_Q_MAX_T1[TOTAL_BATTERY_NUMBER] = { 2796, 2851, 2468, 1984};   // 2796->2657
+            int g_Q_MAX_T2[TOTAL_BATTERY_NUMBER] = { 2718, 2432, 2310, 1946};   // 2718->2583
+            int g_Q_MAX_T3[TOTAL_BATTERY_NUMBER] = { 2535, 1991, 1858, 1873};   // 2535->2410
+            int g_Q_MAX_T4[TOTAL_BATTERY_NUMBER] = { 2523, 1960, 1843, 1851};   // 2523->2400
+
+            int g_Q_MAX_T0_H_CURRENT[TOTAL_BATTERY_NUMBER] = { 2646, 2412, 2190, 1665}; 
+            int g_Q_MAX_T1_H_CURRENT[TOTAL_BATTERY_NUMBER] = { 2496, 2551, 2168, 1684};
+            int g_Q_MAX_T2_H_CURRENT[TOTAL_BATTERY_NUMBER] = { 2418, 2132, 2010, 1646};
+            int g_Q_MAX_T3_H_CURRENT[TOTAL_BATTERY_NUMBER] = { 2235, 1691, 1558, 1573};
+            int g_Q_MAX_T4_H_CURRENT[TOTAL_BATTERY_NUMBER] = { 2223, 1660, 1543, 1551};
+        }
+
+
+        4.充电过程中，温升问题
+        电池温度达到42，主板温度估计还要高很多
+        需要看电池的spec，电池充电达到多少度，需要考虑充电电流大小，这根电池的密度有关
 
     }
+
+
+
 
 
 
