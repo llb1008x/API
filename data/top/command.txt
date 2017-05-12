@@ -244,7 +244,9 @@ adb reboot-bootloader
 		15.git clone gitserver:/L09_BBT5201A_MT6572TDV1.MP.P34_JB3_130428
 		ssh GerritServer			
 
+		git rebase origin/code_main_dev
 
+		
 
 	repo:
 		1.repo forall -cvp git branch -a   察看整个repo管理目录下的分支
