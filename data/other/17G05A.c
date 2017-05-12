@@ -1129,7 +1129,7 @@ static void *update_vibrator_thread_default(void *priv)
 
 /*涉及到的一些文件*/
 {
-dtsi文件:
+dtsi文件(这个目录下很多文件都用到了):
 	kernel-4.4/archarm64/boot/dts/mediatek/mt6757.dtsi  ，rt5081.dtsi  , mt6355.dtsi
 	
 dws文件:
@@ -1143,6 +1143,7 @@ dws文件:
 		mtk_charging.h ，mtk_charging_intf.h(快充)
 		mtk_battery_meter.h ,mtk_battery_meter_table.h
 		pmic_throttling_dlpt.c读电池客制化参数，mtk_battery_property.h
+
 
 
 GM3.0 定义的宏CONFIG_MTK_GAUGE_VERSION=30
