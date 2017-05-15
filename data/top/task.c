@@ -66,6 +66,9 @@
 
 
 
+
+
+
 键盘
 {
 ->2017.4.25
@@ -473,10 +476,6 @@
             如果放电到1%，关机后电池电压还是很大，则用户还有很大的电量没有用到。            
             1%，两端对称，用户的电是用完的，放电关机后的电池电压不能太高
         }
-
-
-        ln -f -s /home/llb/project/PRO/source/gionee_packages_apk_amigo/qcom/packages_7.0 to packages.
-
     }
 
 
