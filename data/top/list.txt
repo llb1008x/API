@@ -311,7 +311,17 @@ other：
 	ARM交叉编译工具链
 	http://www.veryarm.com/cross-tools
 
+	
+	Android Radio Interface Layer
+	http://www.52rd.com/Blog/Detail_RD.Blog_Lexucs_66161.html
 
+
+	Android基础系列-----------Android系统启动过程简析 
+	http://blog.csdn.net/zhoupenglei/article/details/46351701?ref=myread
+
+
+	Android OS MTK6573 SD卡驱动浅析 
+	http://blog.csdn.net/dwyane_zhang/article/details/7586570
 
 
 
