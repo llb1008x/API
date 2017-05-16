@@ -130,6 +130,14 @@
 		CLDMA_WDT (20)是代表有数据连接发送到手机端.
 		CONN2AP是wifi的唤醒.
 		EINT212就是跟C2K的唤醒
+
+		ttyC0:属于虚拟终端的一种
+		radio-interface：在手机上是Modem与AP通讯的桥梁，RIL扮演的角色非常重要，RIL被设计成能够可靠的高效的传输数据一个模块
+		ccci*这个有很多
+		ccmni_md3：这个是cdma相关的
+		ccmni_md1：这个是除cdma以外的其他运营商网络格式
+
+
 	}
 	
 	检索PM: suspend查找唤醒时间对应entry和exit

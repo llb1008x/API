@@ -51,11 +51,11 @@
 
 #include "gn_ti_drv2604l_custom.h"
 
-//Gionee <gn_by_charging> <lilubao> <20170426> add for change vibrate begin
-#define DRV2604L_DEBUG
-//Gionee <gn_by_charging> <lilubao> <20170426> add for change vibrate end
+//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+#define GN_DRV2604L_DEBUG
+//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
 
-#if defined(DRV2604L_DEBUG)
+#if defined(GN_DRV2604L_DEBUG)
 #define DRV2604L_DEBUG(fmt, args...)    printk(KERN_ERR fmt, ##args)
 #else
 #define DRV2604L_DEBUG(fmt, args...)
@@ -214,6 +214,10 @@ static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_
 static void play_effect(struct DRV2604L_data *pDrv2604ldata)
 {
 	switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_SEQUENCE_PLAYBACK);
+
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 	drv2604l_change_mode(pDrv2604ldata, WORK_SEQ_PLAYBACK, DEV_READY);
     drv2604l_set_waveform_sequence(pDrv2604ldata, pDrv2604ldata->sequence, WAVEFORM_SEQUENCER_MAX);
 	pDrv2604ldata->vibrator_is_playing = YES;
@@ -231,10 +235,17 @@ static void play_effect(struct DRV2604L_data *pDrv2604ldata)
 	switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_IDLE);
 	pDrv2604ldata->vibrator_is_playing = NO;
 	wake_unlock(&pDrv2604ldata->wklock);
+
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 }
 
 static void play_Pattern_RTP(struct DRV2604L_data *pDrv2604ldata)
 {
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 	if(pDrv2604ldata->work_mode == WORK_PATTERN_RTP_ON){
 		drv2604l_change_mode(pDrv2604ldata, WORK_PATTERN_RTP_OFF, DEV_READY);
 		if(pDrv2604ldata->repeat_times == 0){
@@ -250,10 +261,17 @@ static void play_Pattern_RTP(struct DRV2604L_data *pDrv2604ldata)
 		drv2604l_change_mode(pDrv2604ldata, WORK_PATTERN_RTP_ON, DEV_READY);
 		hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)pDrv2604ldata->vibration_time * NSEC_PER_MSEC), HRTIMER_MODE_REL);
 	}
+
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 }
 
 static void play_Seq_RTP(struct DRV2604L_data *pDrv2604ldata)
 {
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 	if(pDrv2604ldata->RTPSeq.RTPindex < pDrv2604ldata->RTPSeq.RTPCounts){
 		int RTPTime = pDrv2604ldata->RTPSeq.RTPData[pDrv2604ldata->RTPSeq.RTPindex] >> 8;
 		int RTPVal = pDrv2604ldata->RTPSeq.RTPData[pDrv2604ldata->RTPSeq.RTPindex] & 0x00ff ;
@@ -270,10 +288,17 @@ static void play_Seq_RTP(struct DRV2604L_data *pDrv2604ldata)
 		switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_IDLE);
 		wake_unlock(&pDrv2604ldata->wklock);
 	}
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 }
 
 static void vibrator_off(struct DRV2604L_data *pDrv2604ldata)
 {
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
+	
     if (pDrv2604ldata->vibrator_is_playing) {
 		pDrv2604ldata->vibrator_is_playing = NO;
 		drv2604l_set_go_bit(pDrv2604ldata, STOP);
@@ -281,10 +306,17 @@ static void vibrator_off(struct DRV2604L_data *pDrv2604ldata)
 		switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_IDLE);
 		wake_unlock(&pDrv2604ldata->wklock);
     }
+
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 }
 
 static void drv2604l_stop(struct DRV2604L_data *pDrv2604ldata)
 {
+	//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate end
 	if(pDrv2604ldata->vibrator_is_playing){
 		if((pDrv2604ldata->work_mode == WORK_VIBRATOR)
 				||(pDrv2604ldata->work_mode == WORK_PATTERN_RTP_ON)
@@ -294,10 +326,15 @@ static void drv2604l_stop(struct DRV2604L_data *pDrv2604ldata)
 				||(pDrv2604ldata->work_mode == WORK_RTP)){
 			vibrator_off(pDrv2604ldata);
 		}else if(pDrv2604ldata->work_mode == WORK_SEQ_PLAYBACK){
+		
 		}else{
 			DRV2604L_DEBUG("%s, err mode=%d \n", __FUNCTION__, pDrv2604ldata->work_mode);
 		}
 	}
+
+	//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate end
 }
 
 static int vibrator_get_time(struct timed_output_dev *dev)
@@ -316,6 +353,11 @@ static void vibrator_enable( struct timed_output_dev *dev, int value)
 {
 	struct DRV2604L_data *pDrv2604ldata = container_of(dev, struct DRV2604L_data, to_dev);
 
+	//Gionee <gn_by_charging> <lilubao> <20170503> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	printk(KERN_ERR"in %s value->%d\n", __FUNCTION__,value);
+	//Gionee <gn_by_charging> <lilubao> <20170503> add for change vibrate end
+
 	pDrv2604ldata->should_stop = YES;
 	hrtimer_cancel(&pDrv2604ldata->timer);
 	cancel_work_sync(&pDrv2604ldata->vibrator_work);
@@ -325,6 +367,9 @@ static void vibrator_enable( struct timed_output_dev *dev, int value)
 	drv2604l_stop(pDrv2604ldata);
 
     if (value > 0) {
+		//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+		printk(KERN_ERR"in %s value vaild enable\n", __FUNCTION__);
+		//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 		wake_lock(&pDrv2604ldata->wklock);
 
 		drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
@@ -336,6 +381,10 @@ static void vibrator_enable( struct timed_output_dev *dev, int value)
     }
 
 	mutex_unlock(&pDrv2604ldata->lock);
+
+	//Gionee <gn_by_charging> <lilubao> <20170503> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170503> add for change vibrate end
 }
 
 static enum hrtimer_restart vibrator_timer_func(struct hrtimer *timer)
@@ -350,6 +399,10 @@ static enum hrtimer_restart vibrator_timer_func(struct hrtimer *timer)
 static void vibrator_work_routine(struct work_struct *work)
 {
 	struct DRV2604L_data *pDrv2604ldata = container_of(work, struct DRV2604L_data, vibrator_work);
+	
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 	mutex_lock(&pDrv2604ldata->lock);
 	if((pDrv2604ldata->work_mode == WORK_VIBRATOR)
 		||(pDrv2604ldata->work_mode == WORK_RTP)){
@@ -362,6 +415,10 @@ static void vibrator_work_routine(struct work_struct *work)
 		play_Seq_RTP(pDrv2604ldata);
 	}
 	mutex_unlock(&pDrv2604ldata->lock);
+	
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 }
 
 static int fw_chksum(const struct firmware *fw){
@@ -435,8 +492,15 @@ static int dev2604_open (struct inode * i_node, struct file * filp)
 	if(pDRV2604Ldata == NULL){
 		return -ENODEV;
 	}
+	//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 
 	filp->private_data = pDRV2604Ldata;
+	
+	//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 	return 0;
 }
 
@@ -444,6 +508,10 @@ static ssize_t dev2604_read(struct file* filp, char* buff, size_t length, loff_t
 {
 	struct DRV2604L_data *pDrv2604ldata = (struct DRV2604L_data *)filp->private_data;
 	int ret = 0;
+
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
 
 	if(pDrv2604ldata->ReadLen > 0){
 		ret = copy_to_user(buff, pDrv2604ldata->ReadBuff, pDrv2604ldata->ReadLen);
@@ -457,6 +525,12 @@ static ssize_t dev2604_read(struct file* filp, char* buff, size_t length, loff_t
 		printk("%s, nothing to read\n", __FUNCTION__);
 	}
 
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+	printk(KERN_ERR"in %s read_buff->%s,read_len->%d\n", __FUNCTION__,
+							pDrv2604ldata->ReadBuff,pDrv2604ldata->ReadLen);
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
+	
     return ret;
 }
 
@@ -470,8 +544,24 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
 {
 	struct DRV2604L_data *pDrv2604ldata = (struct DRV2604L_data *)filp->private_data;
 
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	printk(KERN_ERR"in %s buff->%s\n", __FUNCTION__,buff);
+	//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate begin
+	printk(KERN_ERR"in %s buff->%#x,sizeof buff->%ld,len->%ld\n", __FUNCTION__,*buff,sizeof(buff),len);
+	//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate end
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
+	
 	if(isforDebug(buff[0])){
+		//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+		printk(KERN_ERR"in %s ,valid data for debug\n", __FUNCTION__);
+		//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
+		
 	}else{
+		//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+		printk(KERN_ERR"in %s ,invalid data\n", __FUNCTION__);
+		//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
+		
 		pDrv2604ldata->should_stop = YES;
 		hrtimer_cancel(&pDrv2604ldata->timer);
 		cancel_work_sync(&pDrv2604ldata->vibrator_work);
@@ -480,6 +570,9 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
     mutex_lock(&pDrv2604ldata->lock);
 
 	if(isforDebug(buff[0])){
+		//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+		printk(KERN_ERR"in %s ,valid data for debug\n", __FUNCTION__);
+		//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
 	}else{
 		drv2604l_stop(pDrv2604ldata);
 	}
@@ -492,6 +585,10 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
             memset(&pDrv2604ldata->sequence, 0, WAVEFORM_SEQUENCER_MAX);
             if (!copy_from_user(&pDrv2604ldata->sequence, &buff[1], len - 1))
             {
+				//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+				printk(KERN_ERR"in %s ,SINGLE_EFFECT||EFFECT_SEQUENCE\n", __FUNCTION__);
+				printk(KERN_ERR"in %s ,sequence->%d\n", __FUNCTION__,buff[1]);
+				//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 				wake_lock(&pDrv2604ldata->wklock);
 
 				pDrv2604ldata->should_stop = NO;
@@ -506,6 +603,10 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
             value = buff[2];
             value <<= 8;
             value |= buff[1];
+
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+			printk(KERN_ERR"in HAPTIC_CMDID_PLAY_TIMED_EFFECT ,value->%d\n",value);
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 
             if (value > 0)
             {
@@ -523,11 +624,21 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
        case HAPTIC_CMDID_PATTERN_RTP:
         {
 			unsigned char strength = 0;
-
 			pDrv2604ldata->vibration_time = (int)((((int)buff[2])<<8) | (int)buff[1]);
 			pDrv2604ldata->silience_time = (int)((((int)buff[4])<<8) | (int)buff[3]);
 			strength = buff[5];
 			pDrv2604ldata->repeat_times = buff[6];
+
+			//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate begin
+			pDrv2604ldata->vibration_time=10;
+			pDrv2604ldata->silience_time=2;
+			pDrv2604ldata->repeat_times=10;
+			//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate end
+
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+			printk(KERN_ERR"in HAPTIC_CMDID_PATTERN_RTP ,vibration_time->%d,silience_time->%d,repeat_times->%d,strength->%d\n",
+						pDrv2604ldata->vibration_time,pDrv2604ldata->silience_time,pDrv2604ldata->repeat_times ,strength);
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 
             if(pDrv2604ldata->vibration_time > 0){
 				wake_lock(&pDrv2604ldata->wklock);
@@ -550,6 +661,10 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
             memset(&pDrv2604ldata->RTPSeq, 0, sizeof(struct RTP_Seq));
 			if(((len-1)%2) == 0){
 				pDrv2604ldata->RTPSeq.RTPCounts = (len-1)/2;
+				//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+				printk(KERN_ERR"in HAPTIC_CMDID_RTP_SEQUENCE ,RTPSeq.RTPCounts->%d\n",
+							pDrv2604ldata->RTPSeq.RTPCounts);
+				//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 				if((pDrv2604ldata->RTPSeq.RTPCounts <= MAX_RTP_SEQ)&&(pDrv2604ldata->RTPSeq.RTPCounts>0)){
 					if(copy_from_user(pDrv2604ldata->RTPSeq.RTPData, &buff[1], pDrv2604ldata->RTPSeq.RTPCounts*2) != 0){
 						printk("%s, rtp_seq copy seq err\n", __FUNCTION__);
@@ -571,6 +686,10 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
 
         case HAPTIC_CMDID_STOP:
         {
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+			printk(KERN_ERR"in HAPTIC_CMDID_STOP \n");
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
+			
             break;
         }
 
@@ -579,6 +698,10 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
 			struct firmware fw;
 			unsigned char *fw_buffer = (unsigned char *)kzalloc(len-1, GFP_KERNEL);
 			int result = -1;
+
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+			printk(KERN_ERR"in HAPTIC_CMDID_UPDATE_FIRMWARE \n");
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 
 			if(fw_buffer != NULL){
 				fw.size = len-1;
@@ -600,6 +723,9 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
 		case HAPTIC_CMDID_READ_FIRMWARE:
 		{
 			int i;
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+			printk(KERN_ERR"in HAPTIC_CMDID_READ_FIRMWARE \n");
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 			if(len == 3){
 				pDrv2604ldata->ReadLen = 1;
 				drv2604l_reg_write(pDrv2604ldata, RAM_ADDR_UPPER_BYTE_REG, buff[2]);
@@ -619,6 +745,9 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
 		}
 		case HAPTIC_CMDID_REG_READ:
 		{
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+			printk(KERN_ERR"in HAPTIC_CMDID_REG_READ \n");
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 			if(len == 2){
 				pDrv2604ldata->ReadLen = 1;
 				pDrv2604ldata->ReadBuff[0] = drv2604l_reg_read(pDrv2604ldata, buff[1]);
@@ -633,6 +762,9 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
 
 		case HAPTIC_CMDID_REG_WRITE:
 		{
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+			printk(KERN_ERR"in HAPTIC_CMDID_REG_WRITE \n");
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 			if((len-1) == 2){
 				drv2604l_reg_write(pDrv2604ldata, buff[1], buff[2]);
 			}else if((len-1)>2){
@@ -654,6 +786,9 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
 		case HAPTIC_CMDID_REG_SETBIT:
 		{
 			int i=1;
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate begin
+			printk(KERN_ERR"in HAPTIC_CMDID_REG_SETBIT \n");
+			//Gionee <gn_by_charging> <lilubao> <20170428> add for change vibrate end
 			for(i=1; i< len; ){
 				drv2604l_set_bits(pDrv2604ldata, buff[i], buff[i+1], buff[i+2]);
 				i += 3;
@@ -667,8 +802,143 @@ static ssize_t dev2604_write(struct file* filp, const char* buff, size_t len, lo
 
     mutex_unlock(&pDrv2604ldata->lock);
 
+	//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170502> add for change vibrate end
+
     return len;
 }
+
+//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+#define MOTOR_TEST
+#if defined(MOTOR_TEST)
+
+long dev2604_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+	struct DRV2604L_data *pDrv2604ldata = (struct DRV2604L_data *)filp->private_data;
+	int value=(int )arg;
+	int cnt=10;
+	
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	
+    switch(cmd)
+    {
+	  // test vibrator_enable	
+      case 1:
+	  	 printk(KERN_ERR"in %s case 1 vibrator_enable ,value->%d\n", __FUNCTION__,value);
+		 while(cnt--){
+
+			 vibrator_enable( &(pDrv2604ldata->to_dev),value );
+			 mdelay(500);
+			 vibrator_enable( &(pDrv2604ldata->to_dev),0);
+			 mdelay(300);
+		 }
+
+		 break;
+		 
+	  // test drv2604l_change_mode
+	  case 2:
+		  printk(KERN_ERR"in %s case 2 enable drv2604l_change_mode ,value->%d\n", __FUNCTION__,value);
+		  
+		  pDrv2604ldata->should_stop = YES;
+		  hrtimer_cancel(&pDrv2604ldata->timer);
+		  cancel_work_sync(&pDrv2604ldata->vibrator_work);
+		  
+		  mutex_lock(&pDrv2604ldata->lock);
+		  
+		  drv2604l_stop(pDrv2604ldata);
+		  
+		  //wake_lock(&pDrv2604ldata->wklock);
+		  
+		  drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
+		  pDrv2604ldata->vibrator_is_playing = YES;
+		  switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_RTP_PLAYBACK);
+		  
+		  value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
+		  hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+		  schedule_work(&pDrv2604ldata->vibrator_work);
+		  
+		  mutex_unlock(&pDrv2604ldata->lock);
+
+		break;
+		
+	  // test vibrator_off
+	  case 3:
+	  	printk(KERN_ERR"in %s case 3 enable vibrator_off ,value->%d\n", __FUNCTION__,value);
+	  	vibrator_off(pDrv2604ldata);
+		break;
+
+	  // test play_effect
+	  case 4:
+	  	printk(KERN_ERR"in %s case 4 enable play_effect ,value->%d\n", __FUNCTION__,value);
+	  	play_effect(pDrv2604ldata);
+		break;
+		
+	  // test play_Pattern_RTP
+	  case 5:	
+	  	printk(KERN_ERR"in %s case 5 enable play_Pattern_RTP ,value->%d\n", __FUNCTION__,value);
+		play_Pattern_RTP(pDrv2604ldata);
+		break;
+
+	  // test play_Seq_RTP
+	  case 6:
+	  	printk(KERN_ERR"in %s case 6 enable play_Seq_RTP ,value->%d\n", __FUNCTION__,value);
+	  	play_Seq_RTP(pDrv2604ldata);
+		break;
+
+	  // test drv2604l_change_mode	
+  	  case 7:
+		  printk(KERN_ERR"in %s case 7 enable drv2604l_change_mode ,value->%d\n", __FUNCTION__,value);
+		  
+		  pDrv2604ldata->should_stop = YES;
+		  hrtimer_cancel(&pDrv2604ldata->timer);
+		  cancel_work_sync(&pDrv2604ldata->vibrator_work);
+		  
+		  mutex_lock(&pDrv2604ldata->lock);
+		  
+		  drv2604l_stop(pDrv2604ldata);
+		  
+		  //wake_lock(&pDrv2604ldata->wklock);
+		  
+		  drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
+		  pDrv2604ldata->vibrator_is_playing = YES;
+		  switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_RTP_PLAYBACK);
+		  
+		  value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
+		  hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+		  schedule_work(&pDrv2604ldata->vibrator_work);
+		  
+		  mutex_unlock(&pDrv2604ldata->lock);
+
+		break;	
+
+	  // test drv2604l_change_mode	for work_mode
+	  case 8:
+	  	printk(KERN_ERR"in %s case 8 enable drv2604l_change_mode for work_mode,value->%d\n", __FUNCTION__,value);
+	  	cnt=10;
+		drv2604l_change_mode(pDrv2604ldata, value, DEV_READY);
+		value = MAX_TIMEOUT;
+	    hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+	    schedule_work(&pDrv2604ldata->vibrator_work);
+		break;
+
+	  	
+
+
+	  default:
+		printk(KERN_ERR"in %s default no cmd\n", __FUNCTION__);
+	  	break;
+	    
+    }
+
+	mutex_unlock(&pDrv2604ldata->lock);
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+
+	return 0;
+}
+
+#endif
+//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 
 
 static struct file_operations fops =
@@ -676,6 +946,11 @@ static struct file_operations fops =
 	.open = dev2604_open,
     .read = dev2604_read,
     .write = dev2604_write,
+    //Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+    #if defined(MOTOR_TEST)
+    .unlocked_ioctl=dev2604_ioctl,
+    #endif
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 };
 
 #ifdef CONFIG_HAS_EARLYSUSPEND
@@ -706,6 +981,10 @@ void drv2604l_late_resume(struct early_suspend *h) {
 static int Haptics_init(struct DRV2604L_data *pDrv2604ldata)
 {
     int reval = -ENOMEM;
+
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
 
     pDrv2604ldata->version = MKDEV(0,0);
     reval = alloc_chrdev_region(&pDrv2604ldata->version, 0, 1, HAPTICS_DEVICE_NAME);
@@ -770,6 +1049,10 @@ static int Haptics_init(struct DRV2604L_data *pDrv2604ldata)
     wake_lock_init(&pDrv2604ldata->wklock, WAKE_LOCK_SUSPEND, "vibrator");
     mutex_init(&pDrv2604ldata->lock);
 
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
+	
     return 0;
 
 fail4:
@@ -791,10 +1074,12 @@ static void dev_init_platform_data(struct DRV2604L_data *pDrv2604ldata)
 {
 	struct DRV2604L_platform_data *pDrv2604Platdata = &pDrv2604ldata->PlatData;
 	//struct actuator_data actuator = pDrv2604Platdata->actuator;
-		struct actuator_data actuator = DRV2604L_actuator;
+	struct actuator_data actuator = DRV2604L_actuator;
 	unsigned char temp = 0;
 	
-
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
 	
 	pDrv2604Platdata->GpioTrigger=0;
 		pDrv2604Platdata->loop=CLOSE_LOOP;
@@ -916,6 +1201,10 @@ static void dev_init_platform_data(struct DRV2604L_data *pDrv2604ldata)
 		unsigned char R20 = (unsigned char)(100000000 / temp);
 		drv2604l_reg_write(pDrv2604ldata, LRA_OPENLOOP_PERIOD_REG, R20);
 	}
+
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
+	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
 }
 
 #if 0//tangwei modify 20160106
@@ -966,7 +1255,11 @@ static int drv2604l_probe(struct i2c_client* client, const struct i2c_device_id*
 #endif
 	int err = 0;
 	int status = 0;
-	//Gionee <gn_by_charging> <lilubao> <20170426> add for change vibrate begin
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	int ret=0;
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
+	
+	//Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
 	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
 	//Gionee <gn_by_charging> <lilubao> <20170426> add for change vibrate end
 
@@ -1066,6 +1359,11 @@ static int drv2604l_probe(struct i2c_client* client, const struct i2c_device_id*
 	schedule_timeout_interruptible(msecs_to_jiffies(STANDBY_WAKE_DELAY));
 
 	pDrv2604ldata->OTP = drv2604l_reg_read(pDrv2604ldata, Control4_REG) & Control4_REG_OTP_MASK;
+
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	ret = drv2604l_reg_read(pDrv2604ldata, Control4_REG);// for read 0x1e
+	printk(KERN_ERR"in %s Control4_REG->%#x\n", __FUNCTION__,Control4_REG);
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
 
 	dev_init_platform_data(pDrv2604ldata);
 

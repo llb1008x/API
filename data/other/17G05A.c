@@ -11,7 +11,7 @@
 
 	->  AICR:Average Input Current Regulation (AICR) : 0.1A to
 		3.25A in 50mA steps
-		充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由5081来做；
+		充电电流不能大于此值,此功能是检测充电器的input current limit，也就是输出电流的最大值，是由rt5081来做；
 	  但是只是在插入充电器的时候去做检测，直到拔出充电器再次插入才会再一次检测，同一个充电器不会多次检测输出能力，
 	  因为同一个充电器此值肯定是相同的，没必要再检测
 
@@ -365,9 +365,6 @@ kernel
 
     调用不同的震动效果	
 
-
-
-
 }
 
 	
@@ -589,7 +586,7 @@ out:
 	二是根据着mmi测试宏包含的代码
 
 
-
+	这部分不是我负责的工作流程不太清楚
 
 
 
@@ -1119,7 +1116,10 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 
-}
+
+
+
+
 
 
 
