@@ -512,6 +512,8 @@
 
 
 
+01-01 00:05:44.142   359   359 I ccci_mdinit(1): wait_for_property() ready for name:init.svc.gsm0710muxd, loop:18
+01-01 00:05:44.142   359   359 D ccci_mdinit(1): deamon begin to run!
 
 
 
