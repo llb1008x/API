@@ -674,6 +674,55 @@ GNSPR #56384
 	关闭后台所有后台运行/设置开关,电量为99%待机11H后电量为94%》耗电5% 2/40 C45、Q23、Q22
 
 
+GNSPR #84224
+	现象：插一张电信4G卡，开启数据业务，后台打开手机内置所有应用，待机63小时50分钟，耗电71%，耗电异常
+
+	分析：
+
+	Dear Customer:
+
+	一直报下面的AT command:
+	网络状态有变化的时候上报（比如rat change）
+
+	是否容易复现？是否一直是在同一个地方?
+	如果容易复现，请帮忙打开全部的log，再捉给我
+
+	jinhao wu
+	65440
+	Thanks
+
+	1.1    Unsolicited result code: +EGMSS
+	1.1.1    Description
+	This URC is used to inform AP the information of system selection, according to RAT, location and attach status
+	1.1.2    Format
+
+	Unsolicited result code
+	+EGMSS=<rat>,”<mcc>”,<status>
+	1.1.3    Field
+	<rat>: Integer
+	0 3GPP2 RAT group
+	1 3GPP RAT group
+	2 CDMA2000 1x
+	3 CDMA2000 HRPD
+	4 GERAN
+	5 UTRAN
+	6 EUTRAN
+
+	<mcc> String
+	For example, “460” for CT.
+
+	<status> Integer
+	0 Have selected the <rat> and is going to perform PLMN search
+	1 Attached to the network on the <rat>
+
+	网络有点问题：
+	05-15 05:44:15.088 938 954 D AT : AT< +EGMSS: 6,"460",0
+	05-15 05:44:15.686 938 954 D AT : AT< +EGMSS: 6,"460",1
+	05-15 05:47:08.126 938 954 D AT : AT< +EGMSS: 6,"460",0
+	05-15 05:47:08.666 938 954 D AT : AT< +EGMSS: 6,"460",1
+	05-15 05:49:21.136 938 954 D AT : AT< +EGMSS: 6,"460",
+
+
 }
 
 
