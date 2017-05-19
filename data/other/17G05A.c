@@ -1413,6 +1413,12 @@ keyboard 的目录
 17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/vibrator
 
 
+温升相关源码的目录
+17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/drivers/misc/mediatek/thermal
+配置文件(这个目录下有很多初始化的东西)
+17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/device/mediatek/mt6757
+
+
 }
 
 

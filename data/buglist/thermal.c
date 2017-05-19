@@ -273,7 +273,8 @@
 
 --->温升导致的充电电流降低
 	Dear MTK，
-	之前在6753平台 ，mtk_cooler_bcct.c 会根据 thermal.conf 里 配置 调用 mtk_cl_bcct_set_bcct_limit来限制充电电流；现在6755平台这个功能 没有起作用，请问是不在支持了吗？？ 还是某个开关控制没有打开呢？
+	之前在6753平台 ，mtk_cooler_bcct.c 会根据 thermal.conf 里 配置 调用 mtk_cl_bcct_set_bcct_limit来限制充电电流；现在6755平台这个功能 没有起作用，请问是不
+	在支持了吗？？ 还是某个开关控制没有打开呢？
 	我现在 thermal.conf 里设置如下：
 	/proc/driver/thermal/clbcct
 	0 1000 900 750
@@ -296,7 +297,8 @@
 	/proc/driver/thermal/tzbts
 	6 100000 0 mtktspa-sysrst 90000 0 mtk-cl-shutdown00 57000 0 mtk-cl-cam00 50000 0 mtk-cl-bcct02 49000 0 mtk-cl-bcct01 48000 0 mtk-cl-bcct00 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000
 
-	mtk_cl_bcct_set_bcct_limit里默认就有log啊，没有出来；并且肯定没有调到set_bat_charging_current_limit，这个我里面是加了log的；我们关心的就是为何没有调到set_bat_charging_current_limit，调整电流；
+	mtk_cl_bcct_set_bcct_limit里默认就有log啊，没有出来；并且肯定没有调到set_bat_charging_current_limit，这个我里面是加了log的；我们关心的就是为何没有调到
+	set_bat_charging_current_limit，调整电流；
 	thermal.conf    4.18 KB     和 thermal.eng.conf    4.18 KB
 	APLog_2015_0101_081542.rar    62.39 MB     抓取的mobile log，请参考分析；
 

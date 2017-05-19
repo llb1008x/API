@@ -161,12 +161,93 @@
 
 充电过程中，根据温度调节充电电流
 {
-    1.根据当前的温度将充电电流分挡 
-        低温，正常温度，高温
+    1.根据当前的温度简单的限定充电电流
+    {
+        低温（小于15）：1.5A
+        正常温度（25左右）：2A
+        高温（大于45）：1A
+
+        mtk_switch_charging.c -> swchg_select_charging_current_limit
+
+        这其中还要考虑其他情况：打电话，mmi测试等等
+    }
+ 
+
+    G1605A
+    //Gionee GuoJianqiu 20150514 modify for GNNCR00010646 begin
+    if(bat_charge_current_not_down())
+    {
+        g_temp_CC_value = AC_CHARGER_CURRENT;
+        
+        //GioneeDrv GuoJianqiu 20160429 modify for platform change begin
+        if((BMT_status.temperature < 15) || ((g_call_state != CALL_IDLE) && (!is_enter_mmi_test)))
+        {
+            g_temp_CC_value = AC_CHARGER_CURRENT / 2;
+            if(g_temp_CC_value < USB_CHARGER_CURRENT)
+                g_temp_CC_value = USB_CHARGER_CURRENT; 
+            battery_log(BAT_LOG_CRTI, "[BATTERY] temperature = %d, g_call_state = %d, is_enter_mmi_test = %d, g_temp_CC_value = %d\n", BMT_status.temperature, g_call_state, is_enter_mmi_test, g_temp_CC_value); 
+        }
+        //GioneeDrv GuoJianqiu 20160429 modify for platform change end
+        
+    }
+    //Gionee GuoJianqiu 20150514 modify for GNNCR00010646 end
 
 
-    2.充电温度调节策略相关代码，文档    
+     //Gionee GuoJianqiu 20150611 modify for CR01498036 begin
+     kal_bool bat_charge_current_not_down(void)
+     {
+        battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
+
+        if (((g_gn_screenon_time <= 30) && (g_call_state == CALL_IDLE)) || (is_enter_mmi_test == KAL_TRUE) || (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT || get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT))
+            return true;
+        else
+            return false;
+     }
+     //Gionee GuoJianqiu 20150611 modify for CR01498036 end
+
+
+     17G05A
+     //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging begin
+	 pr_err("in %s info->battery_temperature->%d\n",__FUNCTION__,info->battery_temperature);
+
+	 if(info->chr_type==STANDARD_CHARGER){
+
+		if( info->battery_temperature <=15 ){
+
+			pdata->charging_current_limit=1500000;
+			pdata->input_current_limit=1600000;
+			pr_err("in %s ,temperature is too low ,we need limit charging current->1\n",__FUNCTION__);
+		}else if( (info->battery_temperature>15)&&(info->battery_temperature<=45) ){
+
+			pr_err("in %s ,temperature in normal range,do not limit charging current->2 \n",__FUNCTION__);
+		}else if( info->battery_temperature > 45 ){
+
+			pdata->charging_current_limit=1000000;
+			pdata->input_current_limit=1200000;
+			pr_err("in %s ,temperature is too high ,we need limit charging current->3\n",__FUNCTION__);
+		}
+	 }
+	 pr_err("in %s setting charging_current_limit->%d,input_current_limit->%d\n",
+				__FUNCTION__,pdata->charging_current_limit,pdata->input_current_limit);
+	 //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging end	
+
+
+
+
+    2.充电温度调节策略相关代码，文档  
+    {
         mtk_cooler_bcct_v1.c这个文件应该充电调节温度有关
+
+
+        bcct,abcct
+
+
+
+
+
+
+    }  
+        
 
 
     3.充电温度调节调用流程 
@@ -174,6 +255,14 @@
 
 
     }   
+
+
+    4.相关的文档
+    {
+        MT6757CH(CD)_Thermal_Design_Notices_V0.1.pdf
+    
+    }
+
 }
 
 
