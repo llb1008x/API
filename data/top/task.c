@@ -267,12 +267,22 @@
 
 
 
+17G02 安装 pyyaml pip uninstall pyyaml
+sudo apt-get install libyaml-cpp-dev
+pip install pyyaml
 
 
+sudo pip uninstall pyyaml
+sudo apt-get install libyaml-cpp-dev
+sudo pip install pyyaml
 
 
+repo init -u gitserver:/manifest.git -m 17G02.xml ; repo sync
 
-
+sudo apt-get install libyaml-dev
+解压附件 执行如下命令
+python setup.py build
+python setup.py install
 
 
 
