@@ -259,30 +259,23 @@
 
     4.相关的文档
     {
+        Thermal_Management_MT6757.pdf
+        {
+            mtk_cooler_shutdown.c 这个文件通过 proc fs发送signal到上层，上层发送广播ACTION_REQUEST_SHUTDOWN
+            thermal_management将会迅速关机
+
+            thermal_manager
+            
+        }
+
         MT6757CH(CD)_Thermal_Design_Notices_V0.1.pdf
-    
     }
 
 }
 
 
 
-17G02 安装 pyyaml pip uninstall pyyaml
-sudo apt-get install libyaml-cpp-dev
-pip install pyyaml
 
-
-sudo pip uninstall pyyaml
-sudo apt-get install libyaml-cpp-dev
-sudo pip install pyyaml
-
-
-repo init -u gitserver:/manifest.git -m 17G02.xml ; repo sync
-
-sudo apt-get install libyaml-dev
-解压附件 执行如下命令
-python setup.py build
-python setup.py install
 
 
 

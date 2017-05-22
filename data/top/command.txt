@@ -451,6 +451,25 @@ adb reboot-bootloader
 		/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/out/target/product/gnbj6757_66_n/system/bin
 
 
+		17G02A编译
+		{
+			repo init -u gitserver:/manifest.git -m 17G02.xml ; repo sync
+
+			17G02 安装 pyyaml pip uninstall pyyaml
+			sudo apt-get install libyaml-cpp-dev
+			pip install pyyaml
+
+
+			sudo pip uninstall pyyaml
+			sudo apt-get install libyaml-cpp-dev
+			sudo pip install pyyaml
+
+			sudo apt-get install libyaml-dev
+			解压附件 执行如下命令
+			python setup.py build
+			python setup.py install
+		}
+
 
 		调整log时间
 		./ktime -i kernel_log -o kernel_log_output
