@@ -388,7 +388,111 @@
 	建议是修改device.mk
 
 
+
+thermal_tool的使用 FAQ14151
+
+	使用switch charger充电的时候，
+	会出现充电电流被限制在650mA的状况，
+	而且log中可以看到"BCCT"限制充电电流为650mA
+
+	原因是因为thermal.conf中AP default设定trip point 34C的时候，
+	调用BCCT cooler 00，
+	这个cooler就是限定充电电流为default 650mA
+	我司default设定的温度34C，
+	是根据使用pulse charger  800mA充电时候板子发热状况设定的，
+	而使用switch charger，充电电流通常比较大，
+	所以很容易达到34C的温度
 	
+	[SOLUTION]
+	修改方法：
+	您需要在自己的板子上，根据以下的测试来确定贵司自己的温度点
+	1.进入工模，others->thermal
+	选择"thermal protection only"
+	然后点击"APPLY NEW THERMAL POLICY"
+	2.在您的phone当前没有其他的stress在运行，屏幕处于基本亮度的时候，
+	将充电电流设置成最大，
+	然后测试您的板温，记录下这个值，假设您测试的温度为48C
+	3.修改thermal.conf
+	conf存放的路径是在alps\device\mediatek\$(project)中
+	MT6735修改thermal.conf
+	MT6735M修改thermal_eng.conf 以及thermal.conf
+	MT6753修改thermal_6753_eng.conf，thermal_6753.conf，以及thermal.wfd.6753.conf
+	4.修改的方法，
+	将您要修改的conf文件放到thermal config  tool中的decrypt文件夹下，
+	在您要修改的conf文件爱名称的最后加上.mtc，
+	双击decrypt文件夹中的decypt_all_config
+	decrypt目录下就会看到conf对应的txt文件，
+	您可以修改下面一行：
+	/proc/driver/thermal/tzbts
+	3 95000 0 mtktspa-sysrst 48000 0 mtk-cl-bcct01 34000 0 mtk-cl-bcct00
+	假设您测试的板温为48C，修改为：
+	3 95000 0 mtktspa-sysrst 60000 0 mtk-cl-bcct01 48000 0 mtk-cl-bcct00
+	mtk-cl-bcct00的温度修改为48C，前面mtk-cl-bcct01的温度要高一些，这里假设设定为60C
+	然后在windows上面拉出dos命令行，
+	将thermal config  tool中的encrypt命令拖进去，空格，
+	再将您修改后的conf txt文件拖进去，空格，
+	然后再输入您想要生成的conf名称
+	执行后，就会在dos命令行的目录下生成您要的conf文件
+	然后将其放回您取出的地方，
+	build code即可 	
+
+
+关闭thermal throlling
+
+
+	方式1：
+
+	使用adb 命令，需具备root权限.
+
+	adb shell “/system/bin/thermal_manager /etc/.tp/.ht120.mtc”
+
+	备注：重启后需要重新输入命令，否则会失效.
+
+	
+
+	方式2：
+
+	请先把手机里面的/system/etc/.tp/下面的.ht120.mtc拉出来，重新命名为thermal.conf
+
+	然后再替换到/system/etc/.tp/，把原本的thermal.conf替换掉.
+
+	然后需要重启才能够生效.
+
+	备注：系统默认起来后，就会读取thermal.conf这个配置文件. 重启后依旧会生效.	
+
+	 
+	How to confirm thermal off:
+
+	L版本:
+
+	Cat /proc/driver/thermal/tzcpu
+
+	KK版本：
+
+	Cat /proc/mtktscpu/mtktscpu
+
+	[tscpu_read]1--->为1，代表总共绑定1个cooler, 也就是mtktscpu-sysrst说明thermal已经被关闭.
+
+	trip_0=117000 0 mtktscpu-sysrst
+
+	trip_1=100000 0 mtk-cl-shutdown00
+
+	trip_2=62000 0 cpu_adaptive_0
+
+	trip_3=75000 0 no-cooler
+
+	trip_4=65000 0 no-cooler
+
+	trip_5=55000 0 no-cooler
+
+	trip_6=45000 0 no-cooler
+
+	trip_7=35000 0 no-cooler
+
+	trip_8=25000 0 no-cooler
+
+	trip_9=15000 0 no-cooler
+
 
 
 }

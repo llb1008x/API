@@ -240,18 +240,26 @@
 
 
         bcct,abcct
-
-
-
-
-
-
     }  
         
 
 
     3.充电温度调节调用流程 
     {
+        （mtk_thermal_monitor.c） mtkthermal_init，mtk thermal相关的初始化，创建调试调用节点/proc/driver/thermal，在这个目录下
+
+      建立一系列的proc 节点，/proc/mtkcooler这个目录下是降温策略的设备节点 -> (mtk_cooler_shutdown.c) mtk_cooler_shutdown_init
+
+      这个应该跟过温启动关机策略相关的，温度过高触发条件，关机策略应该是最直接，最有效的，但是影响很大，后面还有几个相关的模块的初始化，都是在proc目录下
+
+      创建一系列节点，然后注册函数，相关的操作函数指针 -> (mtk_ts_cpu.c) tscpu_init,tscpu是一个虚拟的thermal_zone，主要是监控cpu的状态
+
+      -> tscpu_thermal_probe   init_thermal
+
+
+
+
+
 
 
     }   

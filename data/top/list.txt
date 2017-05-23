@@ -324,6 +324,10 @@ other：
 	http://blog.csdn.net/dwyane_zhang/article/details/7586570
 
 
+	ipi机制 
+	http://blog.csdn.net/cybertan/article/details/7206209
+
+
 
 
 
