@@ -58,6 +58,11 @@
 		 
 		 1 <bcct00 limit> <bcct01 limit> <bcct02 limit>
 		 
+		 ABCCT：adaptive battery charging current throttling
+		
+		 如果触发了这个条件将会在一个范围内调节充电电流，以此来实现目标温度
+		 
+		 modem侧的温升，通过限制传送时间和减少功率放大器active的时间来降温
 
     }  	
     

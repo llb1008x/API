@@ -260,13 +260,6 @@
     4.相关的文档
     {
         Thermal_Management_MT6757.pdf
-        {
-            mtk_cooler_shutdown.c 这个文件通过 proc fs发送signal到上层，上层发送广播ACTION_REQUEST_SHUTDOWN
-            thermal_management将会迅速关机
-
-            thermal_manager
-            
-        }
 
         MT6757CH(CD)_Thermal_Design_Notices_V0.1.pdf
     }
