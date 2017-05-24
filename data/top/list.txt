@@ -328,6 +328,11 @@ other：
 	http://blog.csdn.net/cybertan/article/details/7206209
 
 
+	从0开始学习 GitHub 系列之「08.如何发现优秀的开源项目」 
+	http://blog.csdn.net/googdev/article/details/52060211
+
+
+
 
 
 
