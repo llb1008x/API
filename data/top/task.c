@@ -275,7 +275,31 @@
 }
 
 
+{
+Step Detector and Step Counter
 
+
+    Android 4.4 also adds platform support for two new composite sensors — step detector and step counter — that let your app track steps 
+    when the user is walking, running, or climbing stairs. These new sensors are implemented in hardware for low power consumption.
+
+    The step detector analyzes accelerometer input to recognize when the user has taken a step, then triggers an event with each step. The
+     step counter tracks the total number of steps since the last device reboot and triggers an event with each change in the step count.
+      Because the logic and sensor management is built into the platform and underlying hardware, you don't need to maintain your own
+       detection algorithms in your app.
+
+    Step detector and counter sensors are available on Nexus 5, and we're working with our chipset partners to bring them to new devices 
+    as soon as possible.
+
+    I fetch the section from android official website.Last week,I got the step detector and step counter APP from one friend.He told me 
+    it is popular.Luckily get the information from Android website.
+
+    Actually,the app is a little simple,but it is widely used.It will be a great perspective for sport APP.I rightly have a good idea 
+    which is relative to sports,such as running,jogging.
+
+    I just show the outline here.A range of  people want to run,jog,but they are lazy.It is difficult to insist on.But if they search 
+    friends who have the same scenario and do it together, the exercise effectiveness will be better.They can share the effectiveness 
+    in friend's group.That's awesome. 
+}
 
 
 

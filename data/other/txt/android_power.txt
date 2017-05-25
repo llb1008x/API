@@ -1,0 +1,47 @@
+
+android电源管理
+
+基本概念：
+SD   socket：SD卡槽，还以为是套接字。。。
+handset:手机听筒，遥控器，耳机孔
+PLL：锁相环，时钟锁相环？
+VPROC：处理器电压 0.95-1.25
+ARM的时钟系统？
+TLP：thread  level parallelism 线程并行处理，并发
+
+
+
+软件环境linux kernel 3.1
+
+硬件环境 MT6735/MT6753
+
+充满电压 4.2v  最低充电电压 3.45v 关机电压 3.4v
+
+代码相关的目录
+/android_mtk_6750_mp/kernel-3.18/drivers/power/mediatek
+
+
+
+
+1.DVFS 动态电压频率调节，根据系统运行情况动态调节CPU频率降低能耗
+
+	系统个个部分消耗电能的比例
+
+	linux内核有一个frq子系统负责管理cpu变频，使系统更加省电
+
+2.CPU的热插拔更多的用在多核处理器工作，哪些CPU核可以工作，通常第一个核工作其他的休息
+
+	cat /proc/cpuinfo 察看cpu情况
+
+	所以整个系统对于power的管理是 DVFS（动态调节CPU电压，频率）+ Hotplug （CPU的热插拔）
+
+	每200ms检测CPU是否要添加其他core
+	
+	CPU input boost :快速相应用户的输入，提升用户体验
+	CPU rush boost：当CPU要处理高负载的任务时，会暂时切断负载大于98%的cpu
+	Quick landing：处理完或不相关的CPU，会在短时间内被关闭
+
+CPU热插拔的一些算法开启单个CPU大于80%，关闭单个CPU小于70%，子系统算法？
+
+
+

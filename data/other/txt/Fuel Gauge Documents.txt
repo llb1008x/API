@@ -1,0 +1,107 @@
+
+pwd   Fuel Gauge Documents
+
+首先解释几个名词：
+AC charge 交流充电
+switch charge 快速充电
+fuel gauge 应该是电池电量的一种检测方法 fuel燃料，gauge计量，测量。
+battery meter电池冲放电时用到的计量电量的工具
+VBAT_SENSE:充电电压检测端
+CC mode恒流充电模式	
+coulomb  counting method：库伦计数法  
+NTC热敏电阻
+OCV：开路电压法
+CAR：?是库伦计数法中的一个量，电流乘时间
+ZCV:电池电压-容量的关系曲线，对于数据的处理
+阻抗轨迹法？impedance tracking /或者说是补偿法，就是测量的时候充放电因为内阻带来的误差，=/-
+
+
+
+本文件夹内主要的文件组成：
+1--->Battery_Charging_Introduction_for_Customer_V1.0.pdf		对于电池充电的主要介绍
+
+2.--->Battery_Customer_Document_MT65xx.pdf				MTK android battery driver驱动的主要介绍
+  1.这个android驱动的主要功能是：充电插拔的检测；如果插入插头，运行充电程序，拔除停止充电；
+  支持不同的充电方式，正常充电（交流充电，PC USB充电），快速充电，无线充电，取决于充电接口是什么；充电时软件启动充电保护。
+  2.影响电池充电时间的因素：电池容量，充电过程中系统追踪电池也会消耗电量，
+  3.充电相关的寄存器MTK PMIC，电池监控信息相关的寄存器MTK AUXADC ，Fuel Gauge。
+  
+充电的几种状态：要每个多少秒进行检测
+  init state初始化状态：初始化安全时间，检测充电电压端决定进入什么模式
+  CC mode恒流充电模式：是否要充电保护，对电池信息进行检测，温度检测
+  CV mode交流充电模式：是否要充电保护，对电池信息进行检测，温度检测
+  Battery full显示充电满，再次插入还是显示充电满
+  error/end充满，插头拔除，没电了
+
+通过AUX_ADC这个芯片检测充电电压端电压
+充电是一直冲还是间歇性的冲，每隔多少秒检测值是多少。
+
+库仑计数法：
+
+电池温度：根据计量表通过线性插值法将电阻转换为温度，
+
+3.----->Battery_Customer_Document_MT6752_MT6732.pdf这个文件跟上面的文件差不多。
+
+4.----->Customer_Training_Battery_Charging.pdf这跟第一个差不多。
+
+
+5.----->Fuel_Gauge_Application_Notes_V1.0.pdf
+这个文件应该是介绍电池测量的一些方法。
+	电池电量测量的准确性，功耗，温度对测量的准确性有一定的影响，所以应该要温度参数。
+
+电池一些参数的测量：
+   1.10k欧姆/25度，47k欧姆/25度建立NTC电阻温度表
+   2.20~50m 电流检测电阻
+
+
+电池的一些参数： 有一项工作应该是电池参数的校准            ZCV table？
+   BATT_CAPACITY:电池容量
+   Q_MAX:跟温度相关的电池容量
+   Rfg:电阻？
+   CAR_TUNE_VALUE:是对Fuel gauge的统计偏差进行修正，好像是在库仑计数法那边
+  
+
+
+Fuel Gauge测量电池电量：
+   1.是一种准确测量电量的方法
+   2.电池剩余电量的计算方法：开路电压法（能准确计算起始电容量），库伦积分法
+   3.电池容量跟温度成正比
+   4.利用库伦积分法需要电压补偿？因为系统加载的不稳定，会消耗电量？测量电量的系统内部会消耗一部分能量？
+   5.基于查表的算法，避免热量的不同对电池的损耗，使使用者电池的电量更接近真是的电量（温度越低偏差越大）	
+   6.因为电池的插拔，手机重启的原因，电池的起始电压未能恢复到zcv（ZCV？），实验次数越多，电压越低；低温导致电池内阻增大，可使用电池容量下降-------------->增加D0 erro
+   7.电池插上插头的充电瞬间，电量显示会跳变，充满的100，可以用很长时间俺，但后来下降的很快。造成感官误差，感官补偿？
+   8.电池电量需要校准
+
+混合方法：
+   1.容量测量的方法
+   2.阻抗寻迹法
+   3.ZCV法
+
+6.------>Fuel_Gauge_Battery_ZCV_Table_Test_SOP_V1.0_20120716.pdf
+  电池检测的一些设备的使用和检测。
+
+7.------>Fuel_Gauge_introduce.pdf
+
+
+8.------>Fuel_Gauge_Q&A.pdf
+fuel gauge测量方法出现的问题和解决办法
+   因电池老化，Qmax等参数的变化......
+
+9.------>Mediatek_HW_Fuel_Gauge_User_Guide.pdf
+
+HW gauge
+	放电精确度的测试：用串口或者手机自带的mtk log功能
+	充电精确度的测试：		
+
+10.----->Mediatek_SW_Fuel_Gauge_User_Guide.pdf
+介绍SW gauge的内容跟上面差不多，讲测试的方法
+
+11.----->MT6573_FuelGauge_Feature_DesignNotes.pdf
+对与fuel guage计量特性的介绍
+
+12.------>MT6577_Charger_IC_SW_Introduction.pdf
+SW快充芯片的介绍
+p14对SW充电寄存器的设置，调试信息的设置
+
+
+

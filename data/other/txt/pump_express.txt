@@ -1,0 +1,67 @@
+
+pwd  pump express  快充技术 好像switch charge 也是快充技术
+
+1.------->[1]MTK Pump Express Plus Introduction V01.pdf
+pump express plus 使用PSR架构
+pump express  使用P-charge架构
+是不是苹果出了个plus什么都有plus了。。。。。。
+
+adaptor 适配器，电源
+适配器
+
+SW快充的流程
+   1.设置提高输出电压的模式
+   2.检查b点电压是否是MTK平台的TA的标示
+   3.设置升压模式到TA =9，设置本地化相应的参数，充电使能
+   4.电压保持在5V的状态
+   5.当电池接近充电电满的的时候，充电电流很小，充进去的电量很小，所以需要设置一个充电截止的标准，高于这个标准，反复插拔都不充电，低于的时候就充电
+
+通过对充电点的检查决定是用什么方式充电，检查应该是轮询的方式
+
+这两个单词都有电压的意思?
+voltage
+current
+
+
+充电的硬件保护
+1.如果充电器意外的接到了高电压，看门狗会立刻启动应急预案将电压降低到5V
+2.温度监控等相关安全措施会保护充电安全
+
+
+使用pump express 快充技术还要相关的IC，修改一点配置等
+充电的过程开始也是要通信的，建立沟通，IC发指令控制电压电流的变化
+	1.快充用更大的功率，降低更多的充电时间
+	2.usb设备传输的电压是有限制的，唯一的办法是提高输出电量，电源管理IC端，提高电压输出能力。
+	3.大的适配器输出电量可以获得大的充电电压，降低充电时间
+	4.pump express充电技术跟switch charge充电技术好像可以兼容
+	5.允许充电器根据电流决定充电所需的初始电压，由PMIC发出脉冲电流指令通过USB的Vbus传送给充电器，充电器依照这个指令调变输出电压，电压逐渐增加至高达5V 达到最大充电电流。
+	
+
+2.------>[1]MTK Pump Express Plus Verify Guideline.pdf
+充电算法？这个文档好像都是些概述
+
+3.------>[1]MTK Pump Express Verify Guideline V1.0.pdf
+标题是说对快充的修改，
+	1.对于TA电压的设置依赖于开路电压进行调整，TA？
+	2.开路电压提高0.1V
+	3.手机上电压的模式，没看明白哪个对哪个？
+	4.伏安特性曲线，不同的量
+	5.先进行识别，电压小于3.7v，迅速升高电压
+
+4.------>MTK Pump Express  20131212.pdf
+这篇文章，中文版的简介
+
+5.------>MTK Pump Express introduction and HW design guide_V1.1.pdf
+跟1.MTK Pump Express Plus Introduction V01.pdf很像
+
+
+6.------>MTK Pump Express Plus Introduction V01- English.pdf
+有一个充电IC，手机，适配器相关的原理图。整个内容跟前面的很相似
+	1.操作的原则，多大电流范围哪可以操作，操作的流程，这是英文版的
+
+快充的一些细节还没讲？
+
+
+
+
+
