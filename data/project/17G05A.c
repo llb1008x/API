@@ -13,8 +13,8 @@
 		#define RTC_DEFAULT_YEA		2010
 		#define RTC_DEFAULT_MTH		1
 		#define RTC_DEFAULT_DOM		1
-		#define RTC_2SEC_REBOOT_ENABLE  1
-		#define RTC_2SEC_MODE		2
+		#define RTC_2SEC_REBOOT_ENABLE  1		//控制使能
+		#define RTC_2SEC_MODE		2			//控制时间
 	}
 
 	键盘按键有问题，mmi测试不通过，测键不管用
