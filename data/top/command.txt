@@ -7,22 +7,20 @@
      要使用adb命令，手机需要打开USB debug。
      电脑这边要对adb进行配置
 
-
-
      安装软件：
-	adb install   apk文件名称.apk
+		adb install   apk文件名称.apk
 	
      重新安装该软件：
-	adb install -r apk文件名称.apk
+		adb install -r apk文件名称.apk
 
      卸载apk软件：
-	adb uninstall apk包名.apk
+		adb uninstall apk包名.apk
 
      查看手机上的运行日志：
-	adb logcat
+		adb logcat
 
      查看手机是否连接：
-	adb devices
+		adb devices
 	
      A为手机路径，B为电脑路径，意思为：把文件从手机中复制到电脑上
     	adb pull	<远程路径>  <本地路径> 
@@ -34,27 +32,27 @@
      	adb shell
 
      重新挂载文件系统(使系统分区重新可写,或者改变读写权限): 
-	adb remount		/* mount -o remount,rw -t yaffs2 /dev/block/mtdblock3 /system */
+		adb remount		/* mount -o remount,rw -t yaffs2 /dev/block/mtdblock3 /system */
     
      重启手机
-	adb reboot
+		adb reboot
 	
      重启到Recovery界面
-	adb reboot recovery
+		adb reboot recovery
 	
      重启到bootloader界面
-	adb reboot bootloader
+		adb reboot bootloader
 
 
     手机正常的log在/sdcard/mtklog下（死机log在/data/anr下）
-	adb pull  /sdcard/mtklog/mobilelog    /home/llb/project/DEBUG/
+		adb pull  /sdcard/mtklog/mobilelog    /home/llb/project/DEBUG/
 	
-	adb pull  /sdcard/GNLogs   /home/llb/project/DEBUG/
+		adb pull  /sdcard/GNLogs   /home/llb/project/DEBUG/
 
 
     手机功耗问题导出电池和相关的参数：
-	adb shell dumpsys batterystats > battersystats.log
-	adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
+		adb shell dumpsys batterystats > battersystats.log
+		adb shell cat /sys/kernel/debug/wakeup_sources > wakeup_sources.log
 
 
     **通过wifi连接ADB
@@ -150,8 +148,6 @@ adb reboot-bootloader
 
 	fastboot flash userdata userdata.img
 
-	
-
 	当然这里手机除了用组合键进入fastboot还可以用adb命令进入到相应的模式烧写文件
 
 
@@ -210,12 +206,6 @@ adb reboot-bootloader
 		git    commit   --amend  
 		合并缓存区的修改和最近的一次commit, 然后用生成的新的commit替换掉老的. 如果缓存区没有内容, 那么利用amend可以修改上一次commit的描述.
 	
-		
-
-		12.通过git下载linux内核
-		git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
-
-
 
 		12.常用的命令(提交之前先fetch，merge避免修改的冲突)
 		git add .			添加文件到暂存区
@@ -280,9 +270,6 @@ adb reboot-bootloader
 		
 		然后才能git fetch ，git merge 
 		
-		 origin/bbl7515a_camp_main_dev
-
-
 		repo forall -vcp git branch  -avv
 	
 		
@@ -472,7 +459,7 @@ adb reboot-bootloader
 
 
 		调整log时间
-		./ktime -i kernel_log -o kernel_log_output
+		./ktime -i kernel_log  -o  kernel_log_output
 
 
 		改变电脑上java jdk javac的版本
@@ -483,13 +470,75 @@ adb reboot-bootloader
 		察看当前的java版本java -version
 
 
-	 	烧写user版本要签名(烧签名版本的是在window环境下)
+		本地编译签名版本
+		{
+			目前我们的项目中 BBL7515A BBL7516A 仅这两个项目开启了 SecurityBoot 功能（此功能是为防止刷机）；
+			由于相关的秘钥保存于服务器上（私钥不能公开），因此开发工程师无法在本地进行签名版本的调试；
+			为满足各童鞋可以在本地编译出签名的镜像文件，并打上签名进行调试，现开发了一个小工具，方便大家进行签名，具体使用步骤如下（工具见附件）：
+			1. 将附件解压到本地，任意目录，建议创建一个空目录，方便存放，同时将你需要签名的文件也放入其中，如下（此处以logo.bin举例）：
+				
+
+			2. 命令行下进入该目录，然后按照下面的格式执行：
+			用法: ./gn_sign_clint.py [PROJECT_NAME] [TYPE] [File Name]
+			参数说明：
+			PROJECT_NAME --- 需要签名的项目名称
+			TYPE ----------- 指定签名的类型,可能的值:
+							img --- 镜像文件: bin/img
+							ota --- 整包或者差分包: zip
+			File Name ------ 需要签名的文件
+			举例：
+				./gn_sign_clint.py BBL7515A img logo.bin
+				./gn_sign_clint.py BBL7516A ota BBL7337A_update_amigo3.5.0_T0037.zip
+
+			3. 等待命令完成：
+			命令完成后，会将签名后的文件放入到 gionee_sign_release/ranyi_BBL7515A_signed_2016-09-02-17-00-24.zip 目录，并且以压缩包的形式；	
+
+			需要注意的几点：
+			1. 执行命令必须严格按照上面例子的格式，并且TYPE参数是必须的，并且只能是 img 或者 ota，这是为了指定签名类型（ota包和镜像签名流程不一样）；
+			2. 目前暂时只支持单个文件进行签名，后续会逐步完善多个镜像文件的签名方式；
+
+
+			编译签名版本的方法：
+			./TmakeGionee BBL7515A_sign -n                    编译 BBL7515A debug版本的签名版本
+			./TmakeGionee BBL7515A_sign -v user -n        编译 BBL7515A user版本的签名版本
+
+			编译完成后，在release目录生成的刷机镜像中，需要签名的只是以下10个
+
+
+			现在签名工具可以支持压缩包上传签名了，当有多个镜像文件需要签名的时候，可以这样操作：
+			1. 将需要签名的多个镜像压缩打包，目前仅支持3中格式的压缩包： zip  7z  rar
+			2. 签名命令的参数直接添加该压缩包的名字：./gn_sign_clint.py BBL7515A img sign.zip 
+
+
+			北研所有带签名功能项目的签名方式如下：
+			./gn_sign_clint.py G1605A img sign.zip 
+			./gn_sign_clint.py G1602A img BJ_G1602A_sign_T0146.zip 
+			./gn_sign_clint.py BBL7515A img logo.bin
+			./gn_sign_clint.py BBL7516A ota BBL7337A_update_amigo3.5.0_T0037.zip
+
+
+			对于高通平台项目（G1602系列）的签名方式要注意以下几点：
+			1. 压缩包名以 BJ_G1602A （具体项目名）打头；
+			2. 必须 zip 格式（一定要在linux下压缩）；
+			3. zip压缩包内不能包含目录；
+			4. 压缩包内必须包含的文件列表：
+				8976_fuseblower_USER.xml   
+				8976_secimage.xml   
+				sign_img_list.txt
+				需要签名的镜像文件
+				
+		}
+	 	
+
+
+		
+		更改编译项目脚本
+		device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
+
 
 
 		**编译android原生代码相关的命令(这个要实践，搭建android开发环境，编译原生代码)
 
-		更改编译项目脚本
-		device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
 
 
 

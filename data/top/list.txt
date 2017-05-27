@@ -332,6 +332,9 @@ other：
 	http://blog.csdn.net/googdev/article/details/52060211
 
 
+	Android中解析XML
+	http://blog.csdn.net/liuhe688/article/details/6415593/
+
 
 
 

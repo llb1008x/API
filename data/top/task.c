@@ -252,14 +252,9 @@
 
       这个应该跟过温启动关机策略相关的，温度过高触发条件，关机策略应该是最直接，最有效的，但是影响很大，后面还有几个相关的模块的初始化，都是在proc目录下
 
-      创建一系列节点，然后注册函数，相关的操作函数指针 -> (mtk_ts_cpu.c) tscpu_init,tscpu是一个虚拟的thermal_zone，主要是监控cpu的状态
-
-      -> tscpu_thermal_probe   init_thermal
-
-
-
-
-
+      创建一系列节点，然后注册函数，相关的操作函数指针 -> (mtk_ts_cpu.c) tscpu_init注册驱动,这个对整个系统的温升有很大影响，tscpu是一个虚拟的thermal_zone，
+      
+      主要是监控cpu的状态 -> tscpu_thermal_probe   
 
 
     }   
@@ -275,31 +270,31 @@
 }
 
 
+
+
+
+
+/*
+    将电池维护代码移植到17G05A上
+*/
 {
-Step Detector and Step Counter
+    mtk_switch_charging_run充电状态机的调整
+    mtk_switch_charging.c
+
+    创建节点
+    mtk_battery.c
+    init.mt6757.rc
+
+    mtk_charger.c
 
 
-    Android 4.4 also adds platform support for two new composite sensors — step detector and step counter — that let your app track steps 
-    when the user is walking, running, or climbing stairs. These new sensors are implemented in hardware for low power consumption.
-
-    The step detector analyzes accelerometer input to recognize when the user has taken a step, then triggers an event with each step. The
-     step counter tracks the total number of steps since the last device reboot and triggers an event with each change in the step count.
-      Because the logic and sensor management is built into the platform and underlying hardware, you don't need to maintain your own
-       detection algorithms in your app.
-
-    Step detector and counter sensors are available on Nexus 5, and we're working with our chipset partners to bring them to new devices 
-    as soon as possible.
-
-    I fetch the section from android official website.Last week,I got the step detector and step counter APP from one friend.He told me 
-    it is popular.Luckily get the information from Android website.
-
-    Actually,the app is a little simple,but it is widely used.It will be a great perspective for sport APP.I rightly have a good idea 
-    which is relative to sports,such as running,jogging.
-
-    I just show the outline here.A range of  people want to run,jog,but they are lazy.It is difficult to insist on.But if they search 
-    friends who have the same scenario and do it together, the exercise effectiveness will be better.They can share the effectiveness 
-    in friend's group.That's awesome. 
+    battery_get_bat_uisoc
+    FG_status.ui_soc
+    
 }
+
+
+
 
 
 

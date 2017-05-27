@@ -1,0 +1,165 @@
+#!/bin/bash
+GN_COMPILE_TOOLS_PATH="gionee/config"
+GN_SECURITY_BOOT_SW_SUPPORT=""
+abs_path=
+
+# \033[显示方式;前景色;背景色m
+# 显示方式:0（默认值）、1（高亮）、22（非粗体）、4（下划线）、24（非下划线）、5（闪烁）、25（非闪烁）、7（反显）、27（非反显）
+# 前景色:30（黑色）、31（红色）、32（绿色）、 33（黄色）、34（蓝色）、35（洋红）、36（青色）、37（白色）
+# 背景色:40（黑色）、41（红色）、42（绿色）、 43（黄色）、44（蓝色）、45（洋红）、46（青色）、47（白色）
+# \033[0m 默认
+# \033[1;32;40m 绿色
+# 033[1;31;40m 红色
+COLOR_ERROR_PREFIX='\033[1;31;48m [ERROR]'
+COLOR_WARNING_PREFIX='\033[1;33;48m [WARNING]'
+COLOR_SUCCESS_PREFIX='\033[1;32;48m [SUCCESS]'
+COLOR_GREEN_PREFIX='\033[1;32;48m'
+COLOR_SUFFIX='\033[0m'
+
+check_file() {
+    if [[  ! -d  build/tools/releasetools ]]; then
+		echo " error : 不是编译目录"
+		exit 1
+    fi
+    if [[ ! -f ${GN_COMPILE_TOOLS_PATH}/$1.mk ]]; then
+		echo " error : 项目名输入错误"
+		exit 1
+    fi
+    if [[ "$2" == "$3" ]]; then
+		echo " error : 使用了相同的文件"
+		exit 1
+    fi
+	file1_sufix=${2##*.}
+	file2_sufix=${3##*.}
+	if [[ "X$file1_sufix" != "Xzip" || "X$file2_sufix" != "Xzip" ]];then
+		echo "error : 非法的文件类型: $2 $3"
+		exit 1
+	fi
+	
+}
+get_abs_path() {
+   if [[ -f "$1"  ]]; then
+   tmp_path=$(dirname $1)/
+   tmp_name=$(basename $1)
+   cd $tmp_path
+   abs_path=`pwd`/$tmp_name
+   cd - >/dev/null 2>&1  
+   fi
+   if [[ -d "$1" ]]; then
+   cd $1
+   abs_path=`pwd`
+   cd - >/dev/null 2>&1  
+   fi 
+
+}
+
+function checkSecuritySwitch()
+{
+	echo -e "${COLOR_GREEN_PREFIX} function checkSecuritySwitch [$1]${COLOR_SUFFIX}"
+	GN_SECURITY_BOOT_SW_SUPPORT=$(grep "GN_SECURITY_BOOT_SW_SUPPORT=" ${GN_COMPILE_TOOLS_PATH}/${1}.mk | awk -F "=" '{printf("%s",$2)}')
+	echo "GN_SECURITY_BOOT_SW_SUPPORT:[${GN_SECURITY_BOOT_SW_SUPPORT}]"
+	if [ -z ${GN_SECURITY_BOOT_SW_SUPPORT} ];then
+		return 0
+	elif [ ${GN_SECURITY_BOOT_SW_SUPPORT} = "yes" ];then
+		return 1
+	else
+		return 0
+	fi
+}
+
+signDiffPackage(){
+	echo "function signDiffPackage"
+	echo "GN_SECURITY_PUB_KEY:${GN_SECURITY_PUB_KEY}"
+	echo "GN_SECURITY_PRI_KEY:[${GN_SECURITY_PRI_KEY}]"
+	local diffOta=$1
+	if [[ ! -e ${GN_SECURITY_PUB_KEY} || ! -e ${GN_SECURITY_PRI_KEY} ]];then
+		echo -e "${COLOR_ERROR_PREFIX} The file ${GN_SECURITY_PUB_KEY} or ${GN_SECURITY_PRI_KEY} is not exsit! ${COLOR_SUFFIX}"
+		exit 1
+	fi
+	if [ ! -e out/host/linux-x86/framework/signapk.jar ];then
+		echo -e "${COLOR_ERROR_PREFIX} The file out/host/linux-x86/framework/signapk.jar is not exsit! ${COLOR_SUFFIX}"
+		exit 1
+	fi
+	if [ ! -e ${diffOta} ];then
+		echo -e "${COLOR_ERROR_PREFIX} The diff OTA package ${diffOta} is not exsit! ${COLOR_SUFFIX}"
+		exit 1
+	fi
+	java -Xmx2048m -jar out/host/linux-x86/framework/signapk.jar -w ${GN_SECURITY_PUB_KEY} ${GN_SECURITY_PRI_KEY} ${diffOta} ${diffOta}_sign
+	if [ $? -ne 0 ];then
+		echo -e "${COLOR_ERROR_PREFIX} 差分包签名错误！ ${COLOR_SUFFIX}"
+		exit 1
+	fi
+	rm ${diffOta}
+	mv ${diffOta}_sign ${diffOta}
+	echo "sign ota package is done!"
+}
+
+make_package() {
+	local signFlag=""
+    product_name="$1"
+    old_pkg_name=${2##*update_}
+    old_pkg_name=${old_pkg_name%%_tmp.zip}
+    new_pkg_name=${3##*update_}
+    new_pkg_name=${new_pkg_name%%_tmp.zip}
+    pkg_path=${3%/*}
+    pkg_path=${pkg_path%/*}
+    inc_pak_name="ota/$1_update_${new_pkg_name%%\.zip}_${old_pkg_name%%\.zip}"
+    eval $(grep -w "^MTK_SECURITY_SW_SUPPORT" ${GN_COMPILE_TOOLS_PATH}/$product_name.mk |awk -F"[= ]" '{print $1"="$NF}')
+    eval $(grep -w "^TARGET_PRODUCT" ${GN_COMPILE_TOOLS_PATH}/${product_name%%_sign}.mk |awk -F"[= ]" '{print $1"="$NF}')
+
+    export MTK_SECURITY_SW_SUPPORT
+    export MKBOOTIMG="out/host/linux-x86/bin/mkbootimg"
+
+	echo "MTK_SECURITY_SW_SUPPORT:[${MTK_SECURITY_SW_SUPPORT}]"
+	echo "TARGET_PRODUCT:${TARGET_PRODUCT}"
+    if [ "$MTK_SECURITY_SW_SUPPORT" == "yes" ];then
+        #这是和加密工具的一个约定，当release 加密后，trustzone.bin文件会保留在ota tmp 包中.
+        unzip -o $2 OTA/trustzone.bin
+        local trustzone_file=OTA/trustzone.bin
+    else
+        local trustzone_file=out/target/product/${TARGET_PRODUCT/full_/}/trustzone.bin
+    fi
+
+    if [ -f "$trustzone_file" ];then
+        local upgrade_mobicore="-z $trustzone_file"
+    else
+        echo "Warnning: not trustzone.bin"
+    fi
+
+	checkSecuritySwitch "$1"
+	if [ $? -ne 1 ];then
+		signFlag="-k build/target/product/security/releasekey"
+	else
+		signFlag="--no_signing"
+	fi
+    ota_inc_cmd="./build/tools/releasetools/ota_from_target_files -v -n \
+        ${signFlag} \
+        --block \
+        -p out/host/linux-x86 \
+        -s ./device/mediatek/build/releasetools/mt_ota_from_target_files \
+        -i $2 $3 $pkg_path/$inc_pak_name.zip"
+    echo $ota_inc_cmd
+    $ota_inc_cmd
+    if [ ${GN_SECURITY_BOOT_SW_SUPPORT} = "yes" ];then
+    	signDiffPackage "$pkg_path/$inc_pak_name.zip"
+    fi
+    echo "ota package make successfull in [$pkg_path/$inc_pak_name.zip]"
+}
+##################################################
+################## Main Loop #####################
+##################################################
+
+if [[ -n "$1" && -f "$2" && -f "$3" ]]; then
+    check_file  $1 $2 $3
+    get_abs_path $2
+    old_abs_path=$abs_path
+    get_abs_path $3 
+    new_abs_path=$abs_path
+    make_package $1 $old_abs_path $new_abs_path
+else
+	echo "用法:	./gn_make_inc_pkg <project_name> <oldpackage_path> <newpackage_path> [pubkey] [prikey]"
+	echo "project_name:		         项目名"
+	echo "oldpackage_path:		     旧版本的ota中间包，必须为zip文件"
+	echo "newpackage_path:	         新版本的ota中间包，必须为zip文件"
+	exit 1
+fi
