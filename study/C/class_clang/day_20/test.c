@@ -9,13 +9,13 @@
 
 void inplace_swap(int *x,int *y)
 {
-    printf("x->%d,y->%d\n",*x,*y);
+   // printf("x->%d,y->%d\n",*x,*y);
     *x = *x ^ *y;
-    printf("x->%d,y->%d\n",*x,*y);
+   // printf("x->%d,y->%d\n",*x,*y);
     *y = *x ^ *y;
-    printf("x->%d,y->%d\n",*x,*y);
+   // printf("x->%d,y->%d\n",*x,*y);
     *y = *x ^ *y;
-    printf("x->%d,y->%d\n",*x,*y);
+   // printf("x->%d,y->%d\n",*x,*y);
 }
 
 void reverse_array(int a[],int cnt)
@@ -31,10 +31,16 @@ void reverse_array(int a[],int cnt)
 
 int main()
 {
-    int x=1,y=2;
+    int x=1,y=2,i;
     inplace_swap(&x,&y);
 
     printf("x->%d,y->%d\n",x,y);
     
+	int a[]={1,2,3,4};
+	reverse_array(a,sizeof(a)/sizeof(int));		
+	for(i=0;i<(sizeof(a)/sizeof(int ));i++){
+		printf("a[%d]->%d\n",i,a[i]);
+	}
+
     return 0;
 }

@@ -159,7 +159,7 @@
 
 
 
-充电过程中，根据温度调节充电电流
+温升相关问题
 {
     1.根据当前的温度简单的限定充电电流
     {
@@ -169,43 +169,9 @@
 
         mtk_switch_charging.c -> swchg_select_charging_current_limit
 
-        这其中还要考虑其他情况：打电话，mmi测试等等
+        这其中还要考虑其他情况：打电话，mmi测试等等（1605上是这样考虑）
     }
  
-
-    G1605A
-    //Gionee GuoJianqiu 20150514 modify for GNNCR00010646 begin
-    if(bat_charge_current_not_down())
-    {
-        g_temp_CC_value = AC_CHARGER_CURRENT;
-        
-        //GioneeDrv GuoJianqiu 20160429 modify for platform change begin
-        if((BMT_status.temperature < 15) || ((g_call_state != CALL_IDLE) && (!is_enter_mmi_test)))
-        {
-            g_temp_CC_value = AC_CHARGER_CURRENT / 2;
-            if(g_temp_CC_value < USB_CHARGER_CURRENT)
-                g_temp_CC_value = USB_CHARGER_CURRENT; 
-            battery_log(BAT_LOG_CRTI, "[BATTERY] temperature = %d, g_call_state = %d, is_enter_mmi_test = %d, g_temp_CC_value = %d\n", BMT_status.temperature, g_call_state, is_enter_mmi_test, g_temp_CC_value); 
-        }
-        //GioneeDrv GuoJianqiu 20160429 modify for platform change end
-        
-    }
-    //Gionee GuoJianqiu 20150514 modify for GNNCR00010646 end
-
-
-     //Gionee GuoJianqiu 20150611 modify for CR01498036 begin
-     kal_bool bat_charge_current_not_down(void)
-     {
-        battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
-
-        if (((g_gn_screenon_time <= 30) && (g_call_state == CALL_IDLE)) || (is_enter_mmi_test == KAL_TRUE) || (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT || get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT))
-            return true;
-        else
-            return false;
-     }
-     //Gionee GuoJianqiu 20150611 modify for CR01498036 end
-
-
      17G05A
      //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging begin
 	 pr_err("in %s info->battery_temperature->%d\n",__FUNCTION__,info->battery_temperature);
@@ -237,16 +203,36 @@
     2.充电温度调节策略相关代码，文档  
     {
         mtk_cooler_bcct_v1.c这个文件应该充电调节温度有关
+        （mtk_cooler_bcct_v1.c）mtk_cooler_bcct_init初始化充电温升 降电流 -> mtk_cooler_bcct_register_ltf这个是注册一个中断，设置回调函数
+
+        struct chrlmt_handle{chr_input_curr_limit;bat_chr_curr_limit;pep30_input_curr_limit;}当温度达到某个状态的时候设置限定的充电电流
+        
+        -> 这边注册了三个降温相关的策略 bcct，abcct，lcmoff
+
+
+            
+           
+            
+        
+
+
+
+        device/mediatek/mt6757/thermal.conf这个是温升调节策略相关的配置文件,这个文件参数的意思
 
 
         bcct,abcct
+         1、bcct：Thermal config tool中bcct策略最多设置3个温度点分别调用3种充电电流，当温度触发条件满足的时候直接降电流
+         2、abcct：Thermal config tool中abcct策略是使用当前板温与目标板温的差值计算下一时刻要调节的充电电流，循环调节直到当前板温=目标板温。
+         可设定充电电流的最大值和最小值。
+
+         Note：bcct和abcct两套机制可以共存，如两套机制同时生效，则取较小的充电电流值进行调节
     }  
         
 
 
     3.充电温度调节调用流程 
     {
-        （mtk_thermal_monitor.c） mtkthermal_init，mtk thermal相关的初始化，创建调试调用节点/proc/driver/thermal，在这个目录下
+     （mtk_thermal_monitor.c） mtkthermal_init，mtk thermal相关的初始化，创建调试调用节点/proc/driver/thermal，在这个目录下
 
       建立一系列的proc 节点，/proc/mtkcooler这个目录下是降温策略的设备节点 -> (mtk_cooler_shutdown.c) mtk_cooler_shutdown_init
 
@@ -274,24 +260,25 @@
 
 
 
-/*
-    将电池维护代码移植到17G05A上
-*/
-{
-    mtk_switch_charging_run充电状态机的调整
-    mtk_switch_charging.c
-
-    创建节点
-    mtk_battery.c
-    init.mt6757.rc
-
-    mtk_charger.c
 
 
-    battery_get_bat_uisoc
-    FG_status.ui_soc
-    
-}
+
+
+
+
+
+
+/****************************************************************************************************************/
+快充升压问题
+
+
+
+
+
+
+
+
+
 
 
 

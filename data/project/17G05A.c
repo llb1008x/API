@@ -5,7 +5,6 @@
 {
 	马达刷机第一次震动太弱，之后震动正常？
 
-
 	关掉2sec断电重启
 	{
 		cust_rtc.h
@@ -24,13 +23,28 @@
 
 
 	充电时序的关机充电和放电状态
+	{
+		放电的1%位置还是有问题
+		1%开始03：00 vbat=3.62V
+		  结束03：52 vbat=3.3V
+
+		1%可能相当于4%左右的电量，而且时间很长  
+
+	}
+
+
+
+	底层电量跟上层电量差别很大，但是这个却开机和刚开是的充电的log
 
 
 	mmi测试的调用节点好像还有问题
 
 
-	通过哪个变量或函数可以判断用户处在打电话状态
-
+由于目前大家手里面有17G05A（前期领到的整机和板子），17G05Q（板子上能看到丝印，17G05A QORVO），以及射频工程师手里的17G05Q+PA77010的机器。并且modem不能兼容。
+    所以，为了满足17G10A尽快开始ROM调试的需求。做了三种编译选项：
+    AA：17G10A的主干版本,是SKY的PA，也就是17G05A QORVO需要用到的；驱动部在这个上面调试驱动；
+    AB：17G10A的77010PA的版本，也就是射频工程师调试77010需要用到的；
+    AC：17G10A分支为17G05A出的版本，也就是前期那一批整机需要用到的，方便软件同事适配ROM用；
 }
 
 
@@ -310,7 +324,17 @@
 
 		[248:charger_thread][name:mtk_charger&]Vbat=4321,I=3597,VChr=492,T=33,Soc100,CT:0:1
 
-    	FG_daemon_log_level 	控制fuel_gauge的log等级
+		控制fuel_gauge的log等级
+    	FG_daemon_log_level 	
+
+		rtc记录的电量
+		BATTERY_METER_CMD_SET_RTC_UI_SOC	
+		获取上层电量
+		FG_status.ui_soc=battery_get_bat_uisoc
+    
+
+		healthd线程检测电池的状态
+		healthd]: healthd: battery l=5 v=3796 t=41.0 h=2 st=4 chg=	
 	}
 
 
@@ -641,18 +665,8 @@ out:
 
 
 
-/****************************************************************************************************************/
-4.快充升压问题
-
-
-
-
-
-
-
-
-/****************************************************************************************************************/
-5.按键功能
+/***************************************************************************************************************/
+4.按键功能
 	因为framework层还有部分未导入，所以检测到一些未知的键值，出现异常？
 	mmi测试显示一些按键还有问题？
 kpd.c
@@ -813,8 +827,8 @@ cat/proc/bus/input/devices 察看input子系统下挂的设备
     B: KEY=10 0 0 0 0 0 0 100040000000 0 0	
 
 
-/*************************************************************************************/
-6.调试马达震动效果
+/**************************************************************************************************/
+5.调试马达震动效果
 
 基本概念
 {
@@ -1161,7 +1175,7 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 /*************************************************************************************/
-7.调节充电时序状态
+6.调节充电时序状态
 {
 	恒流充电时间，按power关机不应该是kpoc	，手机完整的充放电过程是否正常，开机充电和关机充电
 
@@ -1381,24 +1395,94 @@ static void *update_vibrator_thread_default(void *priv)
 }
 	
 
-
-
-
-
-
-
-
-
-
-
-
-/***************************************************************************************************************************/
-8.温升相关的问题
+/****************************************************************************************************************/
+7.通过哪个变量或函数可以判断用户处在打电话状态
 {
+	这个应该是创建一个节点，如果是打电话，上层会写这个节点，通知底层用户正在打电话
 
+	unsigned int g_call_state = CALL_IDLE;
+	accdet.h定义
+	#define CALL_IDLE 0
+	#define CALL_RINGING 1
+	#define CALL_ACTIVE 2
+
+	battery_common.h定义(最终调用的应该是这个)
+	#define CALL_IDLE (0)
+	#define CALL_ACTIVE (1)
+
+	static ssize_t show_Charging_CallState(struct device *dev, struct device_attribute *attr, char *buf)
+	{
+		battery_log(BAT_LOG_CRTI, "call state = %d\n", g_call_state);
+		return sprintf(buf, "%u\n", g_call_state);
+	}
+
+	static ssize_t store_Charging_CallState(struct device *dev, struct device_attribute *attr,
+						const char *buf, size_t size)
+	{
+
+		if (kstrtouint(buf, 10, &g_call_state) == 0) {
+			battery_log(BAT_LOG_CRTI, "call state = %d\n", g_call_state);
+			return size;
+		}
+
+		/* hidden else, for sscanf format error */
+		{
+			battery_log(BAT_LOG_CRTI, "  bad argument, echo [enable] > current_cmd\n");
+		}
+
+		return 0;
+	}
+
+	static DEVICE_ATTR(Charging_CallState, 0664, show_Charging_CallState, store_Charging_CallState);
+
+
+	#if defined(STOP_CHARGING_IN_TAKLING)
+	static PMU_STATUS mt_battery_CheckCallState(void)
+	{
+		PMU_STATUS status = PMU_STATUS_OK;
+
+		if ((g_call_state == CALL_ACTIVE) && (BMT_status.bat_vol > V_CC2TOPOFF_THRES))
+			status = PMU_STATUS_FAIL;
+
+		return status;
+	}
+	#endif
+
+
+	/* phone call last than x min */
+	if (g_call_state == CALL_ACTIVE
+	    && (bat_time_after_sleep.tv_sec - g_bat_time_before_sleep.tv_sec >=
+		TALKING_SYNC_TIME)) {
+		//Gionee GuoJianqiu 20150103 modify for GNSPR00028091 begin
+		SOC = battery_meter_get_battery_percentage();	
+		if(BMT_status.charger_exist == KAL_FALSE && BMT_status.UI_SOC > SOC) 
+			{
+				BMT_status.UI_SOC = battery_meter_get_battery_percentage();
+			}										
+		//Gionee GuoJianqiu 20150103 modify for GNSPR00028091 end
+		battery_log(BAT_LOG_CRTI, "Sync UI SOC to SOC immediately\n");
+	}
 
 
 }
+
+
+
+/**********************************************************************************************/
+8.将电池维护代码移植到17G05A上
+{
+
+	主要涉及的文件
+	mtk_switch_charging.c
+		mtk_switch_charging_run充电状态机的调整
+    
+
+    mtk_battery.c
+    init.mt6757.rc 创建节点，上层读写这个节点设置调整的充电范围
+    mtk_battery.h 这个是变量声明的地方
+}
+
+
 
 
 
@@ -1427,12 +1511,14 @@ dws文件:
 		pmic_throttling_dlpt.c读电池客制化参数，mtk_battery_property.h
 
 
+  		mtk_charger.c跟mtk_charger_intf.h对应
+		mtk_battery.c跟mtk_battery.h对应 
+        
 
 GM3.0 定义的宏CONFIG_MTK_GAUGE_VERSION=30
 		./arch/arm64/configs/k57pv1_6mtee_pre_debug_defconfig:377:CONFIG_MTK_GAUGE_VERSION=30
 		./arch/arm64/configs/k57pv1_6mtee_pre_defconfig:361:CONFIG_MTK_GAUGE_VERSION=30
 		./arch/arm64/boot/dts/mediatek/mt6757.dtsi:1216:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-
 
 rt5081的目录
 17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/pmic/rt5081/
@@ -1452,6 +1538,8 @@ keyboard 的目录
 17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/device/mediatek/mt6757
 
 
+编译相关的脚本工具
+	android_mtk_6757_mp/gionee/config/tools
 }
 
 

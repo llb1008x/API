@@ -615,6 +615,24 @@ adb reboot-bootloader
 		ps -A | grep nautilus
 
 
+		tcpdump 
+		截取本机（192.168.31.147）和主机114.114.114.114之间的数据
+		tcpdump -n -i eth0 host 192.168.31.147 and 114.114.114.114
+
+		还有截取全部进入服务器的数据可以使用以下的格式
+		tcpdump -n -i eth0 dst 192.168.31.147
+		或者服务器有多个IP 可以使用参数
+		tcpdump -n -i eth0 dst 192.168.31.147  or  192.168.31.157
+
+		我们抓取全部进入服务器的TCP数据包使用以下的格式，大家可以参考下
+		tcpdump -n -i eth0 dst 192.168.31.147 or 192.168.31.157 and tcp
+		从本机出去的数据包
+		tcpdump -n -i eth0 src 192.168.31.147 or 192.168.31.157
+		tcpdump -n -i eth0 src 192.168.31.147 or 192.168.31.157 and port ! 22 and tcp
+		或者可以条件可以是or  和 and  配合使用即可筛选出更好的结果
+
+
+
 
 
 7.通过ftp挂在烧写服务器上的rom(当然也可以用文件系统直接登陆，拷贝rom包到本地)
