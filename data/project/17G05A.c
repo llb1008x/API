@@ -1,43 +1,38 @@
 /*********************************************************************************
 		毕业后第一份工作的第一个正式项目，一定要认真细致负责，做好每一个环节
 **********************************************************************************/
-当前存在的问题
+/*当前存在的问题*/
 {
-	马达刷机第一次震动太弱，之后震动正常？
-
-	关掉2sec断电重启
-	{
-		cust_rtc.h
-
-		#define RTC_DEFAULT_YEA		2010
-		#define RTC_DEFAULT_MTH		1
-		#define RTC_DEFAULT_DOM		1
-		#define RTC_2SEC_REBOOT_ENABLE  1		//控制使能
-		#define RTC_2SEC_MODE		2			//控制时间
-	}
-
-	键盘按键有问题，mmi测试不通过，测键不管用
-
-
-	根据温度情况调节充电电流
-
-
-	充电时序的关机充电和放电状态
+	充电时序的关机充电和放电状态			
 	{
 		放电的1%位置还是有问题
 		1%开始03：00 vbat=3.62V
 		  结束03：52 vbat=3.3V
 
 		1%可能相当于4%左右的电量，而且时间很长  
-
+		1%电压还是很高
 	}
 
+	底层电量跟上层电量差别很大，但是这个没有开机和刚开是的充电的log		
 
 
-	底层电量跟上层电量差别很大，但是这个却开机和刚开是的充电的log
+	马达刷机第一次震动太弱，之后震动正常？	
+
+
+	键盘按键有问题，mmi测试不通过，测键不管用
 
 
 	mmi测试的调用节点好像还有问题
+
+
+	快充升压问题
+
+
+	去掉OTG中断
+
+
+	电池曲线的导入
+
 
 
 由于目前大家手里面有17G05A（前期领到的整机和板子），17G05Q（板子上能看到丝印，17G05A QORVO），以及射频工程师手里的17G05Q+PA77010的机器。并且modem不能兼容。
@@ -46,15 +41,6 @@
     AB：17G10A的77010PA的版本，也就是射频工程师调试77010需要用到的；
     AC：17G10A分支为17G05A出的版本，也就是前期那一批整机需要用到的，方便软件同事适配ROM用；
 }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -516,10 +502,16 @@ rt5081这边可以选择路径直接将充电器电给电池还是系统，
 搜索的关键字主要是boot方面的，而mtk搜索的是[PMIC]just_rst = 0
 
 
+关掉2sec断电重启
+{
+	cust_rtc.h
 
-
-
-
+	#define RTC_DEFAULT_YEA		2010
+	#define RTC_DEFAULT_MTH		1
+	#define RTC_DEFAULT_DOM		1
+	#define RTC_2SEC_REBOOT_ENABLE  1		//控制使能
+	#define RTC_2SEC_MODE		2			//控制时间
+}
 
 /*******************************************************************************************************************/
 2.充电电流太小
@@ -1483,6 +1475,93 @@ static void *update_vibrator_thread_default(void *priv)
 }
 
 
+
+
+/**********************************************************************************************/
+9.温升相关问题
+{
+    1.根据当前的温度简单的限定充电电流
+    {
+        低温（小于15）：1.5A
+        正常温度（25左右）：2A
+        高温（大于45）：1A
+
+        mtk_switch_charging.c -> swchg_select_charging_current_limit
+
+        这其中还要考虑其他情况：打电话，mmi测试等等（1605上是这样考虑）
+    }
+ 
+     17G05A
+     //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging begin
+	 pr_err("in %s info->battery_temperature->%d\n",__FUNCTION__,info->battery_temperature);
+
+	 if(info->chr_type==STANDARD_CHARGER){
+
+		if( info->battery_temperature <=15 ){
+
+			pdata->charging_current_limit=1500000;
+			pdata->input_current_limit=1600000;
+			pr_err("in %s ,temperature is too low ,we need limit charging current->1\n",__FUNCTION__);
+		}else if( (info->battery_temperature>15)&&(info->battery_temperature<=45) ){
+
+			pr_err("in %s ,temperature in normal range,do not limit charging current->2 \n",__FUNCTION__);
+		}else if( info->battery_temperature > 45 ){
+
+			pdata->charging_current_limit=1000000;
+			pdata->input_current_limit=1200000;
+			pr_err("in %s ,temperature is too high ,we need limit charging current->3\n",__FUNCTION__);
+		}
+	 }
+	 pr_err("in %s setting charging_current_limit->%d,input_current_limit->%d\n",
+				__FUNCTION__,pdata->charging_current_limit,pdata->input_current_limit);
+	 //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging end	
+
+
+    2.充电温度调节策略相关代码，文档  
+    {
+        mtk_cooler_bcct_v1.c这个文件应该充电调节温度有关
+        （mtk_cooler_bcct_v1.c）mtk_cooler_bcct_init初始化充电温升 降电流 -> mtk_cooler_bcct_register_ltf这个是注册一个中断，设置回调函数
+
+        struct chrlmt_handle{chr_input_curr_limit;bat_chr_curr_limit;pep30_input_curr_limit;}当温度达到某个状态的时候设置限定的充电电流
+        
+        -> 这边注册了三个降温相关的策略 bcct，abcct，lcmoff的中断 -> 创建proc file节点 时时反应设备的状态 -> chrlmt_set_limit_handler
+
+        触发条件就设置限定电流的回调函数 -> charger_manager_set_input_current_limit 通过这个函数设置进充电器的和进电池的 
+
+
+        device/mediatek/mt6757/thermal.conf这个是温升调节策略相关的配置文件,这个文件参数的意思
+
+
+        bcct,abcct
+         1、bcct：Thermal config tool中bcct策略最多设置3个温度点分别调用3种充电电流，当温度触发条件满足的时候直接降电流
+         2、abcct：Thermal config tool中abcct策略是使用当前板温与目标板温的差值计算下一时刻要调节的充电电流，循环调节直到当前板温=目标板温。
+         可设定充电电流的最大值和最小值。
+
+        Note：bcct和abcct两套机制可以共存，如两套机制同时生效，则取较小的充电电流值进行调节
+    }  
+        
+
+    3.充电温度调节调用流程 
+    {
+     （mtk_thermal_monitor.c） mtkthermal_init，mtk thermal相关的初始化，创建调试调用节点/proc/driver/thermal，在这个目录下
+
+      建立一系列的proc 节点，/proc/mtkcooler这个目录下是降温策略的设备节点 -> (mtk_cooler_shutdown.c) mtk_cooler_shutdown_init
+
+      这个应该跟过温启动关机策略相关的，温度过高触发条件，关机策略应该是最直接，最有效的，但是影响很大，后面还有几个相关的模块的初始化，都是在proc目录下
+
+      创建一系列节点，然后注册函数，相关的操作函数指针 -> (mtk_ts_cpu.c) tscpu_init注册驱动,这个对整个系统的温升有很大影响，tscpu是一个虚拟的thermal_zone，
+      
+      主要是监控cpu的状态 -> tscpu_thermal_probe   
+    }   
+
+
+    4.相关的文档
+    {
+        Thermal_Management_MT6757.pdf
+
+        MT6757CH(CD)_Thermal_Design_Notices_V0.1.pdf
+    }
+}
 
 
 

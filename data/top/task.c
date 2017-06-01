@@ -151,14 +151,6 @@
 
 
 
-
-
-
-
-
-
-
-
 温升相关问题
 {
     1.根据当前的温度简单的限定充电电流
@@ -173,6 +165,7 @@
     }
  
      17G05A
+修改：     
      //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging begin
 	 pr_err("in %s info->battery_temperature->%d\n",__FUNCTION__,info->battery_temperature);
 
@@ -207,14 +200,9 @@
 
         struct chrlmt_handle{chr_input_curr_limit;bat_chr_curr_limit;pep30_input_curr_limit;}当温度达到某个状态的时候设置限定的充电电流
         
-        -> 这边注册了三个降温相关的策略 bcct，abcct，lcmoff
+        -> 这边注册了三个降温相关的策略 bcct，abcct，lcmoff的中断 -> 创建proc file节点 时时反应设备的状态 -> chrlmt_set_limit_handler
 
-
-            
-           
-            
-        
-
+        触发条件就设置限定电流的回调函数 -> charger_manager_set_input_current_limit 通过这个函数设置进充电器的和进电池的 
 
 
         device/mediatek/mt6757/thermal.conf这个是温升调节策略相关的配置文件,这个文件参数的意思
@@ -225,7 +213,7 @@
          2、abcct：Thermal config tool中abcct策略是使用当前板温与目标板温的差值计算下一时刻要调节的充电电流，循环调节直到当前板温=目标板温。
          可设定充电电流的最大值和最小值。
 
-         Note：bcct和abcct两套机制可以共存，如两套机制同时生效，则取较小的充电电流值进行调节
+        Note：bcct和abcct两套机制可以共存，如两套机制同时生效，则取较小的充电电流值进行调节
     }  
         
 
@@ -241,8 +229,6 @@
       创建一系列节点，然后注册函数，相关的操作函数指针 -> (mtk_ts_cpu.c) tscpu_init注册驱动,这个对整个系统的温升有很大影响，tscpu是一个虚拟的thermal_zone，
       
       主要是监控cpu的状态 -> tscpu_thermal_probe   
-
-
     }   
 
 
@@ -260,118 +246,41 @@
 
 
 
-
-
-
-
-
-
-
-
-/****************************************************************************************************************/
-快充升压问题
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-modem_introduction
-{
-
-    文档ccnmi
-
-    01-01 00:05:44.142   359   359 I ccci_mdinit(1): wait_for_property() ready for name:init.svc.gsm0710muxd, loop:18
-    01-01 00:05:44.142   359   359 D ccci_mdinit(1): deamon begin to run!
-
-
-    Dear Customer:
-
-    一直报下面的AT command:
-    网络状态有变化的时候上报（比如rat change）
-
-    是否容易复现？是否一直是在同一个地方?
-    如果容易复现，请帮忙打开全部的log，再捉给我
-
-    jinhao wu
-    65440
-    Thanks
-
-    1.1 Unsolicited result code: +EGMSS
-    1.1.1 Description
-    This URC is used to inform AP the information of system selection, according to RAT, location and attach status
-    1.1.2 Format
-
-    Unsolicited result code
-    +EGMSS=<rat>,”<mcc>”,<status>
-    1.1.3 Field
-    <rat>: Integer
-    0 3GPP2 RAT group
-    1 3GPP RAT group
-    2 CDMA2000 1x
-    3 CDMA2000 HRPD
-    4 GERAN
-    5 UTRAN
-    6 EUTRAN
-
-    <mcc> String
-    For example, “460” for CT.
-
-    <status> Integer
-    0 Have selected the <rat> and is going to perform PLMN search
-    1 Attached to the network on the <rat>
-
-    网络有点问题：
-    05-15 05:44:15.088 938 954 D AT : AT< +EGMSS: 6,"460",0
-    05-15 05:44:15.686 938 954 D AT : AT< +EGMSS: 6,"460",1
-    05-15 05:47:08.126 938 954 D AT : AT< +EGMSS: 6,"460",0
-    05-15 05:47:08.666 938 954 D AT : AT< +EGMSS: 6,"460",1
-    05-15 05:49:21.136 938 954 D AT : AT< +EGMSS: 6,"460",0
-    05-15 05:49:21.654 938 954 D AT : AT< +EGMSS: 6,"460",1
-    05-15 05:50:15.086 938 954 D AT : AT< +EGMSS: 6,"460",0
-    05-15 05:50:15.705 938 954 D AT : AT< +EGMSS: 6,"460",1
-    05-15 06:23:32.126 938 954 D AT : AT< +EGMSS: 6,"460",0
-}
-
-
-
-
-
-
-
-
 关掉OTG功能
+{
     不注册OTG这个中断
 
 
+}
 
 
 
-mmi测试：加入充电测试选项
+
+
+
+
+从满电放电到关机的情况是否有异常
 {
-    已加入项目中，当是其中的一些内容还有需要了解工作方式
+
 
 }
+    
+
 
 
 
 
 
 电池曲线的导入    
-
-
+{
 
 }
+
+
+
+
+
+
 
 
 
