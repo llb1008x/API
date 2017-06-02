@@ -336,6 +336,10 @@ other：
 	http://blog.csdn.net/liuhe688/article/details/6415593/
 
 
+	shell具体执行过程及自主实现shell解释器 
+	http://blog.csdn.net/woaimeinuo/article/details/51118882
+
+
 
 
 

@@ -455,6 +455,9 @@ adb reboot-bootloader
 			解压附件 执行如下命令
 			python setup.py build
 			python setup.py install
+
+			sudo apt-get install libxml-simple-perl
+
 		}
 
 
@@ -466,6 +469,8 @@ adb reboot-bootloader
 		sudo update-alternatives --config java
 	
 		sudo update-alternatives --config javac
+
+		sudo update-alternatives --config javadoc
 	
 		察看当前的java版本java -version
 
