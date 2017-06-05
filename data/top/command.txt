@@ -458,6 +458,15 @@ adb reboot-bootloader
 
 			sudo apt-get install libxml-simple-perl
 
+			sudo apt-get install libssl-dev
+
+			sudo apt-get -y install sqlite3
+			sudo apt-get -y install libsqlite3-dev 
+
+
+			sudo apt-get install  smbclient
+			sudo apt-get install  python-yaml
+
 		}
 
 
