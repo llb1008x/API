@@ -1,0 +1,32 @@
+多线程并发 g_thread_create()
+
+同一进程可以包括多个线程，这些线程共享相同的内存空间，而进程都有各自独立的内存空间，进程之间通信需要专门的机制，这无疑增加了内核的开销，降低了系 统性能。线程带来的开销很小，内核无需单独复制进程的内存空间或文件描述符等，这就大量地节省了CPU时间，使得创建线程比进程的速度快数十倍。另外，多 线程程序作为一种多任务、并发的工作方式，还有以下的优点：1）提高应用程序响应时间；2）使多CPU系统更加有效；3）改善程序结构。 
+首先我们理清一下Pthread和Gthread的区别。Pthread即POSIX thread，Posix线程是一个POSIX标准线程，该标准定义内部API创建和操纵线程。Gthread调用的是Glib库中的线程部分；GLib 是GTK+和GNOME工程的基础底层核心程序库，是一个综合用途的实用的轻量级的C程序库。 本软件是带有界面的，并且是GTK+界面，因此，Gthread是最好的选择。
+引入Gthread线程的文件在编译时要加入参数`pkg-config --cflags --libs gthread-2.0`。
+
+（1）gboolean g_thread_supported();/*测试是否支持多线程*/
+
+（2）void g_thread_init (GThreadFunctions *vtable);/*初始化多线程支持*/
+
+（3）void gdk_threads_init (void);/*初始化GDK多线程支持*/
+
+（4）void gdk_threads_enter (void);/*进入多线程互斥区域*/
+
+（5）void gdk_threads_leave (void);/*退出多线程互斥区域*/
+
+（6）GThread * g_thread_create (GThreadFunc func, gpointer data, gboolean joinable, GError **error);
+这是创建线程函数，func是线程执行的外部函数，data是传给该外部函数的参数，joinable标志线程是否可分离，error是出错代码返回地址。
+
+（7）void g_thread_exit (gpointer retval);/*线程退出，retval为返回状态值*/
+
+（8）GMutex *g_mutex_new ();/*返回一个新的互斥锁*/
+
+（9） void g_mutex_lock(GMutex *mutex);/*上锁*/
+
+（10）void g_mutex_unlock (GMutex *mutex);/*解锁*/
+
+（11）GCond* g_cond_new ();/*返回一个新的信号量*/
+
+（12）void g_cond_signal (GCond *cond);/*释放信号量cond*/
+
+（13）void g_cond_wait(GCond *cond, GMutex *mutex);/*等待信号量cond*/
