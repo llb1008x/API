@@ -53,13 +53,9 @@
 		./Documentation/devicetree/bindings/regulator/rpm-smd-regulator.txt
 		./Documentation/devicetree/bindings/gpio/qpnp-pin.txt
 		
-		
-		
 		charger
 		
-		
 		battery profiles
-		
 		
 		没读进去还是要看看代码
     	
@@ -191,6 +187,7 @@
 						adb shell chmod 777 /data/dumper.sh
 				
 					3.运行脚本，将数据写到文件内
+					好像不管用
 					/data/dumper.sh > /data/kmsg.txt
 				
 					4.adb root
@@ -203,18 +200,22 @@
 					echo 0xff > /sys/module/qpnp_fg/parameters/debug_mask
 					echo 8 > /proc/sys/kernel/printk
 					dmesg > debug_output_filename
-	  
-
-					
-			
 			}
 			
-
-			
-		
 		}
 		
     }
+    
+    
+    
+    pmi8937_pmi8940_power_management_ic_device_specification
+    {
+    
+    
+    }
+    
+    
+    
     
     
 

@@ -40,6 +40,21 @@
     AA：17G10A的主干版本,是SKY的PA，也就是17G05A QORVO需要用到的；驱动部在这个上面调试驱动；
     AB：17G10A的77010PA的版本，也就是射频工程师调试77010需要用到的；
     AC：17G10A分支为17G05A出的版本，也就是前期那一批整机需要用到的，方便软件同事适配ROM用；
+
+
+	gionee/config/17G10A.mk ： GIONEE_VERSION_BY=17G10A-T0003-170522AA    //修改最后两位字母，对应编译选项，就是AA
+
+	主要是modem代码不同，先删除不一样的
+	rm -rf vendor/mediatek/proprietary/custom/gnbj6757_66_n/modem/*				*/
+
+	然后拷贝17G10A_AA 目录下的modem到vender目录下
+
+	AA目录下拷贝clkbuf_ctl.h，mtk_clkbuf_ctl.h到外面
+
+	git checkout vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6757/src/drivers/inc/clkbuf_ctl.h
+	git checkout kernel-4.4/drivers/misc/mediatek/base/power/mt6757/mtk_clkbuf_ctl.h 
+
+	
 }
 
 
