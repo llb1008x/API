@@ -112,6 +112,60 @@
 	adb  shell logcat -b main -v threadtime >error_log1.txt
 
 
+	MTK平台GPIO adb控制方法如下：
+
+	列出GPIO的状态：
+	adb shell "cat /sys/devices/virtual/misc/mtgpio/pin"
+
+	//举例，通过控制GPIO输出一个低电平，可以用示波器查看，如果你要控制其他GPIO，请把145换成别的数字
+	//设为GPIO24为  mode 0，
+	adb shell "echo -wmode 24 0 > /sys/devices/virtual/misc/mtgpio/pin"
+	//设为输出
+	adb shell "echo -wdir 24 1 > /sys/devices/virtual/misc/mtgpio/pin"
+	//输出高
+	adb shell "echo -wdout 24 1 > /sys/devices/virtual/misc/mtgpio/pin"
+	//输出低
+	adb shell "echo -wdout 24 0 > /sys/devices/virtual/misc/mtgpio/pin"
+
+
+
+
+	高通平台adb 命令控制GPIO状态的方法高通有对应文档，但尝试后不能用，如有需要请按如下方法使用：
+
+    In sdm660, it has north/center/south tlmm, each tlmm has different base register address, like north tlmm is 0x3000000+NORTH,
+you could check pinctrl-sdm660.c to get each gpio's base register address .
+
+    #define NORTH 0x00900000 
+    #define CENTER 0x00500000 
+    #define SOUTH 0x00100000 
+    #define REG_SIZE 0x1000
+
+    PINGROUP(29, CENTER, blsp_spi8_a, blsp_uart6_b, NA, NA, phase_flag22, NA, NA, NA, NA),
+
+    So GPIO29 cfg register address is 0x3000000+CENTER + REG_SIZE *29
+
+    config CONFIG_DEVMEM=y, then use  /system/bin/r  register address
+
+
+    寄存器bit位表示的意思可查看高通文档：SP80-P8754-6（SDM660/SDM630 Linux Android Software Porting Manual）  section 4.1.1 GPIO configuration
+
+eg：
+        1. 读寄存器TLMM_GPIO_CFG29(0x3000000+CENTER + REG_SIZE * 29)命令
+        adb shell
+        system/bin/r 0x351D000
+        输出：0351d000: 00000201
+
+        2. 读TLMM_GPIO_IN_OUT29(0x3000000+CENTER + REG_SIZE * 29 +4 )命令：
+        adb shell
+        system/bin/r 0x351D004
+        输出：0351d004: 00000003
+
+        3. 写TLMM_GPIO_CFG29寄存器：
+        system/bin/r 0x351D000 0x01
+        输出：0351d000: 00000001
+
+
+
 2.fastboot常用命令(这写命令是G1602A烧写相关的文件，相关命令还要重新看)：
 进入fastboot模式
 adb reboot-bootloader
