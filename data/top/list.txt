@@ -340,6 +340,10 @@ other：
 	http://blog.csdn.net/woaimeinuo/article/details/51118882
 
 
+	fastboot命令汇总 
+	http://blog.csdn.net/tdstds/article/details/25179541
+
+
 
 
 

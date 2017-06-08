@@ -168,6 +168,7 @@ eg：
 
 2.fastboot常用命令(这写命令是G1602A烧写相关的文件，相关命令还要重新看)：
 进入fastboot模式
+要加sudo权限，按音量下
 adb reboot-bootloader
 
 	fastboot flash modem NON-HLOS.bin

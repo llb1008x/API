@@ -207,17 +207,18 @@
     }
     
     
-    
-    pmi8937_pmi8940_power_management_ic_device_specification
-    {
-    
-    
-    }
-    
-    
-    
-    
-    
+ 
+}
 
+
+
+
+
+
+/*软件流程*/
+{
+	高通的充电基本上都叫smbcharger
+	(qpnp-smbcharger.c) smbchg_probe	从dtsi文件中获取参数，上面还有一个投票制度貌似很重要，还有一些工作 -> smbchg_usb_update_online_work
 
 }
+
