@@ -218,7 +218,166 @@
 /*软件流程*/
 {
 	高通的充电基本上都叫smbcharger
-	(qpnp-smbcharger.c) smbchg_probe	从dtsi文件中获取参数，上面还有一个投票制度貌似很重要，还有一些工作 -> smbchg_usb_update_online_work
+	(qpnp-smbcharger.c) smbchg_init 模块初始化->smbchg_probe	从dtsi文件中获取参数，上面还有一个投票制度貌似很重要，还有一些工作 -> smbchg_usb_update_online_work,判断usb是否插入,并上报状态到power_supply子系统 -> smbchg_parallel_usb_en_work并行充电使能，对并行充电的条件进行判断 aicl是否稳定，没有电池的条件下不允许改变并行充电的状态 -> smbchg_parallel_usb_enable -> smbchg_vfloat_adjust_work动态充电电压调节
+	
+	
+	
+	wipower高通的无线充电
+	
+	
+	smbchg_hvdcp_enable_cb
+	
+	
+	vote投票制度
+	{
+	
+		/*创建一个可投票的量，这里是fast charging current
+		spmi接口，投票的名称client，投票类型(最多，最少，还是达到设定的直)
+		默认值是多少，回调函数
+		*/
+		chip->fcc_votable = create_votable(&spmi->dev,
+				"SMBCHG: fcc",
+				VOTE_MIN, NUM_FCC_VOTER, 2000,
+				set_fastchg_current_vote_cb);
+		if (IS_ERR(chip->fcc_votable))
+			return PTR_ERR(chip->fcc_votable);
+			
+			
+			
+			
+			
+			
+		struct votable *create_votable(struct device *dev, const char *name,
+					int votable_type,
+					int num_clients,
+					int default_result,
+					int (*callback)(struct device *dev,
+							int effective_result,
+							int effective_client,
+							int last_result,
+							int last_client)
+					)
+		{
+				int i;
+				struct votable *votable;
+
+				if (!callback) {
+					dev_err(dev, "Invalid callback specified for voter\n");
+					return ERR_PTR(-EINVAL);
+				}
+
+				if (votable_type >= NUM_VOTABLE_TYPES) {
+					dev_err(dev, "Invalid votable_type specified for voter\n");
+					return ERR_PTR(-EINVAL);
+				}
+
+				if (num_clients > NUM_MAX_CLIENTS) {
+					dev_err(dev, "Invalid num_clients specified for voter\n");
+					return ERR_PTR(-EINVAL);
+				}
+
+				votable = devm_kzalloc(dev, sizeof(struct votable), GFP_KERNEL);
+				if (!votable)
+					return ERR_PTR(-ENOMEM);
+
+				votable->dev = dev;
+				votable->name = name;
+				votable->num_clients = num_clients;
+				votable->callback = callback;
+				votable->type = votable_type;
+				votable->default_result = default_result;
+				mutex_init(&votable->vote_lock);
+
+				/*
+				 * Because effective_result and client states are invalid
+				 * before the first vote, initialize them to -EINVAL
+				 */
+				votable->effective_result = -EINVAL;
+				votable->effective_client_id = -EINVAL;
+
+				for (i = 0; i < votable->num_clients; i++)
+					votable->votes[i].state = -EINVAL;
+
+				return votable;
+			}
+			
+			
+			/*回调函数(当然还有很多组)*/
+			static int set_fastchg_current_vote_cb(struct device *dev,
+						int fcc_ma,
+						int client,
+						int last_fcc_ma,
+						int last_client)
+			{
+				struct smbchg_chip *chip = dev_get_drvdata(dev);
+				int rc;
+
+				if (chip->parallel.current_max_ma == 0) {
+					rc = smbchg_set_fastchg_current_raw(chip, fcc_ma);
+					if (rc < 0) {
+						pr_err("Can't set FCC fcc_ma=%d rc=%d\n", fcc_ma, rc);
+						return rc;
+					}
+				}
+				/*
+				 * check if parallel charging can be enabled, and if enabled,
+				 * distribute the fcc
+				 */
+				smbchg_parallel_usb_check_ok(chip);
+				return 0;
+			}
+			
+			
+			/*遍历数组，寻找合适的充电电流，然后设置fcc_ma*/
+			smbchg_set_fastchg_current_raw
+
+			/*并行充电检测，然后调用工作函数*/
+			smbchg_parallel_usb_check_ok
+			
+			/*工作函数*/
+			#define PARALLEL_CHARGER_EN_DELAY_MS	500
+			static void smbchg_parallel_usb_en_work(struct work_struct *work)
+			{
+				struct smbchg_chip *chip = container_of(work,
+							struct smbchg_chip,
+							parallel_en_work.work);
+				int previous_aicl_ma, total_current_ma, aicl_ma;
+				bool in_progress;
+
+				/* 先检测aicl是否稳定 */
+				previous_aicl_ma = smbchg_get_aicl_level_ma(chip);
+				msleep(PARALLEL_CHARGER_EN_DELAY_MS);
+				aicl_ma = smbchg_get_aicl_level_ma(chip);
+				if (previous_aicl_ma == aicl_ma) {
+					pr_smb(PR_STATUS, "AICL at %d\n", aicl_ma);
+				} else {
+					pr_smb(PR_STATUS,
+						"AICL changed [%d -> %d], recheck %d ms\n",
+						previous_aicl_ma, aicl_ma,
+						PARALLEL_CHARGER_EN_DELAY_MS);
+					goto recheck;
+				}
+
+				mutex_lock(&chip->parallel.lock);
+				in_progress = (chip->parallel.current_max_ma != 0);
+				/*检测usb口的充电电流状况，是否ok*/
+				if (smbchg_is_parallel_usb_ok(chip, &total_current_ma)) {
+					
+					smbchg_parallel_usb_enable(chip, total_current_ma);
+				} else {
+					if (in_progress) {
+						pr_smb(PR_STATUS, "parallel charging unavailable\n");
+						smbchg_parallel_usb_disable(chip);
+					}
+				}
+				mutex_unlock(&chip->parallel.lock);
+				smbchg_relax(chip, PM_PARALLEL_CHECK);
+				return;
+
+			recheck:
+				schedule_delayed_work(&chip->parallel_en_work, 0);
+			}
+
 
 }
 
