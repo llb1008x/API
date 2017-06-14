@@ -23,6 +23,33 @@
 
 
 	mmi测试的调用节点好像还有问题
+	{
+		mmi测试读取的节点信息
+		sys/class/power_supply/battery/
+
+		充电可能读取的节点数据有问题
+			几个电流，电压，电池电量，电池电压都有问题
+			充电电流上不去
+			{
+				这个好像是主板温度过高，虽然显示的是电池温度50+，但是电池明显不热
+				[    9.896490] <6>.(4)[258:charger_thread][name:mtk_charger&]Vbat=3775,I=-4446,VChr=9,T=49,Soc=0:0,CT:0:0
+
+				[   12.371394] <6>.(6)[258:charger_thread][name:mtk_battery_hal&][fgauge_read_current] final current=5051 (ratio=950)
+				[   12.372785] <6>.(6)[258:charger_thread][name:mtk_charger&]Vbat=3771,I=-5051,VChr=9,T=50,Soc=0:0,CT:0:0
+				[   12.375494] <4>.(4)[258:charger_thread][name:pmic_auxadc&][mt6355_get_auxadc_value] ch = 2, reg_val = 0x1d3, adc_result = 410
+				[   12.377141] <4>.(4)[258:charger_thread][name:mtk_battery_hal&][fgauge_read_current] final current=4735 (ratio=950)
+				[   12.378491] [name:mtk_charger&][BATTERY] Battery over Temperature or NTC fail 50 50!!
+
+				这个是电池的pin脚有问题
+			}
+
+		键盘mmi测试不能通过
+			键盘的工作，以及涉及哪些目录下的文件
+	}
+
+
+
+
 
 
 	快充升压问题

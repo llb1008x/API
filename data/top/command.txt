@@ -733,8 +733,7 @@ adb reboot-bootloader
 
 	通过ssh挂载服务器 ssh y3_driver@10.8.0.24
 
-
-
+	sudo mount -t cifs -o username=Administrator,password=123456,dir_mode=0777,vers=2.1 //10.8.8.108/d /home/jinjt/work/code/10.8.8.108/d
 
 8.vim配置的快捷方式
 	按F5可以直接编译并执行C、C++、java代码以及执行shell脚本，按“F8”可进行C、C++代码的调试
