@@ -4,63 +4,80 @@
 
 
 
-17G05A  软件关机重启,充电调试 (这个是重点),17G05A的mmi测试
-/*debug*/
+
+
+
+/*要处理的问题*/
 {
-软件关机重启:解决
-{
-    pwrkey连接了pmic和rt5081，pmic关闭了使能，但是rt5081还有连接
-    在long_press_reboot_function_init_pmic内
+    G1605A底层电量跟上层电量偏差大，导致电量跳变问题，原因，怎么改？
+        电量偏差累计
+        1,测试电量相关的问题，要在Download软件版本后，或者 更换电池后，先充满一次电，同步一下电量，再进行测试；
+        2,禁止频繁开关机重启、频繁插拔充电器操作，操作间隔时间要5分钟以上，且操作次数不要超过5次；
+        3,未按照以上1、2操作，引出来的电量显示问题，开发可以直接驳回；
 
-//Gionee <gn_by_charging> <lilubao> <20170406> add for change reboot begin
-    //try again to make sure the reg 0x60e set to 0x00
-	ret=pmic_set_register_value(KPD_PMIC_RG_PWRKEY_RST_EN, 0x00);
-	kpd_info("4ret->%d\n",ret);
-	ret=pmic_set_register_value(KPD_PMIC_RG_HOMEKEY_RST_EN, 0x00);
-	kpd_info("5ret->%d\n",ret);
-
-	kpd_info("[PMIC] Reg[0x%x]=0x%x after by lilubao\n",
-			MT6355_TOP_RST_MISC, upmu_get_reg_value(MT6355_TOP_RST_MISC)); 
-//Gionee <gn_by_charging> <lilubao> <20170406> add for change reboot end	
-
-}
+        eService号：
 
 
-充电电流太小：标准充电器（1.9A） USB充电（500mA）：接近设定的值
-{
-->2017.4.14
+    17G10A mmi测试读取的数据有问题
     {
-         标准充电器（1.6A） USB充电（450mA）
-         修改了：
-         MTK_PUMP_EXPRESS_PLUS_20_SUPPORT = yes
-         mivr = <4400000>;	/* uV 4500000->4400000*/
-    }
+        mmi测试读取的节点在（这几个接口有问题？）
+        sys/class/power_supply/battery/
 
-->2017.4.16
-    {
-        根据MTK最新的RT5081版本做了修改
-        电流还是有问题，比较小
+        BatteryAverageCurrent  平均电流为0？
+        ChargerVoltage InstatVolt      TemperatureR batt_temp capacity     
+
+        device power   present_smb status_smb technology uevent 
+
+        BatterySenseVoltage         ISenseVoltage  TempBattVoltage adjust_power batt_vol  
+
+        capacity_smb health present status      subsystem  type  
+
+
+        上面那一组变量属于power_supply的特性
+        static enum power_supply_property battery_props[] = {
+            POWER_SUPPLY_PROP_STATUS,
+            POWER_SUPPLY_PROP_HEALTH,
+            POWER_SUPPLY_PROP_PRESENT,
+            POWER_SUPPLY_PROP_TECHNOLOGY,
+            POWER_SUPPLY_PROP_CAPACITY,
+            /* Add for Battery Service */
+            POWER_SUPPLY_PROP_batt_vol,
+            POWER_SUPPLY_PROP_batt_temp,
+            /* Add for EM */
+            POWER_SUPPLY_PROP_TemperatureR,             // 7
+            POWER_SUPPLY_PROP_TempBattVoltage,          // 8
+            POWER_SUPPLY_PROP_InstatVolt,               // 9
+            POWER_SUPPLY_PROP_BatteryAverageCurrent,    // 10
+            POWER_SUPPLY_PROP_BatterySenseVoltage,      // 11
+            POWER_SUPPLY_PROP_ISenseVoltage,            // 12
+            POWER_SUPPLY_PROP_ChargerVoltage,           // 13
+            /* Dual battery */
+            POWER_SUPPLY_PROP_status_smb,
+            POWER_SUPPLY_PROP_capacity_smb,
+            POWER_SUPPLY_PROP_present_smb,
+            /* ADB CMD Discharging */
+            POWER_SUPPLY_PROP_adjust_power,
+        };
+
+
+
+
+        void battery_update_psd(struct battery_data *bat_data)
+        {
+            bat_data->BAT_batt_vol = battery_get_bat_voltage();
+            bat_data->BAT_InstatVolt = bat_data->BAT_batt_vol;
+            bat_data->BAT_BatterySenseVoltage = bat_data->BAT_batt_vol;
+            bat_data->BAT_batt_temp = battery_get_bat_temperature();
+            bat_data->BAT_TempBattVoltage = battery_meter_get_tempV();
+            bat_data->BAT_TemperatureR = battery_meter_get_tempR(bat_data->BAT_TempBattVoltage);
+            bat_data->BAT_BatteryAverageCurrent = battery_get_ibus();
+            bat_data->BAT_ISenseVoltage = battery_meter_get_VSense();
+            bat_data->BAT_ChargerVoltage = battery_get_vbus();
+        }
+
     }    
 
-->2017.4.18
-    {
-        修改mivr或者根据充电器类型设置充电电流可以提高充电电流
-        USB充电电流可以达到450+mA但是标准充电器还是有问题
 
-        //Gionee <gn_by_charging> <lilubao> <20170414> add for modify charging begin
-        mivr = <4400000>;	/* uV 4500000->4400000*/
-        //Gionee <gn_by_charging> <lilubao> <20170414> add for modify charging end
-
-        //Gionee <gn_by_charging> <lilubao> <20170418> add for charging change begin	
-        /*chg_data->aicr_limit = aicr;
-        dev_info(chg_data->dev, "%s: OK, aicr upper bound = %dmA\n", __func__,
-            aicr / 1000);
-        */	
-        //force setting aicr_limit
-        chg_data->aicr_limit=2050000;
-        //Gionee <gn_by_charging> <lilubao> <20170418> add for charging change end
-        这样做是强制设定aicr_limit避免将最开始尝试的最大电流设为限定值
-    }
 
 }
 
@@ -69,243 +86,93 @@
 
 
 
-键盘
+
+
+/*17G10A当前存在的问题*/
 {
-->2017.4.25
-    {
-        修改了keyboard的I2C的设备地址跟挂的总线
-        //Gionee <gn_by_charging> <lilubao> <20170425> add for change keypad begin
-        #define AW9523B_DEV_NAME         "aw9523b"
-        #define AW9523B_I2C_NUM		4		// 3->4
-        #define AW9523B_I2C_ADDRESS 0x58	// 0xB0 -> 0x58
-        //Gionee <gn_by_charging> <lilubao> <20170425> add for change keypad end
+	充电时序的关机充电和放电状态			
+	{
+		放电的1%位置还是有问题
+		1%开始03：00 vbat=3.62V
+		  结束03：52 vbat=3.3V
 
-        因为framework层还有部分未导入，所以检测到一些未知的键值，出现异常
+		1%可能相当于4%左右的电量，而且时间很长  
+		1%电压还是很高
+	}
 
-    }
-}
+	底层电量跟上层电量差别很大，但是这个没有开机和刚开是的充电的log		
 
 
+	马达刷机第一次震动太弱，之后震动正常？	
 
 
+	键盘按键有问题，mmi测试不通过，测键不管用
 
 
-马达效果
-{
-     
-    2017.4.27 	    ok
-    {
-     开机震动 
-        //Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate begin
-        mdelay(500);			// 100->500
-        //Gionee <gn_by_charging> <lilubao> <20170427> add for change vibrate end
-    }
+	mmi测试的调用节点好像还有问题
+	{
+		mmi测试读取的节点信息
+		sys/class/power_supply/battery/
 
+		充电可能读取的节点数据有问题
+			几个电流，电压，电池电量，电池电压都有问题
+			充电电流上不去
+			{
+				这个好像是主板温度过高，虽然显示的是电池温度50+，但是电池明显不热
+				[    9.896490] <6>.(4)[258:charger_thread][name:mtk_charger&]Vbat=3775,I=-4446,VChr=9,T=49,Soc=0:0,CT:0:0
 
-    2017.5.2        
-    {
-        写一个测试程序调用/dev/DRV2604L这个节点，
-        read，write，ioctl，写进去正确的数据，产生有效的效果
-        然后写一个ioctl函数 
+				[   12.371394] <6>.(6)[258:charger_thread][name:mtk_battery_hal&][fgauge_read_current] final current=5051 (ratio=950)
+				[   12.372785] <6>.(6)[258:charger_thread][name:mtk_charger&]Vbat=3771,I=-5051,VChr=9,T=50,Soc=0:0,CT:0:0
+				[   12.375494] <4>.(4)[258:charger_thread][name:pmic_auxadc&][mt6355_get_auxadc_value] ch = 2, reg_val = 0x1d3, adc_result = 410
+				[   12.377141] <4>.(4)[258:charger_thread][name:mtk_battery_hal&][fgauge_read_current] final current=4735 (ratio=950)
+				[   12.378491] [name:mtk_charger&][BATTERY] Battery over Temperature or NTC fail 50 50!!
 
-        ioctl函数还没有写
-    }
+				这个是电池的pin脚有问题
+			}
 
+		键盘mmi测试不能通过
+			键盘的工作，以及涉及哪些目录下的文件
+	}
 
-    2017.5.3
-    {
-       ->插入充电器，进行充电器检测时候会有震动
-        震动使能,插入充电器，震动模式   
-        -> 这个是上层调用的
-    }
-      
-    2017.5.4
-    {
-        通过ioctl函数可以通过测试程序，直接调用不同的work_mode产生效果
-        vibrator_enable这个是最简单直接的只要调用然后写一个value就能震动
-        drv2604l_change_mode这个是调用马达震动都要调用的函数
-
-        1.vibrator提供了两套mtk自带的和第三方的
-        CONFIG_GN_BSP_MTK_VIBRATOR_DRV2604L
-        CONFIG_MTK_VIBRATOR
-
-        2.lk和kernel有两套代码
-        lk阶段
-        知道这个函数干了什么：就是让马达震动一会然后关闭
-        void gn_lk_vibrate(void)
-
-        kernel阶段
-        1.通过write写值进入不同的case，这个就要弄清写什么样的值，如何正确的写进去
-        2.或者在原有函数基础上调用自己写的一个函数，ioctl
-        ioctl通过写进不同的cmd，传进值，在不同的case里面调用不同的效果
-
-
-        //Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
-        #define MOTOR_TEST
-        #if defined(MOTOR_TEST)
-
-        long dev2604_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
-  
-}
-
-
-
-
-温升相关问题
-{
-    1.根据当前的温度简单的限定充电电流
-    {
-        低温（小于15）：1.5A
-        正常温度（25左右）：2A
-        高温（大于45）：1A
-
-        mtk_switch_charging.c -> swchg_select_charging_current_limit
-
-        这其中还要考虑其他情况：打电话，mmi测试等等（1605上是这样考虑）
-    }
- 
-     17G05A
-修改：     
-     //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging begin
-	 pr_err("in %s info->battery_temperature->%d\n",__FUNCTION__,info->battery_temperature);
-
-	 if(info->chr_type==STANDARD_CHARGER){
-
-		if( info->battery_temperature <=15 ){
-
-			pdata->charging_current_limit=1500000;
-			pdata->input_current_limit=1600000;
-			pr_err("in %s ,temperature is too low ,we need limit charging current->1\n",__FUNCTION__);
-		}else if( (info->battery_temperature>15)&&(info->battery_temperature<=45) ){
-
-			pr_err("in %s ,temperature in normal range,do not limit charging current->2 \n",__FUNCTION__);
-		}else if( info->battery_temperature > 45 ){
-
-			pdata->charging_current_limit=1000000;
-			pdata->input_current_limit=1200000;
-			pr_err("in %s ,temperature is too high ,we need limit charging current->3\n",__FUNCTION__);
-		}
-	 }
-	 pr_err("in %s setting charging_current_limit->%d,input_current_limit->%d\n",
-				__FUNCTION__,pdata->charging_current_limit,pdata->input_current_limit);
-	 //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging end	
-
-
-
-
-    2.充电温度调节策略相关代码，文档  
-    {
-        mtk_cooler_bcct_v1.c这个文件应该充电调节温度有关
-        （mtk_cooler_bcct_v1.c）mtk_cooler_bcct_init初始化充电温升 降电流 -> mtk_cooler_bcct_register_ltf这个是注册一个中断，设置回调函数
-
-        struct chrlmt_handle{chr_input_curr_limit;bat_chr_curr_limit;pep30_input_curr_limit;}当温度达到某个状态的时候设置限定的充电电流
         
-        -> 这边注册了三个降温相关的策略 bcct，abcct，lcmoff的中断 -> 创建proc file节点 时时反应设备的状态 -> chrlmt_set_limit_handler
-
-        触发条件就设置限定电流的回调函数 -> charger_manager_set_input_current_limit 通过这个函数设置进充电器的和进电池的 
-
-
-        device/mediatek/mt6757/thermal.conf这个是温升调节策略相关的配置文件,这个文件参数的意思
-
-
-        bcct,abcct
-         1、bcct：Thermal config tool中bcct策略最多设置3个温度点分别调用3种充电电流，当温度触发条件满足的时候直接降电流
-         2、abcct：Thermal config tool中abcct策略是使用当前板温与目标板温的差值计算下一时刻要调节的充电电流，循环调节直到当前板温=目标板温。
-         可设定充电电流的最大值和最小值。
-
-        Note：bcct和abcct两套机制可以共存，如两套机制同时生效，则取较小的充电电流值进行调节
-    }  
-        
+	计步器，sd卡相关内容？
+	{
+		set_counter.c
+		sd.c
+	}
 
 
-    3.充电温度调节调用流程 
+    从满电放电到关机的情况是否有异常
+
+
+    计步器，sd卡相关内容？
     {
-     （mtk_thermal_monitor.c） mtkthermal_init，mtk thermal相关的初始化，创建调试调用节点/proc/driver/thermal，在这个目录下
-
-      建立一系列的proc 节点，/proc/mtkcooler这个目录下是降温策略的设备节点 -> (mtk_cooler_shutdown.c) mtk_cooler_shutdown_init
-
-      这个应该跟过温启动关机策略相关的，温度过高触发条件，关机策略应该是最直接，最有效的，但是影响很大，后面还有几个相关的模块的初始化，都是在proc目录下
-
-      创建一系列节点，然后注册函数，相关的操作函数指针 -> (mtk_ts_cpu.c) tscpu_init注册驱动,这个对整个系统的温升有很大影响，tscpu是一个虚拟的thermal_zone，
-      
-      主要是监控cpu的状态 -> tscpu_thermal_probe   
-    }   
-
-
-    4.相关的文档
-    {
-        Thermal_Management_MT6757.pdf
-
-        MT6757CH(CD)_Thermal_Design_Notices_V0.1.pdf
+        set_counter.c
+        sd.c
     }
 
+
+	快充升压问题
+
+
+	去掉OTG中断
+
+
+	电池曲线的导入
 }
 
 
 
-
-
-
-关掉OTG功能
-{
-    不注册OTG这个中断
-
-
-}
-
-
-
-
-
-
-
-从满电放电到关机的情况是否有异常
-{
-
-
-}
-    
-
-
-
-
-
-
-电池曲线的导入    
-{
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-G1605A  售后问题，功耗问题 ， 电池维护特性，healthd线程
-/*debug*/
+/*G1605A  售后问题，功耗问题 healthd线程*/
 {
     售后问题：   电量计不准的机器
+
+
     这个还不知道怎么看，只是觉得电量跟电池电压偏差有点大，而且底层电量跟上层显示的电量差别也很大
 
 
-
     apk发包次数，谁发的(主从)，就是链接到哪了？？
-
-
-
-
-    电池维护特性：
-        机器有问题了，tp不好使怎么办，万一还不了QAQ
-        正在验证
-
-    
-
+        那个脚本怎么用
 }
 
 

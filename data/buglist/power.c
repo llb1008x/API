@@ -181,6 +181,10 @@
 
 		onWakeLockAcquired
 		onWakeLockReleased
+
+		ActivityManager: Failed to get CTM plugin
+		1605是移动商用版自注册sdk ，会连续执行几次，移动自注册过滤他的包名
+		MTK只是想让移动自注册app隐藏 ，他只是没获取到包名，不过不影响其他问题
 	
 
 	d.常见的待机电流:
@@ -242,8 +246,7 @@
 --->总之关于这个功耗偏高，是因为金立推送->经常联网推送（延长推送间隔）->网络配置的问题,导致apk发包链接持续时间较长（休眠一定时间以后，断网，但是如果像qq，微
 信这样做就很有问题）
 
-通过adb 命令：adb shell am start com.gionee.cloud.gpe/.ui.PushActivity 打开的界面查看push推送开关是否都关闭了
-
+	通过adb 命令：adb shell am start com.gionee.cloud.gpe/.ui.PushActivity 打开的界面查看push推送开关是否都关闭了
 	{
 		1.金立push还是有很大的影响，长连接50000多秒.
 		这个单位应该是毫秒把
@@ -285,6 +288,7 @@
 
 	com.mobiletools.systemhelper
 	联通的DM
+
 
 	#79013
 	手机在待机过程中有跑流量，主要是相册，今日头条，但是这两个应用跑的只有几百k，不是很多。
