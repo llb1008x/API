@@ -12,6 +12,7 @@ void getList(Student aStu[],int number)
 {
 	char format[STR_LEN];
 	int i;
+    int t;
 
 	sprintf(format,"%%%ds",STR_LEN-1);
 	for(i=0;i<number;i++){
@@ -22,9 +23,11 @@ void getList(Student aStu[],int number)
 		printf("\t性别： ");
 		scanf("%d",&aStu[i].gender);
 		printf("\t年龄： ");
-		scanf("%d",&aStu[i].age);
-		printf("\n");
-	}
+        // 因为上一行要求输入的是一个整形，
+        // 但是输入的时候包含了回车，所以后面的都不管用
+        scanf("%d",&aStu[i].age);
+        printf("hello\n");
+    }
 }
 
 int save(Student aStu[],int number)
