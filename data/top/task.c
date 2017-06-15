@@ -33,7 +33,7 @@
         capacity_smb health present status      subsystem  type  
 
 
-        上面那一组变量属于power_supply的特性
+        上面那一组变量属于power_supply的特性(mtk_battery.c)
         static enum power_supply_property battery_props[] = {
             POWER_SUPPLY_PROP_STATUS,
             POWER_SUPPLY_PROP_HEALTH,
@@ -59,9 +59,6 @@
             POWER_SUPPLY_PROP_adjust_power,
         };
 
-
-
-
         void battery_update_psd(struct battery_data *bat_data)
         {
             bat_data->BAT_batt_vol = battery_get_bat_voltage();
@@ -77,7 +74,31 @@
 
     }    
 
+		pr_err("Vbat=%d,I=%d,VChr=%d,T=%d,Soc=%d:%d,CT:%d:%d\n", battery_get_bat_voltage(),
+			curr_sign ? bat_current : -1 * bat_current,
+			battery_get_vbus(), battery_get_bat_temperature(),
+			battery_get_bat_soc(), battery_get_bat_uisoc(),
+			mt_get_charger_type(), info->chr_type);
 
+
+        充电器电压     POWER_SUPPLY_PROP_ChargerVoltage  
+        bat_data->BAT_ChargerVoltage = battery_get_vbus();
+
+        {
+            现在的问题好像是数据读的是对的，但是没有上报
+            battery_update_psd
+
+            POWER_SUPPLY_PROP_CAPACITY
+            
+            有几个电池相关的线程，做了哪些事
+
+            过温保护门限设为55
+        }
+ 
+
+
+        mmi代码：
+        AmigoMmiUtil.java
 
 }
 
