@@ -100,6 +100,8 @@
         mmi代码：
         AmigoMmiUtil.java
 
+        amigoserver/AmigoServerManager.java
+        com_android_server_AmigoServerManagerService.cpp
 }
 
 
