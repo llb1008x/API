@@ -15,7 +15,9 @@
         2,禁止频繁开关机重启、频繁插拔充电器操作，操作间隔时间要5分钟以上，且操作次数不要超过5次；
         3,未按照以上1、2操作，引出来的电量显示问题，开发可以直接驳回；
 
-        eService号：
+        eService号：ALPS03218062
+        GNSPR#86321
+        mt_battery_meter.h
 
 
     17G10A mmi测试读取的数据有问题
@@ -98,16 +100,32 @@
             {
                 电池技术显示null
 
-                
                 电池电压BatterySenseVoltage  显示的是电池温度batt_temp
 
                 充电电流有数据但是数据有问题
 
                 电池剩余电量capacity 显示的是电池电压BatterySenseVoltage
             }
+
+            这里首先要解决mmi测试的问题，然后是power_supply子系统的工作框架 *****
+
+            {
+                struct battery_data
+
+                static enum power_supply_property battery_props
+
+                static int battery_get_property
+
+                void battery_update_psd      检测数据
+
+                static void battery_update   数据上报
+
+                enum power_supply_property
+
+                com_android_server_AmigoServerManagerService.cpp
+                AmigoServerManager.java
+            }
         }
-
-
     }    
 
 
