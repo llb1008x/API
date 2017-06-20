@@ -20,6 +20,7 @@
         mt_battery_meter.h
 
 
+
     17G10A mmi测试读取的数据有问题
     {
         mmi测试读取的节点在（这几个接口有问题？）
@@ -155,7 +156,11 @@
         }
 }
 
-
+NTC faild
+    mtk_cahrger.c  mtk_charger_parse_dt
+	//Gionee <gn_by_charging> <lilubao> <20170619> add fixed NTC faild begin
+	info->thermal.max_charge_temperature=60;
+	//Gionee <gn_by_charging> <lilubao> <20170619> add fixed NTC faild end
 
 
 

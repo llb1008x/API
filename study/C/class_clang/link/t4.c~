@@ -237,7 +237,7 @@ int main()
 	printf("学号\t姓名\t性别\t年龄\n");
 	for(i=0;i<num;i++){
 		p_new = malloc(sizeof(STU));
-		scanf("%d %s %c %d",&p_new->num,p_new->name,&p_new->gender,&p_new->score);
+		scanf("%d %s %c %d",&pb->num,pb->name,&pb->gender,&pb->score);
 		head = link_insert(head,p_new);	
 	}
 	link_print(head);
