@@ -9,160 +9,15 @@
 
 /*要处理的问题*/
 {
-    G1605A底层电量跟上层电量偏差大，导致电量跳变问题，原因，怎么改？
-        电量偏差累计
-        1,测试电量相关的问题，要在Download软件版本后，或者 更换电池后，先充满一次电，同步一下电量，再进行测试；
-        2,禁止频繁开关机重启、频繁插拔充电器操作，操作间隔时间要5分钟以上，且操作次数不要超过5次；
-        3,未按照以上1、2操作，引出来的电量显示问题，开发可以直接驳回；
-
-        eService号：ALPS03218062
-        GNSPR#86321
-        mt_battery_meter.h
-
-
-
-    17G10A mmi测试读取的数据有问题
+    利用17G16A项目熟悉高通代码
     {
-        mmi测试读取的节点在（这几个接口有问题？）
-        sys/class/power_supply/battery/
+        
 
-        BatteryAverageCurrent  平均电流为0？
-        ChargerVoltage InstatVolt      TemperatureR batt_temp capacity     
-
-        device power   present_smb status_smb technology uevent 
-
-        BatterySenseVoltage         ISenseVoltage  TempBattVoltage adjust_power batt_vol  
-
-        capacity_smb health present status      subsystem  type  
-
-        //17G10A    要加一个POWER_SUPPLY_PROP_BatteryPresentCurrent节点
-        上面那一组变量属于power_supply的特性(mtk_battery.c)
-        static enum power_supply_property battery_props[] = {
-            POWER_SUPPLY_PROP_STATUS,
-            POWER_SUPPLY_PROP_HEALTH,
-            POWER_SUPPLY_PROP_PRESENT,
-            POWER_SUPPLY_PROP_TECHNOLOGY,
-            POWER_SUPPLY_PROP_CAPACITY,
-            /* Add for Battery Service */
-            POWER_SUPPLY_PROP_batt_vol,
-            POWER_SUPPLY_PROP_batt_temp,
-            /* Add for EM */
-            POWER_SUPPLY_PROP_TemperatureR,             // 7
-            POWER_SUPPLY_PROP_TempBattVoltage,          // 8
-            POWER_SUPPLY_PROP_InstatVolt,               // 9
-            POWER_SUPPLY_PROP_BatteryAverageCurrent,    // 10
-            POWER_SUPPLY_PROP_BatterySenseVoltage,      // 11
-            POWER_SUPPLY_PROP_ISenseVoltage,            // 12
-            POWER_SUPPLY_PROP_ChargerVoltage,           // 13
-            /* Dual battery */
-            POWER_SUPPLY_PROP_status_smb,
-            POWER_SUPPLY_PROP_capacity_smb,
-            POWER_SUPPLY_PROP_present_smb,
-            /* ADB CMD Discharging */
-            POWER_SUPPLY_PROP_adjust_power,
-        };
-
-        //这些变量后面会在sys节点下呈现
-        void battery_update_psd(struct battery_data *bat_data)
-        {
-            bat_data->BAT_batt_vol = battery_get_bat_voltage();
-            bat_data->BAT_InstatVolt = bat_data->BAT_batt_vol;
-            bat_data->BAT_BatterySenseVoltage = bat_data->BAT_batt_vol;
-            bat_data->BAT_batt_temp = battery_get_bat_temperature();
-            bat_data->BAT_TempBattVoltage = battery_meter_get_tempV();
-            bat_data->BAT_TemperatureR = battery_meter_get_tempR(bat_data->BAT_TempBattVoltage);
-            bat_data->BAT_BatteryAverageCurrent = battery_get_ibus();//ibus返回0，不用这个
-            bat_data->BAT_ISenseVoltage = battery_meter_get_VSense();
-            bat_data->BAT_ChargerVoltage = battery_get_vbus();
-        }
-
-        打印log用的这些函数接口
-        pr_err("Vbat=%d,I=%d,VChr=%d,T=%d,Soc=%d:%d,CT:%d:%d\n", battery_get_bat_voltage(),
-			curr_sign ? bat_current : -1 * bat_current,
-			battery_get_vbus(), battery_get_bat_temperature(),
-			battery_get_bat_soc(), battery_get_bat_uisoc(),
-			mt_get_charger_type(), info->chr_type);
-
-        /*debug*/    
-        {
-            1.节点数据没有及时上报，导致有的数据一直显示初始化时候的值            
-                battery_update_psd获取充电，电池的数据然后赋值给power_supply子系统，battery_main数据结构
-
-                在battery_update函数里面添加 battery_update_psd，每隔10s获取的数据可以上报上去
-
-            2.添加时时的充电电流数据这个选项
-            POWER_SUPPLY_PROP_BatteryPresentCurrent
-            val->intval = data->BAT_BatteryPresentCurrent
-
-            power_supply_sysfs.c和power_supply.h里面要添加properity特性
-            要把这个节点特性呈现到sysfs里面
-
-            3.mmi测试读取的数据有问题
-            {
-                电池技术显示null
-
-                电池电压BatterySenseVoltage  显示的是电池温度batt_temp
-
-                充电电流有数据但是数据有问题
-
-                电池剩余电量capacity 显示的是电池电压BatterySenseVoltage
-            }
-
-            这里首先要解决mmi测试的问题，然后是power_supply子系统的工作框架 *****
-
-            {
-                struct battery_data
-
-                static enum power_supply_property battery_props
-
-                static int battery_get_property
-
-                void battery_update_psd      检测数据
-
-                static void battery_update   数据上报
-
-                enum power_supply_property
-
-                com_android_server_AmigoServerManagerService.cpp
-                AmigoServerManager.java
-            }
-        }
     }    
 
 
 
-
-        充电器电压     POWER_SUPPLY_PROP_ChargerVoltage  
-        bat_data->BAT_ChargerVoltage = battery_get_vbus();
-
-        {
-
-
-            POWER_SUPPLY_PROP_CAPACITY
-            
-            有几个电池相关的线程，做了哪些事
-
-            过温保护门限设为55
-        }
- 
-
-        mmi代码：
-        AmigoMmiUtil.java
-
-        amigoserver/AmigoServerManager.java
-        com_android_server_AmigoServerManagerService.cpp
-
-        BaseMMITestData.java
-        }
 }
-
-NTC faild
-    mtk_cahrger.c  mtk_charger_parse_dt
-	//Gionee <gn_by_charging> <lilubao> <20170619> add fixed NTC faild begin
-	info->thermal.max_charge_temperature=60;
-	//Gionee <gn_by_charging> <lilubao> <20170619> add fixed NTC faild end
-
-
 
 
 
@@ -239,6 +94,8 @@ NTC faild
 
 	电池曲线的导入
 }
+
+
 
 
 

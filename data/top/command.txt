@@ -501,7 +501,6 @@ adb reboot-bootloader
 			sudo apt-get install libyaml-cpp-dev
 			pip install pyyaml
 
-
 			sudo pip uninstall pyyaml
 			sudo apt-get install libyaml-cpp-dev
 			sudo pip install pyyaml

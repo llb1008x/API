@@ -328,9 +328,33 @@ eservice：
 --->电量计不准
 	现象：
 	a.充电到78%之后，电量显示上不去，怎么充也不见电量上升，插拔电池后，电量上升至96%
-	b.正常放电至18%~20%后，基本上每秒下降1%，放电至关机			
+	b.正常放电至18%~20%后，基本上每秒下降1%，放电至关机		
 
 
+
+GNSPR#87038
+	G1605A底层电量跟上层电量偏差大，导致电量跳变问题，原因
+    {
+      电量偏差累计
+        1,测试电量相关的问题，要在Download软件版本后，或者 更换电池后，先充满一次电，同步一下电量，再进行测试；
+        2,禁止频繁开关机重启、频繁插拔充电器操作，操作间隔时间要5分钟以上，且操作次数不要超过5次；
+        3,未按照以上1、2操作，引出来的电量显示问题，开发可以直接驳回；
+
+        eService号：ALPS03218062
+        GNSPR#86321
+     
+      /*debug*/  
+        mt_battery_meter.h  
+        修改底层电量跟rtc电量偏差的阈值，这种方法在一定程度上可以降低上层显示电量跳变的概率，但是无法从根本上避免
+        这个跟电池特性有关，最好的办法是直接返回rtc记录的值，但是GM2.0算法封装了，无法获取到代码
+        
+        //Gionee <gn_by_charging> <lilubao> <20170620> add for fixed bug begin
+        #define DIFFERENCE_HWOCV_RTC		60		// 32-> 60
+        #define DIFFERENCE_HWOCV_SWOCV		12		// 10-> 12
+        #define DIFFERENCE_SWOCV_RTC		20		// 18-> 20
+        //Gionee <gn_by_charging> <lilubao> <20170620> add for fixed bug end
+
+    }	
 
 }
 

@@ -1475,6 +1475,7 @@ static void *update_vibrator_thread_default(void *priv)
     }
  
      17G05A
+
      //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging begin
 	 pr_err("in %s info->battery_temperature->%d\n",__FUNCTION__,info->battery_temperature);
 
@@ -1544,7 +1545,163 @@ static void *update_vibrator_thread_default(void *priv)
 
         MT6757CH(CD)_Thermal_Design_Notices_V0.1.pdf
     }
+
+/************************************************************************************************************/
+	17G10A主板显示电池温度50~55，温度过高导致的停止充电问题
+    {
+        NTC faild
+        
+        在mtk_charger.c  charger_check_status会检查充电的状态
+        发现电池的温度为50度超过了最大的充电温度，启动保护措施，然后就停止充电了
+        (但是这里电池温度没有50度，检测可能有问题，先提高充电的最大温度)
+        这个值在dts文件里获取的
+
+        /*debug*/
+        {
+            过温保护门限设为55
+
+            mt6757.dts
+            //Gionee <gn_by_charging> <lilubao> <20170621> add fixed over temperature begin
+		    max_charge_temperature = <55 >;			// 50 -> 55
+		    //Gionee <gn_by_charging> <lilubao> <20170621> add fixed over temperature end
+
+        }
+    }
+
+
 }
+
+
+
+
+/************************************************************************************************************/
+10.17G10A mmi测试读取的数据有问题
+{
+	mmi测试读取的节点在（这几个接口有问题？）
+	sys/class/power_supply/battery/
+
+	BatteryAverageCurrent  平均电流为0？
+	ChargerVoltage InstatVolt      TemperatureR batt_temp capacity     
+
+	device power   present_smb status_smb technology uevent 
+
+	BatterySenseVoltage         ISenseVoltage  TempBattVoltage adjust_power batt_vol  
+
+	capacity_smb health present status      subsystem  type  
+
+	//17G10A    要加一个POWER_SUPPLY_PROP_BatteryPresentCurrent节点
+	上面那一组变量属于power_supply的特性(mtk_battery.c)
+	static enum power_supply_property battery_props[] = {
+		POWER_SUPPLY_PROP_STATUS,
+		POWER_SUPPLY_PROP_HEALTH,
+		POWER_SUPPLY_PROP_PRESENT,
+		POWER_SUPPLY_PROP_TECHNOLOGY,
+		POWER_SUPPLY_PROP_CAPACITY,
+		/* Add for Battery Service */
+		POWER_SUPPLY_PROP_batt_vol,
+		POWER_SUPPLY_PROP_batt_temp,
+		/* Add for EM */
+		POWER_SUPPLY_PROP_TemperatureR,             // 7
+		POWER_SUPPLY_PROP_TempBattVoltage,          // 8
+		POWER_SUPPLY_PROP_InstatVolt,               // 9
+		POWER_SUPPLY_PROP_BatteryAverageCurrent,    // 10
+		POWER_SUPPLY_PROP_BatterySenseVoltage,      // 11
+		POWER_SUPPLY_PROP_ISenseVoltage,            // 12
+		POWER_SUPPLY_PROP_ChargerVoltage,           // 13
+		/* Dual battery */
+		POWER_SUPPLY_PROP_status_smb,
+		POWER_SUPPLY_PROP_capacity_smb,
+		POWER_SUPPLY_PROP_present_smb,
+		/* ADB CMD Discharging */
+		POWER_SUPPLY_PROP_adjust_power,
+	};
+
+	//这些变量后面会在sys节点下呈现
+	void battery_update_psd(struct battery_data *bat_data)
+	{
+		bat_data->BAT_batt_vol = battery_get_bat_voltage();
+		bat_data->BAT_InstatVolt = bat_data->BAT_batt_vol;
+		bat_data->BAT_BatterySenseVoltage = bat_data->BAT_batt_vol;
+		bat_data->BAT_batt_temp = battery_get_bat_temperature();
+		bat_data->BAT_TempBattVoltage = battery_meter_get_tempV();
+		bat_data->BAT_TemperatureR = battery_meter_get_tempR(bat_data->BAT_TempBattVoltage);
+		bat_data->BAT_BatteryAverageCurrent = battery_get_ibus();//ibus返回0，不用这个
+		bat_data->BAT_ISenseVoltage = battery_meter_get_VSense();
+		bat_data->BAT_ChargerVoltage = battery_get_vbus();
+	}
+
+	打印log用的这些函数接口
+	pr_err("Vbat=%d,I=%d,VChr=%d,T=%d,Soc=%d:%d,CT:%d:%d\n", battery_get_bat_voltage(),
+		curr_sign ? bat_current : -1 * bat_current,
+		battery_get_vbus(), battery_get_bat_temperature(),
+		battery_get_bat_soc(), battery_get_bat_uisoc(),
+		mt_get_charger_type(), info->chr_type);
+
+	/*debug*/    
+	{
+		1.节点数据没有及时上报，导致有的数据一直显示初始化时候的值            
+			battery_update_psd获取充电，电池的数据然后赋值给power_supply子系统，battery_main数据结构
+
+			在battery_update函数里面添加 battery_update_psd，每隔10s获取的数据可以上报上去
+
+		2.添加时时的充电电流数据这个选项
+		POWER_SUPPLY_PROP_BatteryPresentCurrent
+		val->intval = data->BAT_BatteryPresentCurrent
+
+		power_supply_sysfs.c和power_supply.h里面要添加properity特性
+		要把这个节点特性呈现到sysfs里面
+
+		3.mmi测试读取的数据有问题
+		{
+			电池技术显示null
+
+			电池电压BatterySenseVoltage  显示的是电池温度batt_temp
+
+			充电电流有数据但是数据有问题
+
+			电池剩余电量capacity 显示的是电池电压BatterySenseVoltage
+
+			power_supply 节点路径
+			充电电流：  /sys/class/power_supply/battery/Battery/BatteryPresentCurrent
+			充电器电压：/sys/class/power_supply/battery/Battery/ChargerVoltage
+			电量：     /sys/class/power_supply/battery/Battery/capacity
+			电池电压：  /sys/class/power_supply/battery/Battery/BatterySenseVoltage
+			电池技术：  /sys/class/power_supply/battery/Battery/technology
+			电池温度：  /sys/class/power_supply/battery/Battery/batt_temp
+		}
+
+		/*修改*/
+		{
+			1.往power_supply的属性里面提供新的属性
+			power_supply_property -> POWER_SUPPLY_PROP_BatteryPresentCurrent, 
+
+			2.修改函数街口，添加新的数据
+			//battery_get_ibus -> pmic_get_ibus return 0 这个函数返回值就是0，没意义
+			//bat_data->BAT_BatteryAverageCurrent = battery_get_ibus();
+			bat_data->BAT_BatteryAverageCurrent = battery_get_bat_avg_current();
+			bat_data->BAT_BatteryPresentCurrent = battery_get_bat_current();
+
+			3.数据没有及时上报，所以要在线程里面添加上报
+			static void battery_update(struct battery_data *bat_data)
+			{
+				struct power_supply *bat_psy = bat_data->psy;
+
+				bat_data->BAT_TECHNOLOGY = POWER_SUPPLY_TECHNOLOGY_LION;
+				bat_data->BAT_HEALTH = POWER_SUPPLY_HEALTH_GOOD;
+				bat_data->BAT_PRESENT = 1;
+
+				//Gionee <gn_by_charging> <lilubao> <20170619> add fixed mmi begin	
+				battery_update_psd(bat_data);
+				//Gionee <gn_by_charging> <lilubao> <20170619> add fixed mmi end
+
+			#if defined(CONFIG_POWER_EXT)
+				bat_data->BAT_CAPACITY = 50;
+			#endif
+				power_supply_changed(bat_psy);
+			}
+		}    
+	}
+}   
 
 
 
