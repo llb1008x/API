@@ -3,6 +3,18 @@
 **********************************************************************************/
 
 
+/*基本概念*/
+{
+		
+	wipower高通的无线充电
+	
+	
+	smbchg_hvdcp_enable_cb
+
+}
+
+/**************************************************************************************************************************************/
+
 /*相关文档*/
 {
     //msm8937_la_software_user_manual
@@ -203,14 +215,12 @@
 			}
 			
 		}
-		
     }
-    
-    
- 
 }
 
 
+
+/******************************************************************************************************************************************/
 
 
 
@@ -218,16 +228,22 @@
 /*软件流程*/
 {
 	高通的充电基本上都叫smbcharger
-	(qpnp-smbcharger.c) smbchg_init 模块初始化->smbchg_probe	从dtsi文件中获取参数，上面还有一个投票制度貌似很重要，还有一些工作 -> smbchg_usb_update_online_work,判断usb是否插入,并上报状态到power_supply子系统 -> smbchg_parallel_usb_en_work并行充电使能，对并行充电的条件进行判断 aicl是否稳定，没有电池的条件下不允许改变并行充电的状态 -> smbchg_parallel_usb_enable -> smbchg_vfloat_adjust_work动态充电电压调节
-	
-	
-	
-	wipower高通的无线充电
-	
-	
-	smbchg_hvdcp_enable_cb
-	
-	
+	(qpnp-smbcharger.c) smbchg_init 模块初始化->smbchg_probe	从dtsi文件中获取参数，上面还有一个投票制度貌似很重要，还有一些工作 -> smbchg_usb_update_online_work,
+	判断usb是否插入,并上报状态到power_supply子系统 -> smbchg_parallel_usb_en_work并行充电使能，对并行充电的条件进行判断 aicl是否稳定，没有电池的条件下不允许改变
+	并行充电的状态 -> smbchg_parallel_usb_enable -> smbchg_vfloat_adjust_work动态充电电压调节
+
+}
+
+
+
+
+
+/***********************************************************************************************************************************/
+
+
+/*代码分析*/
+{
+
 	vote投票制度
 	{
 	
@@ -241,11 +257,6 @@
 				set_fastchg_current_vote_cb);
 		if (IS_ERR(chip->fcc_votable))
 			return PTR_ERR(chip->fcc_votable);
-			
-			
-			
-			
-			
 			
 		struct votable *create_votable(struct device *dev, const char *name,
 					int votable_type,
@@ -378,6 +389,20 @@
 				schedule_delayed_work(&chip->parallel_en_work, 0);
 			}
 
+	}
 
 }
 
+
+
+
+
+/***********************************************************************************************************************************/
+
+
+/*debug*/
+{
+
+
+
+}

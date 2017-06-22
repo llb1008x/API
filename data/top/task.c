@@ -11,13 +11,154 @@
 {
     利用17G16A项目熟悉高通代码
     {
-        
+        充电smbcharger
+        {   
+            dtsi配置文件
+            ./arch/arm/boot/dts/qcom/msm-pmi8940.dtsi
+
+            kernel代码
+            qpnp-smbcharger.c
+            pmic-voter.c    
+
+
+
+            (qpnp-smbcharger.c) 这个是高通充电用的主要的源代码，smbchg_init初始化模块 -> spmi_driver_register注册设备驱动 -> smbchg_probe将设备驱动跟设备挂钩，
+            建立bind -> 从dtsi文件中获取一些参数 ->  create_votable创建了好几个投票变量 (fcc_votable,usb_icl_votable,dc_icl_votable,usb_suspend_votable,
+            dc_suspend_votable,battchg_suspend_votable,hw_aicl_rerun_disable_votable,hw_aicl_rerun_enable_indirect_votable,aicl_deglitch_short_votable,
+            hvdcp_enable_votable)
+
+
+
+            smbcharger里面涉及到的投票变量都是干什么的
+            {
+                1.fcc_votable:这个是设置快充充电电流的，根据投票结果决定并行充电的充电电流是多少
+                   并行充电好像跟taper_irq_en这个中断有关，但是这个中断是干什么的？
+
+                   static int set_fastchg_current_vote_cb(struct device *dev,
+						int fcc_ma,
+						int client,
+						int last_fcc_ma,
+						int last_client)
+                    {
+                        struct smbchg_chip *chip = dev_get_drvdata(dev);
+                        int rc;
+
+                        if (chip->parallel.current_max_ma == 0) {
+                            /*设置快速充电的充电电流 fcc_ma*/
+                            rc = smbchg_set_fastchg_current_raw(chip, fcc_ma);
+                            if (rc < 0) {
+                                pr_err("Can't set FCC fcc_ma=%d rc=%d\n", fcc_ma, rc);
+                                return rc;
+                            }
+                        }
+                        /*
+                        * check if parallel charging can be enabled, and if enabled,
+                        * distribute the fcc
+                        */
+                        /*高通的快充利用的是并行充电方案，主从charger*/
+                        smbchg_parallel_usb_check_ok(chip);
+                        return 0;
+                    }
+
+                
+                2.usb_icl_votable：
+                    设置usb充电电流的限制，可能要根据系统温升的情况决定
+                    static int set_usb_current_limit_vote_cb(struct device *dev,
+						int icl_ma,
+						int client,
+						int last_icl_ma,
+						int last_client)    
+                    {
+                        struct smbchg_chip *chip = dev_get_drvdata(dev);
+                        int rc, aicl_ma, effective_id;
+
+                        effective_id = get_effective_client_id_locked(chip->usb_icl_votable);
+
+                        /* disable parallel charging if HVDCP is voting for 300mA */
+                        if (effective_id == HVDCP_ICL_VOTER)
+                            smbchg_parallel_usb_disable(chip);
+
+                        if (chip->parallel.current_max_ma == 0) {
+                            rc = smbchg_set_usb_current_max(chip, icl_ma);
+                            if (rc) {
+                                pr_err("Failed to set usb current max: %d\n", rc);
+                                return rc;
+                            }
+                        }
+
+                        /* skip the aicl rerun if hvdcp icl voter is active */
+                        if (effective_id == HVDCP_ICL_VOTER)
+                            return 0;
+
+                        aicl_ma = smbchg_get_aicl_level_ma(chip);
+                        if (icl_ma > aicl_ma)
+                            smbchg_rerun_aicl(chip);
+                        smbchg_parallel_usb_check_ok(chip);
+                        return 0;
+                    }
+
+
+
+
+            }
+
+
+            smbcharger里面的几个工作函数
+            {
+
+
+            }
+
+
+        }
+
+        fuelgauge
+        {
+
+
+        }
 
     }    
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    fuelgauge 3.0的问题,文档+邮件
+    {
+
+
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

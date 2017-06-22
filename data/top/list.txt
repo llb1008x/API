@@ -348,6 +348,10 @@ other：
 	http://www.docin.com/p-50062023.html
 
 
+	Android Bootloader分析
+	http://www.tuicool.com/articles/M7v6nuN
+
+
 
 
 

@@ -175,4 +175,19 @@ Andoid中包含一个Java虚拟机，虚拟机是运行在Linux之上的，Andro
 
 Android应用的开发者是工作在Android外特性概念空间的，这里没有了Linux的一点气息，Android构建的外特性空间概念包含了：Activity,Provider,Interface,Events,Provider，
 Service等。至于JVM空间和C++空间的划分是为了研究Android核心的描述而提出的，我们在做Android系统开发时，常常需要修改到JNI的Native部分。后面我将用较多的篇幅来深入阐述这个
-部分。  
+部分。 
+
+
+
+
+bootloader
+{
+  /*基本概念*/
+  Bootloader中一般都会有好几个文件组成，如android手机一般会有：
+  {
+        PBL(Prime Bootloader), SBL1/2/3(Second Bootloader), APPSBL(有的也称为aboot、hboot), HLOS(基带baseband相关)和TZ(TrustZone相关的镜像)。
+    而iphone手机一般是：BootRom(PBL, SecureROM), LLB(Low Level Bootloader),iBoot(stage 2 bootloader，常用于recovery模式), iBBS(精简版的ibOOT)
+    和iBEC(用于从DFU-Device Firmware Upgrade模式恢复)。对于我的Exynos板子，由于其并非手机设备，包含的bootloader相对较少，有：PBL( 也叫bl0，烧在iROM的只读代码),
+    BL1(stage 1 bootloader), BL2(stage 2 bootloader，就是uboot中的spl), tzsw(trustzone firmware)和uboot 
+  }
+}
