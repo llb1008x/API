@@ -39,18 +39,41 @@ int search(int a[],int key,int len)
 {
 	int right=len-1;
 	int left=0;
-	int mid =(right+left)/2;
+	int mid,ret;
 
-	printf("left->%d,right->%d,mid->%d",left,right,mid);
+	while(right>=left){
+	
+		mid=(right+left)/2;
+		if(a[mid]==key){
+		
+			ret=mid;
+			break;
+		}else if(a[mid]>key){
+		
+			right=mid-1;
+		}else {
+		
+			left=mid+1;
+		}
 
+		printf("left->%d,right->%d,mid->%d\n",left,right,mid);
+	}
+
+	if(ret>len)
+		return -1;
+
+	return ret;
 }
 
 
 int main()
 {
-	int a[]={1,5,3,11,82,9,4,73,46,33};
+	int a[]={1,5,3,11,82,9,4,73,46,33,37};
 	int len=sizeof(a)/sizeof(a[0]);
-	int i;
+	int i,ret,number;
+	
+	printf("输入想要搜索的数字：");
+	scanf("%d",&number);
 
 	int *b=(int *)malloc(len);
 	b=sort(a,len);
@@ -58,6 +81,9 @@ int main()
 		
 		printf("b[%d]->%d\n",i,b[i]);
 	}
+
+	ret=search(a,number,len);
+	printf("ret->%d\n",ret);
 
 
 	return 0;

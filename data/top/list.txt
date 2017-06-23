@@ -352,6 +352,14 @@ other：
 	http://www.tuicool.com/articles/M7v6nuN
 
 
+	TCP 协议简介
+	http://www.admin10000.com/document/13621.html
+
+
+	Linux内核之旅——（一）中断
+	http://lib.csdn.net/article/operatingsystem/32054
+
+
 
 
 

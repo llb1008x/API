@@ -9,6 +9,30 @@
 
 /*要处理的问题*/
 {
+
+
+    pmi8952,pmi8940,pmi8937,ti的bq系列电量计，以及精度对比
+    {
+        三个相关的文档对比
+        {
+            1.bq27428
+            
+
+
+        }
+
+        给高通提case
+    }    
+
+
+
+
+
+
+
+
+
+
     利用17G16A项目熟悉高通代码
     {
         充电smbcharger
@@ -63,6 +87,7 @@
                 
                 2.usb_icl_votable：
                     设置usb充电电流的限制，可能要根据系统温升的情况决定
+                    如果是快充充电器的会停止并行充电
                     static int set_usb_current_limit_vote_cb(struct device *dev,
 						int icl_ma,
 						int client,
@@ -98,15 +123,48 @@
                     }
 
 
+                3.dc_icl_votable
+                /*
+                * set the dc charge path's maximum allowed current draw
+                * that may be limited by the system's thermal level
+                */
+                设置直流充电器最大的充电电流，遍历数组寻找最匹配的值，写进寄存器
+                static int set_dc_current_limit_vote_cb(struct device *dev,
+                                        int icl_ma,
+                                        int client,
+                                        int last_icl_ma,
+                                        int last_client)
+                {
+                    struct smbchg_chip *chip = dev_get_drvdata(dev);
 
+                    return smbchg_set_dc_current_max(chip, icl_ma);
+                }                    
 
+                下面这几个大部分都是操作寄存器
+                4.usb_suspend_votable       将usb挂起
+                5.dc_suspend_votable        dc充电挂起
+                6.battchg_suspend_votable   关闭充电使能
+
+                7.hw_aicl_rerun_disable_votable     关闭rerun高电压aicl策略
+                8.smbchg_aicl_deglitch_config_cb    配置aicl去抖
+                9.hvdcp_enable_votable              允许高电压充电
             }
+
+
+
 
 
             smbcharger里面的几个工作函数
             {
-
-
+                1.smbchg_usb_update_online_work 
+                  检测usb的状态然后上报给power_supply子系统
+                2.smbchg_parallel_usb_en_work
+                  设置并行充电使能
+                3.smbchg_vfloat_adjust_work
+                  根据充电能路，目标充电电压，不断步进升压
+                4.smbchg_hvdcp_det_work
+                  高压充电器j 
+                      
             }
 
 
