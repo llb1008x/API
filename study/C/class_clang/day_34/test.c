@@ -22,13 +22,13 @@ int main()
 	char str1[10000]="abba";
 	char str2[10000]="ababbba abbabbabbabbaacc";
 	int len1,len2;
-	int index=0,i=0;
+	int index=0,i=0,cnt=0;
 
 	//gets(str1);
 	//gets(str2);
 	len1=strlen(str1);
 	len2=strlen(str2);
-	printf("len1->%d,len2->%d\n",len1,len2);
+	//printf("len1->%d,len2->%d\n",len1,len2);
 	//第一个字符串比第二个短，两个字符串介于0~10000之间
 	if( (len1>len2)||(len1<=0)||(len2>10000)){
 	
@@ -37,13 +37,40 @@ int main()
 	}
 
 	//循环遍历字符串二
-	for(index=0;index<len2;index++){
+	for(index=0;index<len2-len1;index++){
 	
-		if()
+		//printf("1,index->%d,i->%d\n",index,i);
+		
+		for(i=0;i<len1;i++){
+		
+			
+			if(str2[index+i]==str1[i]){
+			
+				//printf("2,index->%d,i->%d\n",index,i);
+				if(i==(len1-1)){
+		
+					//printf("index->%d,find str2 compart with str1\n",index);
+					//printf("3,index->%d,i->%d\n",index,i);
+					printf("%d ",index);
+					cnt++;
+					break;
+				}
+			}
+		
+			if(str2[index+i]!=str1[i]){
+				//printf("str1 is not comart with str2\n");
+				//printf("4,index->%d,i->%d\n",index,i);	
+				break;
+			}
+		}
 	}
-
-	puts(str1);
-	puts(str2);
+	
+	if(!cnt){
+	
+		printf("-1\n");
+	}
+	//puts(str1);
+	//puts(str2);
 	
 	return 0;
 }

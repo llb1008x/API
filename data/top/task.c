@@ -16,6 +16,28 @@
         三个相关的文档对比
         {
             1.bq27428
+            {
+            	The bq27426 battery fuel gauge uses the patented Impedance TrackTM algorithm for fuel gauging
+            	bq27428利用的是阻抗追踪法来进行电量计算，提供相关的电池信息
+
+
+				相关参数的精确度(温度范围是-40~100)： 
+				电压 -0.1% ~ -0.2%
+				温度 -13%  ~ 13%    这个偏差很大
+				电流 0 ~ 0.6%
+            
+            	电量计通过读取流过采样电阻的电压来估计充电和放电时候的电池信息
+            	
+            	当电池接上了fuelgauge的时候。电池的阻抗是根据流进电池的电流，电池的开路电压
+            	以及有负载情况下的电池电压
+            	
+            	P10 I2C通信要注意的地方
+            	
+            	fuelgauge提供四种模式：initilization,normal,sleep,shutdown
+            
+            
+            }
+            
             
 
 
