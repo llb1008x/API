@@ -35,13 +35,126 @@
             	
             	fuelgauge提供四种模式：initilization,normal,sleep,shutdown
             
+            	这里面应该要注意的一个是I2C通信，还有电量计的一些内容
+            	
+            }
+            
+            
+            2.linux_android_pmic_fuel_gauge_user_guide
+            {
+            	电量计对于电池充电接口的影响取决于
+            	1.允许到充电截止的时间
+            	2.当电池电量低于软件设定的阈值的时候，要关闭OTG功能
+            
+            	电量计读电流通过采样电阻，读电池电压通过连接电池正负极的BATT_P，BATT_N
+            	放电读正极，其他时候读负极
+            	
+            	对于BAT_ID，通常用于检测电池是否存在，以及对于电池的识别，而这个识别的过程
+            	是反复的提高基础电流知道发现匹配的为止(5->15->150uA)
+            	
+            	smart battery? 智能电池
+            	
+            	battery temperature
+            	一是为了保障给电池充电可以安全的使用，二是为了更准确的计算电量
+            
+            	配置电量计中thermistor相关的参数(80-VT310-123).
+            	qcom,thermal-coefficients这是一个位数组，通过这组数据，可以读NTC电阻的一些转换信息
+            	{
+            		这个有两个地方可以setting
+            		一个是在kernel device tree里面
+            		一个是在SBL里面，但是这里要晚1.5s因为要启动SRAM，在pm_config_target.c
+            		里面设置
+            			
+            	}
+
+
+				电池等效串联电阻ESR，这个值最好是实时的，则样才最准确
+				等效电阻跟temperature有很大关系，同时也影响到电池的剩余电量
+				power_supply 子系统是这个POWER_SUPPLY_PROP_RESISTANCE
+				而这个数据的采集是在电量计每隔90s发一个脉冲，然后同步同一时间的电压和电流
+				而这个脉冲会引起设备底电流的升高，所以当设备suspend的时候会关闭这个使能
+				
+				
+				系统截止电流
+				显示100%，系统截止电流，充电截止电流
+				qcom,fg-iterm-ma = <150>; //这个是显示100%的截止电流？
+
+				
+				电量计的截止电流
+				qcom,fg-chg-iterm-ma = <100>;	//这个是充电截止电流？
+				
+				
+				系统关机电压
+				这个影响0%的计算，也就是人为设定的一个0%电压应该是多少
+				qcom, fg-cutoff-voltage-mv = <3000>; 
+				
+				
+				开机的时候估计电池电压，如果超过阈值就重新检测导入对当前电量的计算
+				qcom, vbat-estimate-diff-mv = <30>;
+
+			
+				恒流到恒压充电阈值
+				qcom, fg-cc-cv-threshold-mv = <4340>;
+				如果开启了动态电压调节充电这个值应该设定的接近vfloat voltage
+				
+				
+				电量低于多少开启回充
+				qcom,resume-soc = <95>;
+
+
+				关于电池老化的检测是通过检测ESR来计算的
+				一是通过ESR，
+				一是通过电池电量学习算法
+				{
+					只是产权不开放
+					跟温度，通过学习电池充电循环时间的增减，来学习充电循环
+					电池开始的电量
+				}
+
+
+				Charge cycle count
+				充电循环次数
+				
+
+				代码相关的位置
+				drivers/power/qpnp-fg.c
+				arch/arm/boot/dts/qcom/msm-pmi895x.dtsi
+				Documentation/devicetree/bindings/power/qpnp-fg.txt
+
+				
+				debug
+				{
+					打开调试的log
+					/*all debug types bit turned on */
+					echo 0xff > /sys/module/qpnp_fg/parameters/debug_mask
+					echo 8 > /proc/sys/kernel/printk
+					dmesg > debug_output_filename
+
+					还有一个dump sram信息的脚本，但是不管用					
+				}
+
+            }
+            
+            
+            qpnp-fg.c
+            {
+            	为什么高通的单个结构体都有那么多成员，还有那么多工作函数
+            	
+            	fg_batt_profile_init 电量计相关参数的初始化 ，导入客制化profile
+            	
+            	然后重启电量计fg_do_restart
             
             }
             
             
-
-
+            
+            
+            
         }
+        
+        
+        
+        
 
         给高通提case
     }    
@@ -192,11 +305,15 @@
 
         }
 
+
         fuelgauge
         {
 
 
         }
+
+
+
 
     }    
 
