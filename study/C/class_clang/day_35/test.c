@@ -99,21 +99,42 @@ int main()
 */
 		
 	int num,i=0;
-	NODE *head=NULL,*p_new;
+	NODE *head=NULL,*p_new=NULL;
 	
 	printf("请输入数据:\n");
+/*
 	do{
-		/*
-		scanf("%d",&num);
-		printf("num->%d,i->%d\n",num,i);
-		i++;
-		*/
+
 		p_new=(NODE *)malloc(sizeof(NODE));
+		if(p_new==NULL){
+		
+		    printf("error,not enough space\n");
+		    return -1;
+		}
 		scanf("%d",&p_new->num);
 		head=link_insert(head,p_new);
 		
 	}while(p_new->num!=-1);
+*/
 
+    while(1){
+        
+        p_new=(NODE *)malloc(sizeof(NODE));
+		if(p_new==NULL){
+		
+		    printf("error,not enough space\n");
+		    return -1;
+		}
+		scanf("%d",&p_new->num);
+		if(p_new->num==-1){
+		
+		    printf("termination\n");
+		    break;
+		}
+		
+		head=link_insert(head,p_new);
+		
+    }
 
 	printf("输入结束\n");
 	link_print(head);
