@@ -10,6 +10,38 @@
 /*要处理的问题*/
 {
 
+	17G10A底电流偏高问题
+	{
+		1.中断持锁EINT wakelock次数很多导致系统一直没有睡下去
+		lk里面sc卡配置有问题，导致频繁上报中断
+		
+		还有一个不同阶段的gpio配置
+		
+		
+		2.打印中断号，地址，wakeup.c
+		在有中断持锁的时候知道是哪些中断
+		
+		
+		3.系统的休眠，唤醒流程
+		{
+			"mem", "standby", "freeze" and "disk"
+		
+		}
+		
+		
+		4.如何注掉一些驱动
+		
+		
+		5.系统进入suspend 还有一些低功耗模式
+		
+		
+		5.分析思路
+
+	}
+
+	//测试按键驱动
+	hps_main
+
 
     pmi8952,pmi8940,pmi8937,ti的bq系列电量计，以及精度对比
     {
@@ -138,18 +170,52 @@
             
             qpnp-fg.c
             {
-            	为什么高通的单个结构体都有那么多成员，还有那么多工作函数
+            	为什么高通的单个结构体都有那么多成员，还有那么多工作函数？
             	
-            	fg_batt_profile_init 电量计相关参数的初始化 ，导入客制化profile
             	
-            	然后重启电量计fg_do_restart
+				fg_probe将电量计device跟driver挂钩,建立bind
+				
+				log_bat_status这个打印很多电池相关的信息
+				都要从get_sram_prop_now这个接口里面去根据下标去读取数据
+				fg_mem_data_index
+				
+				
+				常用函数接口：
+				充电使能
+						rc = set_prop_enable_charging(chip, true);
+				
+				
+				开始的时候初始化很多wakeup source，创建了很多work
+				{
+					wakeup source:需要了解机制
+					
+					work：
+						update_jeita_setting 这是跟一个温度设置相关的
+						
+						update_sram_data_work 这个跟fg相关参数存储在sram中相关
+							然后有的数据上报都是从sram从读取数组数据，但是这些数据是在哪写的
+							利用哪些接口获取的
+							
+						update_temp_data 上报电池温度相关信息
+						
+						check_empty_work 这个是上报没电 0%？如果有vbatt-low interrupt这个  中						断触发就会调用这个函数
+						
+						batt_profile_init 电池相关的配置文件初始化
+						
+						
+						check_sanity_work
+						
+
+				}
             
             }
             
             
             
             
-            
+            NTC电阻温度跟阻值之间的关系
+            rpm配置ld0
+            配置设备树
         }
         
         

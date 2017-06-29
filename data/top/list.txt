@@ -360,6 +360,14 @@ other：
 	http://lib.csdn.net/article/operatingsystem/32054
 
 
+	【Android休眠】之Android休眠机制 
+	http://blog.csdn.net/u013686019/article/details/53645646
+
+
+	Android休眠唤醒机制简介（一）
+	http://blog.sina.com.cn/s/blog_a6559d920101aug9.html
+
+
 
 
 
