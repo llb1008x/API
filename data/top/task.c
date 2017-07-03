@@ -2,6 +2,46 @@
 
 
 
+#ifdef LLB_BATTERY_DETECT
+	/* ask shin-shyu programming guide */
+
+    #ifdef MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION
+        print("ignore bat check !\n");
+        return 1;
+    #else
+        #if CFG_EVB_PLATFORM
+            print("ignore bat check\n");
+            return 1;
+        #else
+            U32 val=0;
+			U32 ret_val;
+
+	ret_val=pmic_config_interface( (U32)(MT6355_LDO_VBIF28_CON0),
+							 (U32)(1),
+							 (U32)(PMIC_RG_LDO_VBIF28_EN_MASK),
+							 (U32)(PMIC_RG_LDO_VBIF28_EN_SHIFT)
+							 );
+
+
+	mt6355_upmu_set_rg_baton_en(1);
+	/*mt6355_upmu_set_baton_tdet_en(1);*//*--After 6335, it's unnecessary--*/
+	/*mdelay(100);*/
+	val = mt6355_upmu_get_rgs_baton_undet();
+
+
+	if(val == 0)
+	{
+		print("bat is exist.\n");
+		return 1;
+	}
+	else
+	{
+		print("bat NOT exist.\n");
+		return 0;
+	}
+        #endif
+    #endif
+#endif    
 
 
 

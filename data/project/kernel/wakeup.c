@@ -3,8 +3,6 @@
 代码结构要调整
 
 一.android的休眠唤醒机制
-
-
 1、背景介绍：
     睡眠/唤醒是嵌入式Linux非常重要的组成部分,因为优秀的睡眠唤醒机制可以是嵌入式设备尽可能的进入休眠状态，来延长电池的续航时间（这在移动终端消费类电子设备中是
     非常重要和有意义的！！）。但标准的Linux睡眠唤醒机制有其自身的一些缺陷（所有模块必须同时睡下或者唤醒），在某些情况下，这会导致能耗的白白浪费。因此Android
@@ -44,28 +42,29 @@ Android休眠唤醒机制简介（一）
     经过Java、C++和C语言写的Framework层、JNI层、HAL层最后到达android的最底层（Kernel层）。通过本文的阅读，您将对android的整体有更加深入、宏观的理解和把握！
 
    主要涉及到的目录文件：
+   {
+        android/frameworks/base/core/java/android/os/PowerManager.java 
 
-android/frameworks/base/core/java/android/os/PowerManager.java 
+        android/frameworks/base/services/java/com/android/server/PowerManagerService.java
 
-android/frameworks/base/services/java/com/android/server/PowerManagerService.java
+        android/frameworks/base/core/java/android/os/Power.java
 
-android/frameworks/base/core/java/android/os/Power.java
+        android/frameworks/base/core/jni/android_os_Power.cpp
 
-android/frameworks/base/core/jni/android_os_Power.cpp
-
-android/hardware/libhardware_legacy/power/power.c
+        android/hardware/libhardware_legacy/power/power.c
 
 
 
-android/kernel/kernel/power/main.c 
+        android/kernel/kernel/power/main.c 
 
-android/kernel/kernel/power/earlysuspend.c
+        android/kernel/kernel/power/earlysuspend.c
 
-android/kernel/kernel/power/suspend.c
+        android/kernel/kernel/power/suspend.c
 
-android/kernel/kernel/power/wakelock.c
+        android/kernel/kernel/power/wakelock.c
 
-android/kernel/kernel/power/userwakelock.c
+        android/kernel/kernel/power/userwakelock.c
+   }
 
 
 在应用程序框架层中，PowerManager类是面向上层应用程序的接口类，提供了Wake Lock机制（同时也是睡眠唤醒子系统）的基本接口（唤醒锁的获取和释放）。上层应用程序通过
@@ -98,7 +97,8 @@ power.c：进行sysfs用户接口的操作。
     比如在应用程序中，当获得wakelock唤醒锁的时候，它首先是调用/android/frameworks/base/core/java/android/os/PowerManager类中的
     public void acquire()方法，而该方法通过android特有的通讯机制，会接着调用到PowerManagerService类中的public void acquireWakeLock。
 
-public void acquireWakeLock(int flags, IBinder lock, String tag, WorkSource ws) {
+public void acquireWakeLock(int flags, IBinder lock, String tag, WorkSource ws)
+ {
         int uid = Binder.getCallingUid();
         int pid = Binder.getCallingPid();
         if (uid != Process.myUid()) {
@@ -340,68 +340,72 @@ static void wake_lock_internal(struct wake_lock *lock, long timeout, int has_tim
     BUG_ON(!(lock->flags & WAKE_LOCK_INITIALIZED));
     #ifdef CONFIG_WAKELOCK_STAT
     if (type == WAKE_LOCK_SUSPEND && wait_for_wakeup) {
-    if (debug_mask & DEBUG_WAKEUP)
-    pr_info("wakeup wake lock: %s\n", lock->name);
-    wait_for_wakeup = 0;
-    lock->stat.wakeup_count++;
-}
+        if (debug_mask & DEBUG_WAKEUP)
+        pr_info("wakeup wake lock: %s\n", lock->name);
+        wait_for_wakeup = 0;
+        lock->stat.wakeup_count++;
+    }
 
-if ((lock->flags & WAKE_LOCK_AUTO_EXPIRE) &&
-    (long)(lock->expires - jiffies) <= 0) {
-wake_unlock_stat_locked(lock, 0);
-lock->stat.last_time = ktime_get();
-}
-#endif
-if (!(lock->flags & WAKE_LOCK_ACTIVE)) {
-lock->flags |= WAKE_LOCK_ACTIVE;
-#ifdef CONFIG_WAKELOCK_STAT
-lock->stat.last_time = ktime_get();
-#endif
-}
-list_del(&lock->link);
-if (has_timeout) {
-if (debug_mask & DEBUG_WAKE_LOCK)
-pr_info("wake_lock: %s, type %d, timeout %ld.lu\n",
-lock->name, type, timeout / HZ,
-(timeout % HZ) * MSEC_PER_SEC / HZ);
-lock->expires = jiffies + timeout;
-lock->flags |= WAKE_LOCK_AUTO_EXPIRE;
-list_add_tail(&lock->link, &active_wake_locks[type]);
-} else {
-if (debug_mask & DEBUG_WAKE_LOCK)
-pr_info("wake_lock: %s, type %d\n", lock->name, type);
-lock->expires = LONG_MAX;
-lock->flags &= ~WAKE_LOCK_AUTO_EXPIRE;
-list_add(&lock->link, &active_wake_locks[type]);
-}
-if (type == WAKE_LOCK_SUSPEND) {
-current_event_num++;
-#ifdef CONFIG_WAKELOCK_STAT
-if (lock == &main_wake_lock)
-update_sleep_wait_stats_locked(1);
-else if (!wake_lock_active(&main_wake_lock))
-update_sleep_wait_stats_locked(0);
-#endif
-if (has_timeout)
-expire_in = has_wake_lock_locked(type);
-else
-expire_in = -1;
-if (expire_in > 0) {
-if (debug_mask & DEBUG_EXPIRE)
-pr_info("wake_lock: %s, start expire timer, "
-"%ld\n", lock->name, expire_in);
-mod_timer(&expire_timer, jiffies + expire_in);
-} else {
-if (del_timer(&expire_timer))
-if (debug_mask & DEBUG_EXPIRE)
-pr_info("wake_lock: %s, stop expire timer\n",
-lock->name);
-if (expire_in == 0)
-queue_work(suspend_work_queue, &suspend_work);
-}
-}
-spin_unlock_irqrestore(&list_lock, irqflags);
-}
+    if ((lock->flags & WAKE_LOCK_AUTO_EXPIRE) &&
+        (long)(lock->expires - jiffies) <= 0) {
+    wake_unlock_stat_locked(lock, 0);
+    lock->stat.last_time = ktime_get();
+    }
+    #endif
+
+    if (!(lock->flags & WAKE_LOCK_ACTIVE)) {
+        lock->flags |= WAKE_LOCK_ACTIVE;
+        #ifdef CONFIG_WAKELOCK_STAT
+        lock->stat.last_time = ktime_get();
+        #endif
+    }
+
+    list_del(&lock->link);
+
+    if (has_timeout) {
+        if (debug_mask & DEBUG_WAKE_LOCK)
+            pr_info("wake_lock: %s, type %d, timeout %ld.lu\n",
+            lock->name, type, timeout / HZ,(timeout % HZ) * MSEC_PER_SEC / HZ);
+            lock->expires = jiffies + timeout;
+            lock->flags |= WAKE_LOCK_AUTO_EXPIRE;
+            list_add_tail(&lock->link, &active_wake_locks[type]);
+    } else {
+    if (debug_mask & DEBUG_WAKE_LOCK)
+        pr_info("wake_lock: %s, type %d\n", lock->name, type);
+        lock->expires = LONG_MAX;
+        lock->flags &= ~WAKE_LOCK_AUTO_EXPIRE;
+        list_add(&lock->link, &active_wake_locks[type]);
+    }
+
+    if (type == WAKE_LOCK_SUSPEND) {
+        current_event_num++;
+    #ifdef CONFIG_WAKELOCK_STAT
+    if (lock == &main_wake_lock)
+        update_sleep_wait_stats_locked(1);
+    else if (!wake_lock_active(&main_wake_lock))
+        update_sleep_wait_stats_locked(0);
+    #endif
+    if (has_timeout)
+        expire_in = has_wake_lock_locked(type);
+    else
+        expire_in = -1;
+
+    if (expire_in > 0) {
+        if (debug_mask & DEBUG_EXPIRE)
+        pr_info("wake_lock: %s, start expire timer, "
+        "%ld\n", lock->name, expire_in);
+        mod_timer(&expire_timer, jiffies + expire_in);
+    } else {
+        if (del_timer(&expire_timer))
+                if (debug_mask & DEBUG_EXPIRE)
+                    pr_info("wake_lock: %s, stop expire timer\n",
+            lock->name);
+            if (expire_in == 0)
+            queue_work(suspend_work_queue, &suspend_work);
+        }
+    }
+    spin_unlock_irqrestore(&list_lock, irqflags);
+ }
 
    到这里为止，我们走的第一条路就到目的地了，这个函数具体做了什么，在这里就不仔细分析了，大家可以自己再跟下或者上网查相关资料，理解这个函数不难。
  
@@ -441,10 +445,12 @@ spin_unlock_irqrestore(&list_lock, irqflags);
     int len;
     if(on)
         len = snprintf(buf, sizeof(buf), "%s", on_state);
+
     else
         len = snprintf(buf, sizeof(buf), "%s", off_state);
     buf[sizeof(buf) - 1] = '\0';
     len = write(g_fds[REQUEST_STATE], buf, len);
+
     if(len < 0) {
         LOGE("Failed setting last user activity: g_error=%d\n", g_error);
     }
@@ -497,16 +503,17 @@ Linux标准的suspend：       enter_state(state)
 注意：如果CONFIG_EARLYSUSPEND宏开的话，kernel会先走earlysuspend，反之则直接走suspend；从这里开始就要分两个分支了，如果支持earlysuspend的话就进入 request_suspend_state(state)函数，如果不支持的话就进入标准Linux的enter_state(state)函数。、
 
 这两个函数分别在两个文件中kernel/kernel/power/earlysuspend.c和suspend.c。现在再回过头来看的话，感觉整个android中睡眠唤醒机制还是很清晰的。这两个函数体里又做了什么，在这里就不再做具体分析，大家可以自己对照代码或者上网查资料，因为本文的主旨是带读者从最上层应用层一直到最底层kernel层，把整个android的睡眠唤醒机制给走通。
-
-PowerManager.java                         goToSleep( )
-PowerManagerService.java                 goToSleep（）
-PowerManagerService.java             goToSleepWithReason（）
-PowerManagerService.java                 setPowerState()
-PowerManagerService.java             SetScreenStateLocked ()
-Power.java                             setScreenState（）
-android_os_Power.cpp                   setScreenState（）
-power.c                                  set_screen_state( )
-main.c                                 state_store( )
+{
+    PowerManager.java                         goToSleep( )
+    PowerManagerService.java                 goToSleep（）
+    PowerManagerService.java             goToSleepWithReason（）
+    PowerManagerService.java                 setPowerState()
+    PowerManagerService.java             SetScreenStateLocked ()
+    Power.java                             setScreenState（）
+    android_os_Power.cpp                   setScreenState（）
+    power.c                                  set_screen_state( )
+    main.c                                 state_store( )
+}
 
 
 
@@ -589,18 +596,19 @@ early_suspend：先与linux内核的睡眠过程被调用。一般在手机系�
 本文中，linux kernel版本为 linux-2.6.29，android版本为 android 2.1
 
 与android休眠唤醒主要相关的文件主要有：
+{
+    l linux_source/kernel/power/main.c
 
-l linux_source/kernel/power/main.c
+    l linux_source/kernel/power/earlysuspend.c
 
-l linux_source/kernel/power/earlysuspend.c
+    l linux_source/kernel/power/wakelock.c
 
-l linux_source/kernel/power/wakelock.c
+    l linux_source/kernel/power/process.c
 
-l linux_source/kernel/power/process.c
+    l linux_source/driver/base/power/main.c
 
-l linux_source/driver/base/power/main.c
-
-l linux_source/arch/xxx/mach-xxx/pm.c或linux_source/arch/xxx/plat-xxx/pm.c
+    l linux_source/arch/xxx/mach-xxx/pm.c或linux_source/arch/xxx/plat-xxx/pm.c
+}
 
 
 Android 休眠过程如下：
@@ -619,41 +627,31 @@ static ssize_t state_store(struct kobject *kobj, struct kobj_attribute *attr,
 
 #ifdef CONFIG_EARLYSUSPEND
 
-suspend_state_t state = PM_SUSPEND_ON;
+    suspend_state_t state = PM_SUSPEND_ON;
 
 #else
 
-suspend_state_t state = PM_SUSPEND_STANDBY;
+    suspend_state_t state = PM_SUSPEND_STANDBY;
 
 #endif
 
-const char * const *s;
+    const char * const *s;
 
 #endif
 
-char *p;
+    char *p;
+    int len;
+    int error = -EINVAL;
 
-int len;
+    p = memchr(buf, '\n', n);
 
-int error = -EINVAL;
+    len = p ? p - buf : n;
 
- 
+    if (len == 4 && !strncmp(buf, "disk", len)) {
 
-p = memchr(buf, '\n', n);
-
-len = p ? p - buf : n;
-
- 
-
- 
-
-if (len == 4 && !strncmp(buf, "disk", len)) {
-
-error = hibernate();
-
-  goto Exit;
-
-}
+        error = hibernate();
+        goto Exit;
+    }
 
  
 
@@ -661,10 +659,9 @@ error = hibernate();
 
 for (s = &pm_states[state]; state < PM_SUSPEND_MAX; s++, state++) {
 
-if (*s && len == strlen(*s) && !strncmp(buf, *s, len))
+    if (*s && len == strlen(*s) && !strncmp(buf, *s, len))
 
-break;
-
+        break;
 }
 
 if (state < PM_SUSPEND_MAX && *s)
@@ -1618,6 +1615,598 @@ s3c6410_pm_do_restore(sromc_save, ARRAY_SIZE(sromc_save));
 }
 
 /****************************************************************************************************/
+
+五.static int suspend_enter(suspend_state_t state)
+
+{
+
+int error = 0;
+
+ 
+
+device_pm_lock();
+
+#ifdef CONFIG_CPU_FREQ
+
+cpufreq_get_cpufreq_name(0);
+
+strcpy(governor_name, cpufreq_governor_name);
+
+if(strnicmp(governor_name, userspace_governor, CPUFREQ_NAME_LEN)) {
+
+cpufreq_set_policy(0, "performance");
+
+}
+
+#endif 
+
+arch_suspend_disable_irqs();
+
+BUG_ON(!irqs_disabled());
+
+ 
+
+if ((error = device_power_down(PMSG_SUSPEND))) {
+
+printk(KERN_ERR "PM: Some devices failed to power down\n");
+
+goto Done;
+
+}
+
+ 
+
+error = sysdev_suspend(PMSG_SUSPEND);
+
+if (!error) {
+
+if (!suspend_test(TEST_CORE))
+
+error = suspend_ops->enter(state);  //suspend过程完成处
+
+sysdev_resume();
+
+}
+
+ 
+
+device_power_up(PMSG_RESUME);
+
+ Done:
+
+arch_suspend_enable_irqs();
+
+#ifdef CONFIG_CPU_FREQ
+
+if(strnicmp(governor_name, userspace_governor, CPUFREQ_NAME_LEN)) {
+
+cpufreq_set_policy(0, governor_name);
+
+}
+
+#endif 
+
+BUG_ON(irqs_disabled());
+
+device_pm_unlock();
+
+return error;
+
+}
+
+ 
+
+然后回到suspend_devices_and_enter()函数中，使能休眠时候停止掉的非启动CPU，继续唤醒每个设备，使能终端。
+
+
+int suspend_devices_and_enter(suspend_state_t state)
+
+{
+
+int error;
+
+ 
+
+if (!suspend_ops)
+
+return -ENOSYS;
+
+ 
+
+if (suspend_ops->begin) {
+
+error = suspend_ops->begin(state);
+
+if (error)
+
+goto Close;
+
+}
+
+suspend_console();
+
+suspend_test_start();
+
+error = device_suspend(PMSG_SUSPEND);
+
+if (error) {
+
+printk(KERN_ERR "PM: Some devices failed to suspend\n");
+
+goto Recover_platform;
+
+}
+
+suspend_test_finish("suspend devices");
+
+if (suspend_test(TEST_DEVICES))
+
+goto Recover_platform;
+
+ 
+
+if (suspend_ops->prepare) {
+
+error = suspend_ops->prepare();
+
+if (error)
+
+goto Resume_devices;
+
+}
+
+ 
+
+if (suspend_test(TEST_PLATFORM))
+
+goto Finish;
+
+ 
+
+error = disable_nonboot_cpus();
+
+if (!error && !suspend_test(TEST_CPUS))
+
+suspend_enter(state);  //suspend过程完成处
+
+ 
+
+enable_nonboot_cpus();
+
+ Finish:
+
+if (suspend_ops->finish)
+
+suspend_ops->finish();
+
+ Resume_devices:
+
+suspend_test_start();
+
+device_resume(PMSG_RESUME);
+
+suspend_test_finish("resume devices");
+
+resume_console();
+
+ Close:
+
+if (suspend_ops->end)
+
+suspend_ops->end();
+
+return error;
+
+ 
+
+ Recover_platform:
+
+if (suspend_ops->recover)
+
+suspend_ops->recover();
+
+goto Resume_devices;
+
+}
+
+ 
+
+当suspend_devices_and_enter()执行完成后，系统外设已经唤醒，但进程依然是冻结的状态，返回到enter_state函数中，调用suspend_finish()函数。
+
+static int enter_state(suspend_state_t state)
+
+{
+
+int error;
+
+ 
+
+if (!valid_state(state))
+
+return -ENODEV;
+
+ 
+
+if (!mutex_trylock(&pm_mutex))
+
+return -EBUSY;
+
+ 
+
+printk(KERN_INFO "PM: Syncing filesystems ... ");
+
+sys_sync();
+
+printk("done.\n");
+
+ 
+
+pr_debug("PM: Preparing system for %s sleep\n", pm_states[state]);
+
+error = suspend_prepare();
+
+if (error)
+
+goto Unlock;
+
+ 
+
+if (suspend_test(TEST_FREEZER))
+
+goto Finish;
+
+ 
+
+pr_debug("PM: Entering %s sleep\n", pm_states[state]);
+
+error = suspend_devices_and_enter(state);  //suspend过程完成处
+
+ 
+
+ Finish:
+
+pr_debug("PM: Finishing wakeup.\n");
+
+suspend_finish();
+
+ Unlock:
+
+mutex_unlock(&pm_mutex);
+
+return error;
+
+}
+
+ 
+
+在suspend_finish()函数中，解冻进程和任务，使能用户空间helper进程，广播一个系统从suspend状态退出的notify，唤醒终端。
+
+static void suspend_finish(void)
+
+{
+
+suspend_thaw_processes();
+
+usermodehelper_enable();
+
+pm_notifier_call_chain(PM_POST_SUSPEND);
+
+pm_restore_console();
+
+}
+
+ 
+
+当所有的唤醒已经结束以后，用户进程都已经开始运行了，但没点亮屏幕，唤醒通常会是以下的几种原因：
+
+如果是来电，那么Modem会通过发送命令给rild来让rild通知WindowManager有来电响应，这样就会远程调用PowerManagerService来写”on”到 /sys/power/state 来调用late resume()，执行点亮屏幕等操作。
+
+用户按键事件会送到WindowManager中，WindowManager会处理这些按键事件，按键分为几种情况，如果按键不是唤醒键，那么WindowManager会主动放弃wakeLock来使系统进入再次休眠；如果按键是唤醒键，那么WindowManger就会调用PowerManagerService中的接口来执行late Resume。
+
+ 
+
+当”on”被写入到/sys/power/state之后，同early_suspend过程，request_suspend_state()被调用，只是执行的工作队列变为late_resume_work。在late_resume函数中，唤醒调用了early_suspend的设备。
+
+static DECLARE_WORK(late_resume_work, late_resume);
+
+static void late_resume(struct work_struct *work)
+
+{
+
+struct early_suspend *pos;
+
+unsigned long irqflags;
+
+int abort = 0;
+
+ 
+
+mutex_lock(&early_suspend_lock);
+
+spin_lock_irqsave(&state_lock, irqflags);
+
+if (state == SUSPENDED)
+
+state &= ~SUSPENDED;
+
+else
+
+abort = 1;
+
+spin_unlock_irqrestore(&state_lock, irqflags);
+
+ 
+
+if (abort) {
+
+if (debug_mask & DEBUG_SUSPEND)
+
+pr_info("late_resume: abort, state %d\n", state);
+
+goto abort;
+
+}
+
+if (debug_mask & DEBUG_SUSPEND)
+
+pr_info("late_resume: call handlers\n");
+
+list_for_each_entry_reverse(pos, &early_suspend_handlers, link)
+
+if (pos->resume != NULL)
+
+pos->resume(pos);
+
+if (debug_mask & DEBUG_SUSPEND)
+
+pr_info("late_resume: done\n");
+
+abort:
+
+mutex_unlock(&early_suspend_lock);
+
+}
+
+
+/**********************************************************************************************/
+
+六.关于wake_lock
+
+在上文中，已经介绍了wakelock机制，下面从代码的角度进行介绍。
+
+wakelock有2种类型，常用为WAKE_LOCK_SUSPEND，作用是防止系统进入睡眠。WAKE_LOCK_IDLE
+
+这种锁不会影响到系统进入休眠，但是如果这种锁被持有，那么系统将无法进入idle空闲模式。
+
+enum {
+
+WAKE_LOCK_SUSPEND, 
+
+WAKE_LOCK_IDLE,    
+
+WAKE_LOCK_TYPE_COUNT
+
+};
+
+ 
+
+Wakelock有加锁和解锁2种操作，加锁有2种方式，第一种是永久加锁（wake_lock），这种锁必须手动的解锁；另一种是超时锁（wake_lock_timeout），这种锁在过去指定时间后，会自动解锁。
+
+void wake_lock(struct wake_lock *lock)
+
+{
+
+wake_lock_internal(lock, 0, 0);
+
+}
+
+ 
+
+void wake_lock_timeout(struct wake_lock *lock, long timeout)
+
+{
+
+wake_lock_internal(lock, timeout, 1);
+
+}
+
+ 
+
+对于wakelock，timeout = has_timeout = 0；直接加锁后，然后退出；
+
+static void wake_lock_internal(
+
+struct wake_lock *lock, long timeout, int has_timeout)
+
+{
+
+int type;
+
+unsigned long irqflags;
+
+long expire_in;
+
+ 
+
+spin_lock_irqsave(&list_lock, irqflags);
+
+type = lock->flags & WAKE_LOCK_TYPE_MASK;
+
+BUG_ON(type >= WAKE_LOCK_TYPE_COUNT);
+
+BUG_ON(!(lock->flags & WAKE_LOCK_INITIALIZED));
+
+#ifdef CONFIG_WAKELOCK_STAT
+
+if (type == WAKE_LOCK_SUSPEND && wait_for_wakeup) {
+
+if (debug_mask & DEBUG_WAKEUP)
+
+pr_info("wakeup wake lock: %s\n", lock->name);
+
+wait_for_wakeup = 0;
+
+lock->stat.wakeup_count++;
+
+}
+
+if ((lock->flags & WAKE_LOCK_AUTO_EXPIRE) &&
+
+    (long)(lock->expires - jiffies) <= 0) {
+
+wake_unlock_stat_locked(lock, 0);
+
+lock->stat.last_time = ktime_get();
+
+}
+
+#endif
+
+if (!(lock->flags & WAKE_LOCK_ACTIVE)) {
+
+lock->flags |= WAKE_LOCK_ACTIVE;
+
+#ifdef CONFIG_WAKELOCK_STAT
+
+lock->stat.last_time = ktime_get();
+
+#endif
+
+}
+
+list_del(&lock->link);
+
+if (has_timeout) {
+
+if (debug_mask & DEBUG_WAKE_LOCK)
+
+pr_info("wake_lock: %s, type %d, timeout %ld.lu\n",
+
+lock->name, type, timeout / HZ,
+
+(timeout % HZ) * MSEC_PER_SEC / HZ);
+
+lock->expires = jiffies + timeout;
+
+lock->flags |= WAKE_LOCK_AUTO_EXPIRE;
+
+list_add_tail(&lock->link, &active_wake_locks[type]);
+
+} else {
+
+if (debug_mask & DEBUG_WAKE_LOCK)
+
+pr_info("wake_lock: %s, type %d\n", lock->name, type);
+
+lock->expires = LONG_MAX;
+
+lock->flags &= ~WAKE_LOCK_AUTO_EXPIRE;
+
+list_add(&lock->link, &active_wake_locks[type]);
+
+}
+
+if (type == WAKE_LOCK_SUSPEND) {
+
+current_event_num++;
+
+#ifdef CONFIG_WAKELOCK_STAT
+
+if (lock == &main_wake_lock)
+
+update_sleep_wait_stats_locked(1);
+
+else if (!wake_lock_active(&main_wake_lock))
+
+update_sleep_wait_stats_locked(0);
+
+#endif
+
+if (has_timeout)
+
+expire_in = has_wake_lock_locked(type);
+
+else
+
+expire_in = -1;
+
+if (expire_in > 0) {
+
+if (debug_mask & DEBUG_EXPIRE)
+
+pr_info("wake_lock: %s, start expire timer, "
+
+"%ld\n", lock->name, expire_in);
+
+mod_timer(&expire_timer, jiffies + expire_in);
+
+} else {
+
+if (del_timer(&expire_timer))
+
+if (debug_mask & DEBUG_EXPIRE)
+
+pr_info("wake_lock: %s, stop expire timer\n",
+
+lock->name);
+
+if (expire_in == 0)
+
+queue_work(suspend_work_queue, &suspend_work);
+
+}
+
+}
+
+spin_unlock_irqrestore(&list_lock, irqflags);
+
+}
+
+而对于wake_lock_timeout，在经过timeout时间后，才加锁。再判断当前持有wakelock时，启动另一个定时器，在expire_timer的回调函数中再次判断是否持有wakelock。
+
+static void expire_wake_locks(unsigned long data)
+
+{
+
+long has_lock;
+
+unsigned long irqflags;
+
+if (debug_mask & DEBUG_EXPIRE)
+
+pr_info("expire_wake_locks: start\n");
+
+spin_lock_irqsave(&list_lock, irqflags);
+
+if (debug_mask & DEBUG_SUSPEND)
+
+print_active_locks(WAKE_LOCK_SUSPEND);
+
+has_lock = has_wake_lock_locked(WAKE_LOCK_SUSPEND);
+
+if (debug_mask & DEBUG_EXPIRE)
+
+pr_info("expire_wake_locks: done, has_lock %ld\n", has_lock);
+
+if (has_lock == 0)
+
+queue_work(suspend_work_queue, &suspend_work);
+
+spin_unlock_irqrestore(&list_lock, irqflags);
+
+}
+
+ 
+
+static DEFINE_TIMER(expire_timer, expire_wake_locks, 0, 0);
+
+ 
+
+在wakelock中，有2个地方可以让系统从early_suspend进入suspend状态。分别是：
+
+l 在wake_unlock中，解锁之后，若没有其他的wakelock，则进入suspend。
+
+l 在超时锁的定时器超时后，定时器的回调函数，会判断有没有其他的wakelock，若没有，则进入suspend。
 
 
 
