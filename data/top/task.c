@@ -1,28 +1,68 @@
 
 
 
+
+
+
 /*要处理的问题*/
 {
 	
-	meta模式，写号插假电要接NTC电阻才行
-	{
-		MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION 这个宏是干什么的，包含哪些代码
-		
-		
-		电池检测，NTC检测有哪些过程
-	
-	}
-	
-	
-	#Gionee <gn_by_charging> <lilubao> <20170703> add for platform change begin
-MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION = yes
-#Gionee <gn_by_charging> <lilubao> <20170703> add for platform change end
-	
 	
 	
 
+	
 
-	17G10A底电流偏高问题
+        rpm配置ld0
+        配置设备树
+        
+   USB  pid，vid添加到驱动中
+   
+   DLPT_FEATURE_SUPPORT  
+   {
+   		#if defined(DLPT_FEATURE_SUPPORT)
+	
+		if (g_boot_mode != META_BOOT && g_boot_mode != FACTORY_BOOT && g_boot_mode != ATE_FACTORY_BOOT) {
+			/*pmic_set_register_value(PMIC_BATON_TDET_EN, 1);*/
+		
+			pmic_set_register_value(PMIC_RG_BATON_EN, 1);
+			if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
+	
+				dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
+				mt6575_power_off();
+			}
+		}
+
+		pchr_turn_on_charging(KAL_FALSE);
+		/* disable SW charger power path */
+	
+		switch_charger_power_path_enable(KAL_FALSE);
+		mdelay(50);
+
+		get_dlpt_imix_r();
+		/* after get imix, re-enable SW charger power path */
+	
+		switch_charger_power_path_enable(KAL_TRUE);
+		mdelay(50);
+
+		check_bat_protect_status();
+		if (is_charging == 1) {
+			pchr_turn_on_charging(KAL_TRUE);
+			dprintf(CRITICAL, "turn on charging \n\r");
+		}
+		#endif //#if defined(DLPT_FEATURE_SUPPORT)
+   
+   
+   		pmic_throttling_dlpt
+   		
+   		
+   		FGADC_D0
+		fg_current_avg
+		fg_current_act
+
+   }   
+	
+
+	7.17G10A底电流偏高问题
 	{
 		1.中断持锁EINT wakelock次数很多导致系统一直没有睡下去
 		lk里面sc卡配置有问题，导致频繁上报中断
@@ -51,7 +91,12 @@ MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION = yes
 
 	}
 
+
+
+
+
 	测试按键驱动,调试按键驱动，熟悉流程和代码
+	
 	
 	hps_main是干什么的
 
@@ -222,13 +267,7 @@ MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION = yes
 				}
             
             }
-            
-            
-            
-            
-            NTC电阻温度跟阻值之间的关系
-            rpm配置ld0
-            配置设备树
+          
         }
         
         

@@ -24,6 +24,9 @@
 		git checkout vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6757/src/drivers/inc/clkbuf_ctl.h
 		git checkout kernel-4.4/drivers/misc/mediatek/base/power/mt6757/mtk_clkbuf_ctl.h 
 
+
+		/*有时候要看源码目录下的makefile文件，他制定了编译的规则，哪些是需要的*/
+		项目脚本里哪些宏是需要的，宏包含的代码有哪些？这点很重要
 }
 
 
@@ -1702,6 +1705,96 @@ static void *update_vibrator_thread_default(void *priv)
 		}    
 	}
 }   
+
+
+/*****************************************************************************************/
+11.meta模式，写号插假电要接NTC电阻才行
+{
+
+	这个问题的原因是天线校准用的夹具范围大，导致TEMP就是NTC的测试点无法接上
+	而这段在进入meta模式的时候并没有修改，要检测NTC电阻才能进入meta。
+	
+	/******************************************************************/
+	修改：preloader   charging_bat_mt6355.c
+	
+	没有电池但是return 1 认为有电池
+	//这个地方就是检测电池是否存在 ，meta
+	int hw_check_battery(void)
+	{
+		/* ask shin-shyu programming guide */
+
+		#ifdef MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION
+			print("ignore bat check !\n");
+			return 1;
+		#else
+			#if CFG_EVB_PLATFORM
+				print("ignore bat check\n");
+				return 1;
+			#else
+				U32 val=0;
+				U32 ret_val;
+
+		ret_val=pmic_config_interface( (U32)(MT6355_LDO_VBIF28_CON0),
+									(U32)(1),
+									(U32)(PMIC_RG_LDO_VBIF28_EN_MASK),
+									(U32)(PMIC_RG_LDO_VBIF28_EN_SHIFT)
+									);
+
+		//这个是使能ADC去检测将外置的供应作为输入源，去检测
+		mt6355_upmu_set_rg_baton_en(1);
+		/*mt6355_upmu_set_baton_tdet_en(1);*//*--After 6335, it's unnecessary--*/
+		/*mdelay(100);*/
+		//这个是检测电池 返回1是没有电池，0有电池
+		val = mt6355_upmu_get_rgs_baton_undet();
+
+
+		if(val == 0)
+		{
+			print("bat is exist.\n");
+			return 1;
+		}
+		else
+		{
+			//Gionee <gn_by_charging> <lilubao> <20170702> add for platform change begin
+			print("bat NOT exist,but return 1\n");
+			return 1;
+			//Gionee <gn_by_charging> <lilubao> <20170702> add for platform change end  
+		}
+			#endif
+		#endif
+
+	}	
+	
+	
+	MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION 这个宏是干什么的，包含哪些代码
+	
+	关闭电池是否存在才能开关机的限制,打开这个宏直接跳出检查
+	这个宏在preloader,lk,kernel三个地方后有检测，判断。
+	
+	preloader		charging_bat_mt6355.c
+	lk				mt_battery_6355.c
+	kernel 			
+	
+	电池检测，NTC检测有哪些过程
+	{
+		这里是直接都写pmic的寄存器的值，返回1没有电池，返回0有电池
+		
+		mt6355_upmu_set_rg_baton_en(1);
+		val = mt6355_upmu_get_rgs_baton_undet();
+	}
+
+}
+
+
+
+/***********************************************************************************************/
+12.
+
+
+
+
+
+
 
 
 
