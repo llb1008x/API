@@ -12,6 +12,12 @@
 
 int main()
 {
+	Array a=array_create(100);
+	printf("size->%d\n",array_size(&a));
+
+	*array_at(&a,0)=10;
+
+	array_free(&a);
 
 	return 0;
 }

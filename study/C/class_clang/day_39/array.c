@@ -20,3 +20,35 @@ Array array_create(int init_size)
 
 	return a;
 }
+
+/*
+ *	主要是清空*array这个指针
+ * */
+void array_free(Array *a)
+{
+	free(a->array);
+	a->array=NULL;
+	a->size=0;
+}
+
+
+int array_size(Array *a)
+{
+
+	return a->size;
+}
+
+
+/*
+ *
+ * */
+int *array_at(Array *a,int index)
+{
+	return &(a->array[index]);
+}
+
+
+void array_inflate(Array *a,int more_size)
+{
+
+}
