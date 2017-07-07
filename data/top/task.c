@@ -6,61 +6,435 @@
 
 /*要处理的问题*/
 {
+
+	10.17G10A mmi测试读取的数据有问题
+	{
+		mmi测试读取的节点在（这几个接口有问题？）
+		sys/class/power_supply/battery/
+
+		BatteryAverageCurrent  平均电流为0？
+		ChargerVoltage InstatVolt      TemperatureR batt_temp capacity     
+
+		device power   present_smb status_smb technology uevent 
+
+		BatterySenseVoltage         ISenseVoltage  TempBattVoltage adjust_power batt_vol  
+
+		capacity_smb health present status      subsystem  type  
+
+		//17G10A    要加一个POWER_SUPPLY_PROP_BatteryPresentCurrent节点
+		上面那一组变量属于power_supply的特性(mtk_battery.c)
+		static enum power_supply_property battery_props[] = {
+			POWER_SUPPLY_PROP_STATUS,
+			POWER_SUPPLY_PROP_HEALTH,
+			POWER_SUPPLY_PROP_PRESENT,
+			POWER_SUPPLY_PROP_TECHNOLOGY,
+			POWER_SUPPLY_PROP_CAPACITY,
+			/* Add for Battery Service */
+			POWER_SUPPLY_PROP_batt_vol,
+			POWER_SUPPLY_PROP_batt_temp,
+			/* Add for EM */
+			POWER_SUPPLY_PROP_TemperatureR,             // 7
+			POWER_SUPPLY_PROP_TempBattVoltage,          // 8
+			POWER_SUPPLY_PROP_InstatVolt,               // 9
+			POWER_SUPPLY_PROP_BatteryAverageCurrent,    // 10
+			POWER_SUPPLY_PROP_BatterySenseVoltage,      // 11
+			POWER_SUPPLY_PROP_ISenseVoltage,            // 12
+			POWER_SUPPLY_PROP_ChargerVoltage,           // 13
+			/* Dual battery */
+			POWER_SUPPLY_PROP_status_smb,
+			POWER_SUPPLY_PROP_capacity_smb,
+			POWER_SUPPLY_PROP_present_smb,
+			/* ADB CMD Discharging */
+			POWER_SUPPLY_PROP_adjust_power,
+		};
+
+		//这些变量后面会在sys节点下呈现
+		void battery_update_psd(struct battery_data *bat_data)
+		{
+			bat_data->BAT_batt_vol = battery_get_bat_voltage();
+			bat_data->BAT_InstatVolt = bat_data->BAT_batt_vol;
+			bat_data->BAT_BatterySenseVoltage = bat_data->BAT_batt_vol;
+			bat_data->BAT_batt_temp = battery_get_bat_temperature();
+			bat_data->BAT_TempBattVoltage = battery_meter_get_tempV();
+			bat_data->BAT_TemperatureR = battery_meter_get_tempR(bat_data->BAT_TempBattVoltage);
+			bat_data->BAT_BatteryAverageCurrent = battery_get_ibus();//ibus返回0，不用这个
+			bat_data->BAT_ISenseVoltage = battery_meter_get_VSense();
+			bat_data->BAT_ChargerVoltage = battery_get_vbus();
+		}
+
+		打印log用的这些函数接口
+		pr_err("Vbat=%d,I=%d,VChr=%d,T=%d,Soc=%d:%d,CT:%d:%d\n", battery_get_bat_voltage(),
+			curr_sign ? bat_current : -1 * bat_current,
+			battery_get_vbus(), battery_get_bat_temperature(),
+			battery_get_bat_soc(), battery_get_bat_uisoc(),
+			mt_get_charger_type(), info->chr_type);
+
+		/*debug*/    
+		{
+			1.节点数据没有及时上报，导致有的数据一直显示初始化时候的值            
+				battery_update_psd获取充电，电池的数据然后赋值给power_supply子系统，battery_main数据结构
+
+				在battery_update函数里面添加 battery_update_psd，每隔10s获取的数据可以上报上去
+
+			2.添加时时的充电电流数据这个选项
+			POWER_SUPPLY_PROP_BatteryPresentCurrent
+			val->intval = data->BAT_BatteryPresentCurrent
+
+			power_supply_sysfs.c和power_supply.h里面要添加properity特性
+			要把这个节点特性呈现到sysfs里面
+
+			3.mmi测试读取的数据有问题
+			{
+				电池技术显示null
+
+				电池电压BatterySenseVoltage  显示的是电池温度batt_temp
+
+				充电电流有数据但是数据有问题
+
+				电池剩余电量capacity 显示的是电池电压BatterySenseVoltage
+
+				power_supply 节点路径
+				充电电流：  /sys/class/power_supply/battery/BatteryPresentCurrent
+				充电器电压：/sys/class/power_supply/battery/ChargerVoltage
+				电量：      /sys/class/power_supply/battery/capacity
+				电池电压：  /sys/class/power_supply/battery/BatterySenseVoltage
+				电池技术：  /sys/class/power_supply/battery/technology
+				电池温度：  /sys/class/power_supply/battery/batt_temp
+			}
+
+			/*修改*/
+			{
+				1.往power_supply的属性里面提供新的属性
+				power_supply_property -> POWER_SUPPLY_PROP_BatteryPresentCurrent, 
+
+				2.修改函数街口，添加新的数据
+				//battery_get_ibus -> pmic_get_ibus return 0 这个函数返回值就是0，没意义
+				//bat_data->BAT_BatteryAverageCurrent = battery_get_ibus();
+				bat_data->BAT_BatteryAverageCurrent = battery_get_bat_avg_current();
+				bat_data->BAT_BatteryPresentCurrent = battery_get_bat_current();
+
+				3.数据没有及时上报，所以要在线程里面添加上报
+				static void battery_update(struct battery_data *bat_data)
+				{
+					struct power_supply *bat_psy = bat_data->psy;
+
+					bat_data->BAT_TECHNOLOGY = POWER_SUPPLY_TECHNOLOGY_LION;
+					bat_data->BAT_HEALTH = POWER_SUPPLY_HEALTH_GOOD;
+					bat_data->BAT_PRESENT = 1;
+
+					//Gionee <gn_by_charging> <lilubao> <20170619> add fixed mmi begin	
+					battery_update_psd(bat_data);
+					//Gionee <gn_by_charging> <lilubao> <20170619> add fixed mmi end
+
+				#if defined(CONFIG_POWER_EXT)
+					bat_data->BAT_CAPACITY = 50;
+				#endif
+					power_supply_changed(bat_psy);
+				}
+			}    
+		}
+		
+		
+		mmi显示有问题
+		{
+			1.mmi显示充电电流数据应该少一位
+				电池温度应该不用*10，虽然不需要温度的数据
+				val->intval = data->BAT_batt_temp ;// remove *10
+				充电电流数据应该要除10，不然好几安，太大了	
+				val->intval = data->BAT_BatteryPresentCurrent/10;	
+				
+				
+			2.分析log，mmi测试走了哪些流程
+			
+				
+			
+			
+			3.对比G1605A 还有哪些是缺少的
+				a.缺少enter_mmi_test,exit_mmi_test这两个节点
+				已在mtk_batteruy.c 文件里面添加了两个节点
+				
+				b.  is_enter_mmi_test
+				这个变量使用来告诉充电其他部分现在正在进行mmi测试，不用降电流等操作
+				
+				
+				c.刚插入充电器的时候，检测到中断，充电器检测线程会在刚开始的15s内，每秒都会更新
+				需要在相关的线程里面添加这个判断，并调用gn_update_BatteryPresentCurrent
+				
+				
+				把这段代码加到哪个地方，而且是在线程里面
+				//Gionee <gn_by_charging> <lilubao> <20170705> add for platform change begin
+				static unsigned int gn_update_counter = 0;
+				//Gionee <gn_by_charging> <lilubao> <20170705> add for platform change end
+				
+				
+				//Gionee <gn_by_charging> <lilubao> <20170705> add for platform change begin
+				if(upmu_is_chr_det() == true)
+				{
+					//check_battery_exist();		
+					pr_err("xxxxxxxxxxxxxx\n");
+					if (!(g_platform_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || g_platform_boot_mode == LOW_POWER_OFF_CHARGING_BOOT))
+					{
+						if(++gn_update_counter<15){
+							pr_err("gn_update_counter->%d,by lilubao\n",gn_update_counter);
+							gn_update_BatteryPresentCurrent();
+						}    
+					}else{
+						gn_update_counter = 0;
+					}
+				}	
+				//Gionee <gn_by_charging> <lilubao> <20170705> add for platform change end
+				
+				
+				
+				
+				./drivers/misc/mediatek/include/mt-plat/battery_meter.h:281:	FG_DAEMON_CMD_IS_CHARGER_EXIST,
+				./drivers/misc/mediatek/include/mt-plat/mtk_battery.h:237:	FG_DAEMON_CMD_IS_CHARGER_EXIST,
+				./drivers/power/mediatek/mtk_battery.c:1844:	case FG_DAEMON_CMD_IS_CHARGER_EXIST:
+				./drivers/power/mediatek/mtk_battery.c:1853:			bm_debug("[fg_res] FG_DAEMON_CMD_IS_CHARGER_EXIST = %d\n", is_charger_exist);
+				./drivers/power/mediatek/battery_meter_fg_20.c:3982:	case FG_DAEMON_CMD_IS_CHARGER_EXIST:
+
+				
+				./drivers/power/mediatek/charger/mtk_charger.c:1154:		pr_err("fg start timer");
+
+				
+				./drivers/misc/mediatek/include/mt-plat/mtk_battery.h:768:extern void fg_charger_in_handler(void);
+				./drivers/misc/mediatek/include/mt-plat/mtk_battery.h:843:extern void fg_charger_in_handler(void);
+				./drivers/power/mediatek/mtk_battery.c:3251:void fg_charger_in_handler(void)
+				./drivers/power/mediatek/mtk_battery.c:3257:	bm_debug("[fg_charger_in_handler] notify daemon %d %d\n", chr_type, current_chr_type);
+				./drivers/power/mediatek/charger/mtk_chg_type_det.c:183:	fg_charger_in_handler();
+
+				
+				./drivers/misc/mediatek/include/mt-plat/charger_type.h:38:extern void mtk_charger_int_handler(void);
+				./drivers/power/mediatek/charger/mtk_charger.c:829:void mtk_charger_int_handler(void)
+				./drivers/power/mediatek/charger/mtk_charger.c:832:	pr_err("mtk_charger_int_handler\n");
+				./drivers/power/mediatek/charger/mtk_chg_type_det.c:182:	mtk_charger_int_handler();
 	
-	
-	
+		}
+		
+	}   
+
 
 	
+	有两个kthread function:hrtimer,fgtimer这是两个定时器相关的操作
+	可以适当分析时钟相关的框架
+	charger_kthread_hrtimer_func
+	charger_kthread_fgtimer_func
 
-        rpm配置ld0
-        配置设备树
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	battery_id  ，研读相关代码
+		读battery_id 电压，匹配电池曲线
+		
+		
+	大概写了一下流程，请过目：
+	底层电量跟上层偏差过大导致电量跳变的判断
+	
+	fg_result：
+	0：电量触发跳变的
+	2：rtc=1的情况下，把rtc记录的电量赋给电量计；软件电量超过最大电量的情况
+	4：rtc记录的电量超过10，把电量计记录的初始化的值赋给电量计
+	5：其他情况下也是把电量计记录的初始化的值赋给电量计
+	
+	if (soc_flow == HW_FG || soc_flow == SW_FG) {
+        if ( (fg_plugout_status==0 || (boot_reason == BR_2SEC_REBOOT)) && (charger_exist != true)){
+            if (g_rtc_fg_soc == 0) {
+                fg_capacity_by_v = fg_capacity_by_v_init;
+                fg_result = 0;
+            } else {
+                if (g_rtc_fg_soc == 1) {
+                    fg_capacity_by_v = g_rtc_fg_soc;
+                    fg_result = 2;
+
+                } else if ( fg_sw_soc >= max_swocv ) {
+                    fg_capacity_by_v = g_rtc_fg_soc;
+                    fg_result = 2;
+                } else if (g_rtc_fg_soc > 10) {
+                    fg_capacity_by_v = fg_capacity_by_v_init;
+                    set_rtc = 2;
+                    fg_result = 4;
+                } else {
+                    fg_capacity_by_v = fg_capacity_by_v_init;
+                    set_rtc = 1;
+                    fg_result = 5;
+                }
+            }
+        } 
         
+        else {	//rtc电量-硬件电量  超过  hw_rtc的阈值 同时  软件电量-rtc电量 大于 硬件 -  软件电量
+            if (((abs(g_rtc_fg_soc - fg_hw_soc)) > difference_hwocv_rtc)
+                && (abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_hw_soc - fg_sw_soc))) {
+                /* compare with hw_ocv & sw_ocv, check if less than or equal to 5% tolerance */
+                if (abs(fg_sw_soc - fg_hw_soc) > difference_hwocv_swocv) {
+                    fg_capacity_by_v = fg_capacity_by_v_init;
+                    fg_result = 0;
+                }
+            } else {
+                if (abs(fg_sw_soc - g_rtc_fg_soc) > (difference_swocv_rtc + batterypseudo1)
+                    && ( abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_sw_soc - fg_vbat_soc) ) ) {
+                    fg_capacity_by_v = fg_capacity_by_v_init;
+                    fg_result = 0;
+                } else {
+                    if (g_rtc_fg_soc == 0) {
+                        fg_capacity_by_v = fg_capacity_by_v_init;
+                        fg_result = 0;
+                    } else {
+                        if (g_rtc_fg_soc == 1) {
+                            fg_capacity_by_v = g_rtc_fg_soc;
+                            fg_result = 2;
+
+                        } else if ( fg_sw_soc >= max_swocv ) {
+                            fg_capacity_by_v = g_rtc_fg_soc;
+                            fg_result = 2;
+                        } else if (g_rtc_fg_soc > 10) {
+                            fg_capacity_by_v = fg_capacity_by_v_init;
+                            set_rtc = 2;
+                            fg_result = 4;
+                        } else {
+                            fg_capacity_by_v = fg_capacity_by_v_init;
+                            set_rtc = 1;
+                            fg_result = 5;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+	// modify g_booting_vbat
+
+    if (fg_capacity_by_v == 0 && charger_exist == true) {
+        fg_capacity_by_v = 1;
+        fg_result = 3;
+        FGLOG_NOTICE("[FGADC] fg_capacity_by_v=%d\n", fg_capacity_by_v);
+    }
+
+    if (set_rtc == 1) {
+        fg_capacity = g_rtc_fg_soc;
+    } else if (set_rtc == 2){
+        fg_capacity = g_rtc_fg_soc - 1;
+    } else {
+        fg_capacity = fg_capacity_by_v;
+    }
+    fg_dod0 = 100 - fg_capacity_by_v;
+    fg_capacity_by_c_init = fg_capacity;
+    fg_capacity_by_c = fg_capacity;
+    fg_dod0_init = fg_dod0;
+    fg_dod1 = fg_dod0;
+    set_fg_soc(fg_capacity_by_v);
+    ui_soc=fg_capacity_by_c_init; 
+
+
+
+
+
+	int g_fg_battery_id;
+
+	#ifdef MTK_GET_BATTERY_ID_BY_AUXADC
+	void fgauge_get_profile_id(void)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    USB  pid，vid添加到驱动中
    
-   DLPT_FEATURE_SUPPORT  
+   
+   这几个关键字的代码逻辑
    {
-   		#if defined(DLPT_FEATURE_SUPPORT)
-	
-		if (g_boot_mode != META_BOOT && g_boot_mode != FACTORY_BOOT && g_boot_mode != ATE_FACTORY_BOOT) {
-			/*pmic_set_register_value(PMIC_BATON_TDET_EN, 1);*/
+   	
+		pmic_throttling_dlpt
+
+   		FGADC_D0		开机初始化的电流，电压，电量
+		fg_current_avg  平均电流
+		fg_current_act	消耗电量
 		
-			pmic_set_register_value(PMIC_RG_BATON_EN, 1);
-			if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
+		打开fg log
+		adb shell setpro persist.mediatek.fg.log.enable 1
+		
+		dlpt_notify_thr
+		
+		
+	   //这应该是跟低电保护策略有关
+	   DLPT_FEATURE_SUPPORT  
+	   {
+	   		#if defined(DLPT_FEATURE_SUPPORT)
+
+			if (g_boot_mode != META_BOOT && g_boot_mode != FACTORY_BOOT && g_boot_mode != ATE_FACTORY_BOOT) {
+				/*pmic_set_register_value(PMIC_BATON_TDET_EN, 1);*/
 	
-				dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
-				mt6575_power_off();
+				pmic_set_register_value(PMIC_RG_BATON_EN, 1);
+				if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
+
+					dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
+					mt6575_power_off();
+				}
 			}
-		}
 
-		pchr_turn_on_charging(KAL_FALSE);
-		/* disable SW charger power path */
-	
-		switch_charger_power_path_enable(KAL_FALSE);
-		mdelay(50);
+			pchr_turn_on_charging(KAL_FALSE);
+			/* disable SW charger power path */
 
-		get_dlpt_imix_r();
-		/* after get imix, re-enable SW charger power path */
-	
-		switch_charger_power_path_enable(KAL_TRUE);
-		mdelay(50);
+			switch_charger_power_path_enable(KAL_FALSE);
+			mdelay(50);
 
-		check_bat_protect_status();
-		if (is_charging == 1) {
-			pchr_turn_on_charging(KAL_TRUE);
-			dprintf(CRITICAL, "turn on charging \n\r");
-		}
-		#endif //#if defined(DLPT_FEATURE_SUPPORT)
+			get_dlpt_imix_r();
+			/* after get imix, re-enable SW charger power path */
+
+			switch_charger_power_path_enable(KAL_TRUE);
+			mdelay(50);
+
+			check_bat_protect_status();
+			if (is_charging == 1) {
+				pchr_turn_on_charging(KAL_TRUE);
+				dprintf(CRITICAL, "turn on charging \n\r");
+			}
+			#endif //#if defined(DLPT_FEATURE_SUPPORT)
+	   }   
+   }
    
-   
-   		pmic_throttling_dlpt
-   		
-   		
-   		FGADC_D0
-		fg_current_avg
-		fg_current_act
 
-   }   
-	
 
 	7.17G10A底电流偏高问题
 	{
@@ -94,8 +468,19 @@
 
 
 
+	{
+		高通项目的bring up
+	   
+		rpm配置ld0
+		配置设备树
+	}
+
+
+
+
 
 	测试按键驱动,调试按键驱动，熟悉流程和代码
+	aw9523b.kl	
 	
 	
 	hps_main是干什么的

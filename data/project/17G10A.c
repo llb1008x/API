@@ -307,6 +307,9 @@
 
 		healthd线程检测电池的状态
 		healthd]: healthd: battery l=5 v=3796 t=41.0 h=2 st=4 chg=	
+
+
+
 	}
 
 
@@ -1784,7 +1787,6 @@ static void *update_vibrator_thread_default(void *priv)
 	}
 
 }
-
 
 
 /***********************************************************************************************/

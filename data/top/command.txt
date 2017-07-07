@@ -597,12 +597,24 @@ adb reboot-bootloader
 				
 		}
 	 	
-
-
 		
 		更改编译项目脚本
 		device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
 
+
+		关于17G16A 单烧boot.img后WIFI不能使用的问题。
+		单烧boot.img后，需要重新编译Wlan模块。相关命令如下：
+		1. Compile CMD:
+		./TmakeGionee 17G16A -p vendor/qcom/opensource/wlan/prima/
+
+		2. Target:
+		out/target/product/[$Platform]/obj/vendor/qcom/opensource/wlan/prima/pronto_wlan.ko
+
+		3. PUSH to DUT:
+		adb push pronto_wlan.ko /system/lib/modules/pronto/
+
+		4. Resatrt DUT:
+		adb reboot
 
 
 		**编译android原生代码相关的命令(这个要实践，搭建android开发环境，编译原生代码)

@@ -12,7 +12,7 @@
 
 int main()
 {
-	Array a=array_create(100);
+	Array a=array_create(10);
 	printf("size->%d\n",array_size(&a));
 
 	*array_at(&a,0)=10;

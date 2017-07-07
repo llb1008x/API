@@ -77,6 +77,9 @@ battery：
 	http://www.cnbeta.com/articles/387057.htm
 
 
+	高通平台充电(modem部分)
+	http://www.docin.com/p-969643101.html
+
 
 
 

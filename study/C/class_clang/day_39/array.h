@@ -14,7 +14,7 @@ typedef struct {
 	int size;
 }Array;
 
-Array array_creat(int init_size);
+Array array_create(int init_size);
 
 void array_free(Array *a);
 
