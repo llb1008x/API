@@ -626,28 +626,8 @@ out:
 	//Gionee <gn_by_charging> <lilubao> <20170417> add for charging change end
 
 
-/****************************************************************************************************************/
-3.mmi测试
-	mmi测试代码宏
-	{
-		GN_RW_GN_MMI_BACKUP_TO_PRODUCTINFO=yes
-		GN_RO_GN_GNROMVERNUMBER=GIONEE ROM5.0.16
-		GN_APK_MMI_SUPPORT_BJ=yes
-		GN_APK_AUTOMMI_SUPPORT=yes
-	}
-
-	一是添加BAT_BatteryPresentCurrent，类似mt_battery_update_EM，看mmi测试界面是否有充电部分
-
-	二是根据着mmi测试宏包含的代码
-
-
-	这部分不是我负责的工作流程不太清楚
-
-
-
-
 /***************************************************************************************************************/
-4.按键功能
+3.按键功能
 	因为framework层还有部分未导入，所以检测到一些未知的键值，出现异常？
 	mmi测试显示一些按键还有问题？
 kpd.c
@@ -808,8 +788,66 @@ cat/proc/bus/input/devices 察看input子系统下挂的设备
     B: KEY=10 0 0 0 0 0 0 100040000000 0 0	
 
 
+
+
+
+
+	{
+		1.input device和keylayout的绑定在如下文件：
+			frameworks/native/libs/input/InputDevice.cpp  ：	appendInputDeviceConfigurationFileRelativePath
+		2.事件通过kernel/drivers/input/input.c上报到frameworks/native/services/inputflinger/EventHub.cpp
+		然后在EventHub.cpp来获取按键对应的上层键值，其中的haveKeyLayout就是上面绑定的那个。
+		int32_t EventHub::getKeyCodeState(int32_t deviceId, int32_t keyCode) const {
+			AutoMutex _l(mLock);
+
+			Device* device = getDeviceLocked(deviceId);
+			if (device && !device->isVirtual() && device->keyMap.haveKeyLayout()) {
+				Vector<int32_t> scanCodes;
+				device->keyMap.keyLayoutMap->findScanCodesForKey(keyCode, &scanCodes);
+				if (scanCodes.size() != 0) {
+					uint8_t keyState[sizeof_bit_array(KEY_MAX + 1)];
+					memset(keyState, 0, sizeof(keyState));
+					if (ioctl(device->fd, EVIOCGKEY(sizeof(keyState)), keyState) >= 0) {
+						for (size_t i = 0; i < scanCodes.size(); i++) {
+							int32_t sc = scanCodes.itemAt(i);
+							if (sc >= 0 && sc <= KEY_MAX && test_bit(sc, keyState)) {
+								return AKEY_STATE_DOWN;
+							}
+						}
+						return AKEY_STATE_UP;
+					}
+				}
+			}
+			return AKEY_STATE_UNKNOWN;
+		}
+		3.上层根据上报的键值进行处理frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
+
+
+		例如，aw9523上报了一个253的键值，上报到EventHub.cpp后，通过查找aw9523.kl的映射值：key 253   WWW
+		之后，向上层上报了WWW的键值。
+		上层需要有WWW这个键值的定义才会被识别：
+		gionee/code/alps/public/ROM/frameworks/native/include/android/keycodes.h:801:    AKEYCODE_WWW     = 304,
+		gionee/code/alps/public/ROM/frameworks/base/core/java/android/view/KeyEvent.java:837:	public static final int KEYCODE_WWW = 304; 
+
+		在这里处理
+		gionee/code/alps/public/ROM/frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java:7077:            case KeyEvent.KEYCODE_WWW:
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**************************************************************************************************/
-5.调试马达震动效果
+4.调试马达震动效果
 
 基本概念
 {
@@ -1156,7 +1194,7 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 /*************************************************************************************/
-6.调节充电时序状态
+5.调节充电时序状态
 {
 	恒流充电时间，按power关机不应该是kpoc	，手机完整的充放电过程是否正常，开机充电和关机充电
 
@@ -1377,7 +1415,7 @@ static void *update_vibrator_thread_default(void *priv)
 	
 
 /****************************************************************************************************************/
-7.通过哪个变量或函数可以判断用户处在打电话状态
+6.通过哪个变量或函数可以判断用户处在打电话状态
 {
 	这个应该是创建一个节点，如果是打电话，上层会写这个节点，通知底层用户正在打电话
 
@@ -1450,7 +1488,7 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 /**********************************************************************************************/
-8.将电池维护代码移植到17G05A上
+7.将电池维护代码移植到17G05A上
 {
 
 	主要涉及的文件
@@ -1467,7 +1505,7 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 /**********************************************************************************************/
-9.温升相关问题
+8.温升相关问题
 {
     1.根据当前的温度简单的限定充电电流
     {
@@ -1581,7 +1619,7 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 /************************************************************************************************************/
-10.17G10A mmi测试读取的数据有问题
+9.17G10A mmi测试读取的数据有问题
 {
 	mmi测试读取的节点在（这几个接口有问题？）
 	sys/class/power_supply/battery/
@@ -1657,16 +1695,8 @@ static void *update_vibrator_thread_default(void *priv)
 		power_supply_sysfs.c和power_supply.h里面要添加properity特性
 		要把这个节点特性呈现到sysfs里面
 
-		3.mmi测试读取的数据有问题
+		3.mmi测试读取的数据有问题，可能是读取的节点不对
 		{
-			电池技术显示null
-
-			电池电压BatterySenseVoltage  显示的是电池温度batt_temp
-
-			充电电流有数据但是数据有问题
-
-			电池剩余电量capacity 显示的是电池电压BatterySenseVoltage
-
 			power_supply 节点路径
 			充电电流：  /sys/class/power_supply/battery/Battery/BatteryPresentCurrent
 			充电器电压：/sys/class/power_supply/battery/Battery/ChargerVoltage
@@ -1674,6 +1704,30 @@ static void *update_vibrator_thread_default(void *priv)
 			电池电压：  /sys/class/power_supply/battery/Battery/BatterySenseVoltage
 			电池技术：  /sys/class/power_supply/battery/Battery/technology
 			电池温度：  /sys/class/power_supply/battery/Battery/batt_temp
+
+
+			1.mmi显示充电电流数据应该少一位
+				电池温度应该不用*10，虽然不需要温度的数据，这个数据power_supply上报的原本这个数据
+				尽量不要做修改，谁需要，谁去修改
+				val->intval = data->BAT_batt_temp ;// remove *10
+				充电电流数据应该要除10，不然好几安，太大了	
+				val->intval = data->BAT_BatteryPresentCurrent/10;	
+				
+				
+			2.分析log，mmi测试走了哪些流程
+				mmi测试的log主要在mainlog里面可以找到一些流程
+
+				
+			3.对比G1605A 还有哪些是缺少的
+				a.缺少enter_mmi_test,exit_mmi_test这两个节点
+				已在mtk_batteruy.c 文件里面添加了两个节点
+				
+				b.  is_enter_mmi_test
+				这个变量使用来告诉充电其他部分现在正在进行mmi测试，不用降电流等操作
+		
+				c.刚插入充电器的时候，检测到中断，充电器检测线程会在刚开始的15s内，每秒都会更新
+				需要在相关的线程里面添加这个判断，并调用gn_update_BatteryPresentCurrent
+				
 		}
 
 		/*修改*/
@@ -1705,8 +1759,58 @@ static void *update_vibrator_thread_default(void *priv)
 			#endif
 				power_supply_changed(bat_psy);
 			}
+
+			4.mmi测试刚开始插入充电器，数据上报应该快点
+			mtk_charger.c    charger_routine_thread
+			检测到有充电器插入，前10s加快上报的速度，后面10s上报一次
+			static bool mtk_is_charger_on(struct charger_manager *info)
+			{
+				CHARGER_TYPE chr_type;
+				//Gionee <gn_by_charging> <lilubao> <20170705> add for platform change begin
+				static unsigned int gn_update_counter = 0;
+				pr_err("in [%s],by lilubao\n",__FUNCTION__);
+				//Gionee <gn_by_charging> <lilubao> <20170705> add for platform change end
+					
+				chr_type = mt_get_charger_type();
+				if (chr_type == CHARGER_UNKNOWN) {
+					if (info->chr_type != CHARGER_UNKNOWN)
+						mtk_charger_plug_out(info);
+				} else {
+					if (info->chr_type == CHARGER_UNKNOWN)
+						mtk_charger_plug_in(info, chr_type);
+				}
+
+				//Gionee <gn_by_charging> <lilubao> <20170705> add for platform change begin
+				if( (upmu_is_chr_det() == true)&&(is_enter_mmi_test==1))
+				{
+					//check_battery_exist();		
+					pr_err("enter mmi test ,accelate update param\n");
+					if (!(g_platform_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || g_platform_boot_mode == LOW_POWER_OFF_CHARGING_BOOT))
+					{
+						if(++gn_update_counter<15){
+							pr_err("gn_update_counter->%d\n",gn_update_counter);
+							gn_update_BatteryPresentCurrent();
+						}    
+					}else{
+						gn_update_counter = 0;
+					}
+				}else {
+
+					gn_update_counter=0;
+					pr_err("unknown stop accelate update\n");
+				}	
+				//Gionee <gn_by_charging> <lilubao> <20170705> add for platform change end
+
+
+				if (chr_type == CHARGER_UNKNOWN)
+					return false;
+
+				return true;
+			}
+
 		}    
 	}
+
 }   
 
 
@@ -1801,6 +1905,10 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 
+
+
+
+
 /*涉及到的一些文件*/
 {
 dtsi文件(这个目录下很多文件都用到了):
@@ -1848,6 +1956,9 @@ keyboard 的目录
 
 编译相关的脚本工具
 	android_mtk_6757_mp/gionee/config/tools
+
+电池曲线
+	mtk_battery_table.h	
 }
 
 
