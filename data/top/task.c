@@ -7,6 +7,152 @@
 /*要处理的问题*/
 {
 
+	17G10A p1试产待解决问题
+	{
+		1.插入充电器后的I2C时序或者说波形有问题
+		{
+			请问一下，17g10的充电I2C通信速率是多少（clk频率），目前情况是fh->s->fh，之后没
+			有通信数据了。是否没有调好呢？
+			
+			因为有出现三种频率，分别对应I2C的标准模式，快速模式和高速模式的频率
+			
+			标准模式和高速模式对应的地址也正确，快速模式频率400K是转换到高速模式之前的出现的
+			
+			最后一笔数据是高速模式的，在后面就只有空闲模式，没有I2C信号数据了
+			
+			且高速模式下对应的时序测试结果有异常
+		
+		}
+		
+	
+		2.过压测试：NG，10V时电压不不截止，还有380ma~440ma，无电压过高提醒
+		
+		
+		3.电量显示不正确
+		
+		
+		4.USB眼图：NG
+	
+	}
+	
+
+
+
+
+
+	底层电量跟上层显示差别较大，然后触发电量跳变问题	
+	已提交eservices长时间未解决
+	{
+		大概写了一下流程，请过目：
+		底层电量跟上层偏差过大导致电量跳变的判断
+	
+		fg_result：
+		0：电量触发跳变的
+		2：rtc=1的情况下，把rtc记录的电量赋给电量计；软件电量超过最大电量的情况
+		4：rtc记录的电量超过10，把电量计记录的初始化的值赋给电量计
+		5：其他情况下也是把电量计记录的初始化的值赋给电量计
+	
+		if (soc_flow == HW_FG || soc_flow == SW_FG) {
+		    if ( (fg_plugout_status==0 || (boot_reason == BR_2SEC_REBOOT)) && (charger_exist != true)){
+		        if (g_rtc_fg_soc == 0) {
+		            fg_capacity_by_v = fg_capacity_by_v_init;
+		            fg_result = 0;
+		        } else {
+		            if (g_rtc_fg_soc == 1) {
+		                fg_capacity_by_v = g_rtc_fg_soc;
+		                fg_result = 2;
+
+		            } else if ( fg_sw_soc >= max_swocv ) {
+		                fg_capacity_by_v = g_rtc_fg_soc;
+		                fg_result = 2;
+		            } else if (g_rtc_fg_soc > 10) {
+		                fg_capacity_by_v = fg_capacity_by_v_init;
+		                set_rtc = 2;
+		                fg_result = 4;
+		            } else {
+		                fg_capacity_by_v = fg_capacity_by_v_init;
+		                set_rtc = 1;
+		                fg_result = 5;
+		            }
+		        }
+		    } 
+		    
+		    else {	//rtc电量-硬件电量  超过  hw_rtc的阈值 同时  软件电量-rtc电量 大于 硬件 -  软件电量
+		        if (((abs(g_rtc_fg_soc - fg_hw_soc)) > difference_hwocv_rtc)
+		            && (abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_hw_soc - fg_sw_soc))) {
+		            /* compare with hw_ocv & sw_ocv, check if less than or equal to 5% tolerance */
+		            if (abs(fg_sw_soc - fg_hw_soc) > difference_hwocv_swocv) {
+		                fg_capacity_by_v = fg_capacity_by_v_init;
+		                fg_result = 0;
+		            }
+		        } else {
+		            if (abs(fg_sw_soc - g_rtc_fg_soc) > (difference_swocv_rtc + batterypseudo1)
+		                && ( abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_sw_soc - fg_vbat_soc) ) ) {
+		                fg_capacity_by_v = fg_capacity_by_v_init;
+		                fg_result = 0;
+		            } else {
+		                if (g_rtc_fg_soc == 0) {
+		                    fg_capacity_by_v = fg_capacity_by_v_init;
+		                    fg_result = 0;
+		                } else {
+		                    if (g_rtc_fg_soc == 1) {
+		                        fg_capacity_by_v = g_rtc_fg_soc;
+		                        fg_result = 2;
+
+		                    } else if ( fg_sw_soc >= max_swocv ) {
+		                        fg_capacity_by_v = g_rtc_fg_soc;
+		                        fg_result = 2;
+		                    } else if (g_rtc_fg_soc > 10) {
+		                        fg_capacity_by_v = fg_capacity_by_v_init;
+		                        set_rtc = 2;
+		                        fg_result = 4;
+		                    } else {
+		                        fg_capacity_by_v = fg_capacity_by_v_init;
+		                        set_rtc = 1;
+		                        fg_result = 5;
+		                    }
+		                }
+		            }
+		        }
+		    }
+		}
+
+		// modify g_booting_vbat
+
+		if (fg_capacity_by_v == 0 && charger_exist == true) {
+		    fg_capacity_by_v = 1;
+		    fg_result = 3;
+		    FGLOG_NOTICE("[FGADC] fg_capacity_by_v=%d\n", fg_capacity_by_v);
+		}
+
+		if (set_rtc == 1) {
+		    fg_capacity = g_rtc_fg_soc;
+		} else if (set_rtc == 2){
+		    fg_capacity = g_rtc_fg_soc - 1;
+		} else {
+		    fg_capacity = fg_capacity_by_v;
+		}
+		fg_dod0 = 100 - fg_capacity_by_v;
+		fg_capacity_by_c_init = fg_capacity;
+		fg_capacity_by_c = fg_capacity;
+		fg_dod0_init = fg_dod0;
+		fg_dod1 = fg_dod0;
+		set_fg_soc(fg_capacity_by_v);
+		ui_soc=fg_capacity_by_c_init; 
+	
+	}	
+
+
+
+
+
+
+
+
+
+
+
+
 	高通项目的bring up
 	{
 		1.相关的工作流程，代码框架
@@ -462,106 +608,7 @@
 
 	
 
-	3.底层电量跟上层显示差别较大，然后触发电量跳变问题	
-	{
-		大概写了一下流程，请过目：
-		底层电量跟上层偏差过大导致电量跳变的判断
 	
-		fg_result：
-		0：电量触发跳变的
-		2：rtc=1的情况下，把rtc记录的电量赋给电量计；软件电量超过最大电量的情况
-		4：rtc记录的电量超过10，把电量计记录的初始化的值赋给电量计
-		5：其他情况下也是把电量计记录的初始化的值赋给电量计
-	
-		if (soc_flow == HW_FG || soc_flow == SW_FG) {
-		    if ( (fg_plugout_status==0 || (boot_reason == BR_2SEC_REBOOT)) && (charger_exist != true)){
-		        if (g_rtc_fg_soc == 0) {
-		            fg_capacity_by_v = fg_capacity_by_v_init;
-		            fg_result = 0;
-		        } else {
-		            if (g_rtc_fg_soc == 1) {
-		                fg_capacity_by_v = g_rtc_fg_soc;
-		                fg_result = 2;
-
-		            } else if ( fg_sw_soc >= max_swocv ) {
-		                fg_capacity_by_v = g_rtc_fg_soc;
-		                fg_result = 2;
-		            } else if (g_rtc_fg_soc > 10) {
-		                fg_capacity_by_v = fg_capacity_by_v_init;
-		                set_rtc = 2;
-		                fg_result = 4;
-		            } else {
-		                fg_capacity_by_v = fg_capacity_by_v_init;
-		                set_rtc = 1;
-		                fg_result = 5;
-		            }
-		        }
-		    } 
-		    
-		    else {	//rtc电量-硬件电量  超过  hw_rtc的阈值 同时  软件电量-rtc电量 大于 硬件 -  软件电量
-		        if (((abs(g_rtc_fg_soc - fg_hw_soc)) > difference_hwocv_rtc)
-		            && (abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_hw_soc - fg_sw_soc))) {
-		            /* compare with hw_ocv & sw_ocv, check if less than or equal to 5% tolerance */
-		            if (abs(fg_sw_soc - fg_hw_soc) > difference_hwocv_swocv) {
-		                fg_capacity_by_v = fg_capacity_by_v_init;
-		                fg_result = 0;
-		            }
-		        } else {
-		            if (abs(fg_sw_soc - g_rtc_fg_soc) > (difference_swocv_rtc + batterypseudo1)
-		                && ( abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_sw_soc - fg_vbat_soc) ) ) {
-		                fg_capacity_by_v = fg_capacity_by_v_init;
-		                fg_result = 0;
-		            } else {
-		                if (g_rtc_fg_soc == 0) {
-		                    fg_capacity_by_v = fg_capacity_by_v_init;
-		                    fg_result = 0;
-		                } else {
-		                    if (g_rtc_fg_soc == 1) {
-		                        fg_capacity_by_v = g_rtc_fg_soc;
-		                        fg_result = 2;
-
-		                    } else if ( fg_sw_soc >= max_swocv ) {
-		                        fg_capacity_by_v = g_rtc_fg_soc;
-		                        fg_result = 2;
-		                    } else if (g_rtc_fg_soc > 10) {
-		                        fg_capacity_by_v = fg_capacity_by_v_init;
-		                        set_rtc = 2;
-		                        fg_result = 4;
-		                    } else {
-		                        fg_capacity_by_v = fg_capacity_by_v_init;
-		                        set_rtc = 1;
-		                        fg_result = 5;
-		                    }
-		                }
-		            }
-		        }
-		    }
-		}
-
-		// modify g_booting_vbat
-
-		if (fg_capacity_by_v == 0 && charger_exist == true) {
-		    fg_capacity_by_v = 1;
-		    fg_result = 3;
-		    FGLOG_NOTICE("[FGADC] fg_capacity_by_v=%d\n", fg_capacity_by_v);
-		}
-
-		if (set_rtc == 1) {
-		    fg_capacity = g_rtc_fg_soc;
-		} else if (set_rtc == 2){
-		    fg_capacity = g_rtc_fg_soc - 1;
-		} else {
-		    fg_capacity = fg_capacity_by_v;
-		}
-		fg_dod0 = 100 - fg_capacity_by_v;
-		fg_capacity_by_c_init = fg_capacity;
-		fg_capacity_by_c = fg_capacity;
-		fg_dod0_init = fg_dod0;
-		fg_dod1 = fg_dod0;
-		set_fg_soc(fg_capacity_by_v);
-		ui_soc=fg_capacity_by_c_init; 
-	
-	}		
 
 
    4.USB  pid，vid添加到驱动中
