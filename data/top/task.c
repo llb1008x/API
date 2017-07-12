@@ -14,9 +14,11 @@
 	
 	}
 
+
+
 	17G10A p1试产待解决问题
 	{
-		电量显示不正确
+		电量显示不正确  -> 要熟悉电池相关参数的上报过程
 		{
 			PowerManagerService -> BatteryService -> BatteryProperties.java
 			->BatteryProperties.cpp 
@@ -37,20 +39,96 @@
                 return mBatteryProps.batteryLevel;
             }
       	
-      		
+      	
+      		这两个文件对应的properties不对应，java多读了一个fastcharging属性
       		frameworks/base/core/java/android/os/BatteryProperties.java
       	
 			./native/services/batteryservice/BatteryProperties.cpp
 
-      	
-		
 		}
 	
 	
+	
+	
+	
 		过压测试：NG，10V时电压不不截止，还有380ma~440ma，无电压过高提醒
+		{
+			过压的时候要停止充电，还要上报状态显示过压
+			{
+				检测到充电电压大于6.5v字左右要停止充电
+			
+				rt5081那几个关于ovp的中断和中断函数是否被调用
+				打印出那几个寄存器的值
+				
+				6.5V充电电流是跑sys还是battery
+				
+				vchr = pmic_get_vbus();
+				if (vchr > info->data.max_charger_voltage) {
+					info->notify_code |= 0x0001;
+					pr_err("[BATTERY] charger_vol(%d) > %d mV\n",
+						vchr, info->data.max_charger_voltage);
+						
+						
+				7.5v设置寄存器，可以直接出发中断
+			}
+			
+			
+			device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
+			
+			
+		
+			rt5081有ovp功能
+			
+			CHG_VIN:16.5v
+			VBUS:14.5v
+
+			uvp/ovp
+			0x0e  bit[7:4]   uvp ,bit[3:0]ovp
+			
+			rt5081_pmu_chg_vinovp_irq_handler
+			rt5081_pmu_chg_vbusov_irq_handler    CHARGER_DEV_NOTIFY_VBUS_OVP
+			
+			rt5081_pmu_ovpctrl_ovp_d_evt_irq_handler
+			rt5081_pmu_ovpctrl_ovp_evt_irq_handler
+			
+			0xc8  ovpctrl_irq
+			
+			dev_err
+			
+			pmic_get_vbus
+			
+			battery_get_vbus
+			battery_get_vbus
+			
+			6500000 
+			  11789	
+				
+			 6.500 000    
+			11.789v
+			
+			vcdt chrin ovp
+			vcdt_vthh
+		
+		}
+		
+		
+		
+		CONFIG_ONEKEY_REBOOT_NORMAL_MODE=y
+		CONFIG_ONEKEY_REBOOT_OTHER_MODE=y
+		CONFIG_KPD_PWRKEY_USE_PMIC=y
+		CONFIG_MTK_MRDUMP_KEY=y
+		# CONFIG_KEYBOARD_ATKBD is not set
 	
 	
 		充电电流偏小，关机充电有问题
+		
+		
+		
+		过温测试
+		{
+		
+		
+		}
 	
 	
 		插入充电器后的I2C时序或者说波形有问题，涉及到I2C通信相关的内容
@@ -75,12 +153,14 @@
 		
 		
 		
-		快速关机
+		电量计系数
 		
 		
 		
-		电池曲线的导入
+		电池曲线的导入		7.19
+		mtk_battery_table.h  		fg_profile_t0
 		
+		mt6757.dtsi文件也有类似的 	battery_profile_t0
 		
 		
 		USB眼图：NG
