@@ -7,9 +7,53 @@
 /*要处理的问题*/
 {
 
+	G1605B功耗问题,89268,89269,89270,89272,89273
+	{
+		这几个bug跟modem 的channel 10/34 网络一直变化有关
+		还有可能跟开启了gpslog有关
+	
+	}
+
 	17G10A p1试产待解决问题
 	{
-		1.插入充电器后的I2C时序或者说波形有问题
+		电量显示不正确
+		{
+			PowerManagerService -> BatteryService -> BatteryProperties.java
+			->BatteryProperties.cpp 
+		
+			framework/base/services/core/java/com/android/server/power/PowerManagerService.java
+			
+			上报电池相关数据
+			private void updateIsPoweredLocked(int dirty) 
+			
+			获取电池电量
+			mBatteryLevel = mBatteryManagerInternal.getBatteryLevel();
+			
+			
+			frameworks/base/services/core/java/com/android/server/BatteryService.java
+			
+			public int getBatteryLevel() {
+            synchronized (mLock) {
+                return mBatteryProps.batteryLevel;
+            }
+      	
+      		
+      		frameworks/base/core/java/android/os/BatteryProperties.java
+      	
+			./native/services/batteryservice/BatteryProperties.cpp
+
+      	
+		
+		}
+	
+	
+		过压测试：NG，10V时电压不不截止，还有380ma~440ma，无电压过高提醒
+	
+	
+		充电电流偏小，关机充电有问题
+	
+	
+		插入充电器后的I2C时序或者说波形有问题，涉及到I2C通信相关的内容
 		{
 			请问一下，17g10的充电I2C通信速率是多少（clk频率），目前情况是fh->s->fh，之后没
 			有通信数据了。是否没有调好呢？
@@ -24,14 +68,24 @@
 		
 		}
 		
-	
-		2.过压测试：NG，10V时电压不不截止，还有380ma~440ma，无电压过高提醒
 		
 		
-		3.电量显示不正确
+		
+		底电流偏高
 		
 		
-		4.USB眼图：NG
+		
+		快速关机
+		
+		
+		
+		电池曲线的导入
+		
+		
+		
+		USB眼图：NG
+		
+		
 	
 	}
 	
