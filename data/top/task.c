@@ -1,23 +1,8 @@
 
 
-
-
-
-
-/*要处理的问题*/
+/*已处理完问题*/
 {
-
-	G1605B功耗问题,89268,89269,89270,89272,89273
-	{
-		这几个bug跟modem 的channel 10/34 网络一直变化有关
-		还有可能跟开启了gpslog有关
-	
-	}
-
-
-
-	17G10A p1试产待解决问题
-	{
+			pass
 		电量显示不正确  -> 要熟悉电池相关参数的上报过程
 		{
 			PowerManagerService -> BatteryService -> BatteryProperties.java
@@ -50,7 +35,7 @@
 	
 	
 	
-	
+		pass 
 		过压测试：NG，10V时电压不不截止，还有380ma~440ma，无电压过高提醒
 		{
 			过压的时候要停止充电，还要上报状态显示过压
@@ -76,8 +61,7 @@
 			device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
 			
 			
-		
-			rt5081有ovp功能
+			rt5081有ovp功能，但是没有接那个脚,这个是内接的
 			
 			CHG_VIN:16.5v
 			VBUS:14.5v
@@ -107,38 +91,87 @@
 				
 				 6.500 000    
 				11.789v
+				
+				
+				4500000
+			   13400000
 			
 			}
 
+
 			停止充电之后还有power path功能，充电器直接给系统供电，应该直接关闭这个功能
 			不进充电器也不进系统
+			CHG_EN 0x12 bit[0]
 			
+			charger_dev_enable_powerpath(chg_dev, en);
+			struct charger_device *chg_dev;
+			bool en;
+			chg_dev = info->chg1_dev
 			
 			vcdt chrin ovp
 			vcdt_vthh
 		
 		}
-		
-		
-		
-		CONFIG_ONEKEY_REBOOT_NORMAL_MODE=y
-		CONFIG_ONEKEY_REBOOT_OTHER_MODE=y
-		CONFIG_KPD_PWRKEY_USE_PMIC=y
-		CONFIG_MTK_MRDUMP_KEY=y
-		# CONFIG_KEYBOARD_ATKBD is not set
 	
+}
+
+
+
+
+
+/*待处理的问题*/
+{
+
+	G1605B功耗问题,89268,89269,89270,89272,89273
+	{
+		这几个bug跟modem 的channel 10/34 网络一直变化有关
+		还有可能跟开启了gpslog有关
 	
-		充电电流偏小，关机充电有问题
+	}
+
+
+
+	17G10A p1试产待解决问题
+	{
+
+
+		充电电流偏小
+		{
+			需要跟供应商沟通，指导
+			
+			
+			aicl  [0x13]  
+			mivr  [0x16]
+			
+			修改电池容量后，充电电流有提高到1.7A~1.8A
+		
+		}
 		
 		
 		
-		过温测试
+		底电流偏高
+		{
+			平均电流9mA，lcd有3mA，其他还有1mA
+			1mA这个还有待查
+			
+		}
+		
+		
+		
+		关机充电有问题
 		{
 		
 		
 		}
-	
-	
+		
+		
+		开机电压达到3.6v，电量1%很长
+		{
+			
+		
+		}
+		
+
 		插入充电器后的I2C时序或者说波形有问题，涉及到I2C通信相关的内容
 		{
 			请问一下，17g10的充电I2C通信速率是多少（clk频率），目前情况是fh->s->fh，之后没
@@ -155,14 +188,8 @@
 		}
 		
 		
-		
-		
-		底电流偏高
-		
-		
-		
+
 		电量计系数
-		
 		
 		
 		电池曲线的导入		7.19
@@ -171,10 +198,15 @@
 		mt6757.dtsi文件也有类似的 	battery_profile_t0
 		
 		
-		USB眼图：NG
-		
-		
+		过温测试
+
+
+		 上层显示的电池容量有问题 3450mAh，但是实际的是3000mAh
+		 改变电池容量之后，电流有提高但要知道原因
 	
+		
+		USB眼图：NG
+
 	}
 	
 
@@ -298,6 +330,9 @@
 	高通项目的bring up
 	{
 		1.相关的工作流程，代码框架
+		
+		
+		
 		
 		2.项目脚本，涉及到哪些宏
 		
@@ -876,15 +911,15 @@
 
 
 
+/*测试上的bug*/
+{
+	BUG#89641
+	盒盖状态下，拨号盘界面点击数字后自动关机，连接充电器显示0%的电量，开机后显示满电恢复
+	
+	
+	
 
-
-
-
-
-
-
-
-
+}
 
 
 
