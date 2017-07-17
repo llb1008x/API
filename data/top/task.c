@@ -388,6 +388,9 @@
 	
 	这个文件是一个从的dts文件里面包涵了其他需要的dts
 	msm8917-pmi8937-qrd-sku5.dtsi
+	msm-pmi8937.dtsi
+	msm8917-qrd.dtsi
+	msm8937-mdss-panels.dtsi
 	
 	
 	CONFIG_SMB1351_USB_CHARGER=y
@@ -396,6 +399,10 @@
 	CONFIG_QPNP_FG=y
 	CONFIG_BATTERY_BCL=y
 		
+	CONFIG_QPNP_HAPTIC=y
+	CONFIG_BW_MONITOR=y
+	CONFIG_MSM_SPMI=y
+	CONFIG_MSM_SPMI_PMIC_ARB=y	
 
 
 
