@@ -2,7 +2,7 @@
 
 /*已处理完问题*/
 {
-			pass
+		pass
 		电量显示不正确  -> 要熟悉电池相关参数的上报过程
 		{
 			PowerManagerService -> BatteryService -> BatteryProperties.java
@@ -130,8 +130,23 @@
 /*待处理的问题*/
 {
 
-
-
+	中断问题，如何根据中断号准确定位哪个模块的问题,添加到log中
+	
+	深入理解中断子系统，中断的来龙去脉，整个流程
+	
+	功耗问题的分析，整理思路，丰富手段
+	
+	关于log的一些处理，字符串操作，正则表达式，文件操作，自动化脚本
+	{
+		1.输入要处理的log文件，
+		2.匹配字符串，字符串切割，过滤，
+		3.然后把切割后的内容导入到新的文件中
+		4.自动化这些操作，先写个小程序，然后换成脚本
+		
+		有想法要敢于去实现，敢想敢做，当然要有扎实的基础
+	}
+	
+	
 
 
 
@@ -164,10 +179,29 @@
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
 	G1605A电量跳变问题
 	{
+	
+		87038，86321从1%充电10分钟充电到4%,再关机充电5分钟左右电量变为52%
+	
 		底层电量跟上层显示差别较大，然后触发电量跳变问题	
-		已提交eservices长时间未解决
+		mt_battery_meter.h
+		已提交eservices长时间未解决,case ID:ALPS03373196
+		
+		gitk  --author=liteng   2017.3.15   73194 P80,2017.5.22 84712 P96
+		
+		
+		
+		
+ 
 		{
 			大概写了一下流程，请过目：
 			底层电量跟上层偏差过大导致电量跳变的判断
@@ -285,6 +319,9 @@
 		mivr  [0x16]
 		
 		修改电池容量后，充电电流有提高到1.7A~1.8A
+		
+		
+		检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
 	
 	}
 	
@@ -292,6 +329,37 @@
 	
 	底电流偏高
 	{
+		这里主要是android系统的睡眠唤醒机制，然后为了便于分析功耗问题
+		
+	
+		1.中断持锁EINT wakelock次数很多导致系统一直没有睡下去
+		lk里面sc卡配置有问题，导致频繁上报中断
+		
+		还有一个不同阶段的gpio配置
+		
+		
+		2.打印中断号，地址，wakeup.c
+		在有中断持锁的时候知道是哪些中断
+		
+		
+		3.系统的休眠，唤醒流程
+		{
+			"mem", "standby", "freeze" and "disk"
+		
+		}
+		
+		
+		4.如何注掉一些驱动
+		
+		
+		5.系统进入suspend 还有一些低功耗模式，一些流程
+		
+		
+		5.分析思路
+
+
+	
+	
 		平均电流9mA，lcd有3mA，其他还有1mA
 		1mA这个还有待查
 		
@@ -325,15 +393,100 @@
 		3.lcd内屏+外屏 约有 3~4mA电流，这个导致整体的底电流在11mA+
 		
 		
+		
+		1->
+		EINT wakelock	63		548		0		63		0		51272		2932		296780		0
+		2->
+		EINT wakelock	90		584		13		89		71		65361		2932		445681		0
+
+
+
+
+		01-01 08:06:14.636166 01-01 08:06:39.186808   228   228 E [  368.587824].(2)[228:kworker/u16:5][name:msdc&]: [msdc]msdc1, some of device's pin, dat1~3 are stuck in low!
+		01-01 08:06:14.637566 01-01 08:06:39.188208   228   228 E [  368.589224].(2)[228:kworker/u16:5][name:msdc&]: [msdc]msdc_ops_switch_volt msdc1 set voltage to 3.3V.
+
+		msdc_check_dat_1to3_high
+		msdc_ops_switch_volt
+
+
+		wakeup_reason.c   
+		irq_mtk_eic.c
+
+		max_eint_num = <160>;
+
+		mt_eint_print_status
+
+
+		01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]EINT_STA:  
+		01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]: EINT Module - index:128,EINT_STA = 0x400000
+		01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]: EINT 150 is pending
+
+		01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]:  
+		01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 F [  368.329961]-(0)[1436:system_server][name:mtk_spm_sleep&]: [SPM] dump ID_DUMP_MD_SLEEP_MODE
+		01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server]: Resume caused by IRQ 27, SPM
+		01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 D [  368.329961]-(0)[1436:system_server][name:mtk_wdt&]: mtk_wdt_mode_config  mode value=dd, tmp:220000dd,pid=1436
+		01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 D [  368.329961]-(0)[1436:system_server][name:mtk_wdt&]: [WDT] resume(1)
+		01-01 08:06:14.378325 01-01 08:06:14.378324  1436  1436 E [  368.329983]-(0)[1436:system_server][name:ccci&]: [ccci1/mcd]ccci_modem_sysresume
+
+		01-01 08:06:14.379268 01-01 08:06:14.379267  1436  1436 E [  368.330926]-(0)[1436:system_server][name:ccci&]: [ccci1/mcd]Resume no need reset cldma for md_state=1
+		01-01 08:06:14.380476 01-01 08:06:14.380475  1436  1436 I [  368.332134]-(0)[1436:system_server][name:atf_log&]atf_time_sync: resume sync
+
+		01-01 08:06:14.381082 01-01 08:06:14.381081  1436  1436 E [  368.332740]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) cluster0: opp = 4 (0 - 11), freq = 1508000, volt = 0x56
+		01-01 08:06:14.382604 01-01 08:06:14.382603  1436  1436 E [  368.334262]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) cluster1: opp = 15 (0 - 9), freq = 494000, volt = 0x56
+		01-01 08:06:14.384157 01-01 08:06:14.384156  1436  1436 E [  368.335815]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) [00000001] cluster0 on, pause = 0x9, swctrl = 0x20f4 (0x56bb)
+		01-01 08:06:14.386208 01-01 08:06:14.386207  1436  1436 I [  368.337866].(0)[1436:system_server][name:cpu&]: Enabling non-boot CPUs ...
+		01-01 08:06:14.388081 01-01 08:06:14.388080     0     0 I [  368.339739]-(1)[0:swapper/1][name:cpuinfo&]: Detected VIPT I-cache on CPU1
+		01-01 08:06:14.388120 01-01 08:06:14.388119     0     0 I [  368.339778]-(1)[0:swapper/1][name:irq_gic_v3&]CPU1: found redistributor 1 region 0:0x000000000c220000
+		01-01 08:06:14.388249 01-01 08:06:14.388248     0     0 I [  368.339907]-(1)[0:swapper/1][name:smp&]CPU1: Booted secondary processor [410fd034]
+		01-01 08:06:14.389321 01-01 08:06:14.389320  1436  1436 I [  368.340979].(1)[1436:system_server][name:cpu&]: CPU1 is up
+
+		01-01 08:06:14.393848 01-01 08:06:14.393847  1436  1436 I [  368.345506].(1)[1436:system_server][name:main&]PM: noirq resume of devices complete after 3.684 msecs
+
+
+
+		01-01 08:06:21.488047 01-01 08:06:46.038689  1436  1436 I [  375.439705].(0)[1436:system_server][name:wakeup&]PM: Wakeup pending, aborting suspend
+
+		01-01 08:06:21.489259 01-01 08:06:46.039901  1436  1436 I [  375.440917].(0)[1436:system_server][name:wakeup&]: last active wakeup source: EINT wakelock
+
+		01-01 08:06:21.490324 01-01 08:06:46.040966  1436  1436 W [  375.441982].(0)[1436:system_server][name:process&]:  
+		01-01 08:06:21.490956 01-01 08:06:46.041598  1436  1436 E [  375.442614].(0)[1436:system_server][name:process&]: Freezing of tasks aborted after 0.011 seconds[name:process&]
+		01-01 08:06:21.491954 01-01 08:06:46.042596  1436  1436 I [  375.443612].(0)[1436:system_server][name:process&]: Restarting tasks ... [name:process&]done.
+		01-01 08:06:21.508172 01-01 08:06:46.058814  1436  1436 I [  375.459830].(1)[1436:system_server][name:pmic_auxadc&]: [mt6355_get_auxadc_value] ch = 5, reg_val = 0x630, adc_result = 696
+		01-01 08:06:21.511222 01-01 08:06:46.061864  1436  1436 I [  375.462880].(0)[1436:system_server][name:pmic_auxadc&]: [mt6355_get_auxadc_value] ch = 2, reg_val = 0x369, adc_result = 767
+		01-01 08:06:21.512974 01-01 08:06:46.063616  1436  1436 E [  375.464632].(0)[1436:system_server][name:mtk_battery_hal&]: [fgauge_read_current] final current=691 (ratio=950)
+		01-01 08:06:21.514261 01-01 08:06:46.064903  1436  1436 E [  375.465919].(0)[1436:system_server][name:mtk_battery&]: [BattVoltToTemp] 768 24000 2800 1
+		01-01 08:06:21.515297 01-01 08:06:46.065939  1436  1436 E [  375.466955].(0)[1436:system_server][name:mtk_battery&]: [force_get_tbat] 767,768,0,69,100,27 r:50 100
+		01-01 08:06:21.516613 01-01 08:06:46.067255  1436  1436 D [  375.468271].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_block_write: reg 07 size 4
+		01-01 08:06:21.518169 01-01 08:06:46.068811  1436  1436 I [  375.469827].(0)[1436:system_server]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
+		01-01 08:06:21.519456 01-01 08:06:46.070098  1436  1436 D [  375.471114].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 21 data c0
+		01-01 08:06:21.520657 01-01 08:06:46.071299  1436  1436 D [  375.472315].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask f0
+		01-01 08:06:21.521933 01-01 08:06:46.072575  1436  1436 D [  375.473591].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 21 data 01
+		01-01 08:06:21.523070 01-01 08:06:46.073712  1436  1436 D [  375.474728].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask 01
+		01-01 08:06:21.539516 01-01 08:06:46.090158   235   235 I [  375.491174].(0)[235:hps_main]MobiCore mcd: Cpu 1 is going to die
+		01-01 08:06:21.542572 01-01 08:06:46.093214   235   235 I [  375.494230].(0)[235:hps_main][name:smp&]CPU1: shutdown
+		01-01 08:06:21.543753 01-01 08:06:46.094395   235   235 I [  375.495411].(0)[235:hps_main][name:psci&]psci: CPU1 killed.
+		01-01 08:06:21.546277 01-01 08:06:46.096919   235   235 I [  375.497935].(0)[235:hps_main]MobiCore mcd: Cpu 1 is dead
+
+		
+		
 	}
 	
 	
 	
-	关机充电有问题
+	开关机充电存在的问题
+	{
+		关机充电有问题，而且关机充电状态下，电量显示可能有问题的
 
-
+		开机电压达到3.6v，电量1%很长，很早达到100%，充电曲线的部队成
+		
+		电量计相关的log
+	    FG_DAEMON_CMD_GET_VBAT
+		FG_DAEMON_CMD_GET
 	
-	开机电压达到3.6v，电量1%很长
+	}
+	
+	
+
 
 	
 
@@ -354,7 +507,8 @@
 	
 	
 
-	电量计系数
+	电量计系数的测量
+	
 	
 	
 	电池曲线的导入		7.19
@@ -366,12 +520,165 @@
 	过温测试
 
 
-	 上层显示的电池容量有问题 3450mAh，但是实际的是3000mAh
-	 改变电池容量之后，电流有提高但要知道原因
+	上层显示的电池容量有问题 3450mAh，但是实际的是3000mAh
+	改变电池容量之后，电流有提高但要知道原因
 
 	
 	USB眼图：NG
+	
+	
+	
+	
+	定时器相关的内容
+ 	{
+ 		有两个kthread function:hrtimer,fgtimer这是两个定时器相关的操作
+		可以适当分析时钟相关的框架
+		charger_kthread_hrtimer_func
+		charger_kthread_fgtimer_func
+ 	}
 
+
+
+
+
+
+	battery ID相关的内容，根据ID选择电池曲线
+	{
+		battery_id  ，研读相关代码
+		读battery_id 电压，匹配电池曲线
+		
+		int g_fg_battery_id;
+
+		#ifdef MTK_GET_BATTERY_ID_BY_AUXADC
+		void fgauge_get_profile_id(void)
+	
+	}
+
+	
+
+   USB  pid，vid添加到驱动中
+   {
+   		gionee_usb_uid_pid 
+   		不同功能对应不同的pid
+   
+   }
+   
+   
+ 
+   
+   这几个关键字的代码逻辑
+   {
+   	
+		pmic_throttling_dlpt
+
+   		FGADC_D0		开机初始化的电流，电压，电量
+		fg_current_avg  平均电流
+		fg_current_act	消耗电量
+		
+		打开fg log
+		adb shell setpro persist.mediatek.fg.log.enable 1
+		
+		dlpt_notify_thr
+		
+		
+	   //这应该是跟低电保护策略有关
+	   DLPT_FEATURE_SUPPORT  
+	   {
+	   		#if defined(DLPT_FEATURE_SUPPORT)
+
+			if (g_boot_mode != META_BOOT && g_boot_mode != FACTORY_BOOT && g_boot_mode != ATE_FACTORY_BOOT) {
+				/*pmic_set_register_value(PMIC_BATON_TDET_EN, 1);*/
+	
+				pmic_set_register_value(PMIC_RG_BATON_EN, 1);
+				if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
+
+					dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
+					mt6575_power_off();
+				}
+			}
+
+			pchr_turn_on_charging(KAL_FALSE);
+			/* disable SW charger power path */
+
+			switch_charger_power_path_enable(KAL_FALSE);
+			mdelay(50);
+
+			get_dlpt_imix_r();
+			/* after get imix, re-enable SW charger power path */
+
+			switch_charger_power_path_enable(KAL_TRUE);
+			mdelay(50);
+
+			check_bat_protect_status();
+			if (is_charging == 1) {
+				pchr_turn_on_charging(KAL_TRUE);
+				dprintf(CRITICAL, "turn on charging \n\r");
+			}
+			#endif //#if defined(DLPT_FEATURE_SUPPORT)
+	   }   
+	   
+	   
+	   hps_main是干什么的
+   }
+   
+
+
+
+
+	按键驱动以及工作流程，input子系统
+	{
+		按键工作主要包含哪些目录文件
+		aw9523b.kl	
+		
+		
+		1.input device和keylayout的绑定在如下文件：
+		frameworks/native/libs/input/InputDevice.cpp  ：	appendInputDeviceConfigurationFileRelativePath
+		2.事件通过kernel/drivers/input/input.c上报到frameworks/native/services/inputflinger/EventHub.cpp
+		  然后在EventHub.cpp来获取按键对应的上层键值，其中的haveKeyLayout就是上面绑定的那个。
+		int32_t EventHub::getKeyCodeState(int32_t deviceId, int32_t keyCode) const {
+			AutoMutex _l(mLock);
+
+			Device* device = getDeviceLocked(deviceId);
+			if (device && !device->isVirtual() && device->keyMap.haveKeyLayout()) {
+				Vector<int32_t> scanCodes;
+				device->keyMap.keyLayoutMap->findScanCodesForKey(keyCode, &scanCodes);
+				if (scanCodes.size() != 0) {
+				    uint8_t keyState[sizeof_bit_array(KEY_MAX + 1)];
+				    memset(keyState, 0, sizeof(keyState));
+				    if (ioctl(device->fd, EVIOCGKEY(sizeof(keyState)), keyState) >= 0) {
+				        for (size_t i = 0; i < scanCodes.size(); i++) {
+				            int32_t sc = scanCodes.itemAt(i);
+				            if (sc >= 0 && sc <= KEY_MAX && test_bit(sc, keyState)) {
+				                return AKEY_STATE_DOWN;
+				            }
+				        }
+				        return AKEY_STATE_UP;
+				    }
+				}
+			}
+			return AKEY_STATE_UNKNOWN;
+		}
+		3.上层根据上报的键值进行处理frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
+
+
+		例如，aw9523上报了一个253的键值，上报到EventHub.cpp后，通过查找aw9523.kl的映射值：key 253   WWW
+		之后，向上层上报了WWW的键值。
+		上层需要有WWW这个键值的定义才会被识别：
+		gionee/code/alps/public/ROM/frameworks/native/include/android/keycodes.h:801:    AKEYCODE_WWW     = 304,
+		gionee/code/alps/public/ROM/frameworks/base/core/java/android/view/KeyEvent.java:837:	public static final int KEYCODE_WWW = 304; 
+
+		在这里处理
+		gionee/code/alps/public/ROM/frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java:7077:           
+		case KeyEvent.KEYCODE_WWW:
+
+	}
+
+	
+    fuelgauge 3.0的问题,文档+邮件
+    {
+
+		
+    }
 }
 
 
@@ -381,28 +688,68 @@
 
 17G06A
 {
-	1.移植dts文件，能够充电
+
+	
+
+	理清思路，需要涉及到哪些文件
+	原理图，芯片的spec，gpio表，dts文件，*.c, *.h 文件
+	当然这里移植应该只是涉及几个人的修改
 	
 	
-	2.理清思路，需要涉及到哪些文件
+	系统启动的几个阶段对应的代码
+	
+	
+	解BUG
+	
 	
 	这个文件是一个从的dts文件里面包涵了其他需要的dts
-	msm8917-pmi8937-qrd-sku5.dtsi
-	msm-pmi8937.dtsi
-	msm8917-qrd.dtsi
-	msm8937-mdss-panels.dtsi
+	{
+		msm8917-pmi8937-qrd-sku5.dtsi
+		msm-pmi8937.dtsi
+		msm8917-qrd.dtsi
+		msm8937-mdss-panels.dtsi
 	
 	
-	CONFIG_SMB1351_USB_CHARGER=y
-	CONFIG_SMB135X_CHARGER=y
-	CONFIG_QPNP_SMBCHARGER=y
-	CONFIG_QPNP_FG=y
-	CONFIG_BATTERY_BCL=y
+		这些宏包含哪些文件，哪些代码？
+		CONFIG_SMB1351_USB_CHARGER=y
+		CONFIG_SMB135X_CHARGER=y
+		CONFIG_QPNP_SMBCHARGER=y
+		CONFIG_QPNP_FG=y
+		CONFIG_BATTERY_BCL=y
 		
-	CONFIG_QPNP_HAPTIC=y
-	CONFIG_BW_MONITOR=y
-	CONFIG_MSM_SPMI=y
-	CONFIG_MSM_SPMI_PMIC_ARB=y	
+		CONFIG_QPNP_HAPTIC=y
+		CONFIG_BW_MONITOR=y
+		CONFIG_MSM_SPMI=y
+		CONFIG_MSM_SPMI_PMIC_ARB=y	
+	}
+
+	
+	
+	/*debug*/
+	{
+	
+		1.电池电压不够，不插充电器走一小段，插充电器反复重启
+		这段代码干什么了？
+			[   15.824467] *(1)[333:charger]charger: [15814] shutting down
+			[   15.830815] SysRq : Emergency Remount R/O
+			[   15.834014] *(1)[21:kworker/1:0]Emergency Remount complete
+			[   15.839841] *(1)[333:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
+			[   15.854832] *(0)[333:charger]mdss_fb_release_all: try to close unopened fb 1! from pid:333 name:charger
+			[   15.866762] *(0)[333:charger]FG: fg_shutdown: FG shutdown started
+			[   15.871882] *(0)[333:charger]FG: fg_shutdown: FG shutdown complete
+			[   15.878503] *(0)[333:charger]reboot: Power down
+			[   15.882523] -(0)[333:charger]Powering off the SoC
+	
+	
+		msm-poweroff.c，qpnp-fg.c
+		
+		 (msm-poweroff.c) do_msm_poweroff  
+	
+	}
+	
+	
+
+
 
 
 
@@ -830,176 +1177,9 @@ ti的替换方案
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
- 	1.定时器相关的内容
- 	{
- 		有两个kthread function:hrtimer,fgtimer这是两个定时器相关的操作
-		可以适当分析时钟相关的框架
-		charger_kthread_hrtimer_func
-		charger_kthread_fgtimer_func
- 	}
-
-
-
-
-
-
-	2.battery ID相关的内容，根据ID选择电池曲线
-	{
-		battery_id  ，研读相关代码
-		读battery_id 电压，匹配电池曲线
-		
-		int g_fg_battery_id;
-
-		#ifdef MTK_GET_BATTERY_ID_BY_AUXADC
-		void fgauge_get_profile_id(void)
-	
-	}
-
-	
-
-	
-
-
-   4.USB  pid，vid添加到驱动中
-   {
-   		gionee_usb_uid_pid 
-   		不同功能对应不同的pid
-   
-   }
-   
-   
-   5.这几个关键字的代码逻辑
-   {
-   	
-		pmic_throttling_dlpt
-
-   		FGADC_D0		开机初始化的电流，电压，电量
-		fg_current_avg  平均电流
-		fg_current_act	消耗电量
-		
-		打开fg log
-		adb shell setpro persist.mediatek.fg.log.enable 1
-		
-		dlpt_notify_thr
-		
-		
-	   //这应该是跟低电保护策略有关
-	   DLPT_FEATURE_SUPPORT  
-	   {
-	   		#if defined(DLPT_FEATURE_SUPPORT)
-
-			if (g_boot_mode != META_BOOT && g_boot_mode != FACTORY_BOOT && g_boot_mode != ATE_FACTORY_BOOT) {
-				/*pmic_set_register_value(PMIC_BATON_TDET_EN, 1);*/
-	
-				pmic_set_register_value(PMIC_RG_BATON_EN, 1);
-				if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
-
-					dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
-					mt6575_power_off();
-				}
-			}
-
-			pchr_turn_on_charging(KAL_FALSE);
-			/* disable SW charger power path */
-
-			switch_charger_power_path_enable(KAL_FALSE);
-			mdelay(50);
-
-			get_dlpt_imix_r();
-			/* after get imix, re-enable SW charger power path */
-
-			switch_charger_power_path_enable(KAL_TRUE);
-			mdelay(50);
-
-			check_bat_protect_status();
-			if (is_charging == 1) {
-				pchr_turn_on_charging(KAL_TRUE);
-				dprintf(CRITICAL, "turn on charging \n\r");
-			}
-			#endif //#if defined(DLPT_FEATURE_SUPPORT)
-	   }   
-	   
-	   
-	   hps_main是干什么的
-   }
-   
-
-
-	7.17G10A底电流偏高问题
-	{
-		这里主要是android系统的睡眠唤醒机制，然后为了便于分析功耗问题
-		
-	
-		1.中断持锁EINT wakelock次数很多导致系统一直没有睡下去
-		lk里面sc卡配置有问题，导致频繁上报中断
-		
-		还有一个不同阶段的gpio配置
-		
-		
-		2.打印中断号，地址，wakeup.c
-		在有中断持锁的时候知道是哪些中断
-		
-		
-		3.系统的休眠，唤醒流程
-		{
-			"mem", "standby", "freeze" and "disk"
-		
-		}
-		
-		
-		4.如何注掉一些驱动
-		
-		
-		5.系统进入suspend 还有一些低功耗模式，一些流程
-		
-		
-		5.分析思路
-
-	}
-
-
-
-
-
-
-	按键驱动以及工作流程，input子系统
-	{
-		按键工作主要包含哪些目录文件
-		aw9523b.kl	
-	
-		
-	
-	}
-
-	
-    fuelgauge 3.0的问题,文档+邮件
-    {
-
-
-    }
-
-}
-
-
-
-
 /*测试上的bug*/
 {
-	BUG#89641
-	盒盖状态下，拨号盘界面点击数字后自动关机，连接充电器显示0%的电量，开机后显示满电恢复
+
 	
 	
 	

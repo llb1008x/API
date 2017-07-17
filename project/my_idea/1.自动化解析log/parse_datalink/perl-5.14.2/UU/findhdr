@@ -1,0 +1,31 @@
+#!/bin/sh
+wanted=$1
+name=''
+for usrincdir in /usr/include
+do
+	if test -f $usrincdir/$wanted; then
+		echo "$usrincdir/$wanted"
+		exit 0
+	fi
+done
+awkprg='{ print $3 }'
+echo "#include <$wanted>" > foo$$.c
+cc -E - -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include < foo$$.c 2>/dev/null |  /bin/grep "^[ 	]*#.*$wanted" | while read cline; do
+	name=`echo $cline | /usr/bin/awk "$awkprg" | /usr/bin/tr -d '"'`
+	case "$name" in
+	*[/\\]$wanted) echo "$name"; exit 1;;
+	*[\\/]$wanted) echo "$name"; exit 1;;
+	*) exit 2;;
+	esac;
+done;
+#
+# status = 0: grep returned 0 lines, case statement not executed
+# status = 1: headerfile found
+# status = 2: while loop executed, no headerfile found
+#
+status=$?
+/bin/rm -f foo$$.c;
+if test $status -eq 1; then
+	exit 0;
+fi
+exit 1

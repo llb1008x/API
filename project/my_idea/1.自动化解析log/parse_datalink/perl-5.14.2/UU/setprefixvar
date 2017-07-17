@@ -1,0 +1,4 @@
+#!/bin/sh
+eval "${prefixvar}=\"\$ans\""
+eval "${prefixvar}exp=\"\$ansexp\""
+. ./installprefix

@@ -1,0 +1,7 @@
+#!/bin/sh
+: Change installation prefix, if necessary.
+if $test X"$prefix" != X"$installprefix"; then
+    eval "install${prefixvar}=\`echo \$${prefixvar}exp | sed \"s#^\$prefixexp#\$installprefixexp#\"\`"
+else
+    eval "install${prefixvar}=\"\$${prefixvar}exp\""
+fi

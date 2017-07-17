@@ -206,6 +206,42 @@ adb reboot-bootloader
 	当然这里手机除了用组合键进入fastboot还可以用adb命令进入到相应的模式烧写文件
 
 
+qcom 烧写 当然要换路径
+	sudo ./fastboot flash modem /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/NON-HLOS.bin
+	sudo ./fastboot flash splash /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/splash.img
+	sudo ./fastboot flash sbl1 /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/sbl1.mbn
+	sudo ./fastboot flash sbl1bak /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/sbl1.mbn
+	sudo ./fastboot flash rpm  /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/rpm.mbn
+	sudo ./fastboot flash rpmbak /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/rpm.mbn
+	sudo ./fastboot flash tz /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/tz.mbn
+	sudo ./fastboot flash tzbak /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/tz.mbn
+	sudo ./fastboot flash devcfg /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/devcfg.mbn
+	sudo ./fastboot flash devcfgbak /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/devcfg.mbn
+
+	sudo ./fastboot flash dsp /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/adspso.bin
+	sudo ./fastboot flash aboot /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/emmc_appsboot.mbn
+	sudo ./fastboot flash abootbak /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/emmc_appsboot.mbn
+	sudo ./fastboot flash boot  /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/boot.img
+	sudo ./fastboot flash recovery /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/recovery.img
+	sudo ./fastboot flash system /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/system.img
+	sudo ./fastboot flash cache /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/cache.img
+	sudo ./fastboot flash persist /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/persist.img
+	sudo ./fastboot flash mdtp /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/mdtp.img
+
+
+	sudo ./fastboot flash cmnlib /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/cmnlib.mbn
+	sudo ./fastboot flash cmnlibbak /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/cmnlib.mbn
+
+	sudo ./fastboot flash cmnlib64 /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/cmnlib64.mbn
+	sudo ./fastboot flash cmnlib64bak /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/cmnlib64.mbn
+	sudo ./fastboot flash keymaster /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/keymaster.mbn
+	sudo ./fastboot flash keymasterbak  /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/keymaster.mbn
+
+	sudo ./fastboot flash userdata /home/llb/project/PRO/version/17G06A/BJ17G06A01_A_T0003/userdata.img
+
+	sudo ./fastboot reboot
+
+
 
 3.git/repo常用命令：	
 注意git/repo相关的操作如git status这个很重要，进行相关操作时一定要注意当前分支是否干净

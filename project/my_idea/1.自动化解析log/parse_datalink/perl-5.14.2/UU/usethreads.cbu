@@ -1,0 +1,30 @@
+if getconf GNU_LIBPTHREAD_VERSION | grep NPTL >/dev/null 2>/dev/null
+then
+    threadshavepids=""
+else
+    threadshavepids="-DTHREADS_HAVE_PIDS"
+fi
+case "$usethreads" in
+$define|true|[yY]*)
+        ccflags="-D_REENTRANT -D_GNU_SOURCE $threadshavepids $ccflags"
+        if echo $libswanted | grep -v pthread >/dev/null
+        then
+            set `echo X "$libswanted "| sed -e 's/ c / pthread c /'`
+            shift
+            libswanted="$*"
+        fi
+
+	# Somehow at least in Debian 2.2 these manage to escape
+	# the #define forest of <features.h> and <time.h> so that
+	# the hasproto macro of Configure doesn't see these protos,
+	# even with the -D_GNU_SOURCE.
+
+	d_asctime_r_proto="$define"
+	d_crypt_r_proto="$define"
+	d_ctime_r_proto="$define"
+	d_gmtime_r_proto="$define"
+	d_localtime_r_proto="$define"
+	d_random_r_proto="$define"
+
+	;;
+esac
