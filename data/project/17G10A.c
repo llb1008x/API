@@ -309,6 +309,9 @@
 		healthd]: healthd: battery l=5 v=3796 t=41.0 h=2 st=4 chg=	
 
 
+		FG_DAEMON_CMD_GET_VBAT
+		FG_DAEMON_CMD_GET
+
 
 	}
 
