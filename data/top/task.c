@@ -136,21 +136,34 @@
 	
 	功耗问题的分析，整理思路，丰富手段
 	
+	
+	
+	
+	充电电流太小
+	
+	
+	底电流偏高
+	
+	USB驱动能力
+	
+	电量跳变问题
+	
+
+	
+    帮忙确认一下下面的问题，问题一你不用管，后面两个问题帮我确认一下，谢谢！
+
+您现在的RT5081是放在哪一路I2C上？这路I2C您在dws中是配置成多高的速度？IO方式是opendrain还是push pull?
+
+	I2C_CHANNEL_5  ,0x34
+	speed   3400kbps
+	pull&push en
+ 
+
 
 
 /********************************************************************************************************************************/
-	G1605B功耗问题
-	{
-	
-		89268,89269,89270,89272,89273
-		
-		这几个bug跟modem 的channel 10/34 网络一直变化有关
-		还有可能跟开启了gpslog有关
-	
-	}
-	
-	
-	
+
+
 	G1605A  售后问题，功耗问题 healthd线程
 	{
 		售后问题：   电量计不准的机器
@@ -164,13 +177,7 @@
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	G1605A电量跳变问题
 	{
@@ -183,10 +190,6 @@
 		
 		gitk  --author=liteng   2017.3.15   73194 P80,2017.5.22 84712 P96
 		
-		
-		
-		
- 
 		{
 			大概写了一下流程，请过目：
 			底层电量跟上层偏差过大导致电量跳变的判断
@@ -304,10 +307,27 @@
 		mivr  [0x16]
 		
 		修改电池容量后，充电电流有提高到1.7A~1.8A
-		
+		mtk_battery_table.h
 		
 		检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
-	
+		07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
+		07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
+		07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
+		07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
+		07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
+		
+		jetia这个功能是disable的
+		
+		
+		更新rt5081软件版本 2017.7.18
+		//Gionee <gn_by_charging> <lilubao> <20170718> add for debug current begin
+
+		CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT	
+		
+		
+		高通USB眼图 80-PB524-1 A
+		phy,override
+		
 	}
 	
 	
@@ -347,6 +367,13 @@
 	
 		平均电流9mA，lcd有3mA，其他还有1mA
 		1mA这个还有待查
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		1.跟系统通知有关，即使飞行模式下，系统通知也会每隔一段时间会有唤醒ap检测一些信息如网络连接，想推送一些内容
@@ -453,8 +480,38 @@
 		01-01 08:06:21.546277 01-01 08:06:46.096919   235   235 I [  375.497935].(0)[235:hps_main]MobiCore mcd: Cpu 1 is dead
 
 		
-		
-	}
+		sd卡模块去除
+		cust_mt6757_msdc.dtsi
+		&mmc1 {
+			clk_src = /bits/ 8 <MSDC30_CLKSRC_200MHZ>;
+			bus-width = <4>;
+			max-frequency = <200000000>;
+			msdc-sys-suspend;
+			cap-sd-highspeed;
+			sd-uhs-sdr12;
+			sd-uhs-sdr25;
+			sd-uhs-sdr50;
+			sd-uhs-sdr104;
+			sd-uhs-ddr50;
+			pinctl = <&mmc1_pins_default>;
+			pinctl_sdr104 = <&mmc1_pins_sdr104>;
+			pinctl_sdr50 = <&mmc1_pins_sdr50>;
+			pinctl_ddr50 = <&mmc1_pins_ddr50>;
+			register_setting = <&mmc1_register_setting_default>;
+			host_function = /bits/ 8 <MSDC_SD>;
+			cd_level = /bits/ 8 <MSDC_CD_LOW>;
+			cd-gpios = <&pio 30 0>;
+			status = "okay";
+			vmmc-supply = <&mt_pmic_vmch_ldo_reg>;
+			vqmmc-supply = <&mt_pmic_vmc_ldo_reg>;
+		};
+
+
+		其中的
+		status = "okay";
+		修改为：
+		status = "disabled";
+		}
 	
 	
 	
@@ -462,7 +519,9 @@
 	{
 		关机充电有问题，而且关机充电状态下，电量显示可能有问题的
 
-		开机电压达到3.6v，电量1%很长，很早达到100%，充电曲线的部队成
+		开机电压达到3.6v，电量1%很长，关机电压偏高
+		很早达到100%，充电曲线的不对称
+		
 		
 		电量计相关的log
 	    FG_DAEMON_CMD_GET_VBAT
