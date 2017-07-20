@@ -31,6 +31,7 @@
 
 
 
+
 /*重要的概念*/
 {
 	这几个概念有必要理解一下
@@ -1897,7 +1898,71 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 /***********************************************************************************************/
-12.
+12.	usb眼图问题
+{
+	近端跟远端的测试要求不一样
+	
+	高通USB眼图 80-PB524-1 A
+	phy,override
+	
+	17G10A相关的宏,通过相关的宏找代码
+	{
+		CONFIG_USB_MU3D_DRV=y
+		CONFIG_MU3_PHY=y
+		CONFIG_U3_PHY_AHB_SUPPORT=y
+		CONFIG_USB_MTK_DUALMODE=y
+		CONFIG_USB_MTK_IDDIG=y
+		CONFIG_USB_XHCI_MTK_SUSPEND_SUPPORT=y
+		CONFIG_SND_USB_AUDIO=y
+
+		CONFIG_USB_GADGET=y
+		CONFIG_USB_GADGET_VBUS_DRAW=500
+		CONFIG_USB_G_ANDROID=y
+
+		kernel-4.4/drivers/misc/mediatek/mu3d/
+		kernel-4.4/drivers/misc/mediatek/mu3phy/
+	
+		hal,drv,phy
+	}
+	
+	17G10A的USB体系架构
+	{
+		这两个对应的寄存器和操作的函数
+		USB_DP_P0		D31
+		USB_DM_P0		D32
+	
+		MTK case ID：ALPS03412756 
+
+		这边是从USB转uart这个功能开始的
+		1.
+		/kernel-4.4/drivers/misc/mediatek/mu3phy/mt6757/Makefile
+		23#For USB HQA Driving Tuning Mode 1 Settings
+		24#EXTRA_CFLAGS += -DMTK_USB_MODE1 //取消这一行的注释
+
+		2.
+		/kernel-4.4/drivers/misc/mediatek/mu3phy/mt6757/mtk-phy-asic.c
+		645#if defined(CONFIG_MTK_HDMI_SUPPORT) || defined(MTK_USB_MODE1)
+		646    os_printk(K_INFO, "%s- USB PHY Driving Tuning Mode 1 Settings.\n", __func__);
+		647 U3PhyWriteField32((phys_addr_t) (uintptr_t) U3D_USBPHYACR5, RG_USB20_HS_100U_U3_EN_OFST,
+		648             RG_USB20_HS_100U_U3_EN, 0);
+		649    U3PhyWriteField32((phys_addr_t) (uintptr_t) U3D_USBPHYACR1, RG_USB20_VRT_VREF_SEL_OFST,
+		650             RG_USB20_VRT_VREF_SEL, 5); //驱动电流调节，这里最大可以设置为7
+		651    U3PhyWriteField32((phys_addr_t) (uintptr_t) U3D_USBPHYACR1, RG_USB20_TERM_VREF_SEL_OFST,
+		652             RG_USB20_TERM_VREF_SEL, 5); //电压幅度调节，这里最大可以设置为7 
+
+		//Gionee <gn_by_charging> <lilubao> <20170719> add for fixed usb begin
+		os_printk(K_ERR, "in [%s] before switch,by lilubao\n", __func__);
+		U3PhyWriteField32((phys_addr_t) (uintptr_t) U3D_USBPHYACR5, RG_USB20_HS_100U_U3_EN_OFST,
+					RG_USB20_HS_100U_U3_EN, 0);
+		U3PhyWriteField32((phys_addr_t) (uintptr_t) U3D_USBPHYACR1, RG_USB20_VRT_VREF_SEL_OFST,
+					RG_USB20_VRT_VREF_SEL, 7);// 5->7
+		U3PhyWriteField32((phys_addr_t) (uintptr_t) U3D_USBPHYACR1, RG_USB20_TERM_VREF_SEL_OFST,
+					RG_USB20_TERM_VREF_SEL, 7);//5->7
+		//Gionee <gn_by_charging> <lilubao> <20170719> add for fixed usb end			
+	}
+
+}
+
 
 
 

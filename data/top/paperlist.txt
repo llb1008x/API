@@ -85,13 +85,6 @@ battery：
 	ARM中断向量表与响应流程 
 
 
-
-
-
-
-
-
-
 USB：
 	相关的协议：
 	{
@@ -141,28 +134,16 @@ USB：
 
 	type-c:
 	{
-		
 		USB&nbsp;Type-C
 		http://blog.csdn.net/fouweng/article/details/53435528
-
 
 		USB TYPE-C
 		http://blog.sina.com.cn/s/blog_63f7b4540102wch4.html
 
-
 		USB Type C的基本原理
 		http://blog.csdn.net/zoosenpin/article/details/49963031
-
-
 	}
 	
-
-
-
-
-
-
-
 
 
 other：
@@ -371,6 +352,14 @@ other：
 
 	Android休眠唤醒机制简介（一）
 	http://blog.sina.com.cn/s/blog_a6559d920101aug9.html
+
+
+	Android 的 init.rc 文件简介 
+	http://blog.csdn.net/yimiyangguang1314/article/details/6268177
+
+
+	Android的init过程详解（一） 
+	http://blog.csdn.net/nokiaguy/article/details/8800962
 
 
 

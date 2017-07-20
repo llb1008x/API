@@ -144,7 +144,6 @@
 	
 	底电流偏高
 	
-	USB驱动能力
 	
 	电量跳变问题
 	
@@ -289,6 +288,15 @@
 			ui_soc=fg_capacity_by_c_init; 
 	
 		}	
+		
+		
+		#ifndef DIFFERENCE_VBAT_RTC
+		#define DIFFERENCE_VBAT_RTC 10
+		#endif
+
+		#ifndef DIFFERENCE_SWOCV_RTC_POS
+		#define DIFFERENCE_SWOCV_RTC_POS 15
+		#endif
 
 	}
 
@@ -298,10 +306,10 @@
 17G10A p1试产待解决问题
 {
 
+
 	充电电流偏小
 	{
-		需要跟供应商沟通，指导
-		
+		这个问题托了很长时间
 		
 		aicl  [0x13]  
 		mivr  [0x16]
@@ -309,27 +317,78 @@
 		修改电池容量后，充电电流有提高到1.7A~1.8A
 		mtk_battery_table.h
 		
-		检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
-		07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
-		07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
-		07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
-		07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
-		07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
+		
 		
 		jetia这个功能是disable的
+		{
+			检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
+			07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
+			07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
+			
+			07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
+			
+			07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
+			07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
+		}
 		
 		
-		更新rt5081软件版本 2017.7.18
-		//Gionee <gn_by_charging> <lilubao> <20170718> add for debug current begin
+		合入rt5081软件版本P22  2017.7.18
+		{	
+		可能有问题的地方：
+			//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
 
-		CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT	
+			CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT
+			CONFIG_DUAL_ROLE_USB_INTF=y	
+			#define RT5081_PMU_REG_CHGHIDDENCTRL0	(0x30)
+			RT_REG_DECL(RT5081_PMU_REG_CHGHIDDENCTRL0, 1, RT_VOLATILE, {});
+		
+			rgbled
+			//wangguojun modify for RGB led begin
+			0xe0, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
+			//wangguojun modify for RGB led end
+		
+			0x60, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
+		
+			#if defined(__LP64__) || defined(_LP64)
+		
+			RT5081_APPLE_SAMSUNG_TA_SUPPORT
 		
 		
-		高通USB眼图 80-PB524-1 A
-		phy,override
+			软件分级
+			__,_,
+			#if defined(CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT) && !defined(CONFIG_TCPC_CLASS)
+		
+			ret = rt5081_pmu_reg_test_bit(chg_data->chip, RT5081_PMU_REG_CHGSTAT1,
+			RT5081_SHIFT_MIVR_STAT, &mivr_stat);
+		
+			/* Check DP > 2.3 V */
+			ret = rt5081_pmu_reg_update_bits(
+				chg_data->chip,
+				RT5081_PMU_REG_QCSTATUS2,
+				0x0F,
+				0x0B
+			);
+
+		}
+
+		修改需要插入sim卡才能激活USB
+		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb begin
+		GN_RO_GN_USB_SIMSECURITY_SUPPORT = no
+		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb end
 		
 	}
 	
+	
+	
+	整机测试
+	{
+		2PCS手机因电池温度过高关机，但环y箱里设定温度为57度，要求做高温高湿测试时手机可以有高温安全警告，但不允许执行关机机制； 
+	
+		低温测试，-20度，手机自动关机
+	
+	}
+	
+
 	
 	
 	底电流偏高
@@ -367,11 +426,6 @@
 	
 		平均电流9mA，lcd有3mA，其他还有1mA
 		1mA这个还有待查
-		
-		
-		
-		
-		
 		
 		
 		
@@ -720,7 +774,10 @@
 	
     fuelgauge 3.0的问题,文档+邮件
     {
+    	pacth申请
+		ALPS03411143 for n0.mp5
 
+		ALPS03158638   【L3500-Charger】voltage mode在低温下的修正
 		
     }
 }
