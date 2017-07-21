@@ -147,18 +147,16 @@
 	
 	电量跳变问题
 	
-
 	
-    帮忙确认一下下面的问题，问题一你不用管，后面两个问题帮我确认一下，谢谢！
-
-您现在的RT5081是放在哪一路I2C上？这路I2C您在dws中是配置成多高的速度？IO方式是opendrain还是push pull?
-
-	I2C_CHANNEL_5  ,0x34
-	speed   3400kbps
-	pull&push en
- 
-
-
+	整机测试出现的问题，高温报警，低温关机问题
+	
+	
+	电池曲线的导入和fuelgauge3.0的客制化
+	
+	
+	关机充电的指示灯
+	
+	
 
 /********************************************************************************************************************************/
 
@@ -774,12 +772,15 @@
 	
     fuelgauge 3.0的问题,文档+邮件
     {
-    	pacth申请
-		ALPS03411143 for n0.mp5
+    	pacth申请 已申请
+		ALPS03411143 
+		Fix gauge coulomb value may abnormal in some mode / 修復待機時電量計算可能異常issue 
 
-		ALPS03158638   【L3500-Charger】voltage mode在低温下的修正
+		ALPS03158638   
+		【L3500-Charger】voltage mode在低温下的修正
 		
     }
+    
 }
 
 

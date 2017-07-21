@@ -124,6 +124,13 @@
 		will be turned off, and the buck of the charger will keep
 		providing power to the system
 
+
+		RT5081是放在哪一路I2C上？这路I2C您在dws中是配置成多高的速度？IO方式是opendrain还是push pull?
+
+		I2C_CHANNEL_5  ,0x34
+		speed   3400kbps
+		pull&push en
+
 	}
 
 

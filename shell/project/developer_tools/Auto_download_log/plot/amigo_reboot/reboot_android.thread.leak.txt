@@ -1,0 +1,8 @@
+name:  thread leak 重启问题
+id: 82231
+time: default
+#method: file=main_log*, key=Too many open files, line=1
+#method: file=kernel_log*, key=\[\d+:Binder:\w+\]\[FDLEAK\].*dmabuf Num:\d+, line=1
+#<3>[10426.795826]  (0)[22649:Binder:1267_1A][FDLEAK]OverAllocFDError(PID:22649 fileName:socket:[12843] Num:1)
+method: file=kernel_log*, key=\[\d+:Binder:\w+\]\[FDLEAK\]\w+\(PID:\d+ fileName:socket:\[\d+\] Num:\d+, line=1
+
