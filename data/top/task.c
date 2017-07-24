@@ -333,10 +333,10 @@
 		合入rt5081软件版本P22  2017.7.18
 		{	
 		可能有问题的地方：
-			//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
+	//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
 
 			CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT
-			CONFIG_DUAL_ROLE_USB_INTF=y	
+			#CONFIG_DUAL_ROLE_USB_INTF=y	
 			#define RT5081_PMU_REG_CHGHIDDENCTRL0	(0x30)
 			RT_REG_DECL(RT5081_PMU_REG_CHGHIDDENCTRL0, 1, RT_VOLATILE, {});
 		
@@ -850,6 +850,19 @@
 	}
 	
 	
+		2.无法充电，可能是Battery-type not identified，电池识别不对
+
+		<6>[ 3227.693053] *(0)[8648:kworker/0:1]SMBCHG: smbchg_config_chg_battery_type: Battery-type not identified
+
+		<6>[ 3242.516708] *(2)[316:irq/223-usbin-s]SMBCHG: handle_usb_removal: triggered
+		<6>[ 3242.516723] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_change_usb_supply_type: Type 0: setting mA = 2000
+		<6>[ 3242.516873] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_set_usb_current_max: USB current_ma = 0
+		<6>[ 3242.516910] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_set_usb_current_max: usb type = 5 current set to 0 mA
+		<6>[ 3242.516936] *(2)[316:irq/223-usbin-s]SMBCHG: get_parallel_psy: parallel charger not found
+		<6>[ 3242.517062] *(2)[316:irq/223-usbin-s]SMBCHG: handle_usb_removal: setting usb psy present = 0
+		<6>[ 3242.517147] *(2)[316:irq/223-usbin-s]msm_otg 78db000.usb: Avail curr from USB = 0
+
+		<6>[ 3242.517685] *(2)[11776:kworker/2:0]SMBCHG: read_usb_type: src det low
 
 
 

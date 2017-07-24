@@ -1,19 +1,39 @@
-	高通项目的bring up
-	{
-		1.相关的工作流程，代码框架
-		
-		2.项目脚本，涉及到哪些宏
-		
-		3.gpio，device tree,rpm ,ldo的配置
-		
-		4.充电的工作流程，充电器的检测，数据的上报
-		
-		5.电量计相关的计算
-		
-		6.ti的替换方案
-		
+/*注意事项*/
+{
+	BJ17G16A & BJ17G06A 主干代码已经切换回 T0023，请各位首先fetch，然后基于T0023建立分支
+	remotes/origin/old_code_main_dev_7.1.2
+	remotes/origin/old_patch_main_dev_7.1.2
+	BJ17G16A  的modem 的主干也已切换到  BJ17G16A_MODEM-T0013-170714AA
+	hi all ：
+	为了更好的理解与代码管理，特在BJ17G16A代码库中更改了拷贝顺序，主要修改点是由原来的拷贝顺序：
+	copy  ./gionee/project/项目  
+	copy  ./gionee/alps 
+	修改为：
+	copy  ./gionee/alps 
+	copy  ./gionee/project/项目  
+}
+
+
+
+
+
+/*高通项目的bring up*/
+{
+	1.相关的工作流程，代码框架
 	
-	}
+	2.项目脚本，涉及到哪些宏
+	
+	3.gpio，device tree,rpm ,ldo的配置
+	
+	4.充电的工作流程，充电器的检测，数据的上报
+	
+	5.电量计相关的计算
+	
+	6.ti的替换方案
+	
+
+
+}
 
 	
 	1.msm8917
