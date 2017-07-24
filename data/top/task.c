@@ -368,6 +368,11 @@
 			);
 
 		}
+		
+		
+		// add for debug valid 20170724
+		dev_err(chg_data->dev, " in %s by lilubao rt581 T22\n", __func__);	
+	
 
 		修改需要插入sim卡才能激活USB
 		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb begin
@@ -466,7 +471,7 @@
 
 
 
-		01-01 08:06:14.636166 01-01 08:06:39.186808   228   228 E [  368.587824].(2)[228:kworker/u16:5][name:msdc&]: [msdc]msdc1, some of device's pin, dat1~3 are stuck in low!
+		01-01 08:06:14.636166 01-01 08:06:39.186808   228   228 E [  368.587824].(2)[228:kworker/u16:5][name:msdc&]: [msdc]msdc1, some of device s pin, dat1~3 are stuck in low!
 		01-01 08:06:14.637566 01-01 08:06:39.188208   228   228 E [  368.589224].(2)[228:kworker/u16:5][name:msdc&]: [msdc]msdc_ops_switch_volt msdc1 set voltage to 3.3V.
 
 		msdc_check_dat_1to3_high
