@@ -529,6 +529,8 @@ qcom 烧写 当然要换路径
 		/home/llb/project/PRO/source/17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/out/target/product/gnbj6757_66_n/system/bin
 
 
+		./TmakeGionee  G1605A  -a
+
 		17G02A编译
 		{
 			repo init -u gitserver:/manifest.git -m 17G02.xml ; repo sync

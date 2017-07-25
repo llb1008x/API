@@ -112,6 +112,101 @@
 			vcdt_vthh
 		
 		}
+		
+		
+	充电电流偏小
+	{
+		这个问题拖了很长时间
+		要理清改变充电电流跟哪些量有关
+		
+		aicl  [0x13]  
+		mivr  [0x16]
+		
+		修改电池容量后，充电电流有提高到1.7A~1.8A
+		mtk_battery_table.h，这里里面很多量都很重要
+		
+		
+		jetia这个功能是disable的
+		{
+			检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
+			07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
+			07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
+			
+			07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
+			
+			07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
+			07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
+		}
+		
+		
+		合入rt5081软件版本P22  2017.7.18
+		{	
+		可能有问题的地方：
+	//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
+
+			CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT
+			#CONFIG_DUAL_ROLE_USB_INTF=y	
+			#define RT5081_PMU_REG_CHGHIDDENCTRL0	(0x30)
+			RT_REG_DECL(RT5081_PMU_REG_CHGHIDDENCTRL0, 1, RT_VOLATILE, {});
+		
+			rgbled
+			//wangguojun modify for RGB led begin
+			0xe0, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
+			//wangguojun modify for RGB led end
+		
+			0x60, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
+		
+			#if defined(__LP64__) || defined(_LP64)
+		
+			RT5081_APPLE_SAMSUNG_TA_SUPPORT
+		
+		
+			软件分级
+			__,_,
+			#if defined(CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT) && !defined(CONFIG_TCPC_CLASS)
+		
+			ret = rt5081_pmu_reg_test_bit(chg_data->chip, RT5081_PMU_REG_CHGSTAT1,
+			RT5081_SHIFT_MIVR_STAT, &mivr_stat);
+		
+			/* Check DP > 2.3 V */
+			ret = rt5081_pmu_reg_update_bits(
+				chg_data->chip,
+				RT5081_PMU_REG_QCSTATUS2,
+				0x0F,
+				0x0B
+			);
+
+		}
+		
+		
+		// add for debug valid 20170724
+		dev_err(chg_data->dev, " in %s by lilubao rt5081 T22\n", __func__);	
+		
+		充电器能力，线损的判断
+		充电相关的变量变化和影响
+		电池容量是否对充电电流有影响
+		
+		
+		烧完版本不识别USB，充电没作用，adb不管用
+		
+		#1
+		ichg = <2500000>;	/* uA 2000000->2500000*/
+		ac_charger_current = <2500000>;				//2050000->2500000
+		ac_charger_input_current = <2800000>;		//3200000->2800000
+		
+		#2
+		aicl_vth = mivr + 100000; // 200000->100000->50000
+		
+		aicr,aicl
+		aicl loop，mivr loop
+		
+
+		修改需要插入sim卡才能激活USB
+		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb begin
+		GN_RO_GN_USB_SIMSECURITY_SUPPORT = no
+		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb end
+		
+	}
 	
 }
 
@@ -165,12 +260,12 @@
 	{
 		售后问题：   电量计不准的机器
 
+		apk发包次数，谁发的(主从)，就是链接到哪了？？
+	    那个脚本怎么用
+
 
 		这个还不知道怎么看，只是觉得电量跟电池电压偏差有点大，而且底层电量跟上层显示的电量差别也很大
 
-
-		apk发包次数，谁发的(主从)，就是链接到哪了？？
-		    那个脚本怎么用
 	}
 	
 	
@@ -185,6 +280,7 @@
 		mt_battery_meter.h
 		已提交eservices长时间未解决,case ID:ALPS03373196
 		
+		G1605A-T0114-170310AB
 		gitk  --author=liteng   2017.3.15   73194 P80,2017.5.22 84712 P96
 		
 		{
@@ -288,15 +384,91 @@
 		}	
 		
 		
-		#ifndef DIFFERENCE_VBAT_RTC
-		#define DIFFERENCE_VBAT_RTC 10
-		#endif
+		有变化的地方
+		{
+		
+			//Gionee <gn_by_charging> <lilubao> <20170725> add for debug battery status begin
 
-		#ifndef DIFFERENCE_SWOCV_RTC_POS
-		#define DIFFERENCE_SWOCV_RTC_POS 15
-		#endif
+			#ifndef DIFFERENCE_VBAT_RTC
+			#define DIFFERENCE_VBAT_RTC 10
+			#endif
 
+			#ifndef DIFFERENCE_SWOCV_RTC_POS
+			#define DIFFERENCE_SWOCV_RTC_POS 15
+			#endif
+			
+			#define TRK_POINT_EN 0
+			#define TRK_POINT_THR 5
+			
+			多了一个函数接口
+			BATTERY_METER_CTRL_CMD->BATTERY_METER_CMD_GET_IS_HW_OCV_READY
+			signed int pmic_is_battery_plugout(void);
+			
+			#ifndef MAX_SMOOTH_TIME
+			#define MAX_SMOOTH_TIME 1800
+			#endif
+			
+			batt_meter_cust_data.difference_vbat_rtc = DIFFERENCE_VBAT_RTC;
+			batt_meter_cust_data.difference_swocv_rtc_pos = DIFFERENCE_SWOCV_RTC_POS;
+			
+			batt_meter_cust_data.max_smooth_time = MAX_SMOOTH_TIME;
+			batt_meter_cust_data.trk_point_en = TRK_POINT_EN;
+			batt_meter_cust_data.trk_point_thr = TRK_POINT_THR;
+			
+			mt_battery_set_init_vol(gFG_voltage_init);
+			
+			fgauge_algo_run_get_init_data();
+			每次wakeup的时候移到外面了
+			
+			static ssize_t show_FG_drv_force25c(struct device *dev, struct device_attribute *attr, char *buf)
+			创建一个新的节点
+			FG_BAT_INT		FG_BAT_INT_OLD
+			
+			battery_meter_set_fg_int <- fg_bat_int_handler
+			
+			/* read HW ocv ready bit here, daemon resume flow will get it later */
+			battery_meter_ctrl(BATTERY_METER_CMD_GET_IS_HW_OCV_READY, &is_hwocv_update);
+			
+			mt_battery_set_init_vol
+			
+			#ifdef USING_SMOOTH_UI_SOC2
+				battery_meter_smooth_uisoc2();
+			#endif
+			
+			
+			这是判断关机电压
+			if (previous_SOC == -1 && bat_vol <= SYSTEM_OFF_VOLTAGE) {	//Gionee GuoJianqiu 20160217 modify for GNSPR4723
+			previous_SOC = 0;
+				if (ZCV != 0) {
+					battery_log(BAT_LOG_CRTI,
+							"battery voltage too low, use ZCV to init average data.\n");
+					BMT_status.bat_vol =
+						mt_battery_average_method(BATTERY_AVG_VOLT, &batteryVoltageBuffer[0],
+									  ZCV, &bat_sum, batteryIndex);
+				} else {
+					battery_log(BAT_LOG_CRTI,
+							"battery voltage too low, use V_0PERCENT_TRACKING + 100 to init average data.\n");
+					BMT_status.bat_vol =
+						mt_battery_average_method(BATTERY_AVG_VOLT, &batteryVoltageBuffer[0],
+									  V_0PERCENT_TRACKING + 100, &bat_sum,
+									  batteryIndex);
+				}
+			} else {
+				BMT_status.bat_vol =
+					mt_battery_average_method(BATTERY_AVG_VOLT, &batteryVoltageBuffer[0], bat_vol,
+								  &bat_sum, batteryIndex);
+		   }
+		}
 	}
+
+
+
+
+
+
+
+
+
 
 
 /********************************************************************************************************************************/
@@ -305,81 +477,9 @@
 {
 
 
-	充电电流偏小
-	{
-		这个问题托了很长时间
-		
-		aicl  [0x13]  
-		mivr  [0x16]
-		
-		修改电池容量后，充电电流有提高到1.7A~1.8A
-		mtk_battery_table.h
-		
-		
-		
-		jetia这个功能是disable的
-		{
-			检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
-			07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
-			07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
-			
-			07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
-			
-			07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
-			07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
-		}
-		
-		
-		合入rt5081软件版本P22  2017.7.18
-		{	
-		可能有问题的地方：
-	//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
 
-			CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT
-			#CONFIG_DUAL_ROLE_USB_INTF=y	
-			#define RT5081_PMU_REG_CHGHIDDENCTRL0	(0x30)
-			RT_REG_DECL(RT5081_PMU_REG_CHGHIDDENCTRL0, 1, RT_VOLATILE, {});
-		
-			rgbled
-			//wangguojun modify for RGB led begin
-			0xe0, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
-			//wangguojun modify for RGB led end
-		
-			0x60, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
-		
-			#if defined(__LP64__) || defined(_LP64)
-		
-			RT5081_APPLE_SAMSUNG_TA_SUPPORT
-		
-		
-			软件分级
-			__,_,
-			#if defined(CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT) && !defined(CONFIG_TCPC_CLASS)
-		
-			ret = rt5081_pmu_reg_test_bit(chg_data->chip, RT5081_PMU_REG_CHGSTAT1,
-			RT5081_SHIFT_MIVR_STAT, &mivr_stat);
-		
-			/* Check DP > 2.3 V */
-			ret = rt5081_pmu_reg_update_bits(
-				chg_data->chip,
-				RT5081_PMU_REG_QCSTATUS2,
-				0x0F,
-				0x0B
-			);
-
-		}
-		
-		
-		// add for debug valid 20170724
-		dev_err(chg_data->dev, " in %s by lilubao rt581 T22\n", __func__);	
 	
-
-		修改需要插入sim卡才能激活USB
-		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb begin
-		GN_RO_GN_USB_SIMSECURITY_SUPPORT = no
-		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb end
-		
-	}
+	
 	
 	
 	
@@ -569,6 +669,8 @@
 		修改为：
 		status = "disabled";
 		}
+		
+		这个直接这样改是有问题的
 	
 	
 	
@@ -828,6 +930,21 @@
 		CONFIG_BW_MONITOR=y
 		CONFIG_MSM_SPMI=y
 		CONFIG_MSM_SPMI_PMIC_ARB=y	
+		
+		
+		
+		
+		几个高通平台稳定性文档，感兴趣的可以下载看。
+
+			80-NM641-1
+			80-P7139-1
+			80-P7139-3
+			80-P7139-5
+			80-P7139-6
+			80-P7139-7
+			80-P7139-8
+
+
 	}
 
 	
