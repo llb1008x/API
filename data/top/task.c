@@ -114,100 +114,14 @@
 		}
 		
 		
-	充电电流偏小
+	pass修改需要插入sim卡才能激活USB
 	{
-		这个问题拖了很长时间
-		要理清改变充电电流跟哪些量有关
-		
-		aicl  [0x13]  
-		mivr  [0x16]
-		
-		修改电池容量后，充电电流有提高到1.7A~1.8A
-		mtk_battery_table.h，这里里面很多量都很重要
-		
-		
-		jetia这个功能是disable的
-		{
-			检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
-			07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
-			07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
-			
-			07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
-			
-			07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
-			07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
-		}
-		
-		
-		合入rt5081软件版本P22  2017.7.18
-		{	
-		可能有问题的地方：
-	//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
-
-			CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT
-			#CONFIG_DUAL_ROLE_USB_INTF=y	
-			#define RT5081_PMU_REG_CHGHIDDENCTRL0	(0x30)
-			RT_REG_DECL(RT5081_PMU_REG_CHGHIDDENCTRL0, 1, RT_VOLATILE, {});
-		
-			rgbled
-			//wangguojun modify for RGB led begin
-			0xe0, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
-			//wangguojun modify for RGB led end
-		
-			0x60, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
-		
-			#if defined(__LP64__) || defined(_LP64)
-		
-			RT5081_APPLE_SAMSUNG_TA_SUPPORT
-		
-		
-			软件分级
-			__,_,
-			#if defined(CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT) && !defined(CONFIG_TCPC_CLASS)
-		
-			ret = rt5081_pmu_reg_test_bit(chg_data->chip, RT5081_PMU_REG_CHGSTAT1,
-			RT5081_SHIFT_MIVR_STAT, &mivr_stat);
-		
-			/* Check DP > 2.3 V */
-			ret = rt5081_pmu_reg_update_bits(
-				chg_data->chip,
-				RT5081_PMU_REG_QCSTATUS2,
-				0x0F,
-				0x0B
-			);
-
-		}
-		
-		
-		// add for debug valid 20170724
-		dev_err(chg_data->dev, " in %s by lilubao rt5081 T22\n", __func__);	
-		
-		充电器能力，线损的判断
-		充电相关的变量变化和影响
-		电池容量是否对充电电流有影响
-		
-		
-		烧完版本不识别USB，充电没作用，adb不管用
-		
-		#1
-		ichg = <2500000>;	/* uA 2000000->2500000*/
-		ac_charger_current = <2500000>;				//2050000->2500000
-		ac_charger_input_current = <2800000>;		//3200000->2800000
-		
-		#2
-		aicl_vth = mivr + 100000; // 200000->100000->50000
-		
-		aicr,aicl
-		aicl loop，mivr loop
-		
-
-		修改需要插入sim卡才能激活USB
 		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb begin
 		GN_RO_GN_USB_SIMSECURITY_SUPPORT = no
 		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb end
-		
 	}
-	
+
+
 }
 
 
@@ -475,12 +389,95 @@
 
 17G10A p1试产待解决问题
 {
-
-
-
 	
-	
-	
+	充电电流偏小
+	{
+		这个问题拖了很长时间
+		要理清改变充电电流跟哪些量有关
+		
+		aicl  [0x13]  
+		mivr  [0x16]
+		
+		修改电池容量后，充电电流有提高到1.7A~1.8A
+		mtk_battery_table.h，这里里面很多量都很重要
+		
+		
+		jetia这个功能是disable的
+		{
+			检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
+			07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
+			07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
+			
+			07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
+			
+			07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
+			07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
+		}
+		
+		
+		合入rt5081软件版本P22  2017.7.18
+		{	
+		可能有问题的地方：
+	//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
+
+			CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT
+			#CONFIG_DUAL_ROLE_USB_INTF=y	
+			#define RT5081_PMU_REG_CHGHIDDENCTRL0	(0x30)
+			RT_REG_DECL(RT5081_PMU_REG_CHGHIDDENCTRL0, 1, RT_VOLATILE, {});
+		
+			rgbled
+			//wangguojun modify for RGB led begin
+			0xe0, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
+			//wangguojun modify for RGB led end
+		
+			0x60, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
+		
+			#if defined(__LP64__) || defined(_LP64)
+		
+			RT5081_APPLE_SAMSUNG_TA_SUPPORT
+		
+		
+			软件分级
+			__,_,
+			#if defined(CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT) && !defined(CONFIG_TCPC_CLASS)
+		
+			ret = rt5081_pmu_reg_test_bit(chg_data->chip, RT5081_PMU_REG_CHGSTAT1,
+			RT5081_SHIFT_MIVR_STAT, &mivr_stat);
+		
+			/* Check DP > 2.3 V */
+			ret = rt5081_pmu_reg_update_bits(
+				chg_data->chip,
+				RT5081_PMU_REG_QCSTATUS2,
+				0x0F,
+				0x0B
+			);
+
+		}
+		
+		
+		// add for debug valid 20170724
+		dev_err(chg_data->dev, " in %s by lilubao rt5081 T22\n", __func__);	
+		
+		充电器能力，线损的判断
+		充电相关的变量变化和影响
+		电池容量是否对充电电流有影响
+		
+		
+		烧完版本不识别USB，充电没作用，adb不管用
+		
+		#1
+		ichg = <2500000>;	/* uA 2000000->2500000*/
+		ac_charger_current = <2500000>;				//2050000->2500000
+		ac_charger_input_current = <2800000>;		//3200000->2800000
+		
+		#2
+		aicl_vth = mivr + 100000; // 200000->100000->50000
+		
+		aicr,aicl
+		aicl loop，mivr loop
+
+	}
+
 	
 	
 	整机测试
