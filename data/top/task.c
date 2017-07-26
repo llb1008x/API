@@ -298,10 +298,13 @@
 		}	
 		
 		
+		
+		FGADC_D0
+		
 		有变化的地方
 		{
 		
-			//Gionee <gn_by_charging> <lilubao> <20170725> add for debug battery status begin
+			//Gionee <gn_by_charging> <lilubao> <20170726> add for debug battery status begin
 
 			#ifndef DIFFERENCE_VBAT_RTC
 			#define DIFFERENCE_VBAT_RTC 10
@@ -329,7 +332,7 @@
 			batt_meter_cust_data.trk_point_en = TRK_POINT_EN;
 			batt_meter_cust_data.trk_point_thr = TRK_POINT_THR;
 			
-			mt_battery_set_init_vol(gFG_voltage_init);
+			？？mt_battery_set_init_vol(gFG_voltage_init);
 			
 			fgauge_algo_run_get_init_data();
 			每次wakeup的时候移到外面了
@@ -338,7 +341,7 @@
 			创建一个新的节点
 			FG_BAT_INT		FG_BAT_INT_OLD
 			
-			battery_meter_set_fg_int <- fg_bat_int_handler
+			？？battery_meter_set_fg_int <- fg_bat_int_handler
 			
 			/* read HW ocv ready bit here, daemon resume flow will get it later */
 			battery_meter_ctrl(BATTERY_METER_CMD_GET_IS_HW_OCV_READY, &is_hwocv_update);
@@ -349,6 +352,9 @@
 				battery_meter_smooth_uisoc2();
 			#endif
 			
+			？？INIT_BAT_CUR_FROM_PTIM
+			
+			extern int do_ptim_ex(bool isSuspend, unsigned int *bat, signed int *cur);
 			
 			这是判断关机电压
 			if (previous_SOC == -1 && bat_vol <= SYSTEM_OFF_VOLTAGE) {	//Gionee GuoJianqiu 20160217 modify for GNSPR4723
@@ -374,10 +380,6 @@
 		   }
 		}
 	}
-
-
-
-
 
 
 
@@ -475,9 +477,16 @@
 		
 		aicr,aicl
 		aicl loop，mivr loop
-
+		
 	}
 
+
+	USB  pid，vid添加到驱动中
+	{
+	   		gionee_usb_uid_pid 
+	   		不同功能对应不同的pid
+	   
+	}
 	
 	
 	整机测试
@@ -686,6 +695,21 @@
 	}
 	
 	
+	【GMS-CTS Verifier测试】OTG相关测试应该屏蔽
+	{
+		这个device.mk是干什么用的?
+		xml文件好像用的很多，有必要弄清楚
+		
+		cts对权限有要求，权限过高会有安全隐患
+		
+		把gionee/code/driver/project_common/BJ17G10_DRV_COMMON/device/gionee_bj/gnbj6757_66_n/device.mk中的下面的permissions注释掉。
+
+		USB OTG
+		PRODUCT_COPY_FILES += frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml
+	
+	}
+
+
 
 
 	
@@ -754,16 +778,7 @@
 	
 	}
 
-	
 
-   USB  pid，vid添加到驱动中
-   {
-   		gionee_usb_uid_pid 
-   		不同功能对应不同的pid
-   
-   }
-   
-   
  
    
    这几个关键字的代码逻辑
