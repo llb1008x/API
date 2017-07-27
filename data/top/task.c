@@ -2,116 +2,116 @@
 
 /*已处理完问题*/
 {
-		pass
-		电量显示不正确  -> 要熟悉电池相关参数的上报过程
-		{
-			PowerManagerService -> BatteryService -> BatteryProperties.java
-			->BatteryProperties.cpp 
+	pass
+	电量显示不正确  -> 要熟悉电池相关参数的上报过程
+	{
+		PowerManagerService -> BatteryService -> BatteryProperties.java
+		->BatteryProperties.cpp 
+	
+		framework/base/services/core/java/com/android/server/power/PowerManagerService.java
 		
-			framework/base/services/core/java/com/android/server/power/PowerManagerService.java
-			
-			上报电池相关数据
-			private void updateIsPoweredLocked(int dirty) 
-			
-			获取电池电量
-			mBatteryLevel = mBatteryManagerInternal.getBatteryLevel();
-			
-			
-			frameworks/base/services/core/java/com/android/server/BatteryService.java
-			
-			public int getBatteryLevel() {
-            synchronized (mLock) {
-                return mBatteryProps.batteryLevel;
-            }
-      	
-      	
-      		这两个文件对应的properties不对应，java多读了一个fastcharging属性
-      		frameworks/base/core/java/android/os/BatteryProperties.java
-      	
-			./native/services/batteryservice/BatteryProperties.cpp
+		上报电池相关数据
+		private void updateIsPoweredLocked(int dirty) 
+		
+		获取电池电量
+		mBatteryLevel = mBatteryManagerInternal.getBatteryLevel();
+		
+		
+		frameworks/base/services/core/java/com/android/server/BatteryService.java
+		
+		public int getBatteryLevel() {
+        synchronized (mLock) {
+            return mBatteryProps.batteryLevel;
+        }
+  	
+  	
+  		这两个文件对应的properties不对应，java多读了一个fastcharging属性
+  		frameworks/base/core/java/android/os/BatteryProperties.java
+  	
+		./native/services/batteryservice/BatteryProperties.cpp
 
-		}
+	}
 	
 	
 	
 	
-		pass 
-		过压测试：NG，10V时电压不不截止，还有380ma~440ma，无电压过高提醒
+	pass 
+	过压测试：NG，10V时电压不不截止，还有380ma~440ma，无电压过高提醒
+	{
+		过压的时候要停止充电，还要上报状态显示过压
 		{
-			过压的时候要停止充电，还要上报状态显示过压
-			{
-				检测到充电电压大于6.5v字左右要停止充电
+			检测到充电电压大于6.5v字左右要停止充电
+		
+			rt5081那几个关于ovp的中断和中断函数是否被调用
+			打印出那几个寄存器的值
 			
-				rt5081那几个关于ovp的中断和中断函数是否被调用
-				打印出那几个寄存器的值
-				
-				6.5V充电电流是跑sys还是battery
-				
-				vchr = pmic_get_vbus();
-				if (vchr > info->data.max_charger_voltage) {
-					info->notify_code |= 0x0001;
-					pr_err("[BATTERY] charger_vol(%d) > %d mV\n",
-						vchr, info->data.max_charger_voltage);
-						
-						
-				7.5v设置寄存器，可以直接出发中断
-			}
+			6.5V充电电流是跑sys还是battery
 			
-			
-			device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
-			
-			
-			rt5081有ovp功能，但是没有接那个脚,这个是内接的
-			
-			CHG_VIN:16.5v
-			VBUS:14.5v
+			vchr = pmic_get_vbus();
+			if (vchr > info->data.max_charger_voltage) {
+				info->notify_code |= 0x0001;
+				pr_err("[BATTERY] charger_vol(%d) > %d mV\n",
+					vchr, info->data.max_charger_voltage);
+					
+					
+			7.5v设置寄存器，可以直接出发中断
+		}
+		
+		
+		device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
+		
+		
+		rt5081有ovp功能，但是没有接那个脚,这个是内接的
+		
+		CHG_VIN:16.5v
+		VBUS:14.5v
 
-			uvp/ovp
-			0x0e  bit[7:4]   uvp ,bit[3:0]ovp
+		uvp/ovp
+		0x0e  bit[7:4]   uvp ,bit[3:0]ovp
+		
+		rt5081_pmu_chg_vinovp_irq_handler
+		rt5081_pmu_chg_vbusov_irq_handler    CHARGER_DEV_NOTIFY_VBUS_OVP
+		
+		rt5081_pmu_ovpctrl_ovp_d_evt_irq_handler
+		rt5081_pmu_ovpctrl_ovp_evt_irq_handler
+		
+		0xc8  ovpctrl_irq
+		
+		dev_err
+		
+		pmic_get_vbus
+		
+		battery_get_vbus
+		battery_get_vbus
+		
+		数据位数不对应导致判断一直过不去
+		{
+			6500000 
+			  11789	
 			
-			rt5081_pmu_chg_vinovp_irq_handler
-			rt5081_pmu_chg_vbusov_irq_handler    CHARGER_DEV_NOTIFY_VBUS_OVP
+			 6.500 000    
+			11.789v
 			
-			rt5081_pmu_ovpctrl_ovp_d_evt_irq_handler
-			rt5081_pmu_ovpctrl_ovp_evt_irq_handler
 			
-			0xc8  ovpctrl_irq
-			
-			dev_err
-			
-			pmic_get_vbus
-			
-			battery_get_vbus
-			battery_get_vbus
-			
-			数据位数不对应导致判断一直过不去
-			{
-				6500000 
-				  11789	
-				
-				 6.500 000    
-				11.789v
-				
-				
-				4500000
-			   13400000
-			
-			}
-
-
-			停止充电之后还有power path功能，充电器直接给系统供电，应该直接关闭这个功能
-			不进充电器也不进系统
-			CHG_EN 0x12 bit[0]
-			
-			charger_dev_enable_powerpath(chg_dev, en);
-			struct charger_device *chg_dev;
-			bool en;
-			chg_dev = info->chg1_dev
-			
-			vcdt chrin ovp
-			vcdt_vthh
+			4500000
+		   13400000
 		
 		}
+
+
+		停止充电之后还有power path功能，充电器直接给系统供电，应该直接关闭这个功能
+		不进充电器也不进系统
+		CHG_EN 0x12 bit[0]
+		
+		charger_dev_enable_powerpath(chg_dev, en);
+		struct charger_device *chg_dev;
+		bool en;
+		chg_dev = info->chg1_dev
+		
+		vcdt chrin ovp
+		vcdt_vthh
+	
+	}
 		
 		
 	pass修改需要插入sim卡才能激活USB
@@ -119,6 +119,94 @@
 		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb begin
 		GN_RO_GN_USB_SIMSECURITY_SUPPORT = no
 		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb end
+	}
+
+	pass充电电流偏小-> 这个目前为止软件上只能这样，线上电流1.8A，可能线阻很大
+	{
+		这个问题拖了很长时间
+		要理清改变充电电流跟哪些量有关
+		
+		aicl  [0x13]  
+		mivr  [0x16]
+		
+		修改电池容量后，充电电流有提高到1.7A~1.8A
+		mtk_battery_table.h，这里里面很多量都很重要
+		
+		
+		jetia这个功能是disable的
+		{
+			检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
+			07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
+			07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
+			
+			07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
+			
+			07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
+			07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
+		}
+		
+		
+		合入rt5081软件版本P22  2017.7.18
+		{	
+		可能有问题的地方：
+	//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
+
+			CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT
+			#CONFIG_DUAL_ROLE_USB_INTF=y	
+			#define RT5081_PMU_REG_CHGHIDDENCTRL0	(0x30)
+			RT_REG_DECL(RT5081_PMU_REG_CHGHIDDENCTRL0, 1, RT_VOLATILE, {});
+		
+			rgbled
+			//wangguojun modify for RGB led begin
+			0xe0, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
+			//wangguojun modify for RGB led end
+		
+			0x60, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
+		
+			#if defined(__LP64__) || defined(_LP64)
+		
+			RT5081_APPLE_SAMSUNG_TA_SUPPORT
+		
+		
+			软件分级
+			__,_,
+			#if defined(CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT) && !defined(CONFIG_TCPC_CLASS)
+		
+			ret = rt5081_pmu_reg_test_bit(chg_data->chip, RT5081_PMU_REG_CHGSTAT1,
+			RT5081_SHIFT_MIVR_STAT, &mivr_stat);
+		
+			/* Check DP > 2.3 V */
+			ret = rt5081_pmu_reg_update_bits(
+				chg_data->chip,
+				RT5081_PMU_REG_QCSTATUS2,
+				0x0F,
+				0x0B
+			);
+
+		}
+		
+		
+		// add for debug valid 20170724
+		dev_err(chg_data->dev, " in %s by lilubao rt5081 T22\n", __func__);	
+		
+		充电器能力，线损的判断
+		充电相关的变量变化和影响
+		电池容量是否对充电电流有影响
+		
+		
+		烧完版本不识别USB，充电没作用，adb不管用
+		
+		#1
+		ichg = <2500000>;	/* uA 2000000->2500000*/
+		ac_charger_current = <2500000>;				//2050000->2500000
+		ac_charger_input_current = <2800000>;		//3200000->2800000
+		
+		#2
+		aicl_vth = mivr + 100000; // 200000->100000->50000
+		
+		aicr,aicl
+		aicl loop，mivr loop
+		
 	}
 
 
@@ -392,92 +480,16 @@
 17G10A p1试产待解决问题
 {
 	
-	充电电流偏小
+		
+	电池曲线的导入		7.27
 	{
-		这个问题拖了很长时间
-		要理清改变充电电流跟哪些量有关
+		mtk_battery_table.h  		fg_profile_t0
+	
+		mt6757.dtsi文件也有类似的 	battery_profile_t0
 		
-		aicl  [0x13]  
-		mivr  [0x16]
-		
-		修改电池容量后，充电电流有提高到1.7A~1.8A
-		mtk_battery_table.h，这里里面很多量都很重要
-		
-		
-		jetia这个功能是disable的
-		{
-			检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
-			07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
-			07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
-			
-			07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
-			
-			07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
-			07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
-		}
-		
-		
-		合入rt5081软件版本P22  2017.7.18
-		{	
-		可能有问题的地方：
-	//Gionee <gn_by_charging> <lilubao> <20170720> add for fixed charging current begin
-
-			CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT
-			#CONFIG_DUAL_ROLE_USB_INTF=y	
-			#define RT5081_PMU_REG_CHGHIDDENCTRL0	(0x30)
-			RT_REG_DECL(RT5081_PMU_REG_CHGHIDDENCTRL0, 1, RT_VOLATILE, {});
-		
-			rgbled
-			//wangguojun modify for RGB led begin
-			0xe0, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
-			//wangguojun modify for RGB led end
-		
-			0x60, /* RT5081_PMU_REG_RGBCHRINDDIM: 0x92 */
-		
-			#if defined(__LP64__) || defined(_LP64)
-		
-			RT5081_APPLE_SAMSUNG_TA_SUPPORT
-		
-		
-			软件分级
-			__,_,
-			#if defined(CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT) && !defined(CONFIG_TCPC_CLASS)
-		
-			ret = rt5081_pmu_reg_test_bit(chg_data->chip, RT5081_PMU_REG_CHGSTAT1,
-			RT5081_SHIFT_MIVR_STAT, &mivr_stat);
-		
-			/* Check DP > 2.3 V */
-			ret = rt5081_pmu_reg_update_bits(
-				chg_data->chip,
-				RT5081_PMU_REG_QCSTATUS2,
-				0x0F,
-				0x0B
-			);
-
-		}
-		
-		
-		// add for debug valid 20170724
-		dev_err(chg_data->dev, " in %s by lilubao rt5081 T22\n", __func__);	
-		
-		充电器能力，线损的判断
-		充电相关的变量变化和影响
-		电池容量是否对充电电流有影响
-		
-		
-		烧完版本不识别USB，充电没作用，adb不管用
-		
-		#1
-		ichg = <2500000>;	/* uA 2000000->2500000*/
-		ac_charger_current = <2500000>;				//2050000->2500000
-		ac_charger_input_current = <2800000>;		//3200000->2800000
-		
-		#2
-		aicl_vth = mivr + 100000; // 200000->100000->50000
-		
-		aicr,aicl
-		aicl loop，mivr loop
-		
+		mtk还有两个patch要合入
+	
+		电量计系数的测量
 	}
 
 
@@ -488,6 +500,11 @@
 	   
 	}
 	
+	
+	
+
+
+
 	
 	整机测试
 	{
@@ -731,15 +748,7 @@
 	
 	
 
-	电量计系数的测量
-	
-	
-	
-	电池曲线的导入		7.19
-	mtk_battery_table.h  		fg_profile_t0
-	
-	mt6757.dtsi文件也有类似的 	battery_profile_t0
-	
+
 	
 	过温测试
 
