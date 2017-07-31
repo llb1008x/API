@@ -483,26 +483,135 @@
 		
 	电池曲线的导入		7.27
 	{
-		mtk_battery_table.h  		fg_profile_t0
+		涉及到哪些文件,哪些细节
+		{
+			mtk_battery_table.h  		fg_profile_t0
 	
-		mt6757.dtsi文件也有类似的 	battery_profile_t0
+			mt6757.dtsi文件也有类似的 	battery_profile_t0
+			
+			
+			GM3.0的客制化
+			{
+				car_tune_value -> GMAT_TOOL -> battery_prop_ext.dtsi
+				
+				-> ZCV table + GMAT_TOOL ,battery_table_ext.dtsi
+				
+				->工厂模式下利用 ATE_tool校准参数Rfg ，meta模式下修改NVRAM中存储的car_tune_value
+
+			}
+		}
+		
+		
+		
+		电量计相关的log对应什么意思，怎么看
+		{
+			具体放充电库伦值大小
+			[FGADC_intr_end][FG_INTR_IAVG]
+			read_fg_hw_info
+			
+			
+			打开电量计相关的log
+			adb shell setprop persist.mediatek.fg.log.enable 1
+			
+			手动提高fg log等级
+			adb shell
+			Echo 8 > /sys/bus/platform/devices/battery/FG_daemon_log_level
+			
+			Gauge Low power mode 关闭方法
+			adb shell
+			
+			echo 3000 > /sys/devices/platform/mt-pmic/pmic_access
+			
+			cat /sys/devices/platform/mt-pmic/pmic_access
+			
+			看看出來的值是多少		regiser-> FGADC_CON  (low dropout regulator P47)
+			假設出來的值是 2319
+			用2進位查看這個値, 我們要更改bit 8 的值 (FG_SON_SLP_EN)  , 將其從 1 改成 0 (從 enable 改為disable)
+			
+			將更改後的新值(2219)透過adb command寫回register
+			echo 3000 2219 > /sys/devices/platform/mt-pmic/pmic_access
+			
+			再讀取一次值 double confirm是否讀取出來已經為新的值
+			echo 3000 > /sys/devices/platform/mt-pmic/pmic_access
+
+Cat /sys/devices/platform/mt-pmic/pmic_access    
+			
+		
+		}
+		
+		
+		
+		
 		
 		mtk还有两个patch要合入
+		{
+			ALPS03420707：
+			修复待机是电量计计算可能出现的异常
+		
+			ALPS03420700：
+			UI快速掉电问题，从100%迅速掉到0%
+			
+			ALPS03158638
+			ALPS03248687
+			ALPS03253502
+			ALPS03245474
+			ALPS03287248
+			
+			正是patch，临时patch，申请等一系列注意事项
+		}
+		
+
+
+
 	
 		电量计系数的测量
+		{
+			1、 先帮忙连接SP_META Tool确认下这台机器的NVRAM里面的CAR_TUNE_VALUE值的大小。
+
+			2、 通过外灌电流，然后确认下工模里读取到的电流是否有偏差。外灌电流的大小从1A->500mA->300mA-100mA>50mA->10mA往下调，
+
+			确认电流是否有偏差。前提得保证外灌电流大小的精准度。
+		}
+		
+		
+		这两个宏是否生效
+		CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT=y
+		CONFIG_MTK_ADDITIONAL_BATTERY_TABLE=y
 	}
+
+
+
+
+
+
 
 
 	USB  pid，vid添加到驱动中
 	{
-	   		gionee_usb_uid_pid 
-	   		不同功能对应不同的pid
+   		gionee_usb_uid_pid 
+   		不同功能对应不同的pid
+   		
+   		init.mt6735.usb.rc
+   		init.recovery.mt6735.rc
+   		meta.init.rc
+   		iAmCdRom.iso
+   		android.c
+   		
+   		
+   		#Gionee <gn_by_charging> <lilubao> <20170728> add for USB vid pid begin
 	   
 	}
 	
 	
 	
+	battery_percent  wakelock 持锁问题
+	
 
+	高通提case
+	{
+		USB不识别问题
+	
+	}
 
 
 	
@@ -957,13 +1066,13 @@
 		
 		几个高通平台稳定性文档，感兴趣的可以下载看。
 
-			80-NM641-1
-			80-P7139-1
-			80-P7139-3
-			80-P7139-5
-			80-P7139-6
-			80-P7139-7
-			80-P7139-8
+		80-NM641-1
+		80-P7139-1
+		80-P7139-3
+		80-P7139-5
+		80-P7139-6
+		80-P7139-7
+		80-P7139-8
 
 
 	}
