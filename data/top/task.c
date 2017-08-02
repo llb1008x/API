@@ -121,6 +121,7 @@
 		#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb end
 	}
 
+
 	pass充电电流偏小-> 这个目前为止软件上只能这样，线上电流1.8A，可能线阻很大
 	{
 		这个问题拖了很长时间
@@ -208,6 +209,36 @@
 		aicl loop，mivr loop
 		
 	}
+	
+	
+	pass USB  pid，vid添加到驱动中
+	{
+   		gionee_usb_uid_pid 
+   		不同功能对应不同的pid
+   		
+   		init.mt6735.usb.rc
+   		
+   		init.recovery.mt6735.rc
+   		meta.init.rc
+   		iAmCdRom.iso
+   		android.c
+   		
+   		
+   		#Gionee <gn_by_charging> <lilubao> <20170728> add for USB vid pid begin
+   		
+	    现在的情况是windows电脑用的是UsbDriverSetup_Fac_V2.7.0.0.exe 这是gionee用的新的usb驱动
+	    新版本在meta模式下需要安装UsbDriverSetup_Fac_Path_V1.0.1.0.exe 这个补丁然后才能识别端口，
+	    进入meta模式写号，老版的usb驱动可以识别
+	    
+	    也就是说现在需要知道新版usb驱动和老版的区别在哪，windows电脑怎么识别这些信息的，S10是否有这个问题，如果有怎么做的
+	    
+	    
+	    init.rc之类的文件内那些代码什么意思，以及usb的mass_storage,adb,acm等是什么意思
+	    init.mt6757.usb.rc
+	    meta_init.rc
+	    
+	    mass_storage，adb,ptp,mtp,acm,adb/fastboot
+	}
 
 
 }
@@ -275,6 +306,9 @@
 	
 	G1605A电量跳变问题
 	{
+		G1605A_T113
+		
+	
 	
 		87038，86321从1%充电10分钟充电到4%,再关机充电5分钟左右电量变为52%
 	
@@ -284,7 +318,7 @@
 		
 		G1605A-T0114-170310AB
 		gitk  --author=liteng   2017.3.15   73194 P80,2017.5.22 84712 P96
-		
+		这个patch的目的就是为了解决电量跳变问题
 		{
 			大概写了一下流程，请过目：
 			底层电量跟上层偏差过大导致电量跳变的判断
@@ -392,7 +426,7 @@
 		有变化的地方
 		{
 		
-			//Gionee <gn_by_charging> <lilubao> <20170726> add for debug battery status begin
+			//Gionee <gn_by_charging> <lilubao> <20170801> add for debug battery status begin
 
 			#ifndef DIFFERENCE_VBAT_RTC
 			#define DIFFERENCE_VBAT_RTC 10
@@ -473,8 +507,6 @@
 
 
 
-
-
 /********************************************************************************************************************************/
 
 17G10A p1试产待解决问题
@@ -485,25 +517,26 @@
 	{
 		涉及到哪些文件,哪些细节
 		{
-			mtk_battery_table.h  		fg_profile_t0
-	
-			mt6757.dtsi文件也有类似的 	battery_profile_t0
+			mtk_battery_table.h  ，mtk_battery_property.h ，mt6757_battery_prop_ext.dtsi,mt6757_battery_table_ext.dtsi
 			
-			
-			GM3.0的客制化
+			GM3.0的客制化步骤
 			{
-				car_tune_value -> GMAT_TOOL -> battery_prop_ext.dtsi
+				1.测量car_tune_value 系数
 				
-				-> ZCV table + GMAT_TOOL ,battery_table_ext.dtsi
+				2.利用GMAT_TOOL导出 
+				-> battery_prop_ext.dtsi
 				
-				->工厂模式下利用 ATE_tool校准参数Rfg ，meta模式下修改NVRAM中存储的car_tune_value
-
+				-> ZCV table，battery_table_ext.dtsi
+				
+				3.工厂模式下利用 ATE_tool校准参数Rfg ，meta模式下修改NVRAM中存储的car_tune_value
+				这种应该是单独修正每一台机器的car_tune_value的值，因为这个值不同机器可能不一样
 			}
 		}
 		
 		
+
 		
-		电量计相关的log对应什么意思，怎么看
+		电量计相关的debug
 		{
 			具体放充电库伦值大小
 			[FGADC_intr_end][FG_INTR_IAVG]
@@ -515,7 +548,7 @@
 			
 			手动提高fg log等级
 			adb shell
-			Echo 8 > /sys/bus/platform/devices/battery/FG_daemon_log_level
+			echo 8 > /sys/bus/platform/devices/battery/FG_daemon_log_level
 			
 			Gauge Low power mode 关闭方法
 			adb shell
@@ -534,16 +567,60 @@
 			再讀取一次值 double confirm是否讀取出來已經為新的值
 			echo 3000 > /sys/devices/platform/mt-pmic/pmic_access
 
-Cat /sys/devices/platform/mt-pmic/pmic_access    
-			
+			cat /sys/devices/platform/mt-pmic/pmic_access    
+		}
 		
+		
+		电量计相关参数的测量以及意思
+		{
+		  car_tune_value	
+			1、 先帮忙连接SP_META Tool确认下这台机器的NVRAM里面的CAR_TUNE_VALUE值的大小。
+
+			2、 通过外灌电流，然后确认下工模里读取到的电流是否有偏差。外灌电流的大小从1A->500mA->300mA-100mA>50mA->10mA往下调，
+
+			确认电流是否有偏差。前提得保证外灌电流大小的精准度。
+			
+			car_tune_value 100  ->   948mA		105
+			
+			CALIBRATE_CAR_TUNE_VALUE_BY_META_TOOL这个宏用于在工厂模式下利用ATE_TOOL校准Rfg参数
+			这个值跟板极的阻抗有关
+			
+			这个宏用于工厂校准value参数时打开，
+			#ifdef CALIBRATE_CAR_TUNE_VALUE_BY_META_TOOL
+			bm_notice("[fg_res] cali_car_tune = %d, default = %d, Use [cali_car_tune]\n",
+				cali_car_tune, fg_cust_data.car_tune_value);
+				fg_cust_data.car_tune_value = cali_car_tune;
+			#else
+				bm_notice("[fg_res] cali_car_tune = %d, default = %d, Use [default]\n",
+						cali_car_tune, fg_cust_data.car_tune_value);
+			#endif
+
+			1、#define DIFFERENCE_FULLOCV_ITH       400         /* mA */
+			
+			2、#define EMBEDDED_SEL 1
+
+			3、#define FG_METER_RESISTANCE    		75
+
+		}
+		
+		
+		放电时序，放电是否正常
+		{
+			建议做下放电曲线的量测，如附件是参考案例的模板。
+
+			1、 放电曲线的量测的场景：
+			一、温度25度：重载（可以重载游戏，控制电流输出为1A左右）、轻载（可以播放MP3，控制电流输出为400mA左右）
+
+			二、温度0度：重载（可以重载游戏，控制电流输出为1A左右）、轻载（可以播放MP3，控制电流输出为400mA左右）
+
+			2、 先充电充到满，即battery报Full后开始放电，用ttermpro串口工具（此工具记录时间）抓取Uart Log，直到手机关机。
+
+			3、 重点关注UI_SOC放电曲线的平滑度，及最后放电几percent（5%～1%）的在每percent keep住的时间，会不会出现类似在2%时突然Drop关机的状况。若有，则需要调整参数。
 		}
 		
 		
 		
-		
-		
-		mtk还有两个patch要合入
+		GM3.0相关的patch
 		{
 			ALPS03420707：
 			修复待机是电量计计算可能出现的异常
@@ -559,48 +636,14 @@ Cat /sys/devices/platform/mt-pmic/pmic_access
 			
 			正是patch，临时patch，申请等一系列注意事项
 		}
-		
+	}
+
 
 
 
 	
-		电量计系数的测量
-		{
-			1、 先帮忙连接SP_META Tool确认下这台机器的NVRAM里面的CAR_TUNE_VALUE值的大小。
-
-			2、 通过外灌电流，然后确认下工模里读取到的电流是否有偏差。外灌电流的大小从1A->500mA->300mA-100mA>50mA->10mA往下调，
-
-			确认电流是否有偏差。前提得保证外灌电流大小的精准度。
-		}
-		
-		
-		这两个宏是否生效
-		CONFIG_RT5081_PMU_CHARGER_TYPE_DETECT=y
-		CONFIG_MTK_ADDITIONAL_BATTERY_TABLE=y
-	}
-
-
-
-
-
-
-
-
-	USB  pid，vid添加到驱动中
-	{
-   		gionee_usb_uid_pid 
-   		不同功能对应不同的pid
-   		
-   		init.mt6735.usb.rc
-   		init.recovery.mt6735.rc
-   		meta.init.rc
-   		iAmCdRom.iso
-   		android.c
-   		
-   		
-   		#Gionee <gn_by_charging> <lilubao> <20170728> add for USB vid pid begin
-	   
-	}
+	
+	
 	
 	
 	
