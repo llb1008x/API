@@ -422,7 +422,7 @@
 		有变化的地方
 		{
 		
-			//Gionee <gn_by_charging> <lilubao> <20170801> add for debug battery status begin
+			//Gionee <gn_by_charging> <lilubao> <20170804> add for debug battery status begin
 
 			#ifndef DIFFERENCE_VBAT_RTC
 			#define DIFFERENCE_VBAT_RTC 10
@@ -508,8 +508,9 @@
 17G10A p1试产待解决问题
 {
 	电量计校准，没有测试点，这个会影响到电量计的准确度
+	手上的手机：T1-004，T1-083，T1-672
 	
-	
+
 	电池曲线的导入		7.27
 	{
 		
@@ -536,7 +537,7 @@
 
 		电量计相关的debug
 		{
-			//Gionee <gn_by_CHG> <lilubao> <20170802> add for fuelgauge begin
+			//Gionee <gn_by_CHG> <lilubao> <20170804> add for fuelgauge begin
 			具体放充电库伦值大小
 			[FGADC_intr_end][FG_INTR_IAVG]
 			read_fg_hw_info
@@ -584,7 +585,7 @@
 			CALIBRATE_CAR_TUNE_VALUE_BY_META_TOOL这个宏用于在工厂模式下利用ATE_TOOL校准Rfg参数
 			这个值跟板极的阻抗有关
 			
-			这个宏用于工厂校准value参数时打开，
+			这个宏用于工厂校准value参数时打开，会把库仑计的系数写到一个全局变量里
 			#ifdef CALIBRATE_CAR_TUNE_VALUE_BY_META_TOOL
 			bm_notice("[fg_res] cali_car_tune = %d, default = %d, Use [cali_car_tune]\n",
 				cali_car_tune, fg_cust_data.car_tune_value);
@@ -605,13 +606,32 @@
 		
 		开机充电(四个温度)，关机充电，放电等三种情况
 		{
-			aicl检测的是后设定一个上限，如果超过这个值就设为指定值，防止充电电流过高
+			
 			1.开机充电，在四个温度下测试充到满电
+			{
+				电量显示的差别很大,充电为什么底层电量还会减少
+				
+				充电过程中温度很高
+			
+			}
 		
 		
 			2.现在关机充电遇到的情况：进电池的是2A，但是ibus上电流经常跳变，有时候3A，有时候有是1A
-			系统功耗很大，而且是间断性的跳变，这样会导致充进电池的电流很小
-			系统功耗很大可能是开机关机都有的问题，先要确定是软件还是硬件的问题
+			{
+				系统功耗很大，而且是间断性的跳变，这样会导致充进电池的电流很小
+				系统功耗很大可能是开机关机都有的问题，先要确定是软件还是硬件的问题
+			
+				也可能是充电器或者aicl检测(可能有偏差)到的能力很大，设定值很高，最后设定电流达到3A的时候，然后又被拉下来了
+			
+				aicl检测的是后设定一个上限，如果超过这个值就设为指定值，防止充电电流过高
+			
+				这个充电电流跳变的问题，开机关机充电都存在，什么把电流拉下来了，充电的时候底层跟上层电量显示的差异，开机电压，关机电压的问题
+			
+			
+			}	
+			
+			
+			
 			
 			3.放电时序，放电是否正常
 			{
