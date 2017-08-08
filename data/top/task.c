@@ -211,35 +211,240 @@
 	}
 	
 	
-	pass USB  pid，vid添加到驱动中
-	{
-   		gionee_usb_uid_pid 
-   		不同功能对应不同的pid
-   		
-   		init.mt6735.usb.rc
-   		init.recovery.mt6735.rc
-   		meta.init.rc
-   		android.c
-   		
-   		
-   		#Gionee <gn_by_charging> <lilubao> <20170728> add for USB vid pid begin
-   		
-	    现在的情况是windows电脑用的是UsbDriverSetup_Fac_V2.7.0.0.exe 这是gionee用的新的usb驱动
-	    新版本在meta模式下需要安装UsbDriverSetup_Fac_Path_V1.0.1.0.exe 这个补丁然后才能识别端口，
-	    进入meta模式写号，老版的usb驱动可以识别
-	    
-	    也就是说现在需要知道新版usb驱动和老版的区别在哪，windows电脑怎么识别这些信息的，S10是否有这个问题，如果有怎么做的
-	    
-	    
-	    init.rc之类的文件内那些代码什么意思，以及usb的mass_storage,adb,acm等是什么意思
-	    init.mt6757.usb.rc
-	    meta_init.rc
-	    
-	    mass_storage，adb,ptp,mtp,acm,adb/fastboot
-	}
 
+
+
+
+	pass G1605A电量跳变问题
+	{	
+		G1605A手上的BUG
+		90667		待机功耗
+		89288		电量跳变问题
+		89243		这个也是电量跳变问题引起的，电量虚高
+		90309		电量跳变问题
+	
+
+
+		现象：低电量关机充电条件下，多次插拔充电器，手机电量从8%跳变到45%，开机之后电量仍然是45%
+		但是那只是暂时的，之后手机电量迅速降低
+	
+		相关的BUG号：87038，86321，90309，89288，89243
+		eService ID：ALPS03373196
+		合入patch前后的版本		P80
+		G1605A-T0114-170310AB
+		G1605A-T0115-170314AB
+		G1605A-T0116-170324AB
+	
+		原因：
+			1.fuelgauge2.0的电量是根据电池电压来算的，也就是ZCV table上的电压算电量，多次插拔充电器之后，
+			电池电压升的很高(插入充电器之后，电池电压升高是什么原因，为什么每插一次充电器之后，电池电压都会上升一次)
+		
+			2.开机之后显示的电量是45%，但是电池电压仍然只有3.54V左右，之后十分钟以内电量下降的很快，因为开机之前记录
+			的是RTC的电量，但是之后fuelgauge2.0是会去检测电池电压，计算电量，但是差别很大，为了使电量变化平缓，所以
+			是放慢下降的速率。
+		
+			3.底层电量跟上层显示差别较大，然后触发电量跳变问题	，
+			mt_battery_meter.h
+		
+
+		分析
+		{
+			初步分析原因是P80引入的问题，但是P80就是为了解决这个问题的 
+			gitk  --author=liteng   
+			2017.3.15   73194 P80,	2017.5.22 	84712 P96
+
+
+			/* fg 2.0 */
+			#define DIFFERENCE_HWOCV_RTC		30		//硬件跟RTC的最大偏差
+			#define DIFFERENCE_HWOCV_SWOCV		10		//硬件跟软件的最大偏差
+			#define DIFFERENCE_SWOCV_RTC		10		//软件跟RTC的最大偏差
+			#define MAX_SWOCV					3		//这是个%，就是检测与RTC的电量超过%，就重新检测电池电量
+	
+	
+			关机电量跳变过程 FGADC_D0   embedded 0 
+			[ 3.440954] <0>.(1)[220:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3765,25 SW OCV 3852,49 RTC 9, VBAT 3775,28, T_avg 34, I 5895, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 91 ui_soc:9 7 embedded 0 plugout 0 )
+			[ 6.506033] <0>.(0)[220:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3765,25 SW OCV 3852,49 RTC 9, VBAT 3775,28, T_avg 34, I 5895, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 91 ui_soc:9 7 embedded 0 plugout 0 )
+			[ 3.409184] <0>.(1)[221:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3848,48 SW OCV 3864,51 RTC 9, VBAT 3783,30, T_avg 34, I 6155, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 52 ui_soc:48 2 embedded 0 plugout 0 )
+			[ 6.476715] <0>.(0)[221:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3848,48 SW OCV 3864,51 RTC 9, VBAT 3783,30, T_avg 34, I 6155, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 52 ui_soc:48 2 embedded 0 plugout 0 )
+			[ 16.481772] <0>.(0)[221:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3848,48 SW OCV 3864,51 RTC 9, VBAT 3783,30, T_avg 34, I 6155, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 52 ui_soc:48 2 embedded 0 plugout 0 )
+			[ 26.479228] <0>.(0)[221:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3848,48 SW OCV 3864,51 RTC 9, VBAT 3783,30, T_avg 34, I 6155, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 52 ui_soc:48 2 embedded 0 plugout 0 )
+		
+		
+			开机后电量迅速下降
+			<3>[   11.406829] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3580,bat_vol 3546, AvgI 0, I 0, VChr 0, AvgT 25, T 26, ZCV 0, CHR_Type 0, SOC   0:-100: -1
+			<3>[   12.048313] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3578,bat_vol 3517, AvgI 0, I 0, VChr 0, AvgT 25, T 26, ZCV 0, CHR_Type 0, SOC   0:-100: -1
+			<3>[   22.063274] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3576,bat_vol 3500, AvgI 0, I 0, VChr 0, AvgT 25, T 26, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
+			<3>[   32.061719] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3574,bat_vol 3551, AvgI 0, I 0, VChr 0, AvgT 25, T 26, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
+			<3>[   42.079623] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3575,bat_vol 3601, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
+			<3>[   52.078424] .(1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3576,bat_vol 3594, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
+			<3>[   62.066274] .(1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3575,bat_vol 3570, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
+			<3>[   72.052747]  (3)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3574,bat_vol 3536, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
+
+
+			<3>[   82.055699]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3571,bat_vol 3490, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
+			<3>[   92.057397]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3568,bat_vol 3498, AvgI 0, I 0, VChr 0, AvgT 25, T 28, ZCV 3682, CHR_Type 0, SOC   4: 46: 45
+			<3>[  102.054568]  (2)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3565,bat_vol 3495, AvgI 0, I 0, VChr 0, AvgT 25, T 28, ZCV 3682, CHR_Type 0, SOC   4: 46: 45
+			<3>[  112.054956]  (2)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3561,bat_vol 3460, AvgI 0, I 0, VChr 0, AvgT 25, T 29, ZCV 3682, CHR_Type 0, SOC   4: 45: 44
+			<3>[  122.055205]  (1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3555,bat_vol 3414, AvgI 0, I 0, VChr 0, AvgT 25, T 29, ZCV 3682, CHR_Type 0, SOC   4: 45: 44
+			<3>[  132.054983]  (2)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3552,bat_vol 3477, AvgI 0, I 0, VChr 0, AvgT 26, T 29, ZCV 3682, CHR_Type 0, SOC   3: 44: 43
+			<3>[  142.059308]  (1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3549,bat_vol 3500, AvgI 0, I 0, VChr 0, AvgT 26, T 30, ZCV 3682, CHR_Type 0, SOC   3: 43: 42
+			<3>[  152.057670]  (1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3546,bat_vol 3481, AvgI 0, I 0, VChr 0, AvgT 26, T 30, ZCV 3682, CHR_Type 0, SOC   3: 42: 41
+			<3>[  162.055236]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3542,bat_vol 3475, AvgI 0, I 0, VChr 0, AvgT 26, T 30, ZCV 3682, CHR_Type 0, SOC   3: 41: 40
+			<3>[  172.062902]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3541,bat_vol 3559, AvgI 0, I 0, VChr 0, AvgT 26, T 30, ZCV 3682, CHR_Type 0, SOC   3: 40: 39
+			<3>[  182.062495]  (1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3540,bat_vol 3538, AvgI 0, I 0, VChr 0, AvgT 26, T 31, ZCV 3682, CHR_Type 0, SOC   3: 38: 37
+			<3>[  192.062400]  (2)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3537,bat_vol 3489, AvgI 0, I 0, VChr 0, AvgT 27, T 31, ZCV 3682, CHR_Type 0, SOC   3: 37: 36
+		
+
+			从为合入patch的版本，单独合入patch，patch里面包含的lib，需要在vendor目录和out目录下面都手动替换一次
+			这两个lib库，不知道out目录下是否有替换到
+		
+			所以现在要做的是抓一份未合入patch之前的log，然后合入patch，替换lib库，分析合入之后的log，开fuelgauge log	
+		
+		
+
+		}
+
+		相关的log关键字
+		{
+			int Enable_FGADC_LOG = BMLOG_TRACE_LEVEL;
+		
+			FGADC_D0
+		
+			//Gionee <gn_by_CHG> <lilubao> <20170807> add for fuelgauge begin
+		
+			mt_battery_set_init_vol(gFG_voltage_init);
+			battery_meter_set_fg_int
+
+			INIT_BAT_CUR_FROM_PTIM
+
+		}
+
+
+		解决方案
+		{
+			内置电池和外置电池的区别：
+			如果是内置电池embedded_battery，开机关机的电量是从rtc里面读取的，如果电量偏差超过max_swocv就重新检测电量
+			所以如果是内置电池，第一次或者长时间未充电，建议充满
+			如果是外置电池，开关机的电量是硬件重新检测，而且硬件检测有偏差，就像这个电量跳变问题，插入充电器电池电压升高，然后是根据电池
+			电压计算电量的，所以电量变高
+		
+			battery_meter_fg_20.c -> batt_meter_cust_data.embedded_battery -> batt_meter_cust_data.embedded_battery=1；
+		}
+	
+	
+		MTK：
+		fuelgauge对于电量的判断流程，这个判断过程自己一定要理解，
+		{
+			“理论上需要走这些判断，但是电量的值直接走了都去硬件的电量
+			所以出错“
+		
+		
+		
+			大概写了一下流程，请过目：
+			底层电量跟上层偏差过大导致电量跳变的判断
+
+			fg_result：
+			0：电量触发跳变的
+			2：rtc=1的情况下，把rtc记录的电量赋给电量计；软件电量超过最大电量的情况
+			4：rtc记录的电量超过10，把电量计记录的初始化的值赋给电量计
+			5：其他情况下也是把电量计记录的初始化的值赋给电量计
+
+			if (soc_flow == HW_FG || soc_flow == SW_FG) {
+				if ( (fg_plugout_status==0 || (boot_reason == BR_2SEC_REBOOT)) && (charger_exist != true)){
+					if (g_rtc_fg_soc == 0) {
+					    fg_capacity_by_v = fg_capacity_by_v_init;
+					    fg_result = 0;
+					} else {
+					    if (g_rtc_fg_soc == 1) {
+					        fg_capacity_by_v = g_rtc_fg_soc;
+					        fg_result = 2;
+
+					    } else if ( fg_sw_soc >= max_swocv ) {
+					        fg_capacity_by_v = g_rtc_fg_soc;
+					        fg_result = 2;
+					    } else if (g_rtc_fg_soc > 10) {
+					        fg_capacity_by_v = fg_capacity_by_v_init;
+					        set_rtc = 2;
+					        fg_result = 4;
+					    } else {
+					        fg_capacity_by_v = fg_capacity_by_v_init;
+					        set_rtc = 1;
+					        fg_result = 5;
+					    }
+					}
+				} 
+			
+				else {	//rtc电量-硬件电量  超过  hw_rtc的阈值 同时  软件电量-rtc电量 大于 硬件 -  软件电量
+					if (((abs(g_rtc_fg_soc - fg_hw_soc)) > difference_hwocv_rtc)
+					    && (abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_hw_soc - fg_sw_soc))) {
+					    /* compare with hw_ocv & sw_ocv, check if less than or equal to 5% tolerance */
+					    if (abs(fg_sw_soc - fg_hw_soc) > difference_hwocv_swocv) {
+					        fg_capacity_by_v = fg_capacity_by_v_init;
+					        fg_result = 0;
+					    }
+					} else {
+					    if (abs(fg_sw_soc - g_rtc_fg_soc) > (difference_swocv_rtc + batterypseudo1)
+					        && ( abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_sw_soc - fg_vbat_soc) ) ) {
+					        fg_capacity_by_v = fg_capacity_by_v_init;
+					        fg_result = 0;
+					    } else {
+					        if (g_rtc_fg_soc == 0) {
+					            fg_capacity_by_v = fg_capacity_by_v_init;
+					            fg_result = 0;
+					        } else {
+					            if (g_rtc_fg_soc == 1) {
+					                fg_capacity_by_v = g_rtc_fg_soc;
+					                fg_result = 2;
+
+					            } else if ( fg_sw_soc >= max_swocv ) {
+					                fg_capacity_by_v = g_rtc_fg_soc;
+					                fg_result = 2;
+					            } else if (g_rtc_fg_soc > 10) {
+					                fg_capacity_by_v = fg_capacity_by_v_init;
+					                set_rtc = 2;
+					                fg_result = 4;
+					            } else {
+					                fg_capacity_by_v = fg_capacity_by_v_init;
+					                set_rtc = 1;
+					                fg_result = 5;
+					            }
+					        }
+					    }
+					}
+				}
+			}
+
+			// modify g_booting_vbat
+
+			if (fg_capacity_by_v == 0 && charger_exist == true) {
+				fg_capacity_by_v = 1;
+				fg_result = 3;
+				FGLOG_NOTICE("[FGADC] fg_capacity_by_v=%d\n", fg_capacity_by_v);
+			}
+
+			if (set_rtc == 1) {
+				fg_capacity = g_rtc_fg_soc;
+			} else if (set_rtc == 2){
+				fg_capacity = g_rtc_fg_soc - 1;
+			} else {
+				fg_capacity = fg_capacity_by_v;
+			}
+			fg_dod0 = 100 - fg_capacity_by_v;
+			fg_capacity_by_c_init = fg_capacity;
+			fg_capacity_by_c = fg_capacity;
+			fg_dod0_init = fg_dod0;
+			fg_dod1 = fg_dod0;
+			set_fg_soc(fg_capacity_by_v);
+			ui_soc=fg_capacity_by_c_init; 
+
+		}	
+
+	}	
 
 }
+
+
+
 
 
 
@@ -305,277 +510,65 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-	
-G1605A电量跳变问题
-{
-	G1605A手上的BUG
-	90667		待机功耗
-	89288		电量跳变问题
-	89243		这个也是电量跳变问题引起的，电量虚高
-	90309		电量跳变问题
-	
-
-
-	现象：低电量关机充电条件下，多次插拔充电器，手机电量从8%跳变到45%，开机之后电量仍然是45%
-	但是那只是暂时的，之后手机电量迅速降低
-	
-	相关的BUG号：87038，86321，90309，89288，89243
-	eService ID：ALPS03373196
-	合入patch前后的版本		P80
-	G1605A-T0114-170310AB
-	G1605A-T0115-170314AB
-	G1605A-T0116-170324AB
-	
-	原因：
-		1.fuelgauge2.0的电量是根据电池电压来算的，也就是ZCV table上的电压算电量，多次插拔充电器之后，
-		电池电压升的很高(插入充电器之后，电池电压升高是什么原因，为什么每插一次充电器之后，电池电压都会上升一次)
-		
-		2.开机之后显示的电量是45%，但是电池电压仍然只有3.54V左右，之后十分钟以内电量下降的很快，因为开机之前记录
-		的是RTC的电量，但是之后fuelgauge2.0是会去检测电池电压，计算电量，但是差别很大，为了使电量变化平缓，所以
-		是放慢下降的速率。
-		
-		3.底层电量跟上层显示差别较大，然后触发电量跳变问题	，
-		mt_battery_meter.h
-		
-
-	分析
-	{
-		初步分析原因是P80引入的问题，但是P80就是为了解决这个问题的 
-		gitk  --author=liteng   
-		2017.3.15   73194 P80,	2017.5.22 	84712 P96
-
-
-		/* fg 2.0 */
-		#define DIFFERENCE_HWOCV_RTC		30		//硬件跟RTC的最大偏差
-		#define DIFFERENCE_HWOCV_SWOCV		10		//硬件跟软件的最大偏差
-		#define DIFFERENCE_SWOCV_RTC		10		//软件跟RTC的最大偏差
-		#define MAX_SWOCV					3		//这是个%，就是检测与RTC的电量超过%，就重新检测电池电量
-	
-	
-		关机电量跳变过程 FGADC_D0
-		[ 3.440954] <0>.(1)[220:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3765,25 SW OCV 3852,49 RTC 9, VBAT 3775,28, T_avg 34, I 5895, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 91 ui_soc:9 7 embedded 0 plugout 0 )
-		[ 6.506033] <0>.(0)[220:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3765,25 SW OCV 3852,49 RTC 9, VBAT 3775,28, T_avg 34, I 5895, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 91 ui_soc:9 7 embedded 0 plugout 0 )
-		[ 3.409184] <0>.(1)[221:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3848,48 SW OCV 3864,51 RTC 9, VBAT 3783,30, T_avg 34, I 6155, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 52 ui_soc:48 2 embedded 0 plugout 0 )
-		[ 6.476715] <0>.(0)[221:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3848,48 SW OCV 3864,51 RTC 9, VBAT 3783,30, T_avg 34, I 6155, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 52 ui_soc:48 2 embedded 0 plugout 0 )
-		[ 16.481772] <0>.(0)[221:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3848,48 SW OCV 3864,51 RTC 9, VBAT 3783,30, T_avg 34, I 6155, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 52 ui_soc:48 2 embedded 0 plugout 0 )
-		[ 26.479228] <0>.(0)[221:fuelgauged]MTK_FG: [FGADC_D0](HW OCV 3848,48 SW OCV 3864,51 RTC 9, VBAT 3783,30, T_avg 34, I 6155, is_charging 0, is_charger 1, gap1 32,10,18,5,10,30 D0 52 ui_soc:48 2 embedded 0 plugout 0 )
-		
-		
-		开机后电量迅速下降
-		<3>[   11.406829] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3580,bat_vol 3546, AvgI 0, I 0, VChr 0, AvgT 25, T 26, ZCV 0, CHR_Type 0, SOC   0:-100: -1
-		<3>[   12.048313] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3578,bat_vol 3517, AvgI 0, I 0, VChr 0, AvgT 25, T 26, ZCV 0, CHR_Type 0, SOC   0:-100: -1
-		<3>[   22.063274] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3576,bat_vol 3500, AvgI 0, I 0, VChr 0, AvgT 25, T 26, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
-		<3>[   32.061719] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3574,bat_vol 3551, AvgI 0, I 0, VChr 0, AvgT 25, T 26, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
-		<3>[   42.079623] .(0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3575,bat_vol 3601, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
-		<3>[   52.078424] .(1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3576,bat_vol 3594, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
-		<3>[   62.066274] .(1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3575,bat_vol 3570, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
-		<3>[   72.052747]  (3)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3574,bat_vol 3536, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
-
-
-		<3>[   82.055699]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3571,bat_vol 3490, AvgI 0, I 0, VChr 0, AvgT 25, T 27, ZCV 3682, CHR_Type 0, SOC   4: 47: 46
-		<3>[   92.057397]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3568,bat_vol 3498, AvgI 0, I 0, VChr 0, AvgT 25, T 28, ZCV 3682, CHR_Type 0, SOC   4: 46: 45
-		<3>[  102.054568]  (2)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3565,bat_vol 3495, AvgI 0, I 0, VChr 0, AvgT 25, T 28, ZCV 3682, CHR_Type 0, SOC   4: 46: 45
-		<3>[  112.054956]  (2)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3561,bat_vol 3460, AvgI 0, I 0, VChr 0, AvgT 25, T 29, ZCV 3682, CHR_Type 0, SOC   4: 45: 44
-		<3>[  122.055205]  (1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3555,bat_vol 3414, AvgI 0, I 0, VChr 0, AvgT 25, T 29, ZCV 3682, CHR_Type 0, SOC   4: 45: 44
-		<3>[  132.054983]  (2)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3552,bat_vol 3477, AvgI 0, I 0, VChr 0, AvgT 26, T 29, ZCV 3682, CHR_Type 0, SOC   3: 44: 43
-		<3>[  142.059308]  (1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3549,bat_vol 3500, AvgI 0, I 0, VChr 0, AvgT 26, T 30, ZCV 3682, CHR_Type 0, SOC   3: 43: 42
-		<3>[  152.057670]  (1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3546,bat_vol 3481, AvgI 0, I 0, VChr 0, AvgT 26, T 30, ZCV 3682, CHR_Type 0, SOC   3: 42: 41
-		<3>[  162.055236]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3542,bat_vol 3475, AvgI 0, I 0, VChr 0, AvgT 26, T 30, ZCV 3682, CHR_Type 0, SOC   3: 41: 40
-		<3>[  172.062902]  (0)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3541,bat_vol 3559, AvgI 0, I 0, VChr 0, AvgT 26, T 30, ZCV 3682, CHR_Type 0, SOC   3: 40: 39
-		<3>[  182.062495]  (1)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3540,bat_vol 3538, AvgI 0, I 0, VChr 0, AvgT 26, T 31, ZCV 3682, CHR_Type 0, SOC   3: 38: 37
-		<3>[  192.062400]  (2)[208:bat_routine_thr][name:battery_common_fg_20&][kernel]AvgVbat 3537,bat_vol 3489, AvgI 0, I 0, VChr 0, AvgT 27, T 31, ZCV 3682, CHR_Type 0, SOC   3: 37: 36
-		
-
-		从为合入patch的版本，单独合入patch，patch里面包含的lib，需要在vendor目录和out目录下面都手动替换一次
-		这两个lib库，不知道out目录下是否有替换到
-		
-		所以现在要做的是抓一份未合入patch之前的log，然后合入patch，替换lib库，分析合入之后的log，开fuelgauge log	
-		
-		
-
-	}
-
-	相关的log关键字
-	{
-		int Enable_FGADC_LOG = BMLOG_TRACE_LEVEL;
-		
-		FGADC_D0
-		
-		//Gionee <gn_by_CHG> <lilubao> <20170807> add for fuelgauge begin
-		
-		mt_battery_set_init_vol(gFG_voltage_init);
-		battery_meter_set_fg_int
-
-		INIT_BAT_CUR_FROM_PTIM
-	}
-
-
-	
-	
-	MTK：
-	fuelgauge对于电量的判断流程，这个判断过程自己一定要理解，
-	{
-		“理论上需要走这些判断，但是电量的值直接走了都去硬件的电量
-		所以出错“
-		
-		
-		
-		大概写了一下流程，请过目：
-		底层电量跟上层偏差过大导致电量跳变的判断
-
-		fg_result：
-		0：电量触发跳变的
-		2：rtc=1的情况下，把rtc记录的电量赋给电量计；软件电量超过最大电量的情况
-		4：rtc记录的电量超过10，把电量计记录的初始化的值赋给电量计
-		5：其他情况下也是把电量计记录的初始化的值赋给电量计
-
-		if (soc_flow == HW_FG || soc_flow == SW_FG) {
-			if ( (fg_plugout_status==0 || (boot_reason == BR_2SEC_REBOOT)) && (charger_exist != true)){
-			    if (g_rtc_fg_soc == 0) {
-			        fg_capacity_by_v = fg_capacity_by_v_init;
-			        fg_result = 0;
-			    } else {
-			        if (g_rtc_fg_soc == 1) {
-			            fg_capacity_by_v = g_rtc_fg_soc;
-			            fg_result = 2;
-
-			        } else if ( fg_sw_soc >= max_swocv ) {
-			            fg_capacity_by_v = g_rtc_fg_soc;
-			            fg_result = 2;
-			        } else if (g_rtc_fg_soc > 10) {
-			            fg_capacity_by_v = fg_capacity_by_v_init;
-			            set_rtc = 2;
-			            fg_result = 4;
-			        } else {
-			            fg_capacity_by_v = fg_capacity_by_v_init;
-			            set_rtc = 1;
-			            fg_result = 5;
-			        }
-			    }
-			} 
-			
-			else {	//rtc电量-硬件电量  超过  hw_rtc的阈值 同时  软件电量-rtc电量 大于 硬件 -  软件电量
-			    if (((abs(g_rtc_fg_soc - fg_hw_soc)) > difference_hwocv_rtc)
-			        && (abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_hw_soc - fg_sw_soc))) {
-			        /* compare with hw_ocv & sw_ocv, check if less than or equal to 5% tolerance */
-			        if (abs(fg_sw_soc - fg_hw_soc) > difference_hwocv_swocv) {
-			            fg_capacity_by_v = fg_capacity_by_v_init;
-			            fg_result = 0;
-			        }
-			    } else {
-			        if (abs(fg_sw_soc - g_rtc_fg_soc) > (difference_swocv_rtc + batterypseudo1)
-			            && ( abs(fg_sw_soc - g_rtc_fg_soc) > abs(fg_sw_soc - fg_vbat_soc) ) ) {
-			            fg_capacity_by_v = fg_capacity_by_v_init;
-			            fg_result = 0;
-			        } else {
-			            if (g_rtc_fg_soc == 0) {
-			                fg_capacity_by_v = fg_capacity_by_v_init;
-			                fg_result = 0;
-			            } else {
-			                if (g_rtc_fg_soc == 1) {
-			                    fg_capacity_by_v = g_rtc_fg_soc;
-			                    fg_result = 2;
-
-			                } else if ( fg_sw_soc >= max_swocv ) {
-			                    fg_capacity_by_v = g_rtc_fg_soc;
-			                    fg_result = 2;
-			                } else if (g_rtc_fg_soc > 10) {
-			                    fg_capacity_by_v = fg_capacity_by_v_init;
-			                    set_rtc = 2;
-			                    fg_result = 4;
-			                } else {
-			                    fg_capacity_by_v = fg_capacity_by_v_init;
-			                    set_rtc = 1;
-			                    fg_result = 5;
-			                }
-			            }
-			        }
-			    }
-			}
-		}
-
-		// modify g_booting_vbat
-
-		if (fg_capacity_by_v == 0 && charger_exist == true) {
-			fg_capacity_by_v = 1;
-			fg_result = 3;
-			FGLOG_NOTICE("[FGADC] fg_capacity_by_v=%d\n", fg_capacity_by_v);
-		}
-
-		if (set_rtc == 1) {
-			fg_capacity = g_rtc_fg_soc;
-		} else if (set_rtc == 2){
-			fg_capacity = g_rtc_fg_soc - 1;
-		} else {
-			fg_capacity = fg_capacity_by_v;
-		}
-		fg_dod0 = 100 - fg_capacity_by_v;
-		fg_capacity_by_c_init = fg_capacity;
-		fg_capacity_by_c = fg_capacity;
-		fg_dod0_init = fg_dod0;
-		fg_dod1 = fg_dod0;
-		set_fg_soc(fg_capacity_by_v);
-		ui_soc=fg_capacity_by_c_init; 
-
-	}	
-	
-	
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /********************************************************************************************************************************/
 
 17G10A p1试产待解决问题
 {
-
-	2.对一个问题的分析，处理，解决方案要形成自己的一套处理体系，
+	对一个问题的分析，处理，解决方案要形成自己的一套处理体系，
 	什么问题？什么现象？跟什么有关？时间点，复现的概率，软件还是硬件，log还有数据...
 	什么方向，怎么解决，解决后的现象是什么样的？所有问题都要自己事先理清楚，想明白
 
+
+	17G10A当前比较重要的问题：
+	{
+		1.USB的vid，pid特别是meta 模式下的0x0e05 function： adb ,acm
+	
+		2.fuelgauge3.0的客制化，熟悉流程，GM3.0的硬件测试点，nvram写入电量计系数
+	
+		3.充电后面的ibus跳变问题
+	
+		4.仿照G1605A，添加手机处在打电话状态
+	
+		5.整机测试出现的一些列问题
+	}
+
+
+
+	USB  pid，vid添加到驱动中
+	{
+		#Gionee <gn_by_charging> <lilubao> <20170808> add for USB vid pid begin
+		问题：
+		现在的情况是windows电脑用的是UsbDriverSetup_Fac_V2.7.0.0.exe 这是gionee用的新的usb驱动
+		新版本在meta模式下需要安装UsbDriverSetup_Fac_Path_V1.0.1.0.exe 这个补丁然后才能识别端口，
+		进入meta模式写号，老版的usb驱动可以识别
+		
+		也就是说现在需要知道新版usb驱动和老版的区别在哪，windows电脑怎么识别这些信息的，S10是否有这个问题，如果有怎么做的
+   	
+   	
+	    init.rc之类的文件内那些代码什么意思，以及usb的mass_storage,adb,acm等是什么意思
+	    init.mt6757.usb.rc
+	    meta_init.rc
+	    init.recovery.mt6757.rc
+	    
+	    mass_storage，adb,ptp,mtp,acm,adb/fastboot
+	    mtp：媒体传输协议
+	    mass_storage:USB大容量存储（USB Mass Storage，简称UMS）
+	    ACM:ACM (Abstract Control Model) allows any communication device to provide a serial communication interface (e.g modem devices that send and receive AT commands).
+	    提供一系列的通信接口
+	    
+	    
+	    vid 是不同厂商的标记，pid是不同产品或者说不同功能
+		gionee的vid是 271d，这个是厂商的标记
+		根据不同的功能配置pid，软件根据表格配置pid，也就是说不同的厂商不同的功能组合
+		有不同的pid，pid有点像端口号，新增加一个pid，就相当于新增加一个端口号
+	}
+
+
+
+
 	电量计校准，没有测试点，这个会影响到电量计的准确度
-	手上的手机：T1-004，T1-083，T1-672
+	手上的手机：T1-004，T1-083，T1-672,T1-573
+	T1-573这个机器可能NTC电阻出问题，导致一直显示battery temperature >60 无法开机
 	
 
 	电池曲线的导入		7.27
@@ -698,8 +691,6 @@ G1605A电量跳变问题
 			}	
 			
 			
-			
-			
 			3.放电时序，放电是否正常
 			{
 				建议做下放电曲线的量测，如附件是参考案例的模板。
@@ -716,7 +707,6 @@ G1605A电量跳变问题
 		
 		
 		}
-		
 		
 		
 		GM3.0相关的patch
@@ -738,7 +728,17 @@ G1605A电量跳变问题
 			ALPS03285277
 			
 			
-			正是patch，临时patch，申请等一系列注意事项
+			Dear customer, ALPS03434294(For_gnbj6757_66_n_alps-mp-n0.mp5-V1_P3).tar.gz released. (Download ID: REQ30000429871)
+			
+			fuelgauge 3.0的问题,文档+邮件
+			{
+				pacth申请 已申请
+				ALPS03411143 
+				Fix gauge coulomb value may abnormal in some mode / 修復待機時電量計算可能異常issue 
+
+				ALPS03158638   
+				【L3500-Charger】voltage mode在低温下的修正
+			}
 		}
 	}
 
@@ -747,25 +747,11 @@ G1605A电量跳变问题
 	使用标准充电器充电，几十分钟之后，ibus上的充电电流频繁跳变 
 	{
 		case ID：ALPS03447407 
-	
+		
 	}
 	
 	
-	
-	
-	
-	
-	battery_percent  wakelock 持锁问题
-	
 
-	高通提case
-	{
-		USB不识别问题
-	
-	}
-
-
-	
 	整机测试
 	{
 		2PCS手机因电池温度过高关机，但环y箱里设定温度为57度，要求做高温高湿测试时手机可以有高温安全警告，但不允许执行关机机制； 
@@ -817,8 +803,6 @@ G1605A电量跳变问题
 	
 		平均电流9mA，lcd有3mA，其他还有1mA
 		1mA这个还有待查
-		
-		
 		
 		
 		1.跟系统通知有关，即使飞行模式下，系统通知也会每隔一段时间会有唤醒ap检测一些信息如网络连接，想推送一些内容
@@ -979,23 +963,20 @@ G1605A电量跳变问题
 	
 	
 	【GMS-CTS Verifier测试】OTG相关测试应该屏蔽
-	{
+	 {
 		这个device.mk是干什么用的?
 		xml文件好像用的很多，有必要弄清楚
-		
+	
 		cts对权限有要求，权限过高会有安全隐患
-		
+	
 		把gionee/code/driver/project_common/BJ17G10_DRV_COMMON/device/gionee_bj/gnbj6757_66_n/device.mk中的下面的permissions注释掉。
 
 		USB OTG
 		PRODUCT_COPY_FILES += frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml
-	
-	}
+
+	 }
 
 
-
-
-	
 
 	插入充电器后的I2C时序或者说波形有问题，涉及到I2C通信相关的内容
 	{
@@ -1012,22 +993,7 @@ G1605A电量跳变问题
 	
 	}
 	
-	
 
-
-	
-	过温测试
-
-
-	上层显示的电池容量有问题 3450mAh，但是实际的是3000mAh
-	改变电池容量之后，电流有提高但要知道原因
-
-	
-	USB眼图：NG
-	
-	
-	
-	
 	定时器相关的内容
  	{
  		有两个kthread function:hrtimer,fgtimer这是两个定时器相关的操作
@@ -1163,18 +1129,7 @@ G1605A电量跳变问题
 
 	}
 
-	
-    fuelgauge 3.0的问题,文档+邮件
-    {
-    	pacth申请 已申请
-		ALPS03411143 
-		Fix gauge coulomb value may abnormal in some mode / 修復待機時電量計算可能異常issue 
 
-		ALPS03158638   
-		【L3500-Charger】voltage mode在低温下的修正
-		
-    }
-    
 }
 
 
@@ -1800,9 +1755,6 @@ ti的替换方案
 
 
 	去掉OTG中断
-
-
-	电池曲线的导入
 }
 
 

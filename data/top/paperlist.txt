@@ -129,6 +129,10 @@ USB：
 
 		Android框架理解之USB 
 		http://blog.csdn.net/u011279649/article/details/15497991
+
+
+		android的USB MTP && USB CDC/USBnet(ECM, NCM, ACM) && USB gardget 
+		http://blog.csdn.net/zhandoushi1982/article/details/7563702
 	}
 
 
