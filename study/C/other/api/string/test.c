@@ -5,7 +5,7 @@
 	> Created Time: 2017年08月07日 星期一 20时52分10秒
 	
 	自定义字符串操作函数
-	version 1.0  2017.8.7
+	version 1.0  2017.8.7   最初步的想法，虽然很low
  ************************************************************************/
 #include <stdio.h>
 #include <string.h>
@@ -193,19 +193,100 @@ char *mystrncat(char *dst,char *src,int n)
 }
 
 
+//字符匹配
+char *mystrchr(char *src,char ch)
+{
+    while( *src!='\0'){
+    
+        if(*(src++)==ch){
+        
+            return src;
+        }
+    }
+        
+    if(src==NULL)
+         return NULL;    
+   
+}
+
+
+//字符串匹配
+
+char *mystrstr(char *str1,char *str2,int len1,int len2)
+{
+    int i,j;
+    
+    
+    for(i=0;i<len1;i++){
+    
+        printf("111111111\n");
+        for(j=0;j<len2;j++){
+            
+            if(str1[i+j]!=str2[j]){
+                
+                printf("222222222\n");
+                break;
+            }
+            
+            if(j==len2-1){
+            
+                printf("匹配成功\n");
+                return str1+i;
+            }
+            
+            printf("333333333\n");
+        }
+        printf("4444444444\n");
+    }
+    
+    return NULL;
+}
+
+
+
 
 int main(char *argv[],int argc)
 {
+    char *str1="SBBCABCDABABCDABCDABDE";
+    char *str2="AB";
+    int len1,len2;
+    int i,j;
+    
+    len1=mystrlen(str1);
+    len2=mystrlen(str2);
+    printf("len1->%d,len2->%d\n",len1,len2);
+    
+    char *dst;
+    
+    do{
+    
+        dst=mystrstr(str1++,str2,len1,len2);
+        printf("dst->%s\n",dst);
+    }while(dst!=NULL);
+
+
 
 #if  1	
-	char dst[20]="hello";
-	char *src="world";
+
+
+
+#else
+    //strchr
+    char *src="hello";
+    char ch='a';
+
+    char *dst=mystrchr(src,ch);
+    printf("dst->%s\n",dst);
+    
+    
+    //strcat
+    char dst[20]="hello";
+	char *src=" world";
 	
 	mystrncat(dst,src,3);
 	printf("dst->%s\n",dst);
 
 
-#else
 	//strcpy
 	char dst[20]="hello";
 	char *src="world";
