@@ -1976,14 +1976,6 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 
-
-
-
-
-
-
-
-
 /*涉及到的一些文件*/
 {
 dtsi文件(这个目录下很多文件都用到了):
@@ -2033,8 +2025,42 @@ keyboard 的目录
 	android_mtk_6757_mp/gionee/config/tools
 
 电池曲线
-	mtk_battery_table.h	
+	mtk_battery_property.h	
+	mt6757_battery_table_ext.dtsi
+	mt6757_battery_prop_ext.dtsi
 }
+
+
+
+
+
+
+
+
+
+/*充电测试数据*/
+{
+	#开机充电时序
+
+
+
+
+
+
+	#关机充电时序
+
+
+
+
+
+
+	#放电时序
+
+
+}
+
+
+
 
 
 
