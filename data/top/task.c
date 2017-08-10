@@ -1139,9 +1139,18 @@
 
 17G06A
 {
+	T1-B-119
+
+	几个高通平台稳定性文档，感兴趣的可以下载看。
+	80-NM641-1
+	80-P7139-1
+	80-P7139-3
+	80-P7139-5
+	80-P7139-6
+	80-P7139-7
+	80-P7139-8
 
 	
-
 	理清思路，需要涉及到哪些文件
 	原理图，芯片的spec，gpio表，dts文件，*.c, *.h 文件
 	当然这里移植应该只是涉及几个人的修改
@@ -1149,9 +1158,7 @@
 	
 	系统启动的几个阶段对应的代码
 	
-	
-	解BUG
-	
+
 	
 	这个文件是一个从的dts文件里面包涵了其他需要的dts
 	{
@@ -1174,18 +1181,6 @@
 		CONFIG_MSM_SPMI_PMIC_ARB=y	
 		
 		
-		
-		
-		几个高通平台稳定性文档，感兴趣的可以下载看。
-		80-NM641-1
-		80-P7139-1
-		80-P7139-3
-		80-P7139-5
-		80-P7139-6
-		80-P7139-7
-		80-P7139-8
-
-
 	}
 
 	
@@ -1194,7 +1189,8 @@
 	{
 	
 		1.电池电压不够，不插充电器走一小段，插充电器反复重启
-		这段代码干什么了？
+		{
+			这段代码干什么了？
 			[   15.824467] *(1)[333:charger]charger: [15814] shutting down
 			[   15.830815] SysRq : Emergency Remount R/O
 			[   15.834014] *(1)[21:kworker/1:0]Emergency Remount complete
@@ -1205,47 +1201,58 @@
 			[   15.878503] *(0)[333:charger]reboot: Power down
 			[   15.882523] -(0)[333:charger]Powering off the SoC
 	
+			msm-poweroff.c，qpnp-fg.c
+		
+			(msm-poweroff.c) do_msm_poweroff  
+		}
+
+		 
+		 
+		2.无法充电，可能是Battery-type not identified，电池识别不对
+		{
+			<6>[ 3227.693053] *(0)[8648:kworker/0:1]SMBCHG: smbchg_config_chg_battery_type: Battery-type not identified
+
+			<6>[ 3242.516708] *(2)[316:irq/223-usbin-s]SMBCHG: handle_usb_removal: triggered
+			<6>[ 3242.516723] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_change_usb_supply_type: Type 0: setting mA = 2000
+			<6>[ 3242.516873] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_set_usb_current_max: USB current_ma = 0
+			<6>[ 3242.516910] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_set_usb_current_max: usb type = 5 current set to 0 mA
+			<6>[ 3242.516936] *(2)[316:irq/223-usbin-s]SMBCHG: get_parallel_psy: parallel charger not found
+			<6>[ 3242.517062] *(2)[316:irq/223-usbin-s]SMBCHG: handle_usb_removal: setting usb psy present = 0
+			<6>[ 3242.517147] *(2)[316:irq/223-usbin-s]msm_otg 78db000.usb: Avail curr from USB = 0
+
+			<6>[ 3242.517685] *(2)[11776:kworker/2:0]SMBCHG: read_usb_type: src det low
+		 
+		}
+
+
+		
+
+		
+		3.给高通提case，测量电池曲线	 20170807
+		{
+			battery ID：15k
+			NTC：9k
+			电池容量：4000mAh
+		}
+
+		
+		
+		
+		
+		
+		4.写过IMEI的机器，无法打开USB端口,BUG ID：95605
+		{
+			初步分析：没写音频参数之前，可以识别USB口，但是写入音频参数之后USB口好像被关闭了
+		    无法打开USB端口
+		
+		}
 	
-		msm-poweroff.c，qpnp-fg.c
-		
-		(msm-poweroff.c) do_msm_poweroff  
-		 
-		 
-		 2.无法充电，可能是Battery-type not identified，电池识别不对
-
-		<6>[ 3227.693053] *(0)[8648:kworker/0:1]SMBCHG: smbchg_config_chg_battery_type: Battery-type not identified
-
-		<6>[ 3242.516708] *(2)[316:irq/223-usbin-s]SMBCHG: handle_usb_removal: triggered
-		<6>[ 3242.516723] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_change_usb_supply_type: Type 0: setting mA = 2000
-		<6>[ 3242.516873] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_set_usb_current_max: USB current_ma = 0
-		<6>[ 3242.516910] *(2)[316:irq/223-usbin-s]SMBCHG: smbchg_set_usb_current_max: usb type = 5 current set to 0 mA
-		<6>[ 3242.516936] *(2)[316:irq/223-usbin-s]SMBCHG: get_parallel_psy: parallel charger not found
-		<6>[ 3242.517062] *(2)[316:irq/223-usbin-s]SMBCHG: handle_usb_removal: setting usb psy present = 0
-		<6>[ 3242.517147] *(2)[316:irq/223-usbin-s]msm_otg 78db000.usb: Avail curr from USB = 0
-
-		<6>[ 3242.517685] *(2)[11776:kworker/2:0]SMBCHG: read_usb_type: src det low
 		
 		
 		
-		
-		
-		3.给高通提case，测量电池曲线
-		battery ID：15k
-		NTC：9k
-		电池容量：4000mAh
 		
 	}
 	
-	
-
-
-
-	
-
-
-
-
-
 }
 
 
