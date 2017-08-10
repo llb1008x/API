@@ -34,6 +34,7 @@ char *strtok(char s[], const char *delim);
 
 #include <stdio.h>
 #include <string.h>
+#include "my_string.h"
 
 //计算字符串的长度
 int mystrlen(char *str)
@@ -334,96 +335,3 @@ int myatoi(char *str)
 
 
 
-
-int main(char *argv[],int argc)
-{
-
-
-#if  1
-    //字符串分割函数的使用
-    char str1[]="adc*fvcv*!ebcy!hgbdfg*casdert";
-    char *str2="*!";
-    char *result[10];
-    int num=0,i;
-    
-    result[num]=strtok(str1,str2);
-    while(result[num]!=NULL){
-    
-        num++;
-        result[num]=strtok(NULL,str2);
-    }
-    
-    for(i=0;i<num;i++){
-    
-        printf("result[%d=%s\n",num,result[i]);
-    }
-    
-
-
-#else
-    //atoi
-    char *str="12aa3456";
-    int num=myatoi(str);    
-    
-    printf("num->%d\n",num);
-
-    //strstr
-    char *str1="SBBCABCDABABCDABCDABDE";
-    //char *str1="BBABABC";
-    char *str2="AB";
-    int len1,len2;
-    int i,j;
-    
-    len1=mystrlen(str1);
-    len2=mystrlen(str2);
-    printf("len1->%d,len2->%d\n",len1,len2);
-    printf("str1->%s,str2->%s\n",str1,str2);
-
-    char *dst=mystrstr(str1,str2);
-    printf("dst->%s\n",dst);
-
-
-    //strchr
-    char *src="hello";
-    char ch='a';
-
-    char *dst=mystrchr(src,ch);
-    printf("dst->%s\n",dst);
-    
-    
-    //strcat
-    char dst[20]="hello";
-	char *src=" world";
-	
-	mystrncat(dst,src,3);
-	printf("dst->%s\n",dst);
-
-
-	//strcpy
-	char dst[20]="hello";
-	char *src="world";
-
-	mystrncpy(dst,src,3);
-	printf("dst->%s\n",dst);
-
-	//strcmp
-	char *str1="hello world";
-    char *str2="hella";
-    int ret;
-    
-    ret=mystrncmp(str1,str2,7);
-    printf("ret->%d\n",ret);
-
-	//strlen
-    int len1=0,len2=0;
-    char *str="hello world";    
-
-    len1=mystrlen(str);
-    len2=strlen(str);
-
-    printf("len1->%d,len2->%d\n",len1,len2);
-    
-#endif    
-
-	return 0;
-}
