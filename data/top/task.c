@@ -449,6 +449,41 @@
 
 
 
+/*测试上的BUG*/
+{
+	17G10A
+	{
+		#94044,测机关机状态下连充电器，短按2s不开机长按11s也不开机（有振动），待1min后测机自动开机恢复
+		2017.8.10
+		需要仿照G1605A添加一些boot mode,boot reason
+		
+		
+		#95897,usb网络共享压力一晚上（1000次）失败198次
+		要一份apk
+		
+	}
+	
+	
+	
+	17G06A
+	{
+	  USB：
+		#96132，adb端口被占用			
+		2017.8.10
+		
+		
+		#96141，*#837504#手动开启diag口，PC端和工具找不到diag口
+		2017.8.10
+		打开diag口之后可能是无法识别，然后USB端口无法使用 pid 9001
+		是不是USB的vid，pid配置不对
+		直接连接PC  pid 9039
+		打开diag口  pid 9091
+		
+		
+	
+	}
+}
+
 
 
 
@@ -741,6 +776,13 @@
 			}
 		}
 	}
+	
+	    device/gionee_bj/gnbj6737t_66_m0/ProjectConfig.mk
+        vendor/mediatek/proprietary/packages/apps/DeviceRegister/src/com/mediatek/deviceregister/utils/PlatformManager.java
+        vendor/mediatek/proprietary/packages/apps/SelfRegister/src/com/mediatek/selfregister/RegisterMessage.java
+        vendor/mediatek/proprietary/packages/apps/SelfRegister/src/com/mediatek/selfregister/RegisterService.java
+        vendor/mediatek/proprietary/packages/apps/SelfRegister/src/com/mediatek/selfregister/utils/PlatformManager.java
+
 
 
 
@@ -1004,9 +1046,6 @@
 
 
 
-
-
-
 	battery ID相关的内容，根据ID选择电池曲线
 	{
 		battery_id  ，研读相关代码
@@ -1019,8 +1058,6 @@
 	
 	}
 
-
- 
    
    这几个关键字的代码逻辑
    {
@@ -1179,8 +1216,7 @@
 		CONFIG_BW_MONITOR=y
 		CONFIG_MSM_SPMI=y
 		CONFIG_MSM_SPMI_PMIC_ARB=y	
-		
-		
+			
 	}
 
 	
@@ -1226,8 +1262,6 @@
 
 
 		
-
-		
 		3.给高通提case，测量电池曲线	 20170807
 		{
 			battery ID：15k
@@ -1235,22 +1269,56 @@
 			电池容量：4000mAh
 		}
 
-		
-		
-		
-		
-		
+
 		4.写过IMEI的机器，无法打开USB端口,BUG ID：95605
 		{
 			初步分析：没写音频参数之前，可以识别USB口，但是写入音频参数之后USB口好像被关闭了
 		    无法打开USB端口
+		    
+		    dialog 这是什么口打印modem端的log
+		    
+		    <6>[ 2959.562317] -(0)[8233:kworker/0:1]android_usb gadget: high-speed config #1: 86000c8.android_usb
+			<6>[ 2959.562347] -(0)[8233:kworker/0:1]diag: USB channel diag connected
+			<3>[ 2959.562487] -(0)[8233:kworker/0:1]usb_bam_get_connection_idx: failed for 1
+			<7>[ 2959.566679] *(2)[1935:PhotonicModulat]mdss_dsi_panel_bklt_pwm: bklt_ctrl=0 pwm_period=60 pwm_gpio=1021 pwm_lpg_chan=0
+			<7>[ 2959.566685] *(2)[1935:PhotonicModulat]mdss_dsi_panel_bklt_pwm: ndx=0 level=40 duty=9
+			<3>[ 2959.568329] -(0)[8233:kworker/0:1]usb_bam_get_connection_idx: failed for 1
+			<3>[ 2959.575181] -(0)[8233:kworker/0:1]gport_rmnet_connect: usb_bam_get_connection_idx failed
+			<7>[ 2959.576693] *(2)[1935:PhotonicModulat]mdss_dsi_panel_bklt_pwm: bklt_ctrl=0 pwm_period=60 pwm_gpio=1021 pwm_lpg_chan=0
+			<7>[ 2959.576699] *(2)[1935:PhotonicModulat]mdss_dsi_panel_bklt_pwm: ndx=0 level=44 duty=10
+			<3>[ 2959.583257] -(0)[8233:kworker/0:1]gsmd_ctrl_disconnect: gsmd_ctrl_disconnect: Invalid port_num#0
+			<3>[ 2959.592018] -(0)[8233:kworker/0:1]frmnet_set_alt(): gport_rmnet_connect fail with err:-22
+			<6>[ 2959.600185] -(0)[8233:kworker/0:1]diag: USB channel diag disconnected
+			<3>[ 2959.600216] -(0)[8233:kworker/0:1]smd_tiocmset: Invalid channel specified
+			<6>[ 2959.607888] *(0)[8233:kworker/0:1]android_work: android_work: sent uevent USB_STATE=CONNECTED
+			<6>[ 2959.607941] *(0)[8233:kworker/0:1]FG: get_sram_prop_now: addr 0x594, offset 1 value 215600
+			<6>[ 2959.608003] *(0)[8233:kworker/0:1]SMBCHG: smbchg_external_power_changed: usb type = SDP current_limit = 500
+		    
+		    
+		    
+		    
+		    (diag_usb.c)diag_usb_notifier  -> connect_work, usb_connect_work_fn ,usb_connect
+		    
+		    (usb_bam.c) get_qdss_bam_connection_info -> usb_bam_get_connection_idx
+		    
+		    (mdss_dsi_panel.c) 
+		    
+		    
+		    
+		    (f_rmnet.c)gport_rmnet_connect
+		    
+		    
+		   usb_bam_get_connection_idx: failed for 1    
+		   enum usb_ctrl {
+				DWC3_CTRL = 0,	/* DWC3 controller */
+				CI_CTRL,	   /* ChipIdea controller */
+				HSIC_CTRL,	  /* HSIC controller */
+				NUM_CTRL,
+		   };
+		    
 		
 		}
-	
-		
-		
-		
-		
+
 	}
 	
 }
