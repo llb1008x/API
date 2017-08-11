@@ -1296,16 +1296,16 @@
 		    
 		    
 		    
-		    
+	/*	    
 		    (diag_usb.c)diag_usb_notifier  -> connect_work, usb_connect_work_fn ,usb_connect
 		    
 		    (usb_bam.c) get_qdss_bam_connection_info -> usb_bam_get_connection_idx
 		    
 		    (mdss_dsi_panel.c) 
-		    
-		    
-		    
-		    (f_rmnet.c)gport_rmnet_connect
+	*/
+				    
+		    //Gionee <gn_by_CHG> <lilubao> <20170811add for USB begin
+		    (f_rmnet.c) frmnet_set_alt ,gport_rmnet_connect
 		    
 		    
 		   usb_bam_get_connection_idx: failed for 1    
@@ -1315,6 +1315,22 @@
 				HSIC_CTRL,	  /* HSIC controller */
 				NUM_CTRL,
 		   };
+		   
+		   
+		   enum transport_type {
+				USB_GADGET_XPORT_UNDEF,
+				USB_GADGET_XPORT_TTY,
+				USB_GADGET_XPORT_SMD,
+				USB_GADGET_XPORT_QTI,
+				USB_GADGET_XPORT_BAM2BAM,
+				USB_GADGET_XPORT_BAM2BAM_IPA,
+				USB_GADGET_XPORT_HSIC,
+				USB_GADGET_XPORT_HSUART,
+				USB_GADGET_XPORT_ETHER,
+				USB_GADGET_XPORT_CHAR_BRIDGE,
+				USB_GADGET_XPORT_BAM_DMUX,
+				USB_GADGET_XPORT_NONE,
+			};
 		    
 		
 		}
