@@ -554,6 +554,7 @@
 	什么方向，怎么解决，解决后的现象是什么样的？所有问题都要自己事先理清楚，想明白
 
 
+
 	17G10A当前比较重要的问题：
 	{
 		1.USB的vid，pid特别是meta 模式下的0x0e05 function： adb ,acm
@@ -569,34 +570,95 @@
 
 
 
+
+
+
+
+
+
+
+
+
 	USB  pid，vid添加到驱动中
 	{
 		#Gionee <gn_by_charging> <lilubao> <20170808> add for USB vid pid begin
-		问题：
+问题：
 		现在的情况是windows电脑用的是UsbDriverSetup_Fac_V2.7.0.0.exe 这是gionee用的新的usb驱动
 		新版本在meta模式下需要安装UsbDriverSetup_Fac_Path_V1.0.1.0.exe 这个补丁然后才能识别端口，
 		进入meta模式写号，老版的usb驱动可以识别
 		
+		
+分析：	
+		新的USB驱动可能是根据新的端口0e05
+		
+		
+		
+	log：	
+		[   11.621249] <1>.(1)[1:multi_init][name:g_android&][g_android][USB]enable_store: device_attr->attr.name: enable
+
+		[   11.622511] <1>.(1)[1:multi_init][name:g_android&][g_android]android_usb: already disabled
+
+		[   11.624198] <1>.(1)[1:multi_init][name:g_android&][g_android][USB]functions_store: name = adb
+
+		[   11.624606] <1>.(0)[328:logd][name:unix&]unix: [mtk_net][socket]unix_stream_connect[134 ]: connect [/dev/socket/logd] other[11481]
+
+		[   11.625808] <1>.(3)[314:logd.daemon]logd.daemon: reinit
+
+		[   11.627463] <3>.(1)[1:multi_init][name:g_android&][g_android][USB]functions_store: name = acm
+
+		[   11.628410] <3>.(0)[314:logd.daemon]logd no log reader, set log level to INFO!
+
+		[   11.628536] <3>.(1)[1:multi_init][name:g_android&][g_android][USB]enable_store: device_attr->attr.name: enable
+
+		[   11.628546] <3>.(1)[1:multi_init][name:g_android&][g_android][USB]enable_store: enable 0->1 case, device_desc.idVendor = 0x271d, device_desc.idProduct = 0xe05
+
+	
+	
 		也就是说现在需要知道新版usb驱动和老版的区别在哪，windows电脑怎么识别这些信息的，S10是否有这个问题，如果有怎么做的
-   	
-   	
+   		
+		#Gionee <gn_by_charging> <lilubao> <20170808> add for USB vid pid begin
+		#adb,acm
+		on property:ro.boot.usbconfig=0
+			write /sys/class/android_usb/android0/iSerial $ro.serialno
+			write /sys/class/android_usb/android0/enable 0
+			write /sys/class/android_usb/android0/idVendor 271d
+			write /sys/class/android_usb/android0/idProduct 0e05
+			write /sys/class/android_usb/android0/f_acm/instances 1
+			write /sys/class/android_usb/android0/functions adb,acm
+			write /sys/class/android_usb/android0/enable 1
+			start adbd
+		#Gionee <gn_by_charging> <lilubao> <20170808> add for USB vid pid end		
+		
+		
+		
+		
+涉及到的文件：   	
 	    init.rc之类的文件内那些代码什么意思，以及usb的mass_storage,adb,acm等是什么意思
 	    init.mt6757.usb.rc
 	    meta_init.rc
 	    init.recovery.mt6757.rc
+	    meta_init.rc
 	    
+	    
+常用的概念：
 	    mass_storage，adb,ptp,mtp,acm,adb/fastboot
 	    mtp：媒体传输协议
 	    mass_storage:USB大容量存储（USB Mass Storage，简称UMS）
 	    ACM:ACM (Abstract Control Model) allows any communication device to provide a serial communication interface (e.g modem devices that send and receive AT commands).
 	    提供一系列的通信接口
-	    
-	    
+	    	    
 	    vid 是不同厂商的标记，pid是不同产品或者说不同功能
 		gionee的vid是 271d，这个是厂商的标记
 		根据不同的功能配置pid，软件根据表格配置pid，也就是说不同的厂商不同的功能组合
 		有不同的pid，pid有点像端口号，新增加一个pid，就相当于新增加一个端口号
 	}
+
+
+
+
+
+
+
 
 
 
@@ -1261,6 +1323,8 @@
 		}
 
 
+
+
 		
 		3.给高通提case，测量电池曲线	 20170807
 		{
@@ -1270,12 +1334,20 @@
 		}
 
 
+
+
+
 		4.写过IMEI的机器，无法打开USB端口,BUG ID：95605
 		{
-			初步分析：没写音频参数之前，可以识别USB口，但是写入音频参数之后USB口好像被关闭了
+			初步分析：
 		    无法打开USB端口
 		    
-		    dialog 这是什么口打印modem端的log
+		    adb shell setprop sys.usb.config  mtp,diag,adb
+		    
+			可以加上persisit属性，重启也会生效
+			diag 口是用于出modemlog的端口，是USB端口复用
+		    
+		   	
 		    
 		    <6>[ 2959.562317] -(0)[8233:kworker/0:1]android_usb gadget: high-speed config #1: 86000c8.android_usb
 			<6>[ 2959.562347] -(0)[8233:kworker/0:1]diag: USB channel diag connected
@@ -1344,6 +1416,62 @@
 
 
 
+USB quick start
+{
+	evaluate 80-P2485-17
+	
+	define/design 80-P2485-17,80-P2468-5B
+	
+	build/bringup  80-NF238-1 ,80-NA648-1
+	
+	customize 80-NF283-1,80-VB717-1,80-V4609-1
+	
+	fine-tune/verfiy quality/cerfity 80-NF283-1
+	
+	
+	create case for USB issues
+	{
+		1.You can file cases for the following problem areas:
+		• PA1 – BSP/HLOS
+		• PA2 – Drivers: USB/HSIC
+
+		
+		2.Remember to provide necessary information
+		• Dump and symbol files (vmlinux and ELF files)
+		matching to the dump
+		• Test scenario, frequency of the issues,
+		reproducibility
+		• Software versions when the issue first reported
+		• USB eye diagram for compliance issues
+		• USB scopeshots for electrical issues
+		• USB analyzer log for data stalls, protocol issues,
+		and throughput issues
+
+	}
+	
+}
+
+
+
+power management(80-P2468-5B)
+{
+	常用缩写
+	{
+		OVP:overvoltage protection  过压保护
+		
+		APSD:Automatic power source detection 自动电源检测
+		
+		OTP：One-time programmable 一次性编程
+
+
+
+	
+	}
+	
+
+
+}
+
 
 
 
@@ -1367,6 +1495,13 @@
 	
 
 }
+
+
+
+
+
+
+
 
 
 1.msm8917
