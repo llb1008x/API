@@ -470,6 +470,39 @@
 	  USB：
 		#96132，adb端口被占用			
 		2017.8.10
+		{
+		 问题：
+			现在要解决的是如何让diag口跟adb如何共用，就是打开diag口同时可以使用adb命令
+			
+		 
+		 分析：
+		    17G06A不能用，17G02A可以使用，对比两个项目的代码，初始化到打开端口的log
+		    
+		    对比代码：	
+		
+			
+		
+			涉及到的文件：
+			{
+				init.qcom.usb.rc
+				init.gn.platform.rc
+				init.msm.usb.configfs.rc
+				init.qcom.factory.rc
+				
+				
+				./alps_drv/device/qcom/common/rootdir/etc/init.qcom.usb.rc
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		#96141，*#837504#手动开启diag口，PC端和工具找不到diag口
@@ -478,6 +511,7 @@
 		是不是USB的vid，pid配置不对
 		直接连接PC  pid 9039
 		打开diag口  pid 9091
+		
 		
 		
 	
@@ -1343,9 +1377,13 @@
 		    无法打开USB端口
 		    
 		    adb shell setprop sys.usb.config  mtp,diag,adb
+		    adb shell setprop sys.usb.config diag,serial_smd,rmnet_ipa,adb
+		    adb shell setprop persisit.sys.usb.config diag,serial_smd,rmnet_ipa,adb
 		    
 			可以加上persisit属性，重启也会生效
 			diag 口是用于出modemlog的端口，是USB端口复用
+			getprop sys.usb.config 
+			mtp,adb
 		    
 		   	
 		    
@@ -1367,6 +1405,12 @@
 			<6>[ 2959.608003] *(0)[8233:kworker/0:1]SMBCHG: smbchg_external_power_changed: usb type = SDP current_limit = 500
 		    
 		    
+		   hw_platform  QRD
+		   target		msm8937
+		   soc_id		303
+		   baseband     msm 
+		   VDD_USB_CORE
+		   VDD_USBBPHY_1P8 
 		    
 	/*	    
 		    (diag_usb.c)diag_usb_notifier  -> connect_work, usb_connect_work_fn ,usb_connect
@@ -1374,6 +1418,8 @@
 		    (usb_bam.c) get_qdss_bam_connection_info -> usb_bam_get_connection_idx
 		    
 		    (mdss_dsi_panel.c) 
+		    
+		    (ci13xxx_msm.c)
 	*/
 				    
 		    //Gionee <gn_by_CHG> <lilubao> <20170811add for USB begin
@@ -1403,6 +1449,22 @@
 				USB_GADGET_XPORT_BAM_DMUX,
 				USB_GADGET_XPORT_NONE,
 			};
+		    
+				
+			debug
+			{
+					private String mCurrentDefaultFunction = null;
+					private final String AMIGO_USB_PERSISTENT_CONFIG = "mtp,adb";
+					private final String AMIGO_USB_DIAG_PERSISTENT_CONFIG = "mtp,diag,adb";
+					private final String AMIGO_USB_APPDIAG_PERSISTENT_CONFIG = "diag,serial_smd,rmnet_ipa,adb";
+				
+					mAdbEnabled
+					handleActivateUsbTemporary, PERMANENT/TEMPORARY,so no need
+			
+			}	
+		
+		    
+		    
 		    
 		
 		}
@@ -1449,31 +1511,56 @@ USB quick start
 
 	}
 	
+	power management(80-P2468-5B)
+	{
+		常用缩写
+		{
+			OVP:overvoltage protection  过压保护
+		
+			APSD:Automatic power source detection 自动电源检测
+		
+			OTP：One-time programmable 一次性编程
+		
+			Two-line serial power management interface (MIPI SPMI)
+
+		}
+	
+		USB input
+		{
+		
+		}
+	
+
+	}
+
+	
 }
 
 
 
-power management(80-P2468-5B)
+pmic
 {
-	常用缩写
-	{
-		OVP:overvoltage protection  过压保护
-		
-		APSD:Automatic power source detection 自动电源检测
-		
-		OTP：One-time programmable 一次性编程
-		
-		Two-line serial power management interface (MIPI SPMI)
+	Based on these selections, the following information can be used to help resolve common issues in this particular area:
 
-	}
-	
-	USB input
-	{
-		
-	}
-	
+	To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
+
+	80-P2485-18 : MSM8937 System Drivers PMIC Overview
+	80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
+	80-NG006-1 : System Driver PMIC NPA Overview
+	80-NN255-1 : RPM PMIC SW Driver Overview
+	80-NV610-47 : LA VREG CLK SW User Guide
+
+	For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
+
+	80-NR097-1 : PMIC Software Master Document
+	80-NR097-2 : PMIC Software KB Solution Master Document
+
+
+
 
 }
+
+
 
 
 
