@@ -1462,13 +1462,16 @@ power management(80-P2468-5B)
 		APSD:Automatic power source detection 自动电源检测
 		
 		OTP：One-time programmable 一次性编程
+		
+		Two-line serial power management interface (MIPI SPMI)
 
-
-
-	
 	}
 	
-
+	USB input
+	{
+		
+	}
+	
 
 }
 
