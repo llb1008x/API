@@ -1371,12 +1371,20 @@
 
 
 
+
+
+
+
+
+
+
+
 		4.写过IMEI的机器，无法打开USB端口,BUG ID：95605
 		{
 			初步分析：
 		    无法打开USB端口
 		    
-		    adb shell setprop sys.usb.config  mtp,diag,adb
+		    adb shell setprop sys.usb.config  mtp,diag,adb	//903a
 		    adb shell setprop sys.usb.config diag,serial_smd,rmnet_ipa,adb
 		    adb shell setprop persisit.sys.usb.config diag,serial_smd,rmnet_ipa,adb
 		    
@@ -1384,8 +1392,6 @@
 			diag 口是用于出modemlog的端口，是USB端口复用
 			getprop sys.usb.config 
 			mtp,adb
-		    
-		   	
 		    
 		    <6>[ 2959.562317] -(0)[8233:kworker/0:1]android_usb gadget: high-speed config #1: 86000c8.android_usb
 			<6>[ 2959.562347] -(0)[8233:kworker/0:1]diag: USB channel diag connected
@@ -1403,71 +1409,17 @@
 			<6>[ 2959.607888] *(0)[8233:kworker/0:1]android_work: android_work: sent uevent USB_STATE=CONNECTED
 			<6>[ 2959.607941] *(0)[8233:kworker/0:1]FG: get_sram_prop_now: addr 0x594, offset 1 value 215600
 			<6>[ 2959.608003] *(0)[8233:kworker/0:1]SMBCHG: smbchg_external_power_changed: usb type = SDP current_limit = 500
-		    
-		    
-		   hw_platform  QRD
-		   target		msm8937
-		   soc_id		303
-		   baseband     msm 
-		   VDD_USB_CORE
-		   VDD_USBBPHY_1P8 
-		    
-	/*	    
-		    (diag_usb.c)diag_usb_notifier  -> connect_work, usb_connect_work_fn ,usb_connect
-		    
-		    (usb_bam.c) get_qdss_bam_connection_info -> usb_bam_get_connection_idx
-		    
-		    (mdss_dsi_panel.c) 
-		    
-		    (ci13xxx_msm.c)
-	*/
-				    
-		    //Gionee <gn_by_CHG> <lilubao> <20170811add for USB begin
-		    (f_rmnet.c) frmnet_set_alt ,gport_rmnet_connect
-		    
-		    
-		   usb_bam_get_connection_idx: failed for 1    
-		   enum usb_ctrl {
-				DWC3_CTRL = 0,	/* DWC3 controller */
-				CI_CTRL,	   /* ChipIdea controller */
-				HSIC_CTRL,	  /* HSIC controller */
-				NUM_CTRL,
-		   };
-		   
-		   
-		   enum transport_type {
-				USB_GADGET_XPORT_UNDEF,
-				USB_GADGET_XPORT_TTY,
-				USB_GADGET_XPORT_SMD,
-				USB_GADGET_XPORT_QTI,
-				USB_GADGET_XPORT_BAM2BAM,
-				USB_GADGET_XPORT_BAM2BAM_IPA,
-				USB_GADGET_XPORT_HSIC,
-				USB_GADGET_XPORT_HSUART,
-				USB_GADGET_XPORT_ETHER,
-				USB_GADGET_XPORT_CHAR_BRIDGE,
-				USB_GADGET_XPORT_BAM_DMUX,
-				USB_GADGET_XPORT_NONE,
-			};
-		    
-				
-			debug
-			{
-					private String mCurrentDefaultFunction = null;
-					private final String AMIGO_USB_PERSISTENT_CONFIG = "mtp,adb";
-					private final String AMIGO_USB_DIAG_PERSISTENT_CONFIG = "mtp,diag,adb";
-					private final String AMIGO_USB_APPDIAG_PERSISTENT_CONFIG = "diag,serial_smd,rmnet_ipa,adb";
-				
-					mAdbEnabled
-					handleActivateUsbTemporary, PERMANENT/TEMPORARY,so no need
 			
-			}	
-		
-		    
-		    
-		    
-		
+			
 		}
+		
+		
+		
+		
+		
+		
+		
+		
 
 	}
 	
@@ -1511,6 +1463,9 @@ USB quick start
 
 	}
 	
+
+	
+	
 	power management(80-P2468-5B)
 	{
 		常用缩写
@@ -1532,6 +1487,86 @@ USB quick start
 	
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	linux_usb_implementation_guide
+	{
+	  常用缩写
+	  {	
+	  	HCD:host controller driver
+		
+		DCD:device controller driver
+
+	  
+	  }
+	
+	
+	  software architectural
+	  {
+	  	1.Google initially developed a new framework called the "function framework", as the gadget framework in the Linux kernel was not supporting composite devices. 
+		2.EHCI
+		增强型主机控制器接口规范描述了一个通用串行总线（USB）2.0版的主机控制器的寄存器级接口
+	  	3.OTG
+
+	  }		
+	  
+	  devices tree
+	  {
+	  		  adress range  address start
+	  	reg = <0xf9200000 0xfc000>,
+		<0xfd4ab000 0x4>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+	  	the USB device could have several dedicated interrupts
+in the Global Interrupt Controller (GIC), in addition to GPIO interrupts, etc.
+ 		GIC 中断管理子系统
+ 		
+ 		interrupt-parent = <&usb3>;
+		interrupts = <0 1>;
+		#interrupt-cells = <1>;
+		interrupt-map-mask = <0x0 0xffffffff>;
+							   注册到具体的中断控制器	   注册到系统的中断				
+		interrupt-map = <0x0 0 &intc 0 					133 0
+			  注册到具体的中断控制器					注册到系统的中断
+		0x0 1 &spmi_bus 0x0 0x0 					0x9 0x0>;
+		interrupt-names = "hs_phy_irq", "pmic_id_irq";
+
+		
+
+		
+		
+		ci13xxx_msm_probe() [ci13xxx_msm.c]
+		Maps the USB registers from physical to kernel address space
+		Calls udc_probe() [ci13xxx_udc.c]
+		
+		Allocates and initializes a struct ci13xxx device assigned to _udc
+
+		Initializes structure variables
+		Assigns callbacks for the USB gadget driver usb_gadget_ops
+		Initializes driver hardware bank register values
+		
+		Saves an offsetted base address for different register I/O APIs, i.e., hw_aread(),
+		hw_cread()
+		Calls otg_set_peripheral()
+		
+	  }
+	
+	}
+	
+	
+	
 
 	
 }
@@ -1554,9 +1589,6 @@ pmic
 
 	80-NR097-1 : PMIC Software Master Document
 	80-NR097-2 : PMIC Software KB Solution Master Document
-
-
-
 
 }
 
