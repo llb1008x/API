@@ -55,6 +55,9 @@
 					
 					
 			7.5v设置寄存器，可以直接出发中断
+			
+			
+			UUG P37  0x1d
 		}
 		
 		
@@ -449,17 +452,46 @@
 
 
 
+
+
+
+
+
+
+
+
 /*测试上的BUG*/
 {
 	17G10A
 	{
-		#94044,测机关机状态下连充电器，短按2s不开机长按11s也不开机（有振动），待1min后测机自动开机恢复
-		2017.8.10
-		需要仿照G1605A添加一些boot mode,boot reason
+		#94044,测机关机状态下连充电器，短按2s不开机长按11s也不开机（有振动），待1min后测机自动开机恢复		2017.8.10
+		{		
+			需要仿照G1605A添加一些boot mode,boot reason
+[bat_routine_thr]g_gn_screenon_time=(80), g_call_state=0, g_boot_reason=4, g_boot_mode=0
+		
+		}
+
 		
 		
-		#95897,usb网络共享压力一晚上（1000次）失败198次
-		要一份apk
+		#99363
+		
+		
+		#99469
+		
+		
+		#99348
+		
+		
+		#99192
+		
+		
+		#99037
+		
+		
+		#95897
+		
+		
+	
 		
 	}
 	
@@ -495,16 +527,7 @@
 		}
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
 		#96141，*#837504#手动开启diag口，PC端和工具找不到diag口
 		2017.8.10
 		打开diag口之后可能是无法识别，然后USB端口无法使用 pid 9001
@@ -873,11 +896,6 @@
 		}
 	}
 	
-	    device/gionee_bj/gnbj6737t_66_m0/ProjectConfig.mk
-        vendor/mediatek/proprietary/packages/apps/DeviceRegister/src/com/mediatek/deviceregister/utils/PlatformManager.java
-        vendor/mediatek/proprietary/packages/apps/SelfRegister/src/com/mediatek/selfregister/RegisterMessage.java
-        vendor/mediatek/proprietary/packages/apps/SelfRegister/src/com/mediatek/selfregister/RegisterService.java
-        vendor/mediatek/proprietary/packages/apps/SelfRegister/src/com/mediatek/selfregister/utils/PlatformManager.java
 
 
 
@@ -887,6 +905,14 @@
 		case ID：ALPS03447407 
 		
 	}
+	
+	
+	温升好像有问题,bcct好像没有生效		20170816
+	{
+	
+	
+	}
+	
 	
 	
 
@@ -1371,14 +1397,6 @@
 
 
 
-
-
-
-
-
-
-
-
 		4.写过IMEI的机器，无法打开USB端口,BUG ID：95605
 		{
 			初步分析：
@@ -1412,14 +1430,6 @@
 			
 			
 		}
-		
-		
-		
-		
-		
-		
-		
-		
 
 	}
 	
