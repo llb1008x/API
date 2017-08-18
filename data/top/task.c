@@ -514,15 +514,177 @@
 	
 2.温升问题，根据不同场景降电流
 /******************************************************************************************/		
+{
+	除了启动信息，还要加上正常情况下判断电池相关信息的log
+
+	这函数mt_battery_average_method,battery_common_fg_20.c做的什么操作？			//20170818	
+	
+	boot_reason type  中的kernel panic	BR_KERNEL_PANIC,//这个是内核错误，不知道下步该怎么走 http://blog.csdn.net/liukuan73/article/details/45537889
+	
+	cood_boot,hot_mode
+}
+
+
+
+
+
+
+
+
+
+
+
+
 1.需要仿照G1605A添加一些boot mode,boot reason,call state,g_screen，call_state
 [bat_routine_thr]g_gn_screenon_time=(80), g_call_state=0, g_boot_reason=4, g_boot_mode=0
 
+	//Gionee <GN_BSP_CHG> <lilubao> <20170818> add for gn_boot info begin
+	但是这个g_gn_screenon_time好像是跟插入充电器有关的，不插入充电器不一定有
+	
+	
 
-		//Gionee <GN_BSP_CHG> <lilubao> <20170816> add for boot information begin
-		但是这个g_gn_screenon_time好像是跟插入充电器有关的，不插入充电器不一定有
+	/* boot type definitions */
+	typedef enum
+	{
+		NORMAL_BOOT = 0,
+		META_BOOT = 1,
+		RECOVERY_BOOT = 2,
+		SW_REBOOT = 3,
+		FACTORY_BOOT = 4,
+		ADVMETA_BOOT = 5,		//这个是什么模式？，is_advanced_meta_mode
+		ATE_FACTORY_BOOT = 6,
+		ALARM_BOOT = 7,			//具体什么场景?
+	#if defined (MTK_KERNEL_POWER_OFF_CHARGING)
+		KERNEL_POWER_OFF_CHARGING_BOOT = 8,
+		LOW_POWER_OFF_CHARGING_BOOT = 9,
+	#endif
+		FASTBOOT = 99,
+		DOWNLOAD_BOOT = 100,
+		UNKNOWN_BOOT
+	} BOOTMODE;
+
+	typedef enum {
+		BR_POWER_KEY = 0,
+		BR_USB,
+		BR_RTC,
+		BR_WDT,
+		BR_WDT_BY_PASS_PWK,
+		BR_TOOL_BY_PASS_PWK,
+		BR_2SEC_REBOOT,
+		BR_UNKNOWN,
+		BR_KERNEL_PANIC,//这个是内核错误，不知道下步该怎么走 http://blog.csdn.net/liukuan73/article/details/45537889
+		BR_WDT_SW,
+		BR_WDT_HW
+	} boot_reason_t;
+	
+	
+	
+	a. gn_boot_mode	=get_boot_mode();这个是通过mtk_boot_common.c 下的
+	
+	判断系统启动的boot_mode.boot_reason的流程 G1605A
+	(mt_boot_common.c)dt_get_boot_common 这是从内核传参的过程中，从lk获取的atag -> init_boot_common然后初始化判断不同的启动模式，组包不同的字符串
+	
+	创建相应的节点	->  get_boot_mode这个接口函数可以在后面获取启动的信息
+	
+	
+	
+	
+	
+	#include <mt-plat/mtk_boot.h>
+	/* return boot mode */
+	unsigned int get_boot_mode(void)
+	{
+		init_boot_common(__LINE__);
+		return g_boot_mode;
+	}
+	
+	./drivers/misc/mediatek/aee/aed/monitor_hang.c:647:		LOGE("Press powerkey!!	g_boot_mode=%d,wdt_kick_status=0x%x,tickTimes=0x%x,g_kinterval=%d,RT[%lld]\n",
+	./drivers/misc/mediatek/boot/mt_boot_common.c:32:enum boot_mode_t g_boot_mode __nosavedata = UNKNOWN_BOOT;
+	./drivers/misc/mediatek/boot/mt_boot_common.c:53:		g_boot_mode = tags->bootmode;
+	./drivers/misc/mediatek/boot/mt_boot_common.c:72:			g_boot_mode);
+	./drivers/misc/mediatek/boot/mt_boot_common.c:82:	if (UNKNOWN_BOOT != g_boot_mode) {
+	./drivers/misc/mediatek/boot/mt_boot_common.c:84:		pr_warn("%s (%d) boot_mode = %d\n", __func__, line, g_boot_mode);
+	./drivers/misc/mediatek/boot/mt_boot_common.c:88:	pr_debug("%s %d %d %d\n", __func__, line, g_boot_mode, atomic_read(&g_boot_init));
+	./drivers/misc/mediatek/boot/mt_boot_common.c:94:	pr_debug("%s %d %d %d\n", __func__, line, g_boot_mode, atomic_read(&g_boot_init));
+	./drivers/misc/mediatek/boot/mt_boot_common.c:102:	return g_boot_mode;
+	./drivers/misc/mediatek/boot/mt_boot_common.c:111:	if (g_boot_mode == META_BOOT)
+	./drivers/misc/mediatek/boot/mt_boot_common.c:122:	if (g_boot_mode == ADVMETA_BOOT)
+	./drivers/misc/mediatek/boot/mt_boot_common.c:225:	switch (g_boot_mode) {
+	./drivers/misc/mediatek/boot/mt_boot_common.c:275:	pr_debug("boot_mode = %d, state(%d,%d,%d)", g_boot_mode,
+	./drivers/power/mediatek/switch_charging.c:142:	battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
+	./drivers/power/mediatek/battery_common_fg_20.c:2245:	battery_log(BAT_LOG_CRTI,"g_gn_screenon_time=(%d), g_call_state=%d, g_boot_reason=%d, g_boot_mode=%d\n", g_gn_screenon_time, g_call_state, get_boot_reason(),get_boot_mode());
 			
-		a. gn_boot_mode				
 			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+	b.gn_call_state 判断是否处于打电话的状态
+	
+	/*****************************************************************************
+	 *  CallState
+	 ****************************************************************************/
+	#define CALL_IDLE (0)
+	#define CALL_ACTIVE (1)
+			
+	./drivers/misc/mediatek/include/mt-plat/battery_common.h:316:extern kal_bool g_call_state;
+	./drivers/power/mediatek/switch_charging.c:142:	battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
+	./drivers/power/mediatek/switch_charging.c:144:	if (((g_gn_screenon_time <= 30) && (g_call_state == CALL_IDLE)) || (is_enter_mmi_test == KAL_TRUE) || (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT || get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT))
+	./drivers/power/mediatek/switch_charging.c:800:			if((BMT_status.temperature < 15) || ((g_call_state != CALL_IDLE) && (!is_enter_mmi_test)))
+	./drivers/power/mediatek/switch_charging.c:805:				battery_log(BAT_LOG_CRTI, "[BATTERY] temperature = %d, g_call_state = %d, is_enter_mmi_test = %d, g_temp_CC_value = %d\n", BMT_status.temperature, g_call_state, is_enter_mmi_test, g_temp_CC_value); 
+	./drivers/power/mediatek/switch_charging.c:1062:			if((BMT_status.temperature < 15) || ((g_call_state != CALL_IDLE) && (!is_enter_mmi_test)))
+	./drivers/power/mediatek/switch_charging.c:1067:				battery_log(BAT_LOG_CRTI, "[BATTERY] temperature = %d, g_call_state = %d, is_enter_mmi_test = %d, g_temp_CC_value = %d\n", BMT_status.temperature, g_call_state, is_enter_mmi_test, g_temp_CC_value); 
+	./drivers/power/mediatek/switch_charging.c:1327:	if (BMT_status.bat_vol < TALKING_RECHARGE_VOLTAGE || g_call_state == CALL_IDLE) {
+	./drivers/power/mediatek/linear_charging.c:1317:	    || g_call_state == CALL_IDLE) {
+	
+	./drivers/power/mediatek/battery_common_fg_20.c:132:unsigned int g_call_state = CALL_IDLE;
+	./drivers/power/mediatek/battery_common_fg_20.c:1535:	battery_log(BAT_LOG_CRTI, "call state = %d\n", g_call_state);
+	./drivers/power/mediatek/battery_common_fg_20.c:1536:	return sprintf(buf, "%u\n", g_call_state);
+	./drivers/power/mediatek/battery_common_fg_20.c:1543:	if (kstrtouint(buf, 10, &g_call_state) == 0) {
+	./drivers/power/mediatek/battery_common_fg_20.c:1544:		battery_log(BAT_LOG_CRTI, "call state = %d\n", g_call_state);
+	./drivers/power/mediatek/battery_common_fg_20.c:2248:	battery_log(BAT_LOG_CRTI,"g_gn_screenon_time=(%d), g_call_state=%d, g_boot_reason=%d, g_boot_mode=%d\n", g_gn_screenon_time, g_call_state, get_boot_reason(),get_boot_mode());
+	./drivers/power/mediatek/battery_common_fg_20.c:2366:	if ((g_call_state == CALL_ACTIVE) && (BMT_status.bat_vol > V_CC2TOPOFF_THRES))
+./drivers/power/mediatek/battery_common_fg_20.c:4215:	if (g_call_state == CALL_ACTIVE
+		
+			
+				
+		
+			
+	这步应该是根据当前的一个状态判断是否要降电流		
+	//Gionee GuoJianqiu 20150611 modify for CR01498036 begin
+	kal_bool bat_charge_current_not_down(void)
+	{
+		battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
+
+		if (((g_gn_screenon_time <= 30) && (g_call_state == CALL_IDLE)) || (is_enter_mmi_test == KAL_TRUE) || (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT || get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT))
+			return true;
+		else
+			return false;
+	}
+	 //Gionee GuoJianqiu 20150611 modify for CR01498036 end	
+
+	//Gionee GuoJianqiu 20150514 modify for GNNCR00010646 begin
+	if(bat_charge_current_not_down())
+	{
+		g_temp_CC_value = AC_CHARGER_CURRENT;
+		
+		//GioneeDrv GuoJianqiu 20160429 modify for platform change begin
+		if((BMT_status.temperature < 15) || ((g_call_state != CALL_IDLE) && (!is_enter_mmi_test)))
+		{
+			g_temp_CC_value = AC_CHARGER_CURRENT / 2;
+			if(g_temp_CC_value < USB_CHARGER_CURRENT)
+				g_temp_CC_value = USB_CHARGER_CURRENT; 
+			battery_log(BAT_LOG_CRTI, "[BATTERY] temperature = %d, g_call_state = %d, is_enter_mmi_test = %d, g_temp_CC_value = %d\n", BMT_status.temperature, g_call_state, is_enter_mmi_test, g_temp_CC_value); 
+		}
+		//GioneeDrv GuoJianqiu 20160429 modify for platform change end
+		
+	}
+	//Gionee GuoJianqiu 20150514 modify for GNNCR00010646 end			
 			
 			
 			
@@ -530,6 +692,18 @@
 			
 			
 		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -540,43 +714,28 @@
 	{
 	
 	
-		#94044
-		测机关机状态下连充电器，短按2s不开机长按11s也不开机（有振动），待1min后测机自动开机恢复		2017.8.10
-		{		
-		 2017-8-3	16：54~16：55
-			电量1%，长按时间14+s这个超过了软件重启的时间
-			电量低的情况下手机要充一段时间才能恢复，所以关机充电条件下可能有段时间不亮屏
-				
-		}
-
-		
-		
-
-		
 		#99363	****
 		待机一晚上早上手机电量1%时，连接充2A电器不充电，连充电器30min插拔充电器不恢复，30min后待电量自动耗完再次连充电器恢复
 		{
-		1
-		分析：
-		2017-8-16 08：12左右插入充电器，不充电，然后关机，关机也不显示关机充电
-		
-			<6>[    5.475795]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_pmu_attachi_irq_handler
-			<6>[    5.475882]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_inform_psy_changed: online = 1, type = 1
-			<6>[    5.475892]  (0)[182:irq/773-rt5081_]mt_charger_set_property
-			<6>[    5.475899]  (0)[182:irq/773-rt5081_]mt_charger_set_property
-			<3>[    5.475906]  (0)[182:irq/773-rt5081_]dump_charger_name: charger type: 1, Standard USB Host
-			<3>[    5.475922]  (0)[182:irq/773-rt5081_]mtk_charger_int_handler
-			<3>[    5.475928]  (0)[182:irq/773-rt5081_]wake_up_charger
-			<3>[    5.475948]  (0)[182:irq/773-rt5081_][fg_charger_in_handler] notify daemon 0 1
-			<6>[    5.475965]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_chgdet_flow: en = 0
-			<3>[    5.476009]  (0)[245:kworker/0:1][U3D]U3D_LTSSM_INTR: 0
-			<6>[    5.476122]  (6)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_set_usbsw_state: state = 1
-		
-		充电器可能没有插好 因为软件没有走那步流程
-		MTK case ID：ALPS03468158
-		
-		
-		
+			1
+			分析：
+			2017-8-16 08：12左右插入充电器，不充电，然后关机，关机也不显示关机充电
+	
+				<6>[    5.475795]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_pmu_attachi_irq_handler
+				<6>[    5.475882]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_inform_psy_changed: online = 1, type = 1
+				<6>[    5.475892]  (0)[182:irq/773-rt5081_]mt_charger_set_property
+				<6>[    5.475899]  (0)[182:irq/773-rt5081_]mt_charger_set_property
+				<3>[    5.475906]  (0)[182:irq/773-rt5081_]dump_charger_name: charger type: 1, Standard USB Host
+				<3>[    5.475922]  (0)[182:irq/773-rt5081_]mtk_charger_int_handler
+				<3>[    5.475928]  (0)[182:irq/773-rt5081_]wake_up_charger
+				<3>[    5.475948]  (0)[182:irq/773-rt5081_][fg_charger_in_handler] notify daemon 0 1
+				<6>[    5.475965]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_chgdet_flow: en = 0
+				<3>[    5.476009]  (0)[245:kworker/0:1][U3D]U3D_LTSSM_INTR: 0
+				<6>[    5.476122]  (6)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_set_usbsw_state: state = 1
+	
+			充电器可能没有插好 因为软件没有走那步流程
+			MTK case ID：ALPS03468158
+
 		}
 
 
@@ -587,9 +746,19 @@
 		{
 			这个问题是连接到PC没有显示盘符，重启后恢复，08：03~08：05
 		
-			
+			MTK case ID：ALPS03469265
+		}
+		
+		
+		
+		#100910
+		低温0℃充电未停止充电且没有提示语，高温55℃，OK
+		{
+		
+		
 		
 		}
+		
 		
 	
 	}
@@ -739,46 +908,6 @@ Running: cp /home/llb/project/PRO/source/17G06A/L33_QCOM_8920_17G16A_170605_ALPS
 	什么方向，怎么解决，解决后的现象是什么样的？所有问题都要自己事先理清楚，想明白
 
 
-
-	17G10A当前比较重要的问题：
-	{
-		1.USB的vid，pid特别是meta 模式下的0x0e05 function： adb ,acm
-	
-		2.fuelgauge3.0的客制化，熟悉流程，GM3.0的硬件测试点，nvram写入电量计系数
-	
-		3.充电后面的ibus跳变问题
-	
-		4.仿照G1605A，添加手机处在打电话状态
-	
-		5.整机测试出现的一些列问题
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	电量计校准，没有测试点，这个会影响到电量计的准确度
-	手上的手机：T1-004，T1-083，T1-672,
-	T1-573这个机器可能NTC电阻出问题，导致一直显示battery temperature >60 无法开机
 	
 
 	电池曲线的导入		7.27
@@ -2081,16 +2210,6 @@ ti的替换方案
 
 
 
-
-
-/*测试上的bug*/
-{
-
-	
-	
-	
-
-}
 
 
 
