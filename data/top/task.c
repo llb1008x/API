@@ -462,38 +462,148 @@
 
 /*测试上的BUG*/
 {
+20170817
+	1.手上的BUG													20170817
+		还有两类BUG：一类是低电插上充电器不识别，关机；一类是USB不识别问题
+		已经提case
+		
+	2.温升问题，温升降电流有没有起作用							20170818
+		主要是分场景降低充电电流，比如打电话，拍照，听音乐，玩游戏等(具体是否还有其他还有带确认)
+		温升部分主要有两个一个是上面的根据不同场景降低充电电流问题		计划今天完成
+		还有一类是MTK的 thermal regulator，bcct这部分要熟悉相关文档，代码
+		
+		
+		
+		
+	3.电量显示的不准												20170818
+		这个的主要问题是充电时候电池电压跟电量显示差别比较大(差别在10%以上)，放电比较准确
+		这部分跟GM3.0的客制化有关，但是相关的文档还是不熟悉，必须弄清楚
+		相关的软件自己首先要熟悉
+		
+				
+	4.高通USB相关的框架，文档，代码必须弄清楚，不然很多你都不懂
+	一定要下力气，下决心打通这部分
+	
+	
+				
+	5.相关测试
+	17G10A
+	白盒测试：													20170817
+		4.LDO: VIO18/VCN33/VEMC/VCAMD2纹波略大,NG
+		5.charger I2C ：fast mode plus 与high speed mode均是Trclk、Trdat、Tfclk、Tfdat偏低，NG
+	整机测试：													20170817
+		3.配合旅充充电测试       2PCS     NG  开机待机状态下充电，手机表面温度偏高，正面温度为38.6℃、背面温度为44.3℃，（标准为金属≤38℃；塑胶/橡胶 ≤43℃；玻璃≤41℃）。
+		5.配合电脑USB充电功能测试      2PCS        NG  关机状态下手机连接电脑充电，电量充电至60%后充电电流由466mA将至370mA，跳变的原因最好能找到。	
+	
+	17G06A:
+	眼图测试失败的case
+		You can follow doc 80-PB524-1 usb_tunning_-_phy_eye_diagram_for_oems(1).pdf
+		and 80-NA648-1_H_Tuning_USB_PHY_Eye_Diagram_Receiver_Sensitivity.pdf on eye diagram tunning. 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+2.温升问题，根据不同场景降电流
+/******************************************************************************************/		
+1.需要仿照G1605A添加一些boot mode,boot reason,call state,g_screen，call_state
+[bat_routine_thr]g_gn_screenon_time=(80), g_call_state=0, g_boot_reason=4, g_boot_mode=0
+
+
+		//Gionee <GN_BSP_CHG> <lilubao> <20170816> add for boot information begin
+		但是这个g_gn_screenon_time好像是跟插入充电器有关的，不插入充电器不一定有
+			
+		a. gn_boot_mode				
+			
+			
+			
+			
+			
+			
+			
+		
+	
+	
+	
+	
+	
+
 	17G10A
 	{
-		#94044,测机关机状态下连充电器，短按2s不开机长按11s也不开机（有振动），待1min后测机自动开机恢复		2017.8.10
+	
+	
+		#94044
+		测机关机状态下连充电器，短按2s不开机长按11s也不开机（有振动），待1min后测机自动开机恢复		2017.8.10
 		{		
-			需要仿照G1605A添加一些boot mode,boot reason
-[bat_routine_thr]g_gn_screenon_time=(80), g_call_state=0, g_boot_reason=4, g_boot_mode=0
-		
+		 2017-8-3	16：54~16：55
+			电量1%，长按时间14+s这个超过了软件重启的时间
+			电量低的情况下手机要充一段时间才能恢复，所以关机充电条件下可能有段时间不亮屏
+				
 		}
 
 		
 		
-		#99363
+
+		
+		#99363	****
+		待机一晚上早上手机电量1%时，连接充2A电器不充电，连充电器30min插拔充电器不恢复，30min后待电量自动耗完再次连充电器恢复
+		{
+		1
+		分析：
+		2017-8-16 08：12左右插入充电器，不充电，然后关机，关机也不显示关机充电
+		
+			<6>[    5.475795]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_pmu_attachi_irq_handler
+			<6>[    5.475882]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_inform_psy_changed: online = 1, type = 1
+			<6>[    5.475892]  (0)[182:irq/773-rt5081_]mt_charger_set_property
+			<6>[    5.475899]  (0)[182:irq/773-rt5081_]mt_charger_set_property
+			<3>[    5.475906]  (0)[182:irq/773-rt5081_]dump_charger_name: charger type: 1, Standard USB Host
+			<3>[    5.475922]  (0)[182:irq/773-rt5081_]mtk_charger_int_handler
+			<3>[    5.475928]  (0)[182:irq/773-rt5081_]wake_up_charger
+			<3>[    5.475948]  (0)[182:irq/773-rt5081_][fg_charger_in_handler] notify daemon 0 1
+			<6>[    5.475965]  (0)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_chgdet_flow: en = 0
+			<3>[    5.476009]  (0)[245:kworker/0:1][U3D]U3D_LTSSM_INTR: 0
+			<6>[    5.476122]  (6)[182:irq/773-rt5081_]rt5081_pmu_charger rt5081_pmu_charger: rt5081_set_usbsw_state: state = 1
+		
+		充电器可能没有插好 因为软件没有走那步流程
+		MTK case ID：ALPS03468158
 		
 		
-		#99469
 		
+		}
+
+
+
 		
 		#99348
+		手机连接电脑USB打开传文件和临时USB调试后，电脑不显示连接到手机，再次插拔USB不恢复，插其它手机可以正常识别，重启恢复
+		{
+			这个问题是连接到PC没有显示盘符，重启后恢复，08：03~08：05
 		
+			
 		
-		#99192
-		
-		
-		#99037
-		
-		
-		#95897
-		
+		}
 		
 	
-		
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -534,6 +644,24 @@
 		是不是USB的vid，pid配置不对
 		直接连接PC  pid 9039
 		打开diag口  pid 9091
+		
+		
+		
+		
+		
+		
+		
+2017-08-17-14-33-04 start to build adsp
+----Begin build adsp-----
+cd ADSP.8953.2.8.2; cd adsp_proc; python ./build/build.py -c msm8937 -o all
+Running: cd ADSP.8953.2.8.2; cd adsp_proc; python ./build/build.py -c msm8937 -o all
+Build adsp failed, exit
+Running: cp /home/llb/project/PRO/source/17G06A/L33_QCOM_8920_17G16A_170605_ALPS/modem_qcom_mp/L33_QCOM_8920_17G16A_170605_MODEM/BuildLogs/BJ17G06A01_2017-08-17-14-33-02 release/BJ17G06A01_MODEM_T0012
+
+		
+		
+		
+		
 		
 		
 		
@@ -636,79 +764,7 @@
 
 
 
-	USB  pid，vid添加到驱动中
-	{
-		#Gionee <gn_by_charging> <lilubao> <20170808> add for USB vid pid begin
-问题：
-		现在的情况是windows电脑用的是UsbDriverSetup_Fac_V2.7.0.0.exe 这是gionee用的新的usb驱动
-		新版本在meta模式下需要安装UsbDriverSetup_Fac_Path_V1.0.1.0.exe 这个补丁然后才能识别端口，
-		进入meta模式写号，老版的usb驱动可以识别
-		
-		
-分析：	
-		新的USB驱动可能是根据新的端口0e05
-		
-		
-		
-	log：	
-		[   11.621249] <1>.(1)[1:multi_init][name:g_android&][g_android][USB]enable_store: device_attr->attr.name: enable
 
-		[   11.622511] <1>.(1)[1:multi_init][name:g_android&][g_android]android_usb: already disabled
-
-		[   11.624198] <1>.(1)[1:multi_init][name:g_android&][g_android][USB]functions_store: name = adb
-
-		[   11.624606] <1>.(0)[328:logd][name:unix&]unix: [mtk_net][socket]unix_stream_connect[134 ]: connect [/dev/socket/logd] other[11481]
-
-		[   11.625808] <1>.(3)[314:logd.daemon]logd.daemon: reinit
-
-		[   11.627463] <3>.(1)[1:multi_init][name:g_android&][g_android][USB]functions_store: name = acm
-
-		[   11.628410] <3>.(0)[314:logd.daemon]logd no log reader, set log level to INFO!
-
-		[   11.628536] <3>.(1)[1:multi_init][name:g_android&][g_android][USB]enable_store: device_attr->attr.name: enable
-
-		[   11.628546] <3>.(1)[1:multi_init][name:g_android&][g_android][USB]enable_store: enable 0->1 case, device_desc.idVendor = 0x271d, device_desc.idProduct = 0xe05
-
-	
-	
-		也就是说现在需要知道新版usb驱动和老版的区别在哪，windows电脑怎么识别这些信息的，S10是否有这个问题，如果有怎么做的
-   		
-		#Gionee <gn_by_charging> <lilubao> <20170808> add for USB vid pid begin
-		#adb,acm
-		on property:ro.boot.usbconfig=0
-			write /sys/class/android_usb/android0/iSerial $ro.serialno
-			write /sys/class/android_usb/android0/enable 0
-			write /sys/class/android_usb/android0/idVendor 271d
-			write /sys/class/android_usb/android0/idProduct 0e05
-			write /sys/class/android_usb/android0/f_acm/instances 1
-			write /sys/class/android_usb/android0/functions adb,acm
-			write /sys/class/android_usb/android0/enable 1
-			start adbd
-		#Gionee <gn_by_charging> <lilubao> <20170808> add for USB vid pid end		
-		
-		
-		
-		
-涉及到的文件：   	
-	    init.rc之类的文件内那些代码什么意思，以及usb的mass_storage,adb,acm等是什么意思
-	    init.mt6757.usb.rc
-	    meta_init.rc
-	    init.recovery.mt6757.rc
-	    meta_init.rc
-	    
-	    
-常用的概念：
-	    mass_storage，adb,ptp,mtp,acm,adb/fastboot
-	    mtp：媒体传输协议
-	    mass_storage:USB大容量存储（USB Mass Storage，简称UMS）
-	    ACM:ACM (Abstract Control Model) allows any communication device to provide a serial communication interface (e.g modem devices that send and receive AT commands).
-	    提供一系列的通信接口
-	    	    
-	    vid 是不同厂商的标记，pid是不同产品或者说不同功能
-		gionee的vid是 271d，这个是厂商的标记
-		根据不同的功能配置pid，软件根据表格配置pid，也就是说不同的厂商不同的功能组合
-		有不同的pid，pid有点像端口号，新增加一个pid，就相当于新增加一个端口号
-	}
 
 
 
@@ -721,7 +777,7 @@
 
 
 	电量计校准，没有测试点，这个会影响到电量计的准确度
-	手上的手机：T1-004，T1-083，T1-672,T1-573
+	手上的手机：T1-004，T1-083，T1-672,
 	T1-573这个机器可能NTC电阻出问题，导致一直显示battery temperature >60 无法开机
 	
 
