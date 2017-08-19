@@ -1567,6 +1567,16 @@ static void *update_vibrator_thread_default(void *priv)
 
         触发条件就设置限定电流的回调函数 -> charger_manager_set_input_current_limit 通过这个函数设置进充电器的和进电池的 
 
+	 （mtk_thermal_monitor.c） mtkthermal_init，mtk thermal相关的初始化，创建调试调用节点/proc/driver/thermal，在这个目录下
+
+      建立一系列的proc 节点，/proc/mtkcooler这个目录下是降温策略的设备节点 -> (mtk_cooler_shutdown.c) mtk_cooler_shutdown_init
+
+      这个应该跟过温启动关机策略相关的，温度过高触发条件，关机策略应该是最直接，最有效的，但是影响很大，后面还有几个相关的模块的初始化，都是在proc目录下
+
+      创建一系列节点，然后注册函数，相关的操作函数指针 -> (mtk_ts_cpu.c) tscpu_init注册驱动,这个对整个系统的温升有很大影响，tscpu是一个虚拟的thermal_zone，
+      
+      主要是监控cpu的状态 -> tscpu_thermal_probe 
+
 
         device/mediatek/mt6757/thermal.conf这个是温升调节策略相关的配置文件,这个文件参数的意思
 
@@ -1580,21 +1590,8 @@ static void *update_vibrator_thread_default(void *priv)
     }  
         
 
-    3.充电温度调节调用流程 
-    {
-     （mtk_thermal_monitor.c） mtkthermal_init，mtk thermal相关的初始化，创建调试调用节点/proc/driver/thermal，在这个目录下
 
-      建立一系列的proc 节点，/proc/mtkcooler这个目录下是降温策略的设备节点 -> (mtk_cooler_shutdown.c) mtk_cooler_shutdown_init
-
-      这个应该跟过温启动关机策略相关的，温度过高触发条件，关机策略应该是最直接，最有效的，但是影响很大，后面还有几个相关的模块的初始化，都是在proc目录下
-
-      创建一系列节点，然后注册函数，相关的操作函数指针 -> (mtk_ts_cpu.c) tscpu_init注册驱动,这个对整个系统的温升有很大影响，tscpu是一个虚拟的thermal_zone，
-      
-      主要是监控cpu的状态 -> tscpu_thermal_probe   
-    }   
-
-
-    4.相关的文档
+    3.相关的文档
     {
         Thermal_Management_MT6757.pdf
 

@@ -515,7 +515,18 @@
 2.温升问题，根据不同场景降电流
 /******************************************************************************************/		
 {
-	除了启动信息，还要加上正常情况下判断电池相关信息的log
+	除了启动信息，还要加上正常情况下判断电池相关信息的log，current，voltage
+	fg_drv_update_hw_status
+	bm_err("[fg_drv_update_hw_status] current:%d %d state:%d %d car:%d %d bat:%d %d chr:%d %d hwocv:%d %d bat_plug_out:%d %d tmp:%d %d imix %d rac %d\n",
+	fg_current, fg_current_new,
+	fg_current_state, fg_current_state_new,
+	fg_coulomb, fg_coulomb_new,
+	bat_vol, bat_vol_new,
+	chr_vol, chr_vol_new,
+	hwocv, hwocv_new,
+	plugout_status, plugout_status_new,
+	tmp, tmp_new, (UNIT_TRANS_10 * get_imix()), get_rac()
+	);
 
 	这函数mt_battery_average_method,battery_common_fg_20.c做的什么操作？			//20170818	
 	
@@ -538,10 +549,7 @@
 1.需要仿照G1605A添加一些boot mode,boot reason,call state,g_screen，call_state
 [bat_routine_thr]g_gn_screenon_time=(80), g_call_state=0, g_boot_reason=4, g_boot_mode=0
 
-	//Gionee <GN_BSP_CHG> <lilubao> <20170818> add for gn_boot info begin
-	但是这个g_gn_screenon_time好像是跟插入充电器有关的，不插入充电器不一定有
-	
-	
+	//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for gn_boot info begin
 
 	/* boot type definitions */
 	typedef enum
@@ -598,7 +606,6 @@
 		return g_boot_mode;
 	}
 	
-	./drivers/misc/mediatek/aee/aed/monitor_hang.c:647:		LOGE("Press powerkey!!	g_boot_mode=%d,wdt_kick_status=0x%x,tickTimes=0x%x,g_kinterval=%d,RT[%lld]\n",
 	./drivers/misc/mediatek/boot/mt_boot_common.c:32:enum boot_mode_t g_boot_mode __nosavedata = UNKNOWN_BOOT;
 	./drivers/misc/mediatek/boot/mt_boot_common.c:53:		g_boot_mode = tags->bootmode;
 	./drivers/misc/mediatek/boot/mt_boot_common.c:72:			g_boot_mode);
@@ -617,14 +624,53 @@
 			
 			
 			
+		
+		
+		b.gn_boot_reason 判断启动的原因
+		
+		(mt_boot_reason.c) dt_get_boot_reason跟boot_mode一样都是内核传参获取atag，获取字符串，然后读取指定信息
+	
+		./drivers/misc/mediatek/aee/common/reboot-reason.c:82:	int g_boot_reason = 0;
+		./drivers/misc/mediatek/aee/common/reboot-reason.c:88:		g_boot_reason = br_ptr[12] - '0';
+		./drivers/misc/mediatek/aee/common/reboot-reason.c:89:		LOGE("g_boot_reason=%d\n", g_boot_reason);
+		./drivers/misc/mediatek/aee/common/reboot-reason.c:92:			g_boot_reason = BR_KE_REBOOT;
+		./drivers/misc/mediatek/aee/common/reboot-reason.c:94:		return sprintf(buf, "%s\n", boot_reason[g_boot_reason]);
+		./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:33:enum boot_reason_t g_boot_reason __nosavedata = BR_UNKNOWN;
+		./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:51:			g_boot_reason = br_ptr[12] - '0';	/* get boot reason */
+		./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:82:	if (BR_UNKNOWN != g_boot_reason) {
+		./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:84:		pr_warn("boot_reason = %d\n", g_boot_reason);
+		./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:88:	pr_debug("%s %d %d %d\n", __func__, line, g_boot_reason, atomic_read(&g_br_state));
+		./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:94:	pr_debug("%s %d %d %d\n", __func__, line, g_boot_reason, atomic_read(&g_br_state));
+		./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:102:	return g_boot_reason;
+		./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:113:	pr_debug("boot_reason = %d, state(%d,%d,%d)", g_boot_reason,
+		./drivers/misc/mediatek/include/mt-plat/battery_meter.h:271:	FG_DAEMON_CMD_GET_BOOT_REASON,	/* g_boot_reason, */
+		./drivers/power/mediatek/battery_meter_fg_20.c:3895:			bm_debug("[fg_res] g_boot_reason = %d\n", boot_reason);
+		./drivers/power/mediatek/battery_common_fg_20.c:2248:	battery_log(BAT_LOG_CRTI,"g_gn_screenon_time=(%d), g_call_state=%d, g_boot_reason=%d, g_boot_mode=%d\n", g_gn_screenon_time, g_call_state, get_boot_reason(),get_boot_mode());
+
+		
+		
+		
+		c.g_gn_screenon_time 判断亮屏时间，这个是通过led亮的时间，因为守护进程10s一次，检测led是否亮的，如果亮+10s
+		
+		但是这个好像有问题
+		./drivers/misc/mediatek/include/mt-plat/battery_common.h:329:extern unsigned int g_gn_screenon_time;
+		./drivers/power/mediatek/switch_charging.c:142:	battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
+		./drivers/power/mediatek/switch_charging.c:144:	if (((g_gn_screenon_time <= 30) && (g_call_state == CALL_IDLE)) || (is_enter_mmi_test == KAL_TRUE) || (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT || get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT))
+		./drivers/power/mediatek/battery_common_fg_20.c:315:unsigned int g_gn_screenon_time = 0;
+		./drivers/power/mediatek/battery_common_fg_20.c:2245:		g_gn_screenon_time = g_gn_screenon_time + 10;
+		./drivers/power/mediatek/battery_common_fg_20.c:2247:		g_gn_screenon_time = 0;
+		./drivers/power/mediatek/battery_common_fg_20.c:2248:	battery_log(BAT_LOG_CRTI,"g_gn_screenon_time=(%d), g_call_state=%d, g_boot_reason=%d, g_boot_mode=%d\n", g_gn_screenon_time, g_call_state, get_boot_reason(),get_boot_mode());
+		
+		
+		./drivers/misc/mediatek/leds/mt6735/leds.c:120:unsigned int mt_get_bl_brightness(void)
+		./drivers/misc/mediatek/leds/mt6735/leds_hal.h:10:extern unsigned int mt_get_bl_brightness(void);
+		./drivers/misc/mediatek/leds/leds_drv.c:511:			bl_brightness = mt_get_bl_brightness();
+		./drivers/power/mediatek/battery_common_fg_20.c:316:extern unsigned int mt_get_bl_brightness(void);
+		./drivers/power/mediatek/battery_common_fg_20.c:2244:	if(mt_get_bl_brightness() != 0)
+
+
 			
-			
-			
-			
-			
-			
-			
-	b.gn_call_state 判断是否处于打电话的状态
+	d.gn_call_state 判断是否处于打电话的状态
 	
 	/*****************************************************************************
 	 *  CallState
@@ -653,62 +699,96 @@
 		
 			
 				
-		
-			
 	这步应该是根据当前的一个状态判断是否要降电流		
-	//Gionee GuoJianqiu 20150611 modify for CR01498036 begin
-	kal_bool bat_charge_current_not_down(void)
-	{
-		battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
 
-		if (((g_gn_screenon_time <= 30) && (g_call_state == CALL_IDLE)) || (is_enter_mmi_test == KAL_TRUE) || (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT || get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT))
-			return true;
-		else
-			return false;
-	}
-	 //Gionee GuoJianqiu 20150611 modify for CR01498036 end	
 
-	//Gionee GuoJianqiu 20150514 modify for GNNCR00010646 begin
-	if(bat_charge_current_not_down())
+	//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for gn_boot info begin
+	bool bat_charge_current_not_down(void)
 	{
-		g_temp_CC_value = AC_CHARGER_CURRENT;
-		
-		//GioneeDrv GuoJianqiu 20160429 modify for platform change begin
-		if((BMT_status.temperature < 15) || ((g_call_state != CALL_IDLE) && (!is_enter_mmi_test)))
+		int gn_boot_mode ;
+		gn_boot_mode=get_boot_mode();
+
+		pr_err("in [%s] by lilubao gn_boot_mode->%d,gn_call_state->%d\n",
+					__FUNCTION__,gn_boot_mode,gn_call_state);
+	
+		if( /*(g_gn_screenon_time <= 30) && (gn_call_state == CALL_IDLE)) || */(is_enter_mmi_test == true) || (gn_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || gn_boot_mode == LOW_POWER_OFF_CHARGING_BOOT))
 		{
-			g_temp_CC_value = AC_CHARGER_CURRENT / 2;
-			if(g_temp_CC_value < USB_CHARGER_CURRENT)
-				g_temp_CC_value = USB_CHARGER_CURRENT; 
-			battery_log(BAT_LOG_CRTI, "[BATTERY] temperature = %d, g_call_state = %d, is_enter_mmi_test = %d, g_temp_CC_value = %d\n", BMT_status.temperature, g_call_state, is_enter_mmi_test, g_temp_CC_value); 
+			pr_err("in [%s] 1111111111 \n",__FUNCTION__);
+			return true;
+		}	
+		else{
+			pr_err("in [%s] 2222222222 \n",__FUNCTION__);
+			return false;
 		}
-		//GioneeDrv GuoJianqiu 20160429 modify for platform change end
 		
 	}
-	//Gionee GuoJianqiu 20150514 modify for GNNCR00010646 end			
-			
-			
-			
-			
-			
-			
+	//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for gn_boot info end
+
+
+	
+	17G10A 电芯规格书，请确认一下配机参数。重点关注一下充电参数。
+	0~15，0.3C，MAX to 4.2 V cutoff		900mA
+	15~45 2.5A to 4.2V ,2A to 4.4V ,then CV to 0.02C
+	45~60 0.5C MAX to 4.2V				1500mA
+
+	//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for gn_boot info begin
+	pr_err("in [%s] by lilubao  gn_call_state->%d,temperature->%d\n,is_enter_mmi_test->%d\n",
+			__FUNCTION__,gn_call_state,info->battery_temperature,is_enter_mmi_test);
+
+	if( bat_charge_current_not_down() ){
+
+		
+		pr_err("11111111111\n");
+		pr_err("normal mode,not change any action\n");
+	}else{
+		pr_err("222222222222\n");
+
+		if( info->battery_temperature <=15 ){
+			pdata->charging_current_limit=1500000;
+			pdata->input_current_limit=1600000;
+			pr_err("temperature is too low ,charging_current_limit->%d,or is_enter_mmi_test is disable\n",
+						pdata->charging_current_limit);
+		}else if( (info->battery_temperature>15)&&(info->battery_temperature<=40) ){
+
+			pr_err("temperature in normal range\n");
+		}else if( info->battery_temperature > 40 ){
+
+			pdata->charging_current_limit=1400000;
+			pdata->input_current_limit=1300000;
+			pr_err("temperature is too high ,charging_current_limit->%d\n",pdata->charging_current_limit);
+		}
+
+		if( gn_call_state != CALL_IDLE ){
+
+			pr_err("333333333333\n");
+			pr_err("calling state ,decrease charging current\n");
+
+			pdata->charging_current_limit  = pdata->charging_current_limit/2;
+			pdata->input_current_limit = pdata->input_current_limit/2;
+		}
+
+	}
+	//Gionee <gn_by_charging> <lilubao> <20170705> add for fixed mmi end
+
+
+
+
+	thermal regulation主要在哪些地方，有没有生效
+	{
 		
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}
+
+
+
+
+		
+			
+			
+			
+			
+			
+
 
 	17G10A
 	{
