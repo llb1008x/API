@@ -320,7 +320,6 @@
 		FG_DAEMON_CMD_GET_VBAT
 		FG_DAEMON_CMD_GET
 
-
 	}
 
 
@@ -1599,7 +1598,7 @@ static void *update_vibrator_thread_default(void *priv)
     }
 
 /************************************************************************************************************/
-	17G10A主板显示电池温度50~55，温度过高导致的停止充电问题
+	9.17G10A主板显示电池温度50~55，温度过高导致的停止充电问题
     {
         NTC faild
         
@@ -1620,8 +1619,21 @@ static void *update_vibrator_thread_default(void *priv)
         }
     }
 
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
