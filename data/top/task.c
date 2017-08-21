@@ -744,8 +744,8 @@
 		pr_err("222222222222\n");
 
 		if( info->battery_temperature <=15 ){
-			pdata->charging_current_limit=1500000;
-			pdata->input_current_limit=1600000;
+			pdata->charging_current_limit=900000;
+			pdata->input_current_limit=1000000;
 			pr_err("temperature is too low ,charging_current_limit->%d,or is_enter_mmi_test is disable\n",
 						pdata->charging_current_limit);
 		}else if( (info->battery_temperature>15)&&(info->battery_temperature<=40) ){
@@ -754,7 +754,7 @@
 		}else if( info->battery_temperature > 40 ){
 
 			pdata->charging_current_limit=1400000;
-			pdata->input_current_limit=1300000;
+			pdata->input_current_limit=1500000;
 			pr_err("temperature is too high ,charging_current_limit->%d\n",pdata->charging_current_limit);
 		}
 
