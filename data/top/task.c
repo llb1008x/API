@@ -205,26 +205,9 @@ log关键字
 		arch
 			./arch/arm64/boot/dts/qcom/msm8917-pmi8937-qrd-sku5.dtsi
 			./arch/arm64/boot/dts/qcom/msm-pmi8937.dtsi
-	
-	
-	
-	
+
 	}
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -238,7 +221,22 @@ log关键字
 			You can follow doc 80-PB524-1 usb_tunning_-_phy_eye_diagram_for_oems(1).pdf
 			and 80-NA648-1_H_Tuning_USB_PHY_Eye_Diagram_Receiver_Sensitivity.pdf on eye diagram tunning. 
   	
-  		80-P2536-2X 
+  	
+  	
+  	 	现在是分成host/devics两种mode		kba-170123171355
+  	 	  
+  	 	value  addr  value addr  value addr  
+	  	qcom,hsusb-otg-phy-init-seq =
+		//Gionee <gn_by_CHG> <lilubao> <20170821> modify for USB eye diagram begin
+			<0x74 0x80 0x3c 0x81 0x3d 0x82 0x33 0x83 0xffffffff>;
+		qcom,hsusb-otg-phy-host-init-seq =
+			<0x74 0x80 0x39 0x81 0x1d 0x82 0x33 0x83 0xffffffff>;
+		//Gionee <gn_by_CHG> <lilubao> <20170821> modify for USB eye diagram end
+  	 	  
+  	 	  
+		80-na648-1a
+		
+		
   	
   	
   	
@@ -303,6 +301,18 @@ log关键字
 		是不是USB的vid，pid配置不对
 		直接连接PC  pid 9039
 		打开diag口  pid 9091
+		
+		
+		getprop |grep usb
+		[init.svc.qcom-usb-sh]: [stopped]
+		[init.svc.usb_uicc_daemon]: [stopped]
+		[init.svc.usb_uicc_enable]: [stopped]
+		[persist.sys.usb.config]: [diag,serial_smd,rmnet_qti_b
+		[persist.sys.usb.config.extra]: [none]
+		[sys.usb.config]: [diag,serial_smd,rmnet_qti_bam,adb]
+		[sys.usb.ffs.ready]: [1]
+		[sys.usb.rps_mask]: [0]
+		[sys.usb.state]: [diag,serial_smd,rmnet_qti_bam,adb]
 	}
 	
 	

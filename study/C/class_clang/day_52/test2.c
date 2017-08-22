@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 
-#define     MAX_SIZE    2
+#define     MAX_SIZE    3
 
 typedef struct student
 {
@@ -55,9 +55,9 @@ int *sort(int *a,int len)
 int main()
 {
     STU stu[MAX_SIZE];
-    int i,j,tmp,sum=0;
+    int i,j,sum=0;
     double average;
-    
+    STU tmp;
     
     printf("请输入数据：\n");
     for(i=0;i<MAX_SIZE;i++){
@@ -76,9 +76,9 @@ int main()
         
             if(stu[i].score>stu[j].score){
             
-                tmp=stu[i].score;
-                stu[i].score=stu[j].score;
-                stu[j].score=tmp;
+                tmp=stu[i];
+                stu[i]=stu[j];
+                stu[j]=tmp;
             }
         }
     }
