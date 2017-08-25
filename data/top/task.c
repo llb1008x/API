@@ -110,7 +110,7 @@ log关键字
 		adb shell setprop sys.usb.config diag,serial_smd,rmnet_ipa,adb 
 		
 		
-		
+		//
 		
 		
 
@@ -163,17 +163,49 @@ log关键字
 			2PCS手机因电池温度过高关机，但环y箱里设定温度为57度，要求做高温高湿测试时手机可以有高温安全警告，但不允许执行关机机制； 
 	
 			低温测试，-20度，手机自动关机
+			
+			
+			//Gionee <GN_BSP_CHG> <lilubao> <20170823> modify for low temp notify begin
+			//Gionee <GN_BSP_CHG> <lilubao> <20170823> add for thermal charging end
+			
+812 scan_count = sscanf(tmp, "%ld %ld %ld %ld %d %d %d %d %d %d"
+813        , &_abcct_target_temp, &_abcct_kp, &_abcct_ki, &_abcct_kd
+814        , &_max_cur, &_min_cur, &_input_current_limit_on
+815        , &_HW_thermal_sol, &_min_input, &_times_of_ts_polling_inteval);
+			
+			
+			/proc/driver/thermal/clabcct
+			44000 1000 200000 5 3000 0 0 3000 0 1
+			
+			thermal降电流有降功耗，还有其他的方式(定义了很多cooler)
+			
+			
+			
 	
 		}
+		
+		
+	-	
+	 ALPS03466994 【GIONEEBJ】【待机功耗】【联通卡不开数据，不开wifi，平均电流高】
+
+	 ALPS03467151 【GIONEEBJ】【待机功耗】【不插sim卡，开wifi，待机平均电流高】 
+
+	 ALPS03467419 【GIONEEBJ】【待机功耗】【不插sim卡，不开wifi，飞行模式下待机平均电流高】
+ 	
+		
+	获取lte rspr信号强弱	
+	GnGetLteLevel(), rsrpIconLevel =1, standard LTE, mLteRsrp =-116,isCampOnLte =true
+
+		
+		
+		
+		
+		
+		
 
 	}
 	
-	
-	
-	
-	
-	
-	
+
 
 }
 
