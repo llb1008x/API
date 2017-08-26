@@ -33,6 +33,10 @@ log关键字
 	FG_DAEMON_CMD_GET_VBAT
 	FG_DAEMON_CMD_GET
 	
+	
+	获取lte rspr信号强弱	
+	GnGetLteLevel(), rsrpIconLevel =1, standard LTE, mLteRsrp =-116,isCampOnLte =true
+
 
 }
 
@@ -70,22 +74,18 @@ log关键字
 
 
 	5.相关测试
-	17G10A
-	白盒测试：													20170817
-		4.LDO: VIO18/VCN33/VEMC/VCAMD2纹波略大,NG
-		5.charger I2C ：fast mode plus 与high speed mode均是Trclk、Trdat、Tfclk、Tfdat偏低，NG
-		
-		
-		
-		
-		
+
+
 		
 		
 	整机测试：													20170817
+	{
+		这几个问题都是温升相关的问题
+	
 		3.配合旅充充电测试       2PCS     NG  开机待机状态下充电，手机表面温度偏高，正面温度为38.6℃、背面温度为44.3℃，（标准为金属≤38℃；塑胶/橡胶 ≤43℃；玻璃≤41℃）。
 		5.配合电脑USB充电功能测试      2PCS        NG  关机状态下手机连接电脑充电，电量充电至60%后充电电流由466mA将至370mA，跳变的原因最好能找到。
 		{
-			高温高湿测试NG					20170821
+			高温高湿测试NG										20170821
 			这个测试场景是：
 				1.手机先关机放在温度57度的温箱里面，一小时左右，大概环境温度稳定在57度，
 				2.开机，将手机放在温箱里面待机2h，此时手机不关机
@@ -100,21 +100,115 @@ log关键字
      这问题跟手机待机时电池温度有关！环境设置温度为57℃，请知悉！	
 			
 			
-		
-		
 		}
 		
 		
 		
-		setprop sys.usb.config diag,adb 
-		adb shell setprop sys.usb.config diag,serial_smd,rmnet_ipa,adb 
 		
 		
-		//
+		
+		//Gionee <GN_BSP_CHG> <lilubao> <20170826> modify for thermal manage begin
+		
+		现在问题分成两类：
+		一类是几种场景下充电温度偏高
+		{
+			这种要查找thermal是否起作用了，thermal管了那些地方，参数什么意思，怎么改？
+			
+			bcct:battery charging current throtting
+			这个是在触发温度条件后就设定充电电流
+			abcct:adaptive battery charging current throtting
+			这个是在设定的目标温度的时候在最高和最低温度范围内动态调节电流
+			
+			根据以上两个设定chrlimt
+			
+			
+			abcct_lcmoff 是在lcm off的时候启动的，如果灭屏的情况下温度过高设定的策略 
+			
+			
+			 * sscanf format <klog_on> <mtk-cl-bcct00 limit> <mtk-cl-bcct01 limit> ...
+			 * <klog_on> can only be 0 or 1
+			 * <mtk-cl-bcct00 limit> can only be positive integer or -1 to denote no limit
+		
+			前面的1是打开thermal debug log的
+			echo 1 1200 1000 800 > /proc/driver/thermal/clbcct
+			
+			
+			
+			config文件的相关参数
+			
+			/proc/driver/thermal/clabcct
+			40000 1000 200000 5 2000 500 0 3000 0 1 5000 2000
+			
+
+			
+			
+			当前abcct的配置
+			abcct
+
+				abcct_cur_bat_chr_curr_limit 3000
+				abcct_cur_chr_input_curr_limit -1
+				abcct_pep30_cur_input_curr_limit 5000
+				
+				abcct_target_temp 44000
+				abcct_kp 1000
+				abcct_ki 200000
+				abcct_kd 5
+				abcct_max_bat_chr_curr_limit 3000
+				abcct_min_bat_chr_curr_limit 0
+				abcct_input_current_limit_on 0
+				abcct_HW_thermal_solution 3000
+				abcct_min_chr_input_curr_limit 0
+				abcct_times_of_ts_polling_interval 1
+				abcct_pep30_max_input_curr_limit 5000
+				abcct_pep30_min_input_curr_limit 2000
+				
+				
+			tzbts	这个是默认的参数，修改了几个策略  20170826 
+			/proc/driver/thermal/tzbts
+			6 100000 0 mtktsAP-sysrst 90000 0 mtk-cl-shutdown00 62000 0 mtk-cl-cam00 50000 0 abcct_lcmoff 44000 0 mtk-cl-adp-fps 42000 0 abcct 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000	
+			
+			
+			alert diaglog
+			
+			mtk game detection
+			
+
+		}
+		
+		
+		
+		另一类是高温高湿测试，手机关机的情况
+		{
+			手机整体温度跟电池温度差多少
+		
+		}
+		
+
+	}
+	
+
 		
 		
 
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -158,56 +252,61 @@ log关键字
 		
 		
 		
-		#100910，低温0℃充电未停止充电且没有提示语，高温55℃
+		pass#100910，低温0℃充电未停止充电且没有提示语，高温55℃
 		{
 			2PCS手机因电池温度过高关机，但环y箱里设定温度为57度，要求做高温高湿测试时手机可以有高温安全警告，但不允许执行关机机制； 
 	
 			低温测试，-20度，手机自动关机
 			
-			
+			mt6757.dtsi			
 			//Gionee <GN_BSP_CHG> <lilubao> <20170823> modify for low temp notify begin
-			//Gionee <GN_BSP_CHG> <lilubao> <20170823> add for thermal charging end
-			
-812 scan_count = sscanf(tmp, "%ld %ld %ld %ld %d %d %d %d %d %d"
-813        , &_abcct_target_temp, &_abcct_kp, &_abcct_ki, &_abcct_kd
-814        , &_max_cur, &_min_cur, &_input_current_limit_on
-815        , &_HW_thermal_sol, &_min_input, &_times_of_ts_polling_inteval);
-			
-			
-			/proc/driver/thermal/clabcct
-			44000 1000 200000 5 3000 0 0 3000 0 1
-			
-			thermal降电流有降功耗，还有其他的方式(定义了很多cooler)
-			
-			
-			
-	
+			min_charge_temperature = <2>;
+			min_charge_temperature_plus_x_degree = <4>;
+			max_charge_temperature = <55>;
+			max_charge_temperature_minus_x_degree = <50>;
+			//Gionee <GN_BSP_CHG> <lilubao> <20170823> modify for low temp notify end
+
+			mtk_charger.c
+			//Gionee <GN_BSP_CHG> <lilubao> <20170823> modify for low temp notify begin
+			#define BAT_LOW_TEMP_PROTECT_ENABLE 
+			//Gionee <GN_BSP_CHG> <lilubao> <20170823> modify for low temp notify end
+
 		}
 		
 		
-	-	
-	 ALPS03466994 【GIONEEBJ】【待机功耗】【联通卡不开数据，不开wifi，平均电流高】
+		#功耗相关的case还没解决
+		{
+			 ALPS03466994 【GIONEEBJ】【待机功耗】【联通卡不开数据，不开wifi，平均电流高】
 
-	 ALPS03467151 【GIONEEBJ】【待机功耗】【不插sim卡，开wifi，待机平均电流高】 
+			 ALPS03467151 【GIONEEBJ】【待机功耗】【不插sim卡，开wifi，待机平均电流高】 
 
-	 ALPS03467419 【GIONEEBJ】【待机功耗】【不插sim卡，不开wifi，飞行模式下待机平均电流高】
+			 ALPS03467419 【GIONEEBJ】【待机功耗】【不插sim卡，不开wifi，飞行模式下待机平均电流高】
+		
+		}
+
  	
-		
-	获取lte rspr信号强弱	
-	GnGetLteLevel(), rsrpIconLevel =1, standard LTE, mLteRsrp =-116,isCampOnLte =true
-
-		
-		
-		
-		
-		
-		
-
 	}
 	
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
