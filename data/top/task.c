@@ -32,6 +32,8 @@ log关键字
 
 	FG_DAEMON_CMD_GET_VBAT
 	FG_DAEMON_CMD_GET
+	FG_DAEMON_CMD_SET_KERNEL_SOC
+	FG_DAEMON_CMD_SET_KERNEL_UISOC
 	
 	
 	获取lte rspr信号强弱	
@@ -170,9 +172,9 @@ log关键字
 			
 			alert diaglog
 			
-			mtk game detection
+			mtk game detection service
 			
-
+			
 		}
 		
 		
@@ -287,7 +289,7 @@ log关键字
  	
 	}
 	
-
+		关机充电logo分几档，0~10,10~35,35~70,70~99,100，如果二十几是这种应该正常
 
 }
 
@@ -449,15 +451,26 @@ log关键字
 	
 	
 	
+		QCAP 解析dump文件
+		https://cap.qti.qualcomm.com
+
 	
-	
-	
+		
 	
 	
 	
 	
   	
   }
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   
