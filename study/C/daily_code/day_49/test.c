@@ -18,7 +18,7 @@ clock_t start,stop;
 
 //1.公式法计算多项式
 int fun1(int n,int *a,int x)
-{
+{   
 	int cout,i;
 		
 	for(i=0;i<n;i++){
