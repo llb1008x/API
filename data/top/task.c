@@ -38,6 +38,13 @@ log关键字
 	
 	获取lte rspr信号强弱	
 	GnGetLteLevel(), rsrpIconLevel =1, standard LTE, mLteRsrp =-116,isCampOnLte =true
+	
+	
+	performance相关的代码目录
+	kernel-4.4/drivers/misc/mediatek/base/power
+	
+	
+	/home/llb/project/PRO/source/17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/vendor/mediatek/proprietary/hardware/perfservice/mt6757/app_list/perfservapplist.txt
 
 
 }
@@ -75,11 +82,12 @@ log关键字
 
 
 
+
+
+
+
 	5.相关测试
 
-
-		
-		
 	整机测试：													20170817
 	{
 		这几个问题都是温升相关的问题
@@ -109,113 +117,178 @@ log关键字
 		
 		
 		
+		
+		
+	
+	
+/**************************************************************************************/	
+		
+		
+		
+		
 		//Gionee <GN_BSP_CHG> <lilubao> <20170826> modify for thermal manage begin
 		
 		现在问题分成两类：
-		一类是几种场景下充电温度偏高
-		{
-			这种要查找thermal是否起作用了，thermal管了那些地方，参数什么意思，怎么改？
-			
-			bcct:battery charging current throtting
-			这个是在触发温度条件后就设定充电电流
-			abcct:adaptive battery charging current throtting
-			这个是在设定的目标温度的时候在最高和最低温度范围内动态调节电流
-			
-			根据以上两个设定chrlimt
-			
-			
-			abcct_lcmoff 是在lcm off的时候启动的，如果灭屏的情况下温度过高设定的策略 
-			
-			
-			 * sscanf format <klog_on> <mtk-cl-bcct00 limit> <mtk-cl-bcct01 limit> ...
-			 * <klog_on> can only be 0 or 1
-			 * <mtk-cl-bcct00 limit> can only be positive integer or -1 to denote no limit
 		
-			前面的1是打开thermal debug log的
-			echo 1 1200 1000 800 > /proc/driver/thermal/clbcct
+		温升测试失败
+		{
+			1.一类是几种场景下充电温度偏高
+			{
+				这种要查找thermal是否起作用了，thermal管了那些地方，参数什么意思，怎么改？
+			
+				bcct:battery charging current throtting
+				这个是在触发温度条件后就设定充电电流
+				abcct:adaptive battery charging current throtting
+				这个是在设定的目标温度的时候在最高和最低温度范围内动态调节电流
+			
+				根据以上两个设定chrlimt
+			
+			
+				abcct_lcmoff 是在lcm off的时候启动的，如果灭屏的情况下温度过高设定的策略 
+			
+			
+				 * sscanf format <klog_on> <mtk-cl-bcct00 limit> <mtk-cl-bcct01 limit> ...
+				 * <klog_on> can only be 0 or 1
+				 * <mtk-cl-bcct00 limit> can only be positive integer or -1 to denote no limit
+		
+				前面的1是打开thermal debug log的
+				echo 1 1200 1000 800 > /proc/driver/thermal/clbcct
 			
 			
 			
-			config文件的相关参数
+				config文件的相关参数
 			
-			/proc/driver/thermal/clabcct
-			40000 1000 200000 5 2000 500 0 3000 0 1 5000 2000
+				/proc/driver/thermal/clabcct
+				40000 1000 200000 5 2000 500 0 3000 0 1 5000 2000
 			
 
 			
-			
-			当前abcct的配置
-			abcct
+				当前abcct的配置
+				abcct
 
-				abcct_cur_bat_chr_curr_limit 3000
-				abcct_cur_chr_input_curr_limit -1
-				abcct_pep30_cur_input_curr_limit 5000
+					abcct_cur_bat_chr_curr_limit 3000
+					abcct_cur_chr_input_curr_limit -1
+					abcct_pep30_cur_input_curr_limit 5000
 				
-				abcct_target_temp 44000
-				abcct_kp 1000
-				abcct_ki 200000
-				abcct_kd 5
-				abcct_max_bat_chr_curr_limit 3000
-				abcct_min_bat_chr_curr_limit 0
-				abcct_input_current_limit_on 0
-				abcct_HW_thermal_solution 3000
-				abcct_min_chr_input_curr_limit 0
-				abcct_times_of_ts_polling_interval 1
-				abcct_pep30_max_input_curr_limit 5000
-				abcct_pep30_min_input_curr_limit 2000
+					abcct_target_temp 44000
+					abcct_kp 1000
+					abcct_ki 200000
+					abcct_kd 5
+					abcct_max_bat_chr_curr_limit 3000
+					abcct_min_bat_chr_curr_limit 0
+					abcct_input_current_limit_on 0
+					abcct_HW_thermal_solution 3000
+					abcct_min_chr_input_curr_limit 0
+					abcct_times_of_ts_polling_interval 1
+					abcct_pep30_max_input_curr_limit 5000
+					abcct_pep30_min_input_curr_limit 2000
 				
 				
-			tzbts	这个是默认的参数，修改了几个策略  20170826 
-			/proc/driver/thermal/tzbts
-			6 100000 0 mtktsAP-sysrst 90000 0 mtk-cl-shutdown00 62000 0 mtk-cl-cam00 50000 0 abcct_lcmoff 44000 0 mtk-cl-adp-fps 42000 0 abcct 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000	
+				tzbts	这个是默认的参数，修改了几个策略  20170826 
+				/proc/driver/thermal/tzbts
+				6 100000 0 mtktsAP-sysrst 90000 0 mtk-cl-shutdown00 62000 0 mtk-cl-cam00 50000 0 abcct_lcmoff 44000 0 mtk-cl-adp-fps 42000 0 abcct 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000	
 			
 			
-			alert diaglog
+				alert diaglog
 			
-			mtk game detection service
+				mtk game detection service
 			
 			
+				这个文件在devices/gionee_bj 目录下有效的，编译的时候可能要全编
+			
+			
+				亮屏 251mA
+				cam  600mA
+			}
+		
+		
+		
+			2.另一类是高温高湿测试，手机关机的情况
+			{
+				这个在测试的时候没有关机，但是亮屏看温度的时候手机关机，电池温度达到了60度
+				
+				1.手机整体温度跟电池温度差多少
+				2.NTC是否准确
+				3.手机整体功耗偏高
+				
+
+				这个pmic读的值是准确的的，经过校准后，温度偏低了1度
+				mtk_battery.c
+				force_get_tbat_internal
+				
+			}
+			
+			
+			
+			3.低温关机
+			{
+				
+			
+			}
+			
+		
 		}
 		
 		
 		
-		另一类是高温高湿测试，手机关机的情况
-		{
-			手机整体温度跟电池温度差多少
 		
-		}
 		
+		
+		
+
 
 	}
 	
 
+
+
+/****************************************************************************************/
+	
+	
+	电量显示有问题
+	{
+		手机低电充电有问题，充电电流只有300~400mA
+		
+	
+		常温 充电到5%、15%、30%、50%时，电池电量与ZCV曲线对应电量百分比差值大于5%
+	
+	}	
+		
+		
+		
+		
+		
 		
 		
 
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+/****************************************************************************************/	
+
+
+
 	
 	redmine
 	{
+	
+		#103678	接听或者挂断电话时，振动的同时会有崩的一声。
+		{
+			降低震动强度或者震动时间
+			//Gionee <GN_BSP_CHG> <lilubao> <20170829> modify for vibrator begin
+			
+			还有一个问题是开机振动偏弱
+			
+			首先要知道是调用的过程，然后是如何减小振动的强度？
+		
+		
+			pDrv2604Platdata->GpioTrigger=0;
+			pDrv2604Platdata->loop=CLOSE_LOOP;
+			pDrv2604Platdata->RTPFormat=Signed;
+			pDrv2604Platdata->BIDIRInput=BiDirectional;
+				
+		}
+	
+	
+
 	
 		#99363	****
 		待机一晚上早上手机电量1%时，连接充2A电器不充电，连充电器30min插拔充电器不恢复，30min后待电量自动耗完再次连充电器恢复
@@ -285,12 +358,14 @@ log关键字
 			 ALPS03467419 【GIONEEBJ】【待机功耗】【不插sim卡，不开wifi，飞行模式下待机平均电流高】
 		
 		}
-
- 	
+	
+ 		关机充电logo分几档，0~10,10~35,35~70,70~99,100，如果二十几是这种应该正常
 	}
 	
-		关机充电logo分几档，0~10,10~35,35~70,70~99,100，如果二十几是这种应该正常
-
+	
+	
+	
+		
 }
 
 
@@ -369,30 +444,8 @@ log关键字
   	 	  
 		80-na648-1a
 		
-		
-  	
-  	
-  	
-  	
-  	
-  	
-  	
   	
   	}
-  	
-  	
-
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
-  	
   	
   	
   	
@@ -451,6 +504,7 @@ log关键字
 	
 	
 	
+	
 		QCAP 解析dump文件
 		https://cap.qti.qualcomm.com
 
@@ -462,6 +516,49 @@ log关键字
 	
   	
   }
+  
+  
+  
+  
+  
+  
+  
+  
+  打开飞行模式电流3~4mA，关闭飞行模式之后，其他全关闭，电流18mA以上
+  {
+  
+  
+  
+  
+  
+  
+  platform版本
+    开飞航模式后02:39到04:52没有什么请其它交互，ril没怎么工作。
+	01-01 00:02:36.061  1976  1976 D RILJ    : [3759]> RADIO_POWER off [SUB0]
+	01-01 00:02:36.134  1976  1976 D RILJ    : [3760]> RADIO_POWER off [SUB1]
+	01-01 00:02:39.598  1976  1976 D QtiGsmDCT: [1]screen off
+	01-01 00:02:39.598  1976  1976 D QtiGsmDCT: [1]stopNetStatPoll
+	01-01 00:02:39.599  1976  1976 D QtiSubscriptionController: getPhoneId, received dummy subId 2147483644
+	01-01 00:02:39.603  1976  1976 D QtiSubscriptionController: getPhoneId, received dummy subId 2147483644
+	01-01 00:04:52.365  1976  1976 D RILJ    : [3790]> SCREEN_STATE: true [SUB0]
+
+
+	关闭飞航后从屏幕灭屏开始中间也是很长时间按ril没工作，到09:28后才有ril的处理。
+	01-01 00:04:55.563  1976  1976 D RILJ    : [3792]> RADIO_POWER on [SUB0]
+	01-01 00:04:55.572  1976  1976 D RILJ    : [3793]> RADIO_POWER on [SUB1]
+	01-01 00:04:57.784  1976  1976 D QtiGsmDCT: [1]screen off
+	01-01 00:04:57.784  1976  1976 D QtiGsmDCT: [1]stopNetStatPoll
+	01-01 00:04:57.786  1976  1976 D QtiSubscriptionController: getPhoneId, received dummy subId 2147483644
+	01-01 00:04:57.788  1976  1976 D QtiSubscriptionController: getPhoneId, received dummy subId 2147483644
+	01-01 00:09:28.356  1976  1976 D RILJ    : [3829]> RIL_REQUEST_GET_ACTIVITY_INFO [SUB0]
+
+	所以从log看ril屏灭后都没有其它多余的操作，wakelock的东西就开机的时候有后面搜不到。
+  
+  }
+  
+  
+
+
   
   
   
@@ -1171,6 +1268,184 @@ G1605A
 		80-P7139-8
 	
 	}
+	
+	
+	功耗分析
+	{
+		1.通常思路 察看各各子系统的情况，是否没睡，哪个没睡
+		都有哪些子系统，代表什么，大致负责哪些的
+		2.获取rpm的状态，
+		cat d/rpm_stats
+		cat d/rpm_master_stats
+	
+		各各子系统的状态，如果有唤醒，则numshutdowns这个会有变化
+		APSS
+		shutdown_req:0xB43F91631
+		wakeup_ind:0xB3AB3307C
+		bringup_req:0xB4424B2C9
+		bringup_ack:0xB4425046A
+		xo_last_entered_at:0x28B67E024
+		xo_last_exited_at:0x28BB88141
+		xo_accumulated_duration:0x9E2A9AF8
+		last_sleep_transition_duration:0x1587
+		last_wake_transition_duration:0x4bab
+		xo_count:0xc
+		wakeup_reason:0x0
+		numshutdowns:0x263b
+		active_cores:0x1
+			core0
+			core32
+			core33
+			core35
+			core36
+			MPSS
+		shutdown_req:0xB4385C321
+		wakeup_ind:0xB43802067
+		bringup_req:0xB4380211D
+		bringup_ack:0xB4380217B
+		xo_last_entered_at:0xB4385F552
+		xo_last_exited_at:0xB437FF3AD
+		xo_accumulated_duration:0xAE5C30BFB
+		last_sleep_transition_duration:0x42b6
+		last_wake_transition_duration:0x4f61
+		xo_count:0x59a
+		wakeup_reason:0x0
+		numshutdowns:0x5f5
+		active_cores:0x0
+			core32
+			core34
+			core36
+			core37
+			core38PRONTO
+		shutdown_req:0xA1994DA22
+		wakeup_ind:0x1EBF341F
+		bringup_req:0xA199301D7
+		bringup_ack:0xA19935377
+		xo_last_entered_at:0xA19951290
+		xo_last_exited_at:0xA1993266A
+		xo_accumulated_duration:0x9F9E59ED6
+		last_sleep_transition_duration:0x5206
+		last_wake_transition_duration:0x4d71
+		xo_count:0x97
+		wakeup_reason:0x0
+		numshutdowns:0x9a
+		active_cores:0x0
+			core33
+			core35
+			core36
+			core39
+	TZ
+		shutdown_req:0x0
+		wakeup_ind:0x0
+		bringup_req:0x0
+		bringup_ack:0x0
+		xo_last_entered_at:0x0
+		xo_last_exited_at:0x0
+		xo_accumulated_duration:0x0
+		last_sleep_transition_duration:0x0
+		last_wake_transition_duration:0x0
+		xo_count:0x0
+		wakeup_reason:0x0
+		numshutdowns:0x0
+		active_cores:0x0
+	LPASS
+		shutdown_req:0x29EA81BEF
+		wakeup_ind:0x29EA61538
+		bringup_req:0x29EA72D7E
+		bringup_ack:0x29EA72DB2
+		xo_last_entered_at:0x29EA82B0A
+		xo_last_exited_at:0x29EA611E7
+		xo_accumulated_duration:0x281CBF707
+		last_sleep_transition_duration:0xac3
+		last_wake_transition_duration:0xb17
+		xo_count:0x580
+		wakeup_reason:0x0
+		numshutdowns:0x5d4
+		active_cores:0x0
+			core34
+			core36
+			core38
+			core39
+			core40
+			
+			
+		3.几个相关的文档	
+		{
+			
+			功耗相关的
+			{
+				1.80-P0955-1SC  
+				很详细的功耗debug中文手册,里面有各种case debug的步骤,以及如何来抓取各种log。功耗优化的必读宝典
+				2.80-NT616-1 
+				有各种多媒体case的功耗调试手段介绍
+
+				3.80-P0956-1 
+				Android 功耗概述
+
+				4.80-P1818-1EC 
+				客户机功耗测试指导手册
+
+				5.80-N6837-1 
+				高通内部Power dashboard测试用例详细步骤
+
+				6.80-P0897-1 
+				IDLE, XO Shtudown, VDD Min 调试概述
+	
+				7.80-NP885-1 
+				Graphic 功耗概述
+
+				8.80-NP961-1 
+				Camera功耗调试手册
+
+				9.80-P0834-1 
+				Video功耗调试向导
+			
+				10.80-P0106-1 
+				Core Control 介绍
+
+				11.80-NR497-1 
+				Modem时钟和功耗管理调试向导
+
+				12.80-N1089-1 
+				NPA概述
+
+				13.80-P3103-1 
+				总线动态调频调压概述
+
+				14.80-N8715-14 
+				AVS Adaptive Voltage Scaling 概述
+
+				15.80-NU566-1 
+				DPM 数据功耗管理概述
+
+
+
+
+			}
+
+
+
+
+
+			
+
+		
+		}
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

@@ -1006,6 +1006,7 @@ kernel阶段
 2.或者在原有函数基础上调用自己写的一个函数，ioctl (这里ioctl比write更方便一点)
 ioctl通过写进不同的cmd，传进值，在不同的case里面调用不同的效果
 
+gn_ti_drv2604l.c
 这样直接调用drv2604l_change_mode，传进不同的work_mode，然后调用work
 {
 	drv2604l_change_mode(pDrv2604ldata, work_mode, DEV_READY);
