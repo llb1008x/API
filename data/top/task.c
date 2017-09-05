@@ -249,8 +249,16 @@ log关键字
 	{
 		手机低电充电有问题，充电电流只有300~400mA
 		
-	
 		常温 充电到5%、15%、30%、50%时，电池电量与ZCV曲线对应电量百分比差值大于5%
+		
+		
+		
+		#105124
+		卡1移动4G，电量耗尽，标配旅充2A充电》第四晚待机，电量耗尽-第二天早08：30关机充电-两台机同时充电，15min后测试机电量1%，对比机电量15%-18min后测试机电量4%，对比机电量18%-开机充电-26min后测试机电量11%，对比机电量26%》再次操作恢复 对比S10无此现象 
+		
+		
+		
+		
 	
 	}	
 		
@@ -527,11 +535,6 @@ log关键字
   打开飞行模式电流3~4mA，关闭飞行模式之后，其他全关闭，电流18mA以上
   {
   
-  
-  
-  
-  
-  
   platform版本
     开飞航模式后02:39到04:52没有什么请其它交互，ril没怎么工作。
 	01-01 00:02:36.061  1976  1976 D RILJ    : [3759]> RADIO_POWER off [SUB0]
@@ -553,6 +556,33 @@ log关键字
 	01-01 00:09:28.356  1976  1976 D RILJ    : [3829]> RIL_REQUEST_GET_ACTIVITY_INFO [SUB0]
 
 	所以从log看ril屏灭后都没有其它多余的操作，wakelock的东西就开机的时候有后面搜不到。
+	
+	
+	关闭sensor
+	android_qcom_mp/gionee/project/BJ17G06/vendor/qcom/proprietary/sensors/dsps/reg_defaults/sensor_def_qcomdev.conf
+	
+	adb remount
+	adb shell rm /etc/sensors/sensor_def_qcomdev.conf
+	adb push sensor_def_qcomdev.conf  /etc/sensors
+	adb shell chmod 644 /etc/sensors/sensor_def_qcomdev.conf
+	adb shell rm /persist/sensors/sns.reg
+	adb reboot
+	
+	
+	
+	1.
+	echo 1 > /sys/module/msm_show_resume_irq/parameters/debug_mask
+	echo 1 > /sys/kernel/debug/clk/debug_suspend
+	echo 8 > /sys/module/mpm_of/parameters/debug_mask
+
+	2. 
+	adb shell dmesg -c
+	adb shell dumpsys batterystats --enable full-wake-history
+	adb shell dumpsys batterystats --reset
+
+	3. plug out USB and perform your test
+
+	4. adb bugreport > bugreport.txt
   
   }
   
@@ -1597,6 +1627,11 @@ G1605A
 		To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
 
 		80-P2485-18 : MSM8937 System Drivers PMIC Overview
+		
+		boot_images\core\api\systemdrivers\pmic
+
+		
+		
 		80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
 		80-NG006-1 : System Driver PMIC NPA Overview
 		80-NN255-1 : RPM PMIC SW Driver Overview

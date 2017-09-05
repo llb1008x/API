@@ -1891,7 +1891,9 @@ static void *update_vibrator_thread_default(void *priv)
 			#endif
 		#endif
 
-	}	
+	}
+
+
 	
 	
 	MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION 这个宏是干什么的，包含哪些代码
@@ -1910,6 +1912,40 @@ static void *update_vibrator_thread_default(void *priv)
 		mt6355_upmu_set_rg_baton_en(1);
 		val = mt6355_upmu_get_rgs_baton_undet();
 	}
+
+
+	还有两处
+	mt_battery_6355.c  check_bat_protect_status
+	/*pmic_set_register_value(PMIC_BATON_TDET_EN, 1);*/
+	pmic_set_register_value(PMIC_RG_BATON_EN, 1);
+	
+	//Gionee <GN_BSP_CHG> <lilubao> <20170830> modify for platform change begin
+	dprintf(CRITICAL, "[BATTERY] No battry plug-in.but don't power off\n");
+	#if 0	
+	if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
+		dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
+		mt6575_power_off();
+		break;
+	}
+	#endif
+	//Gionee <GN_BSP_CHG> <lilubao> <20170830> modify for platform change end
+
+
+	mt_battery_6355.c   mt65xx_bat_init
+	if (g_boot_mode != META_BOOT && g_boot_mode != FACTORY_BOOT && g_boot_mode != ATE_FACTORY_BOOT) {
+		/*pmic_set_register_value(PMIC_BATON_TDET_EN, 1);*/
+		pmic_set_register_value(PMIC_RG_BATON_EN, 1);
+		//Gionee <GN_BSP_CHG> <lilubao> <20170830> modify for platform change begin
+		dprintf(CRITICAL, "[BATTERY] No battry plug-in.but don't power off\n");
+		#if 0
+		if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
+			dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
+			mt6575_power_off();
+		}
+		#endif
+		//Gionee <GN_BSP_CHG> <lilubao> <20170826> modify for platform change end
+	}
+
 
 }
 
