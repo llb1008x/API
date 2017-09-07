@@ -457,7 +457,13 @@ log关键字
   	
   	
   	
+  	
+  	
   	2.LD0上VDD_USB_CORE ，VDD_USBBPHY_1P8电压偏高
+  	
+  	
+  	
+  	
   	
   	3.diag口打不开
 
@@ -512,18 +518,11 @@ log关键字
 	
 	
 	
-	
-		QCAP 解析dump文件
-		https://cap.qti.qualcomm.com
 
-	
-		
-	
-	
-	
-	
-  	
   }
+  
+  
+  
   
   
   
@@ -558,6 +557,11 @@ log关键字
 	所以从log看ril屏灭后都没有其它多余的操作，wakelock的东西就开机的时候有后面搜不到。
 	
 	
+	
+	
+	
+	
+	
 	关闭sensor
 	android_qcom_mp/gionee/project/BJ17G06/vendor/qcom/proprietary/sensors/dsps/reg_defaults/sensor_def_qcomdev.conf
 	
@@ -583,6 +587,23 @@ log关键字
 	3. plug out USB and perform your test
 
 	4. adb bugreport > bugreport.txt
+	
+	
+	
+	Please share log with below steps
+
+	这个貌似是提高debug的等级
+	1. Please use the uploaded qmi_fw.conf
+	adb root
+	adb remount
+	adb push qmi_fw.conf /system/etc/qmi_fw.conf
+	adb push qmi_fw.conf /etc/qmi_fw.conf
+	adb shell sync
+	adb reboot
+
+	2. plug out USB and reproduce your issue
+
+	3. share main log, system log, radio log, kernel log with me 
   
   }
   
