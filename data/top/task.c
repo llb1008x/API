@@ -8,7 +8,8 @@ log关键字
 	[FGADC_intr_end][FG_INTR_IAVG]
 	read_fg_hw_info
 	
-	
+	查看底层电量
+	battery_thread]car
 	
 	可以通过检索Call trace，察看内存堆栈函数的调用
 
