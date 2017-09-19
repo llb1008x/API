@@ -1,4 +1,74 @@
-    pass
+pass一类是几种场景下充电温度偏高
+{
+	这种要查找thermal是否起作用了，thermal管了那些地方，参数什么意思，怎么改？
+
+	bcct:battery charging current throtting
+	这个是在触发温度条件后就设定充电电流
+	abcct:adaptive battery charging current throtting
+	这个是在设定的目标温度的时候在最高和最低温度范围内动态调节电流
+
+	根据以上两个设定chrlimt
+
+
+	abcct_lcmoff 是在lcm off的时候启动的，如果灭屏的情况下温度过高设定的策略 
+
+
+	 * sscanf format <klog_on> <mtk-cl-bcct00 limit> <mtk-cl-bcct01 limit> ...
+	 * <klog_on> can only be 0 or 1
+	 * <mtk-cl-bcct00 limit> can only be positive integer or -1 to denote no limit
+
+	前面的1是打开thermal debug log的
+	echo 1 1200 1000 800 > /proc/driver/thermal/clbcct
+
+
+
+	config文件的相关参数
+
+	/proc/driver/thermal/clabcct
+	40000 1000 200000 5 2000 500 0 3000 0 1 5000 2000
+
+
+	当前abcct的配置
+	abcct
+
+		abcct_cur_bat_chr_curr_limit 3000
+		abcct_cur_chr_input_curr_limit -1
+		abcct_pep30_cur_input_curr_limit 5000
+	
+		abcct_target_temp 44000
+		abcct_kp 1000
+		abcct_ki 200000
+		abcct_kd 5
+		abcct_max_bat_chr_curr_limit 3000
+		abcct_min_bat_chr_curr_limit 0
+		abcct_input_current_limit_on 0
+		abcct_HW_thermal_solution 3000
+		abcct_min_chr_input_curr_limit 0
+		abcct_times_of_ts_polling_interval 1
+		abcct_pep30_max_input_curr_limit 5000
+		abcct_pep30_min_input_curr_limit 2000
+	
+	
+	tzbts	这个是默认的参数，修改了几个策略  20170826 
+	/proc/driver/thermal/tzbts
+	6 100000 0 mtktsAP-sysrst 90000 0 mtk-cl-shutdown00 62000 0 mtk-cl-cam00 50000 0 abcct_lcmoff 44000 0 mtk-cl-adp-fps 42000 0 abcct 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000	
+
+
+	alert diaglog
+
+	mtk game detection service
+
+
+	这个文件在devices/gionee_bj 目录下有效的，编译的时候可能要全编
+
+
+	亮屏 251mA
+	cam  600mA
+}
+
+	
+	
+	pass
 	电量显示不正确  -> 要熟悉电池相关参数的上报过程
 	{
 		PowerManagerService -> BatteryService -> BatteryProperties.java

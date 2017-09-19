@@ -65,22 +65,11 @@ log关键字
 		已经提case
 		
 		
-		
-		
-	2.温升问题，温升降电流有没有起作用							20170818
-		主要是分场景降低充电电流，比如打电话，拍照，听音乐，玩游戏等(具体是否还有其他还有带确认)
-		温升部分主要有两个一个是上面的根据不同场景降低充电电流问题		计划今天完成
-		还有一类是MTK的 thermal regulator，bcct这部分要熟悉相关文档，代码
-	
-	
 
 		
 	3.电量显示的不准												20170818
 		这个的主要问题是充电时候电池电压跟电量显示差别比较大(差别在10%以上)，放电比较准确
 		这部分跟GM3.0的客制化有关，但是相关的文档还是不熟悉，必须弄清楚,相关的软件自己首先要熟悉
-
-
-
 
 
 
@@ -133,74 +122,7 @@ log关键字
 		
 		温升测试失败
 		{
-			1.一类是几种场景下充电温度偏高
-			{
-				这种要查找thermal是否起作用了，thermal管了那些地方，参数什么意思，怎么改？
-			
-				bcct:battery charging current throtting
-				这个是在触发温度条件后就设定充电电流
-				abcct:adaptive battery charging current throtting
-				这个是在设定的目标温度的时候在最高和最低温度范围内动态调节电流
-			
-				根据以上两个设定chrlimt
-			
-			
-				abcct_lcmoff 是在lcm off的时候启动的，如果灭屏的情况下温度过高设定的策略 
-			
-			
-				 * sscanf format <klog_on> <mtk-cl-bcct00 limit> <mtk-cl-bcct01 limit> ...
-				 * <klog_on> can only be 0 or 1
-				 * <mtk-cl-bcct00 limit> can only be positive integer or -1 to denote no limit
-		
-				前面的1是打开thermal debug log的
-				echo 1 1200 1000 800 > /proc/driver/thermal/clbcct
-			
-			
-			
-				config文件的相关参数
-			
-				/proc/driver/thermal/clabcct
-				40000 1000 200000 5 2000 500 0 3000 0 1 5000 2000
-			
 
-			
-				当前abcct的配置
-				abcct
-
-					abcct_cur_bat_chr_curr_limit 3000
-					abcct_cur_chr_input_curr_limit -1
-					abcct_pep30_cur_input_curr_limit 5000
-				
-					abcct_target_temp 44000
-					abcct_kp 1000
-					abcct_ki 200000
-					abcct_kd 5
-					abcct_max_bat_chr_curr_limit 3000
-					abcct_min_bat_chr_curr_limit 0
-					abcct_input_current_limit_on 0
-					abcct_HW_thermal_solution 3000
-					abcct_min_chr_input_curr_limit 0
-					abcct_times_of_ts_polling_interval 1
-					abcct_pep30_max_input_curr_limit 5000
-					abcct_pep30_min_input_curr_limit 2000
-				
-				
-				tzbts	这个是默认的参数，修改了几个策略  20170826 
-				/proc/driver/thermal/tzbts
-				6 100000 0 mtktsAP-sysrst 90000 0 mtk-cl-shutdown00 62000 0 mtk-cl-cam00 50000 0 abcct_lcmoff 44000 0 mtk-cl-adp-fps 42000 0 abcct 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000	
-			
-			
-				alert diaglog
-			
-				mtk game detection service
-			
-			
-				这个文件在devices/gionee_bj 目录下有效的，编译的时候可能要全编
-			
-			
-				亮屏 251mA
-				cam  600mA
-			}
 		
 		
 		
@@ -209,23 +131,25 @@ log关键字
 				这个在测试的时候没有关机，但是亮屏看温度的时候手机关机，电池温度达到了60度
 				
 				1.手机整体温度跟电池温度差多少
-				2.NTC是否准确
+				2.NTC是否准确 -> 这个是准确的
 				3.手机整体功耗偏高
 				
 
 				这个pmic读的值是准确的的，经过校准后，温度偏低了1度
 				mtk_battery.c
 				force_get_tbat_internal
+
+				
+				
+				有没有在高温场景抓下uart log看？
+					掉电的过程中帮忙量一下vcore 26m vio18的电压，看一下掉电时序
 				
 			}
 			
 			
 			
 			3.低温关机
-			{
-				
-			
-			}
+				目前从log看是低电量问题，低温条件下电池容量小，电阻大，亮屏操作电流很高，很容易将电池电压拉低
 			
 		
 		}
@@ -605,6 +529,47 @@ log关键字
 	2. plug out USB and reproduce your issue
 
 	3. share main log, system log, radio log, kernel log with me 
+	
+	
+	80-p0897-1_a_presentation__idle_xo_shutdown_vdd_minimization_overview.pdf
+	{
+		lpm_suspend_enter,lpm_cpuidle_enter
+		
+		
+		hwirq = GIC_PPI_START/GIC_SPI_START + interrupt number
+		1 – Interrupt type
+		0 – SPI
+		1 – PPI
+		2 – Interrupt number of interrupt type
+		3 – Trigger type
+		1 – Low-to-high edge triggered
+		2 – High-to-low edge triggered
+		4 – Active high-level sensitive
+		8 – Active low-level sensitive
+	
+		debug：
+			Step 1 – Check current waveform
+			Step 2 – Enable Power Management (PM) debug kernel log
+			Step 3 – Determine which IRQs prevent system sleep
+			Step 4 – Determine the specific hwirq owner
+			Step 5 – Determine which clocks stay on and prevent system sleep	
+			
+			
+			echo 32 > /sys/module/msm_pm/parameters/debug_mask
+			
+			echo 8 > /sys/module/mpm_of/parameters/debug_mask
+			
+			cat  /proc/interrupt
+			
+			 //中断看最后一个
+			 if (d->hwirq == 280 && enable) {
+				 pr_err ("!!!hwirq 280 registered, wakeset %d\n", wakeset);
+				 dump_stack();
+			 }
+			
+			Search “Enabled clocks” to determine which clocks prevent XO shutdown
+and VDD minimization
+		}
   
   }
   
