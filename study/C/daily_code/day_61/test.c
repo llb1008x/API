@@ -17,7 +17,7 @@
 *******************************************************************************/                
 typedef struct listnode{
 
-    ElementType data[MAX];//存储数据
+    ElementType data;      //存储数据
     ListNode *next;             //指向下一组数据
 }ListNode;
 
@@ -65,16 +65,24 @@ ListNode *link_findk(int k,ListNode *PL)
 
 
 //按值查找
-int link_findv(ElementType x,ListNode *PL)
+ListNode *link_findv(ElementType x,ListNode *PL)
 {
 
     ListNode *p=PL;
-    int i=0;
     
-    while((p!=NULL)&&(p->data[i]!=x)){
+    while((p!=NULL)&&(p->data!=x)){
     
-        
+        p=p->next;    
     }
+
+    return p;
+}
+
+//插入新节点
+ListNode *link_insert(ElementType x,int k,ListNode *PL)
+{
+	
+
 }
 
 
