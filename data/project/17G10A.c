@@ -5,6 +5,7 @@
 /*注意事项*/
 {
 
+
 	由于目前大家手里面有17G05A（前期领到的整机和板子），17G05Q（板子上能看到丝印，17G05A QORVO），以及射频工程师手里的17G05Q+PA77010的机器。并且modem不能兼容。
 		所以，为了满足17G10A尽快开始ROM调试的需求。做了三种编译选项：
 		AA：17G10A的主干版本,是SKY的PA，也就是17G05A QORVO需要用到的；驱动部在这个上面调试驱动；
@@ -34,6 +35,42 @@
 
 /*重要的概念*/
 {
+
+	log关键字
+	{
+		fg_drv_update_hw_status  电量计上报一些硬件信息
+		
+		[FGADC_intr_end][FG_INTR_IAVG]
+		read_fg_hw_info
+		
+		FG_DAEMON_CMD_GET_VBAT
+		FG_DAEMON_CMD_GET
+
+		控制fuel_gauge的log级
+		FG_daemon_log_level 	
+
+		rtc记录的电量
+		BATTERY_METER_CMD_SET_RTC_UI_SOC	
+		获取上层电量
+		FG_status.ui_soc=battery_get_bat_uisoc
+
+		可以通过检索Call trace，察看内存堆栈函数的调用
+
+
+		ibus，ibat可以检索相关的电流电压信息，这写都在一块
+
+		[248:charger_thread][name:mtk_charger&]Vbat=4321,I=3597,VChr=492,T=33,Soc100,CT:0:1
+
+		healthd线程检测电池的状态
+		healthd]: healthd: battery l=5 v=3796 t=41.0 h=2 st=4 chg=	
+
+		获取lte rspr信号强弱	
+		GnGetLteLevel(), rsrpIconLevel =1, standard LTE, mLteRsrp =-116,isCampOnLte =true
+		
+	}
+
+
+
 	这几个概念有必要理解一下
 	{   
 		
@@ -86,11 +123,11 @@
 
 
 
-	**************************************************************************************
+	/**************************************************************************************/
 		info->enable_dynamic_cv = true；
 		mtk_get_dynamic_cv
 
-	？“所以这时候要看MIVR中断是否触发，触发后AICL是否也对应着改变了？”
+	“所以这时候要看MIVR中断是否触发，触发后AICL是否也对应着改变了？”
 		Do AICL in a workqueue after receiving MIVR IRQ
 		rt5081_run_aicl
 		/* Enable MIVR IRQ ，stop AICL*/
@@ -294,36 +331,6 @@
 		};
 	}
 
-
-	log搜索关键字
-	{
-		可以通过检索Call trace，察看内存堆栈函数的调用
-
-
-		ibus，ibat可以检索相关的电流电压信息，这写都在一块
-
-		[248:charger_thread][name:mtk_charger&]Vbat=4321,I=3597,VChr=492,T=33,Soc100,CT:0:1
-
-		控制fuel_gauge的log等级
-    	FG_daemon_log_level 	
-
-		rtc记录的电量
-		BATTERY_METER_CMD_SET_RTC_UI_SOC	
-		获取上层电量
-		FG_status.ui_soc=battery_get_bat_uisoc
-    
-
-		healthd线程检测电池的状态
-		healthd]: healthd: battery l=5 v=3796 t=41.0 h=2 st=4 chg=	
-
-
-		FG_DAEMON_CMD_GET_VBAT
-		FG_DAEMON_CMD_GET
-
-	}
-
-
-
 }
 
 
@@ -425,98 +432,114 @@ kernel
 
 
 /*debug*/
-{
+/*************************************************************************************************************************************/
 1.关闭软件关机重启
-
-	(kpd.c)kpd_pwrkey_pmic_handler  -> kpd_pmic_pwrkey_hal -> 
-
-	keypad_dts_data对应这几个数据成员，而这几个数据成员可能跟powerkey有关
-	u32 kpd_sw_pwrkey;
-	u32 kpd_hw_pwrkey;
-	u32 kpd_sw_rstkey;
-	u32 kpd_hw_rstkey;
-
-
-G1605A上定义的
-/* boot type definitions */
-enum boot_mode_t {
-	NORMAL_BOOT = 0,
-	META_BOOT = 1,
-	RECOVERY_BOOT = 2,
-	SW_REBOOT = 3,
-	FACTORY_BOOT = 4,
-	ADVMETA_BOOT = 5,
-	ATE_FACTORY_BOOT = 6,
-	ALARM_BOOT = 7,
-#if defined(CONFIG_MTK_KERNEL_POWER_OFF_CHARGING)
-	KERNEL_POWER_OFF_CHARGING_BOOT = 8,
-	LOW_POWER_OFF_CHARGING_BOOT = 9,
-#endif
-	DONGLE_BOOT = 10,
-	UNKNOWN_BOOT
-};
-
-
-typedef enum {
-    BR_POWER_KEY = 0,
-    BR_USB,
-    BR_RTC,
-    BR_WDT,
-    BR_WDT_BY_PASS_PWK,
-    BR_TOOL_BY_PASS_PWK,
-    BR_2SEC_REBOOT,
-    BR_UNKNOWN,
-    BR_KERNEL_PANIC,
-    BR_WDT_SW,
-    BR_WDT_HW
-} boot_reason_t;
-
-
-reason=6，mode=0
-17G05A上定义
-char g_boot_reason[][16]= {"power_key","usb",
-							"rtc","wdt",
-							"wdt_by_pass_pwk",
-							"tool_by_pass_pwk",
-							"2sec_reboot","unknown",
-							"kernel_panic","reboot",
-							"watchdog"};
-
-修改：
-pmic_mt6355.c  
-	PMIC_enable_long_press_reboot函数设置寄存器MT6355_TOP_RST_MISC相应的位为0
-
-hal_kpd.c
-	long_press_reboot_function_init_pmic函数，改变宏定义或者设置寄存器
-
-
-分析：
-最后是pmic这边将pwrkey的软件重启关闭了，但是pwrkey还有一根线连接到了rt5081上，而rt5081的CHG_QONB 
-引脚长按15s会断开同系统侧的供电，所以引起了重启动作
-CHG_QONB low time to enable full system reset 
-
-rt5081这边可以选择路径直接将充电器电给电池还是系统，
-所以最后的解决办法是断开pwrey同rt5081的连接
-
-搜索的关键字主要是boot方面的，而mtk搜索的是[PMIC]just_rst = 0
-
-
-关掉2sec断电重启
 {
-	cust_rtc.h
+		(kpd.c)kpd_pwrkey_pmic_handler  -> kpd_pmic_pwrkey_hal -> 
 
-	#define RTC_DEFAULT_YEA		2010
-	#define RTC_DEFAULT_MTH		1
-	#define RTC_DEFAULT_DOM		1
-	#define RTC_2SEC_REBOOT_ENABLE  1		//控制使能
-	#define RTC_2SEC_MODE		2			//控制时间
+		keypad_dts_data对应这几个数据成员，而这几个数据成员可能跟powerkey有关
+		u32 kpd_sw_pwrkey;
+		u32 kpd_hw_pwrkey;
+		u32 kpd_sw_rstkey;
+		u32 kpd_hw_rstkey;
+
+
+	G1605A上定义的
+	/* boot type definitions */
+	enum boot_mode_t {
+		NORMAL_BOOT = 0,
+		META_BOOT = 1,
+		RECOVERY_BOOT = 2,
+		SW_REBOOT = 3,
+		FACTORY_BOOT = 4,
+		ADVMETA_BOOT = 5,
+		ATE_FACTORY_BOOT = 6,
+		ALARM_BOOT = 7,
+	#if defined(CONFIG_MTK_KERNEL_POWER_OFF_CHARGING)
+		KERNEL_POWER_OFF_CHARGING_BOOT = 8,
+		LOW_POWER_OFF_CHARGING_BOOT = 9,
+	#endif
+		DONGLE_BOOT = 10,
+		UNKNOWN_BOOT
+	};
+
+
+	typedef enum {
+		BR_POWER_KEY = 0,
+		BR_USB,
+		BR_RTC,
+		BR_WDT,
+		BR_WDT_BY_PASS_PWK,
+		BR_TOOL_BY_PASS_PWK,
+		BR_2SEC_REBOOT,
+		BR_UNKNOWN,
+		BR_KERNEL_PANIC,
+		BR_WDT_SW,
+		BR_WDT_HW
+	} boot_reason_t;
+
+
+	reason=6，mode=0
+	17G05A上定义
+	char g_boot_reason[][16]= {"power_key","usb",
+								"rtc","wdt",
+								"wdt_by_pass_pwk",
+								"tool_by_pass_pwk",
+								"2sec_reboot","unknown",
+								"kernel_panic","reboot",
+								"watchdog"};
+
+	修改：
+	pmic_mt6355.c  
+		PMIC_enable_long_press_reboot函数设置寄存器MT6355_TOP_RST_MISC相应的位为0
+
+	hal_kpd.c
+		long_press_reboot_function_init_pmic函数，改变宏定义或者设置寄存器
+
+
+	分析：
+	最后是pmic这边将pwrkey的软件重启关闭了，但是pwrkey还有一根线连接到了rt5081上，而rt5081的CHG_QONB 
+	引脚长按15s会断开同系统侧的供电，所以引起了重启动作
+	CHG_QONB low time to enable full system reset 
+
+	rt5081这边可以选择路径直接将充电器电给电池还是系统，
+	所以最后的解决办法是断开pwrey同rt5081的连接
+
+	搜索的关键字主要是boot方面的，而mtk搜索的是[PMIC]just_rst = 0
+
+
+	关掉2sec断电重启
+	{
+		cust_rtc.h
+
+		#define RTC_DEFAULT_YEA		2010
+		#define RTC_DEFAULT_MTH		1
+		#define RTC_DEFAULT_DOM		1
+		#define RTC_2SEC_REBOOT_ENABLE  1		//控制使能
+		#define RTC_2SEC_MODE		2			//控制时间
+	}
+
+
 }
+
+
+
+
+
+
+
+
+
 
 /*******************************************************************************************************************/
 2.充电电流太小
+{
 	充电电流太小：标准充电器（1.9A） USB充电（500mA）
 	实际只有 标充1.6A~1.8A ，USB充电400mA~460mA
 
+两个重要的功能寄存器的位置
+aicl  [0x13]  ，mivr  [0x16]		
+		
 _rt5081_set_aicr这个是设置电流的，dts文件中是设置初始化的值，但是关于充电电流的设置它是每次插入充电器的时候检测
 不断提高充电电流step by step,直到达到最大能力，拔除的时候就将aicr这个值清零，所以每次充电电流都会重新检测充电能力
 但是aicr这个值不是很准确，有一定的误差，并把最大值赋值给aicr_limit，
@@ -610,7 +633,6 @@ out:
 }
 
 
-
 修改：
 	//Gionee <gn_by_charging> <lilubao> <20170414> add for modify charging begin
 	mivr = <4400000>;	/* uV 4500000->4400000*/
@@ -635,215 +657,253 @@ out:
 	}
 	//Gionee <gn_by_charging> <lilubao> <20170417> add for charging change end
 
+	jetia这个功能是disable的，不影响充电电流问题
+	{
+		检查rt5081的jieta功能是否使用了，是否有跟根据温度限流的有冲突
+		07-18 10:12:21.187669   257   257 D [ 1607.744824] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1E] = 0x05
+		07-18 10:12:21.187769   257   257 D [ 1607.744924] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x1F] = 0x06
+		
+		07-18 10:12:21.187871   257   257 D [ 1607.745026] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x20] = 0x00
+		
+		07-18 10:12:21.187971   257   257 D [ 1607.745126] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x21] = 0x80
+		07-18 10:12:21.188073   257   257 D [ 1607.745228] (1)[257:charger_thread]: rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: reg[0x22] = 0x50
+	}
+		
+
+
+	而这个问题最后确定是由于串接的仪器阻抗太大，有0.4V导致进电池点电压太小，触发mivr，使aicr检测到的认为充电噐的能力很弱
+    而中间修改电池容量不是引起充电电流变化的根本原因
+
+
+这里有几个需要弄清楚的：			20170924
+	充电器能力，线损的判断？
+	充电相关的变量变化和影响？
+	电池容量是否对充电电流有影响？
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /***************************************************************************************************************/
 3.按键功能
-	因为framework层还有部分未导入，所以检测到一些未知的键值，出现异常？
-	mmi测试显示一些按键还有问题？
-kpd.c
-	内核创建的设备节点
-	platform总线下
-	/sys/devices/platform/10010000.keypad/input/input1
-
-	虚拟文件系统
-	/sys/devices/virtual/input/
-
-dts文件内定义的一些重要数据	
-    struct keypad_dts_data {
-        u32 kpd_key_debounce;
-        u32 kpd_sw_pwrkey;
-        u32 kpd_hw_pwrkey;
-        u32 kpd_sw_rstkey;
-        u32 kpd_hw_rstkey;
-        u32 kpd_use_extend_type;
-        u32 kpd_hw_map_num;
-        u32 kpd_hw_init_map[72];
-        u32 kpd_pwrkey_eint_gpio;
-        u32 kpd_pwrkey_gpio_din;
-        u32 kpd_hw_dl_key1;
-        u32 kpd_hw_dl_key2;
-        u32 kpd_hw_dl_key3;
-        u32 kpd_hw_recovery_key;
-        u32 kpd_hw_factory_key;
-    }
-
-
-slide qwerty侧键
-    kpd: key-debounce = 1024, sw-pwrkey = 116, hw-pwrkey = 8, hw-rstkey = 17, sw-rstkey = 115
-
-键盘相关的宏
-    CONFIG_KEYBOARD_MTK=y
-    CONFIG_ONEKEY_REBOOT_NORMAL_MODE=y
-    CONFIG_ONEKEY_REBOOT_OTHER_MODE=y
-    CONFIG_KPD_PWRKEY_USE_PMIC=y
-    CONFIG_MTK_MRDUMP_KEY=y
-    # CONFIG_KEYBOARD_ATKBD is not set
-
-
-cat/proc/bus/input/devices 察看input子系统下挂的设备
 {
-    I: Bus=0019 Vendor=0000 Product=0000 Version=0000
-    N: Name="ACCDET"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input0
-    U: Uniq=
-    H: Handlers=gpufreq_ib event0 
-    B: PROP=0
-    B: EV=3
-    B: KEY=40 0 0 0 0 0 0 1000000000 c000000000000 0
+   kpd.c
+		内核创建的设备节点
+		platform总线下
+		/sys/devices/platform/10010000.keypad/input/input1
 
-    I: Bus=0019 Vendor=2454 Product=6500 Version=0010
-    N: Name="mtk-kpd"
-    P: Phys=
-    S: Sysfs=/devices/platform/10010000.keypad/input/input1
-    U: Uniq=
-    H: Handlers=gpufreq_ib event1 
-    B: PROP=0
-    B: EV=3
-    B: KEY=1000000 0 b00000000 0 0 1c000000000000 0
+		虚拟文件系统
+		/sys/devices/virtual/input/
 
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="gf-keys"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input2
-    U: Uniq=
-    H: Handlers=gpufreq_ib event2 
-    B: PROP=0
-    B: EV=3
-    B: KEY=3100000 100040000800 1c168000000000 0
-
-    I: Bus=0019 Vendor=0000 Product=0000 Version=0000
-    N: Name="aw9523b"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input3
-    U: Uniq=
-    H: Handlers=gpufreq_ib event3 
-    B: PROP=0
-    B: EV=3
-    B: KEY=2000019800100000 40000800 168000000000 4ffc
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="hwmdata"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input4
-    U: Uniq=
-    H: Handlers=gpufreq_ib event4 
-    B: PROP=0
-    B: EV=5
-    B: REL=6
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="m_alsps_input"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input5
-    U: Uniq=
-    H: Handlers=gpufreq_ib event5 
-    B: PROP=0
-    B: EV=d
-    B: REL=6
-    B: ABS=101
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="m_acc_input"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input6
-    U: Uniq=
-    H: Handlers=gpufreq_ib event6 
-    B: PROP=0
-    B: EV=d
-    B: REL=c1
-    B: ABS=107
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="m_mag_input"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input7
-    U: Uniq=
-    H: Handlers=gpufreq_ib event7 
-    B: PROP=0
-    B: EV=d
-    B: REL=3c9
-    B: ABS=17f
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="m_step_c_input"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input8
-    U: Uniq=
-    H: Handlers=gpufreq_ib event8 
-    B: PROP=0
-    B: EV=d
-    B: REL=7
-    B: ABS=100
-
-    I: Bus=0000 Vendor=0000 Product=0000 Version=0000
-    N: Name="mtk-tpd"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input9
-    U: Uniq=
-    H: Handlers=gpufreq_ib event9 
-    B: PROP=2
-    B: EV=b
-    B: KEY=10 0 0 0 400 0 0 100040000000 0 0
-    B: ABS=263800001000003
-
-    I: Bus=0019 Vendor=0001 Product=0001 Version=0100
-    N: Name="mtk-tpd-kpd"
-    P: Phys=
-    S: Sysfs=/devices/virtual/input/input10
-    U: Uniq=
-    H: Handlers=gpufreq_ib event10 
-    B: PROP=0
-    B: EV=3
-    B: KEY=10 0 0 0 0 0 0 100040000000 0 0	
+	dts文件内定义的一些重要数据	
+		struct keypad_dts_data {
+			u32 kpd_key_debounce;
+			u32 kpd_sw_pwrkey;
+			u32 kpd_hw_pwrkey;
+			u32 kpd_sw_rstkey;
+			u32 kpd_hw_rstkey;
+			u32 kpd_use_extend_type;
+			u32 kpd_hw_map_num;
+			u32 kpd_hw_init_map[72];
+			u32 kpd_pwrkey_eint_gpio;
+			u32 kpd_pwrkey_gpio_din;
+			u32 kpd_hw_dl_key1;
+			u32 kpd_hw_dl_key2;
+			u32 kpd_hw_dl_key3;
+			u32 kpd_hw_recovery_key;
+			u32 kpd_hw_factory_key;
+		}
 
 
+	slide qwerty侧键
+		kpd: key-debounce = 1024, sw-pwrkey = 116, hw-pwrkey = 8, hw-rstkey = 17, sw-rstkey = 115
+
+	键盘相关的宏
+		CONFIG_KEYBOARD_MTK=y
+		CONFIG_ONEKEY_REBOOT_NORMAL_MODE=y
+		CONFIG_ONEKEY_REBOOT_OTHER_MODE=y
+		CONFIG_KPD_PWRKEY_USE_PMIC=y
+		CONFIG_MTK_MRDUMP_KEY=y
+		# CONFIG_KEYBOARD_ATKBD is not set
 
 
-
-
+	cat/proc/bus/input/devices 察看input子系统下挂的设备
 	{
-		1.input device和keylayout的绑定在如下文件：
-			frameworks/native/libs/input/InputDevice.cpp  ：	appendInputDeviceConfigurationFileRelativePath
-		2.事件通过kernel/drivers/input/input.c上报到frameworks/native/services/inputflinger/EventHub.cpp
-		然后在EventHub.cpp来获取按键对应的上层键值，其中的haveKeyLayout就是上面绑定的那个。
-		int32_t EventHub::getKeyCodeState(int32_t deviceId, int32_t keyCode) const {
-			AutoMutex _l(mLock);
+		I: Bus=0019 Vendor=0000 Product=0000 Version=0000
+		N: Name="ACCDET"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input0
+		U: Uniq=
+		H: Handlers=gpufreq_ib event0 
+		B: PROP=0
+		B: EV=3
+		B: KEY=40 0 0 0 0 0 0 1000000000 c000000000000 0
 
-			Device* device = getDeviceLocked(deviceId);
-			if (device && !device->isVirtual() && device->keyMap.haveKeyLayout()) {
-				Vector<int32_t> scanCodes;
-				device->keyMap.keyLayoutMap->findScanCodesForKey(keyCode, &scanCodes);
-				if (scanCodes.size() != 0) {
-					uint8_t keyState[sizeof_bit_array(KEY_MAX + 1)];
-					memset(keyState, 0, sizeof(keyState));
-					if (ioctl(device->fd, EVIOCGKEY(sizeof(keyState)), keyState) >= 0) {
-						for (size_t i = 0; i < scanCodes.size(); i++) {
-							int32_t sc = scanCodes.itemAt(i);
-							if (sc >= 0 && sc <= KEY_MAX && test_bit(sc, keyState)) {
-								return AKEY_STATE_DOWN;
-							}
+		I: Bus=0019 Vendor=2454 Product=6500 Version=0010
+		N: Name="mtk-kpd"
+		P: Phys=
+		S: Sysfs=/devices/platform/10010000.keypad/input/input1
+		U: Uniq=
+		H: Handlers=gpufreq_ib event1 
+		B: PROP=0
+		B: EV=3
+		B: KEY=1000000 0 b00000000 0 0 1c000000000000 0
+
+		I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+		N: Name="gf-keys"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input2
+		U: Uniq=
+		H: Handlers=gpufreq_ib event2 
+		B: PROP=0
+		B: EV=3
+		B: KEY=3100000 100040000800 1c168000000000 0
+
+		I: Bus=0019 Vendor=0000 Product=0000 Version=0000
+		N: Name="aw9523b"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input3
+		U: Uniq=
+		H: Handlers=gpufreq_ib event3 
+		B: PROP=0
+		B: EV=3
+		B: KEY=2000019800100000 40000800 168000000000 4ffc
+
+		I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+		N: Name="hwmdata"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input4
+		U: Uniq=
+		H: Handlers=gpufreq_ib event4 
+		B: PROP=0
+		B: EV=5
+		B: REL=6
+
+		I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+		N: Name="m_alsps_input"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input5
+		U: Uniq=
+		H: Handlers=gpufreq_ib event5 
+		B: PROP=0
+		B: EV=d
+		B: REL=6
+		B: ABS=101
+
+		I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+		N: Name="m_acc_input"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input6
+		U: Uniq=
+		H: Handlers=gpufreq_ib event6 
+		B: PROP=0
+		B: EV=d
+		B: REL=c1
+		B: ABS=107
+
+		I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+		N: Name="m_mag_input"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input7
+		U: Uniq=
+		H: Handlers=gpufreq_ib event7 
+		B: PROP=0
+		B: EV=d
+		B: REL=3c9
+		B: ABS=17f
+
+		I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+		N: Name="m_step_c_input"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input8
+		U: Uniq=
+		H: Handlers=gpufreq_ib event8 
+		B: PROP=0
+		B: EV=d
+		B: REL=7
+		B: ABS=100
+
+		I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+		N: Name="mtk-tpd"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input9
+		U: Uniq=
+		H: Handlers=gpufreq_ib event9 
+		B: PROP=2
+		B: EV=b
+		B: KEY=10 0 0 0 400 0 0 100040000000 0 0
+		B: ABS=263800001000003
+
+		I: Bus=0019 Vendor=0001 Product=0001 Version=0100
+		N: Name="mtk-tpd-kpd"
+		P: Phys=
+		S: Sysfs=/devices/virtual/input/input10
+		U: Uniq=
+		H: Handlers=gpufreq_ib event10 
+		B: PROP=0
+		B: EV=3
+		B: KEY=10 0 0 0 0 0 0 100040000000 0 0	
+
+
+
+		按键驱动以及工作流程，input子系统
+		{
+			按键工作主要包含哪些目录文件
+			aw9523b.kl	
+		
+		
+			1.input device和keylayout的绑定在如下文件：
+			frameworks/native/libs/input/InputDevice.cpp  ：	appendInputDeviceConfigurationFileRelativePath
+			2.事件通过kernel/drivers/input/input.c上报到frameworks/native/services/inputflinger/EventHub.cpp
+			  然后在EventHub.cpp来获取按键对应的上层键值，其中的haveKeyLayout就是上面绑定的那个。
+			int32_t EventHub::getKeyCodeState(int32_t deviceId, int32_t keyCode) const {
+				AutoMutex _l(mLock);
+
+				Device* device = getDeviceLocked(deviceId);
+				if (device && !device->isVirtual() && device->keyMap.haveKeyLayout()) {
+					Vector<int32_t> scanCodes;
+					device->keyMap.keyLayoutMap->findScanCodesForKey(keyCode, &scanCodes);
+					if (scanCodes.size() != 0) {
+						uint8_t keyState[sizeof_bit_array(KEY_MAX + 1)];
+						memset(keyState, 0, sizeof(keyState));
+						if (ioctl(device->fd, EVIOCGKEY(sizeof(keyState)), keyState) >= 0) {
+						    for (size_t i = 0; i < scanCodes.size(); i++) {
+						        int32_t sc = scanCodes.itemAt(i);
+						        if (sc >= 0 && sc <= KEY_MAX && test_bit(sc, keyState)) {
+						            return AKEY_STATE_DOWN;
+						        }
+						    }
+						    return AKEY_STATE_UP;
 						}
-						return AKEY_STATE_UP;
 					}
 				}
+				return AKEY_STATE_UNKNOWN;
 			}
-			return AKEY_STATE_UNKNOWN;
+			3.上层根据上报的键值进行处理frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
+
+
+			例如，aw9523上报了一个253的键值，上报到EventHub.cpp后，通过查找aw9523.kl的映射值：key 253   WWW
+			之后，向上层上报了WWW的键值。
+			上层需要有WWW这个键值的定义才会被识别：
+			gionee/code/alps/public/ROM/frameworks/native/include/android/keycodes.h:801:    AKEYCODE_WWW     = 304,
+			gionee/code/alps/public/ROM/frameworks/base/core/java/android/view/KeyEvent.java:837:	public static final int KEYCODE_WWW = 304; 
+
+			在这里处理
+			gionee/code/alps/public/ROM/frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java:7077:           
+			case KeyEvent.KEYCODE_WWW:
+
 		}
-		3.上层根据上报的键值进行处理frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java
 
-
-		例如，aw9523上报了一个253的键值，上报到EventHub.cpp后，通过查找aw9523.kl的映射值：key 253   WWW
-		之后，向上层上报了WWW的键值。
-		上层需要有WWW这个键值的定义才会被识别：
-		gionee/code/alps/public/ROM/frameworks/native/include/android/keycodes.h:801:    AKEYCODE_WWW     = 304,
-		gionee/code/alps/public/ROM/frameworks/base/core/java/android/view/KeyEvent.java:837:	public static final int KEYCODE_WWW = 304; 
-
-		在这里处理
-		gionee/code/alps/public/ROM/frameworks/base/services/core/java/com/android/server/policy/PhoneWindowManager.java:7077:            case KeyEvent.KEYCODE_WWW:
-	}
-
-
+}
 
 
 
@@ -858,346 +918,356 @@ cat/proc/bus/input/devices 察看input子系统下挂的设备
 
 /**************************************************************************************************/
 4.调试马达震动效果
-
-基本概念
 {
-    LRA (Linear Resonance Actuator) 线性制动器
+	1.基本概念
+	{
+		LRA (Linear Resonance Actuator) 线性制动器
 
-    ERM (Eccentric Rotating Mass) 偏转转动惯量
+		ERM (Eccentric Rotating Mass) 偏转转动惯量
 
-    Back-EMF detection 反电动势检测
+		Back-EMF detection 反电动势检测
 
-    actuator n.激励者； [电脑]执行机构； [电]（电磁铁）螺线管； [机]促动器
+		actuator n.激励者； [电脑]执行机构； [电]（电磁铁）螺线管； [机]促动器
 
-    braking  n. 刹车，制动，（用闸）减速；
-            v. 刹（车）( brake的现在分词 )；
+		braking  n. 刹车，制动，（用闸）减速；
+				v. 刹（车）( brake的现在分词 )；
 
-    calibration  n. 校准，标准化； 刻度，标度； 测量口径；变形         
+		calibration  n. 校准，标准化； 刻度，标度； 测量口径；变形         
 
-    resonant adj.洪亮的； 回响的； 共振的； 能共鸣的
-
-
-    The ERM_LRA bit in register 0x1A must be
-    configured to select the type of actuator that the device uses.
-
-    The smart-loop architecture makes the resonant frequency of the LRA available through I2C (see the LRA
-    Resonance Period (Address: 0x22) section)
-
-    A key feature of the DRV2604L is the “smart-loop architecture” which employs actuator feedback control for both
-    ERMs and LRAs. The feedback control desensitizes the input waveform from the motor-response behavior by
-    providing automatic overdrive and automatic braking.
-
-    The FB_BRAKE_FACTOR[2:0] bits can be adjusted to set the brake factor.
-
-    the start-time characteristic may be different for each actuator, the AUTO_CAL_TIME[1:0] bit can change the duration of the
-    automatic level-calibration routine to optimize calibration performance.
-
-	DRV2604L 器件是一款低压触觉驱动器，其闭环致动器控制系统，可为 ERM 和 LRA 提供高质量的触觉反馈。此方案有助于提升致动器在加速度稳定性、启动时间和制动时间方面的
-	性能，通过共用的 I2C 兼容总线或 PWM 输入信号即可触发该方案。
-
-	DRV2604L 器件集成有足够的 RAM，用户能够预装载超过 100 个定制智能环路架构波形。这些波形可通过 I2C 即时回放，或者也可选择由硬件触发引脚来触发。
-
-	此外，主机处理器可利用实时回放模式绕过存储器回放引擎并通过 I2C 从主机直接播放波形。
-
-	DRV2604L 器件内部采用智能环路架构，可轻松实现自动谐振 LRA 驱动，以及优化反馈的 ERM 驱动，从而提供自动过驱动和制动。这种智能环路架构可构建简化的输入波形接口，
-	并且能够提供可靠的电机控制和稳定的电机性能。此外，DRV2604L 器件还 能够 在 LRA 致动器不产生有效反电动势电压时自动切换至开环系统。当 LRA 产生有效反电动势电压时，
-	DRV2604L 器件会自动与 LRA 同步。 DRV2604L 还可以利用内部生成的 PWM 信号实现开环驱动。
+		resonant adj.洪亮的； 回响的； 共振的； 能共鸣的
 
 
-}
+		The ERM_LRA bit in register 0x1A must be
+		configured to select the type of actuator that the device uses.
 
-重要的控制
-{
-	当然下面很多变量最重要的是gn_ti_drv2604l.h / gn_ti_drv2604l_customer.h + 芯片手册
-    static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)
-    这个里面有两个mode ，work和dev，什么意思
-    dev_mode 这个是马达设备所处的状态，idle闲置中断来了也不会有响应，standby应该是待机模式这个是低功耗随时处在待命模式，中断可以响应
-    ready这个应该是active模式了
-    #define DEV_IDLE	                0 // default
-    #define DEV_STANDBY					1
-    #define DEV_READY					2
+		The smart-loop architecture makes the resonant frequency of the LRA available through I2C (see the LRA
+		Resonance Period (Address: 0x22) section)
 
-    这个是相应的工作模式 
-    #define	WORK_IDLE					0x00
-    #define WORK_RTP			      	0x06
-    #define WORK_CALIBRATION	      	0x07
-    #define WORK_VIBRATOR		      	0x08
-    #define	WORK_PATTERN_RTP_ON			0x09
-    #define WORK_PATTERN_RTP_OFF      	0x0a
-    #define WORK_SEQ_RTP_ON		      	0x0b
-    #define WORK_SEQ_RTP_OFF    	  	0x0c
-    #define WORK_SEQ_PLAYBACK    	  	0x0d
+		A key feature of the DRV2604L is the “smart-loop architecture” which employs actuator feedback control for both
+		ERMs and LRAs. The feedback control desensitizes the input waveform from the motor-response behavior by
+		providing automatic overdrive and automatic braking.
 
-	I2C的地址和适配器
-    #define DRV2604L_I2C_BUS_ID         4
-    #define DRV2604L_I2C_ADDR			0x5A
-}
+		The FB_BRAKE_FACTOR[2:0] bits can be adjusted to set the brake factor.
 
-这是振动器的配置
-static struct actuator_data DRV2604L_actuator={
-		.device_type = LRA,
-		.rated_vol = 0x46,
-		.over_drive_vol = 0x7a,
-		.LRAFreq = 235,
-};
+		the start-time characteristic may be different for each actuator, the AUTO_CAL_TIME[1:0] bit can change the duration of the
+		automatic level-calibration routine to optimize calibration performance.
+
+		DRV2604L 器件是一款低压触觉驱动器，其闭环致动器控制系统，可为 ERM 和 LRA 提供高质量的触觉反馈。此方案有助于提升致动器在加速度稳定性、启动时间和制动时间方面的
+		性能，通过共用的 I2C 兼容总线或 PWM 输入信号即可触发该方案。
+
+		DRV2604L 器件集成有足够的 RAM，用户能够预装载超过 100 个定制智能环路架构波形。这些波形可通过 I2C 即时回放，或者也可选择由硬件触发引脚来触发。
+
+		此外，主机处理器可利用实时回放模式绕过存储器回放引擎并通过 I2C 从主机直接播放波形。
+
+		DRV2604L 器件内部采用智能环路架构，可轻松实现自动谐振 LRA 驱动，以及优化反馈的 ERM 驱动，从而提供自动过驱动和制动。这种智能环路架构可构建简化的输入波形接口，
+		并且能够提供可靠的电机控制和稳定的电机性能。此外，DRV2604L 器件还 能够 在 LRA 致动器不产生有效反电动势电压时自动切换至开环系统。当 LRA 产生有效反电动势电压时，
+		DRV2604L 器件会自动与 LRA 同步。 DRV2604L 还可以利用内部生成的 PWM 信号实现开环驱动。
 
 
-1.vibrator提供了两套mtk自带的和第三方的
-        CONFIG_GN_BSP_MTK_VIBRATOR_DRV2604L
-        CONFIG_MTK_VIBRATOR
-
-
-2.lk和kernel有两套代码
-
-lk阶段
-效果：就是让马达震动一会然后关闭
-这里调用的是更直接的过程
-拉高使能引脚，配置几个必须的参数，往0x01 mode_reg写相应的工作模式，然后设置成idle模式，关闭使引脚
-void gn_lk_vibrate(void)
-{    
-	printf("%s.\n",__func__);
-	
-	unsigned int result_tmp;
-	char reg_address;
-	char reg_data;
-
-    //set gpio，设置drv2604_en引脚输出使能
-	mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,1);
-	mdelay(2);
-
-    //往寄存器0x01写 0 为DEV_IDLE模式，DEV_STANDBY  1， DEV_READY  2
-	drv2604l_i2c_write(MODE_REG,DEV_IDLE);
-
-	//init regs 这两个参数都要在标准化之前设定好
-    //这个是设置额定电压 rated_voltage: 0x16
-	drv2604l_i2c_write(RATED_VOLTAGE_REG, 0x30);
-
-    //超速的钳位电压 ，在闭环操作中这个电压可以超过额定电压 Overdrive Clamp Voltage ：0x17
-  	drv2604l_i2c_write(OVERDRIVE_CLAMP_VOLTAGE_REG,0x53);
-
-	/*drv2604l_set_bits(FEEDBACK_CONTROL_REG,	
-						FEEDBACK_CONTROL_DEVICE_TYPE_MASK|FEEDBACK_CONTROL_FB_BRAKE_MASK|FEEDBACK_CONTROL_LOOP_GAIN_MASK,
-						FEEDBACK_CONTROL_MODE_LRA|FB_BRAKE_FACTOR|LOOP_GAIN);
-
-	drv2604l_set_bits(Control3_REG,	
-						Control3_REG_LOOP_MASK|Control3_REG_FORMAT_MASK,
-						BIDIR_INPUT_BIDIRECTIONAL|ERM_OpenLoop_Disable|LRA_OpenLoop_Disable|RTP_FORMAT_SIGNED);
-	*/
-
-    //real time payback：0x02 给这个模式写一个值
-	drv2604l_i2c_write(REAL_TIME_PLAYBACK_REG, 0x5F);
-    //进入RTP模式 ， 实时的反馈
-	drv2604l_i2c_write(MODE_REG,MODE_REAL_TIME_PLAYBACK);
-	mdelay(300);	// 100 -> 300
-
-    //让设备进入idle模式
-	drv2604l_i2c_write(MODE_REG,DEV_IDLE);
-
-    //set gpio
-    //关闭en使能引脚
-	mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,0);
-}
-
-
-
-kernel阶段
-
-1.通过write写值进入不同的case，这个就要弄清写什么样的值，如何正确的写进去
-2.或者在原有函数基础上调用自己写的一个函数，ioctl (这里ioctl比write更方便一点)
-ioctl通过写进不同的cmd，传进值，在不同的case里面调用不同的效果
-
-gn_ti_drv2604l.c
-这样直接调用drv2604l_change_mode，传进不同的work_mode，然后调用work
-{
-	drv2604l_change_mode(pDrv2604ldata, work_mode, DEV_READY);
-	value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
-	hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
-	schedule_work(&pDrv2604ldata->vibrator_work);
-}
-
-//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
-#define MOTOR_TEST
-#if defined(MOTOR_TEST)
-
-long dev2604_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
-{
-	struct DRV2604L_data *pDrv2604ldata = (struct DRV2604L_data *)filp->private_data;
-	int value=(int )arg;
-	int cnt=10;
-	
-	printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
-	
-    switch(cmd)
-    {
-	  // test vibrator_enable	
-      case 1:
-	  	 printk(KERN_ERR"in %s case 1 vibrator_enable ,value->%d\n", __FUNCTION__,value);
-		 while(cnt--){
-
-			 vibrator_enable( &(pDrv2604ldata->to_dev),value );
-			 mdelay(500);
-			 vibrator_enable( &(pDrv2604ldata->to_dev),0);
-			 mdelay(300);
-		 }
-
-		 break;
-		 
-	  // test drv2604l_change_mode
-	  case 2:
-		  printk(KERN_ERR"in %s case 2 enable drv2604l_change_mode ,value->%d\n", __FUNCTION__,value);
-		  
-		  pDrv2604ldata->should_stop = YES;
-		  hrtimer_cancel(&pDrv2604ldata->timer);
-		  cancel_work_sync(&pDrv2604ldata->vibrator_work);
-		  
-		  mutex_lock(&pDrv2604ldata->lock);
-		  
-		  drv2604l_stop(pDrv2604ldata);
-		  
-		  //wake_lock(&pDrv2604ldata->wklock);
-		  
-		  drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
-		  pDrv2604ldata->vibrator_is_playing = YES;
-		  switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_RTP_PLAYBACK);
-		  
-		  value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
-		  hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
-		  schedule_work(&pDrv2604ldata->vibrator_work);
-		  
-		  mutex_unlock(&pDrv2604ldata->lock);
-
-		break;
-		
-	  // test vibrator_off
-	  case 3:
-	  	printk(KERN_ERR"in %s case 3 enable vibrator_off ,value->%d\n", __FUNCTION__,value);
-	  	vibrator_off(pDrv2604ldata);
-		break;
-
-	  // test play_effect
-	  case 4:
-	  	printk(KERN_ERR"in %s case 4 enable play_effect ,value->%d\n", __FUNCTION__,value);
-	  	play_effect(pDrv2604ldata);
-		break;
-		
-	  // test play_Pattern_RTP
-	  case 5:	
-	  	printk(KERN_ERR"in %s case 5 enable play_Pattern_RTP ,value->%d\n", __FUNCTION__,value);
-		play_Pattern_RTP(pDrv2604ldata);
-		break;
-
-	  // test play_Seq_RTP
-	  case 6:
-	  	printk(KERN_ERR"in %s case 6 enable play_Seq_RTP ,value->%d\n", __FUNCTION__,value);
-	  	play_Seq_RTP(pDrv2604ldata);
-		break;
-
-	  // test drv2604l_change_mode	
-  	  case 7:
-		  printk(KERN_ERR"in %s case 7 enable drv2604l_change_mode ,value->%d\n", __FUNCTION__,value);
-		  
-		  pDrv2604ldata->should_stop = YES;
-		  hrtimer_cancel(&pDrv2604ldata->timer);
-		  cancel_work_sync(&pDrv2604ldata->vibrator_work);
-		  
-		  mutex_lock(&pDrv2604ldata->lock);
-		  
-		  drv2604l_stop(pDrv2604ldata);
-		  
-		  //wake_lock(&pDrv2604ldata->wklock);
-		  
-		  drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
-		  pDrv2604ldata->vibrator_is_playing = YES;
-		  switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_RTP_PLAYBACK);
-		  
-		  value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
-		  hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
-		  schedule_work(&pDrv2604ldata->vibrator_work);
-		  
-		  mutex_unlock(&pDrv2604ldata->lock);
-
-		break;	
-
-	  // test drv2604l_change_mode	for work_mode
-	  case 8:
-	  	printk(KERN_ERR"in %s case 8 enable drv2604l_change_mode for work_mode,value->%d\n", __FUNCTION__,value);
-	  	cnt=10;
-		drv2604l_change_mode(pDrv2604ldata, value, DEV_READY);
-		value = MAX_TIMEOUT;
-	    hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
-	    schedule_work(&pDrv2604ldata->vibrator_work);
-		break;
-
-	  default:
-		printk(KERN_ERR"in %s default no cmd\n", __FUNCTION__);
-	  	break;
-	    
-    }
-
-	mutex_unlock(&pDrv2604ldata->lock);
-	printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
-
-	return 0;
-}
-
-#endif
-//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
-
-
-mmi测试有调用马达震动的接口，而ftm*应该是mmi测试相关的源码
-ftm_vibrator.c
-
-这个是往enable节点写value，震动多长时间
-static int write_int(char const* path, int value)
-{
-	int fd;
-
-	if (path == NULL)
-		return -1;
-
-	fd = open(path, O_RDWR);
-	if (fd >= 0) {
-		char buffer[20];
-		int bytes = sprintf(buffer, "%d\n", value);
-		int amt = write(fd, buffer, bytes);
-		close(fd);
-		return amt == -1 ? -errno : 0;
 	}
 
-	LOGE("write_int failed to open %s\n", path);
-	return -errno;
-}
-
-默认是打开mmi测试，震动，也可以手动写值
-static void *update_vibrator_thread_default(void *priv)
-{
-	LOGD("%s: Start\n", __FUNCTION__);
-
-	if(vibrator_time == 0)
+	2.重要的控制
 	{
-	do {
-        write_int(VIBRATOR_ENABLE, 8000); // 1 seconds
-		if (vibrator_test_exit)
+		当然下面很多变量最重要的是gn_ti_drv2604l.h / gn_ti_drv2604l_customer.h + 芯片手册
+		static void drv2604l_change_mode(struct DRV2604L_data *pDrv2604ldata, char work_mode, char dev_mode)
+		这个里面有两个mode ，work和dev，什么意思
+		dev_mode 这个是马达设备所处的状态，idle闲置中断来了也不会有响应，standby应该是待机模式这个是低功耗随时处在待命模式，中断可以响应
+		ready这个应该是active模式了
+		#define DEV_IDLE	                0 // default
+		#define DEV_STANDBY					1
+		#define DEV_READY					2
+
+		这个是相应的工作模式 
+		#define	WORK_IDLE					0x00
+		#define WORK_RTP			      	0x06
+		#define WORK_CALIBRATION	      	0x07
+		#define WORK_VIBRATOR		      	0x08
+		#define	WORK_PATTERN_RTP_ON			0x09
+		#define WORK_PATTERN_RTP_OFF      	0x0a
+		#define WORK_SEQ_RTP_ON		      	0x0b
+		#define WORK_SEQ_RTP_OFF    	  	0x0c
+		#define WORK_SEQ_PLAYBACK    	  	0x0d
+
+		I2C的地址和适配器
+		#define DRV2604L_I2C_BUS_ID         4
+		#define DRV2604L_I2C_ADDR			0x5A
+	}
+
+
+
+	这是振动器的配置
+	static struct actuator_data DRV2604L_actuator={
+			.device_type = LRA,
+			.rated_vol = 0x46,
+			.over_drive_vol = 0x7a,
+			.LRAFreq = 235,
+	};
+
+
+	相关的代码
+	{
+			1.vibrator提供了两套mtk自带的和第三方的
+			CONFIG_GN_BSP_MTK_VIBRATOR_DRV2604L
+			CONFIG_MTK_VIBRATOR
+
+
+	2.lk和kernel有两套代码
+
+	lk阶段
+	效果：就是让马达震动一会然后关闭
+	这里调用的是更直接的过程
+	拉高使能引脚，配置几个必须的参数，往0x01 mode_reg写相应的工作模式，然后设置成idle模式，关闭使引脚
+	void gn_lk_vibrate(void)
+	{    
+		printf("%s.\n",__func__);
+		
+		unsigned int result_tmp;
+		char reg_address;
+		char reg_data;
+
+		//set gpio，设置drv2604_en引脚输出使能
+		mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,1);
+		mdelay(2);
+
+		//往寄存器0x01写 0 为DEV_IDLE模式，DEV_STANDBY  1， DEV_READY  2
+		drv2604l_i2c_write(MODE_REG,DEV_IDLE);
+
+		//init regs 这两个参数都要在标准化之前设定好
+		//这个是设置额定电压 rated_voltage: 0x16
+		drv2604l_i2c_write(RATED_VOLTAGE_REG, 0x30);
+
+		//超速的钳位电压 ，在闭环操作中这个电压可以超过额定电压 Overdrive Clamp Voltage ：0x17
+		drv2604l_i2c_write(OVERDRIVE_CLAMP_VOLTAGE_REG,0x53);
+
+		/*drv2604l_set_bits(FEEDBACK_CONTROL_REG,	
+							FEEDBACK_CONTROL_DEVICE_TYPE_MASK|FEEDBACK_CONTROL_FB_BRAKE_MASK|FEEDBACK_CONTROL_LOOP_GAIN_MASK,
+							FEEDBACK_CONTROL_MODE_LRA|FB_BRAKE_FACTOR|LOOP_GAIN);
+
+		drv2604l_set_bits(Control3_REG,	
+							Control3_REG_LOOP_MASK|Control3_REG_FORMAT_MASK,
+							BIDIR_INPUT_BIDIRECTIONAL|ERM_OpenLoop_Disable|LRA_OpenLoop_Disable|RTP_FORMAT_SIGNED);
+		*/
+
+		//real time payback：0x02 给这个模式写一个值
+		drv2604l_i2c_write(REAL_TIME_PLAYBACK_REG, 0x5F);
+		//进入RTP模式 ， 实时的反馈
+		drv2604l_i2c_write(MODE_REG,MODE_REAL_TIME_PLAYBACK);
+		mdelay(300);	// 100 -> 300
+
+		//让设备进入idle模式
+		drv2604l_i2c_write(MODE_REG,DEV_IDLE);
+
+		//set gpio
+		//关闭en使能引脚
+		mt_set_gpio_out(DRV2604L_GPIO_ENABLE_PIN,0);
+	}
+
+
+
+	kernel阶段
+
+	1.通过write写值进入不同的case，这个就要弄清写什么样的值，如何正确的写进去
+	2.或者在原有函数基础上调用自己写的一个函数，ioctl (这里ioctl比write更方便一点)
+	ioctl通过写进不同的cmd，传进值，在不同的case里面调用不同的效果
+
+	gn_ti_drv2604l.c
+	这样直接调用drv2604l_change_mode，传进不同的work_mode，然后调用work
+	{
+		drv2604l_change_mode(pDrv2604ldata, work_mode, DEV_READY);
+		value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
+		hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+		schedule_work(&pDrv2604ldata->vibrator_work);
+	}
+
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate begin
+	#define MOTOR_TEST
+	#if defined(MOTOR_TEST)
+
+	long dev2604_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+	{
+		struct DRV2604L_data *pDrv2604ldata = (struct DRV2604L_data *)filp->private_data;
+		int value=(int )arg;
+		int cnt=10;
+		
+		printk(KERN_ERR"in %s before by lilubao\n", __FUNCTION__);
+		
+		switch(cmd)
+		{
+		// test vibrator_enable	
+		case 1:
+			printk(KERN_ERR"in %s case 1 vibrator_enable ,value->%d\n", __FUNCTION__,value);
+			while(cnt--){
+
+				vibrator_enable( &(pDrv2604ldata->to_dev),value );
+				mdelay(500);
+				vibrator_enable( &(pDrv2604ldata->to_dev),0);
+				mdelay(300);
+			}
+
 			break;
-		sleep(1);
-		} while (1);	
-		write_int(VIBRATOR_ENABLE, 0);
+			
+		// test drv2604l_change_mode
+		case 2:
+			printk(KERN_ERR"in %s case 2 enable drv2604l_change_mode ,value->%d\n", __FUNCTION__,value);
+			
+			pDrv2604ldata->should_stop = YES;
+			hrtimer_cancel(&pDrv2604ldata->timer);
+			cancel_work_sync(&pDrv2604ldata->vibrator_work);
+			
+			mutex_lock(&pDrv2604ldata->lock);
+			
+			drv2604l_stop(pDrv2604ldata);
+			
+			//wake_lock(&pDrv2604ldata->wklock);
+			
+			drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
+			pDrv2604ldata->vibrator_is_playing = YES;
+			switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_RTP_PLAYBACK);
+			
+			value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
+			hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+			schedule_work(&pDrv2604ldata->vibrator_work);
+			
+			mutex_unlock(&pDrv2604ldata->lock);
+
+			break;
+			
+		// test vibrator_off
+		case 3:
+			printk(KERN_ERR"in %s case 3 enable vibrator_off ,value->%d\n", __FUNCTION__,value);
+			vibrator_off(pDrv2604ldata);
+			break;
+
+		// test play_effect
+		case 4:
+			printk(KERN_ERR"in %s case 4 enable play_effect ,value->%d\n", __FUNCTION__,value);
+			play_effect(pDrv2604ldata);
+			break;
+			
+		// test play_Pattern_RTP
+		case 5:	
+			printk(KERN_ERR"in %s case 5 enable play_Pattern_RTP ,value->%d\n", __FUNCTION__,value);
+			play_Pattern_RTP(pDrv2604ldata);
+			break;
+
+		// test play_Seq_RTP
+		case 6:
+			printk(KERN_ERR"in %s case 6 enable play_Seq_RTP ,value->%d\n", __FUNCTION__,value);
+			play_Seq_RTP(pDrv2604ldata);
+			break;
+
+		// test drv2604l_change_mode	
+		case 7:
+			printk(KERN_ERR"in %s case 7 enable drv2604l_change_mode ,value->%d\n", __FUNCTION__,value);
+			
+			pDrv2604ldata->should_stop = YES;
+			hrtimer_cancel(&pDrv2604ldata->timer);
+			cancel_work_sync(&pDrv2604ldata->vibrator_work);
+			
+			mutex_lock(&pDrv2604ldata->lock);
+			
+			drv2604l_stop(pDrv2604ldata);
+			
+			//wake_lock(&pDrv2604ldata->wklock);
+			
+			drv2604l_change_mode(pDrv2604ldata, WORK_VIBRATOR, DEV_READY);
+			pDrv2604ldata->vibrator_is_playing = YES;
+			switch_set_state(&pDrv2604ldata->sw_dev, SW_STATE_RTP_PLAYBACK);
+			
+			value = (value>MAX_TIMEOUT)?MAX_TIMEOUT:value;
+			hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+			schedule_work(&pDrv2604ldata->vibrator_work);
+			
+			mutex_unlock(&pDrv2604ldata->lock);
+
+			break;	
+
+		// test drv2604l_change_mode	for work_mode
+		case 8:
+			printk(KERN_ERR"in %s case 8 enable drv2604l_change_mode for work_mode,value->%d\n", __FUNCTION__,value);
+			cnt=10;
+			drv2604l_change_mode(pDrv2604ldata, value, DEV_READY);
+			value = MAX_TIMEOUT;
+			hrtimer_start(&pDrv2604ldata->timer, ns_to_ktime((u64)value * NSEC_PER_MSEC), HRTIMER_MODE_REL);
+			schedule_work(&pDrv2604ldata->vibrator_work);
+			break;
+
+		default:
+			printk(KERN_ERR"in %s default no cmd\n", __FUNCTION__);
+			break;
+			
+		}
+
+		mutex_unlock(&pDrv2604ldata->lock);
+		printk(KERN_ERR"in %s after by lilubao\n", __FUNCTION__);
+
+		return 0;
 	}
-	else
+
+	#endif
+	//Gionee <gn_by_charging> <lilubao> <20170504> add for change vibrate end
+
+
+	mmi测试有调用马达震动的接口，而ftm*应该是mmi测试相关的源码
+	ftm_vibrator.c
+
+	这个是往enable节点写value，震动多长时间
+	static int write_int(char const* path, int value)
 	{
-		LOGD("%s: write vibrator_enable=%d\n", __FUNCTION__, vibrator_time);
-		write_int(VIBRATOR_ENABLE, vibrator_time);
-		sleep(1);
-		write_int(VIBRATOR_ENABLE, 0);
-		LOGD("%s: write vibrator_enable=0\n", __FUNCTION__);
+		int fd;
+
+		if (path == NULL)
+			return -1;
+
+		fd = open(path, O_RDWR);
+		if (fd >= 0) {
+			char buffer[20];
+			int bytes = sprintf(buffer, "%d\n", value);
+			int amt = write(fd, buffer, bytes);
+			close(fd);
+			return amt == -1 ? -errno : 0;
+		}
+
+		LOGE("write_int failed to open %s\n", path);
+		return -errno;
 	}
 
-	pthread_exit(NULL);
+	默认是打开mmi测试，震动，也可以手动写值
+	static void *update_vibrator_thread_default(void *priv)
+	{
+		LOGD("%s: Start\n", __FUNCTION__);
 
-	LOGD("%s: Exit\n", __FUNCTION__);
+		if(vibrator_time == 0)
+		{
+		do {
+			write_int(VIBRATOR_ENABLE, 8000); // 1 seconds
+			if (vibrator_test_exit)
+				break;
+			sleep(1);
+			} while (1);	
+			write_int(VIBRATOR_ENABLE, 0);
+		}
+		else
+		{
+			LOGD("%s: write vibrator_enable=%d\n", __FUNCTION__, vibrator_time);
+			write_int(VIBRATOR_ENABLE, vibrator_time);
+			sleep(1);
+			write_int(VIBRATOR_ENABLE, 0);
+			LOGD("%s: write vibrator_enable=0\n", __FUNCTION__);
+		}
 
-	return NULL;
+		pthread_exit(NULL);
+
+		LOGD("%s: Exit\n", __FUNCTION__);
+
+		return NULL;
+	}
+
+	}
+
+
 }
+
 
 
 
@@ -1208,7 +1278,6 @@ static void *update_vibrator_thread_default(void *priv)
 5.调节充电时序状态
 {
 	恒流充电时间，按power关机不应该是kpoc	，手机完整的充放电过程是否正常，开机充电和关机充电
-
 
     //==============================================================================
     // PMIC define
@@ -1240,10 +1309,18 @@ static void *update_vibrator_thread_default(void *priv)
         mtk_battery_property.h这个里面包含很多电池电量计相关的参数
 
 
-        shutdown_event_handler做了哪些事：
+        关机的几个判断shutdown_event_handler
         {   
             1.执行关机的回调函数，判断一些关机条件是否满足或触发然后执行kernel_power_off -> machine_power_off
             mtk_power_misc_init     power_misc      power_misc_thread
+
+
+			(mtk_power_mis.c ) power_misc_routine_thread 这个线程里面用于执行等待队列，和shutdown的回调函数shutdown_event_handler
+			
+			->shutdown_event_handler 回调函数里面对上面物种关机条件进行判断  -> set_shutdown_cond 这个是在(mtk_battery.c)由上层写相应的值传达指令
+			
+			这里还有一个shutdown_cond_flag 这个标志位是从节点传过来的，应该是是否执行关机条件的判断
+
 
 
             2.会创建一个power_misc_thread线程，这个进程应该是在低电条件下创建的，低电出发了条件，高电的时候没有这个
@@ -1315,17 +1392,17 @@ static void *update_vibrator_thread_default(void *priv)
         int g_battery_id_voltage[TOTAL_BATTERY_NUMBER] = {
             500000, 1000000, 1500000, -1};
 
-        int g_FG_PSEUDO1_T0[TOTAL_BATTERY_NUMBER] = { 1, 6, 7, 8};		// 5->2->1
-        int g_FG_PSEUDO1_T1[TOTAL_BATTERY_NUMBER] = { 2, 10, 11, 12};	// 9->3->2
-        int g_FG_PSEUDO1_T2[TOTAL_BATTERY_NUMBER] = { 3, 14, 15, 16};	// 13->5->3
-        int g_FG_PSEUDO1_T3[TOTAL_BATTERY_NUMBER] = { 5, 18, 19, 20};	// 17->7->5
-        int g_FG_PSEUDO1_T4[TOTAL_BATTERY_NUMBER] = { 7, 22, 23, 24};	// 21->10->7
+        int g_FG_PSEUDO1_T0[TOTAL_BATTERY_NUMBER] = { 1, 6, 7, 8};		// 5->1
+        int g_FG_PSEUDO1_T1[TOTAL_BATTERY_NUMBER] = { 2, 10, 11, 12};	// 9->2
+        int g_FG_PSEUDO1_T2[TOTAL_BATTERY_NUMBER] = { 3, 14, 15, 16};	// 13->3
+        int g_FG_PSEUDO1_T3[TOTAL_BATTERY_NUMBER] = { 5, 18, 19, 20};	// 17->5
+        int g_FG_PSEUDO1_T4[TOTAL_BATTERY_NUMBER] = { 7, 22, 23, 24};	// 21->7
 
         int g_FG_PSEUDO100_T0[TOTAL_BATTERY_NUMBER] = { 99, 98, 98, 97};// 98->99
         int g_FG_PSEUDO100_T1[TOTAL_BATTERY_NUMBER] = { 98, 95, 94, 93};// 95->98	
-        int g_FG_PSEUDO100_T2[TOTAL_BATTERY_NUMBER] = { 96, 90, 90, 89};// 90->95->96
-        int g_FG_PSEUDO100_T3[TOTAL_BATTERY_NUMBER] = { 93, 80, 86, 85};// 80->90->93
-        int g_FG_PSEUDO100_T4[TOTAL_BATTERY_NUMBER] = { 93, 80, 82, 81};// 80->90->93	
+        int g_FG_PSEUDO100_T2[TOTAL_BATTERY_NUMBER] = { 96, 90, 90, 89};// 90->96
+        int g_FG_PSEUDO100_T3[TOTAL_BATTERY_NUMBER] = { 93, 80, 86, 85};// 80->93
+        int g_FG_PSEUDO100_T4[TOTAL_BATTERY_NUMBER] = { 93, 80, 82, 81};// 80->93	
         //Gionee <gn_by_charging> <lilubao> <20170510> add for change charging process end
     }
 
@@ -1357,11 +1434,11 @@ static void *update_vibrator_thread_default(void *priv)
         mtk_battery_table.h
         修改
         {
-            int g_Q_MAX_T0[TOTAL_BATTERY_NUMBER] = { 2946, 2712, 2490, 1965};   // 2946->2800->3100
-            int g_Q_MAX_T1[TOTAL_BATTERY_NUMBER] = { 2796, 2851, 2468, 1984};   // 2796->2657->2936
-            int g_Q_MAX_T2[TOTAL_BATTERY_NUMBER] = { 2718, 2432, 2310, 1946};   // 2718->2583->2854
-            int g_Q_MAX_T3[TOTAL_BATTERY_NUMBER] = { 2535, 1991, 1858, 1873};   // 2535->2410->2662
-            int g_Q_MAX_T4[TOTAL_BATTERY_NUMBER] = { 2523, 1960, 1843, 1851};   // 2523->2400->2649
+            int g_Q_MAX_T0[TOTAL_BATTERY_NUMBER] = { 2946, 2712, 2490, 1965};   // 2946->3100
+            int g_Q_MAX_T1[TOTAL_BATTERY_NUMBER] = { 2796, 2851, 2468, 1984};   // 2796->2936
+            int g_Q_MAX_T2[TOTAL_BATTERY_NUMBER] = { 2718, 2432, 2310, 1946};   // 2718->2854
+            int g_Q_MAX_T3[TOTAL_BATTERY_NUMBER] = { 2535, 1991, 1858, 1873};   // 2535->2662
+            int g_Q_MAX_T4[TOTAL_BATTERY_NUMBER] = { 2523, 1960, 1843, 1851};   // 2523->2649
 
             int g_Q_MAX_T0_H_CURRENT[TOTAL_BATTERY_NUMBER] = { 2646, 2412, 2190, 1665}; 
             int g_Q_MAX_T1_H_CURRENT[TOTAL_BATTERY_NUMBER] = { 2496, 2551, 2168, 1684};
@@ -1401,7 +1478,6 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 
-        
     调用流程    
     电池相关参数的初始化，这部分跟电池参数相关的应该是之前的meter那一类
     （mtk_battery.c）battery_probe 电池参数的初始化 -> (mtk_battery_hal.c)battery_meter_ctrl = bm_ctrl_cmd,电池电量参数相关计算的一组函数接口
@@ -1424,6 +1500,14 @@ static void *update_vibrator_thread_default(void *priv)
 
 }
 	
+
+
+
+
+
+
+
+
 
 /****************************************************************************************************************/
 6.通过哪个变量或函数可以判断用户处在打电话状态
@@ -1498,6 +1582,11 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 
+
+
+
+
+
 /**********************************************************************************************/
 7.将电池维护代码移植到17G05A上
 {
@@ -1515,6 +1604,15 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 
+
+
+
+
+
+
+
+
+
 /**********************************************************************************************/
 8.温升相关问题
 {
@@ -1527,33 +1625,22 @@ static void *update_vibrator_thread_default(void *priv)
         mtk_switch_charging.c -> swchg_select_charging_current_limit
 
         这其中还要考虑其他情况：打电话，mmi测试等等（1605上是这样考虑）
-    }
- 
-     17G05A
 
-     //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging begin
-	 pr_err("in %s info->battery_temperature->%d\n",__FUNCTION__,info->battery_temperature);
 
-	 if(info->chr_type==STANDARD_CHARGER){
+		除了启动信息，还要加上正常情况下判断电池相关信息的log，current，voltage
+		fg_drv_update_hw_status
+		bm_err("[fg_drv_update_hw_status] current:%d %d state:%d %d car:%d %d bat:%d %d chr:%d %d hwocv:%d %d bat_plug_out:%d %d tmp:%d %d imix %d rac %d\n",
+		fg_current, fg_current_new,
+		fg_current_state, fg_current_state_new,
+		fg_coulomb, fg_coulomb_new,
+		bat_vol, bat_vol_new,
+		chr_vol, chr_vol_new,
+		hwocv, hwocv_new,
+		plugout_status, plugout_status_new,
+		tmp, tmp_new, (UNIT_TRANS_10 * get_imix()), get_rac()
+		);
+	}
 
-		if( info->battery_temperature <=15 ){
-
-			pdata->charging_current_limit=1500000;
-			pdata->input_current_limit=1600000;
-			pr_err("in %s ,temperature is too low ,we need limit charging current->1\n",__FUNCTION__);
-		}else if( (info->battery_temperature>15)&&(info->battery_temperature<=45) ){
-
-			pr_err("in %s ,temperature in normal range,do not limit charging current->2 \n",__FUNCTION__);
-		}else if( info->battery_temperature > 45 ){
-
-			pdata->charging_current_limit=1000000;
-			pdata->input_current_limit=1200000;
-			pr_err("in %s ,temperature is too high ,we need limit charging current->3\n",__FUNCTION__);
-		}
-	 }
-	 pr_err("in %s setting charging_current_limit->%d,input_current_limit->%d\n",
-				__FUNCTION__,pdata->charging_current_limit,pdata->input_current_limit);
-	 //Gionee <gn_by_charging> <lilubao> <20170519> add for thermal charging end	
 
 
     2.充电温度调节策略相关代码，文档  
@@ -1590,7 +1677,6 @@ static void *update_vibrator_thread_default(void *priv)
     }  
         
 
-
     3.相关的文档
     {
         Thermal_Management_MT6757.pdf
@@ -1598,28 +1684,307 @@ static void *update_vibrator_thread_default(void *priv)
         MT6757CH(CD)_Thermal_Design_Notices_V0.1.pdf
     }
 
+
+
+	4.modify code
+	{
+	  (mtk_switch_charging.c)  
+
+	  	判断是否该降电流，主要是灭屏，mmi，关机充电不能降电流
+		//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for thermal charging begin
+		bool bat_charge_current_not_down(void)
+		{
+			int gn_boot_mode ;
+			gn_boot_mode=get_boot_mode();
+
+			pr_err("in [%s] gn_boot_mode->%d,gn_call_state->%d,gn_screenon_time->%d\n",
+						__FUNCTION__,gn_boot_mode,gn_call_state,gn_screenon_time);
+			
+			if( (g_gn_screenon_time <= 30) && (gn_call_state == CALL_IDLE)) || (is_enter_mmi_test == true) || (gn_boot_mode == KERNEL_POWER_OFF_CHARGING_BOOT || gn_boot_mode == LOW_POWER_OFF_CHARGING_BOOT))
+			{
+				return true;
+			}    
+			else{
+				return false;
+			}
+				
+		}
+		//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for thermal charging end
+
+		这里主要是判断条件，同时控制充电电流
+		//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for thermal charging begin
+		pr_err("in [%s] gn_call_state->%d,temperature->%d,is_enter_mmi_test->%d,gn_screenon_time->%d\n",
+				__FUNCTION__,gn_call_state,info->battery_temperature,is_enter_mmi_test,gn_screenon_time);
+
+		if( bat_charge_current_not_down() ){
+
+			pr_err("normal mode,not change any action\n");
+		}else{
+
+		/* 但是大于45度的时候电流还是很大，所以要调小点
+		17G10A 电芯规格书，请确认一下配机参数。重点关注一下充电参数。
+		0~15，0.3C，MAX to 4.2 V cutoff		900mA
+		15~45 2.5A to 4.2V ,2A to 4.4V ,then CV to 0.02C
+		45~60 0.5C MAX to 4.2V				1500mA
+		*/
+			if( info->battery_temperature <=15 ){
+				pdata->charging_current_limit=900000;
+				pdata->input_current_limit=1000000;
+				pr_err("temperature is too low ,charging_current_limit->%d,or is_enter_mmi_test is disable\n",
+							pdata->charging_current_limit);
+			}else if( (info->battery_temperature>15)&&(info->battery_temperature<=45) ){
+
+				pr_err("temperature in normal range\n");
+			}else if( info->battery_temperature > 45 ){
+
+				pdata->charging_current_limit=1100000;
+				pdata->input_current_limit=1200000;
+				pr_err("temperature is too high ,charging_current_limit->%d\n",pdata->charging_current_limit);
+			}
+
+			if( gn_call_state != CALL_IDLE ){
+
+				pr_err("calling state or normal use when the mobile was charging ,decrease charging current\n");
+
+				pdata->charging_current_limit  = pdata->charging_current_limit/2;
+				pdata->input_current_limit = pdata->input_current_limit/2;
+			}
+
+
+			一定要把温升的判断移到这边，不然灭屏触发了温升还是会降电流，温升触发abcct之后限制的是充进电池的电流
+			if (pdata->thermal_charging_current_limit != -1)
+				if (pdata->thermal_charging_current_limit < pdata->charging_current_limit)
+					pdata->charging_current_limit = pdata->thermal_charging_current_limit;
+
+			if (pdata->thermal_input_current_limit != -1)
+				if (pdata->thermal_input_current_limit < pdata->input_current_limit)
+					pdata->input_current_limit = pdata->thermal_input_current_limit;
+		}
+		//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for thermal charging end
+
+	}
+
+
+	5.添加一些log
+	{
+		1.需要仿照G1605A添加一些boot mode,boot reason,call state,g_gn_screen_time，call_state
+		[bat_routine_thr]g_gn_screenon_time=(80), g_call_state=0, g_boot_reason=4, g_boot_mode=0
+
+			//Gionee <GN_BSP_CHG> <lilubao> <20170819> add for gn_boot info begin
+			/* boot type definitions */
+			typedef enum
+			{
+				NORMAL_BOOT = 0,
+				META_BOOT = 1,
+				RECOVERY_BOOT = 2,
+				SW_REBOOT = 3,
+				FACTORY_BOOT = 4,
+				ADVMETA_BOOT = 5,		//这个是什么模式？，is_advanced_meta_mode
+				ATE_FACTORY_BOOT = 6,
+				ALARM_BOOT = 7,			//具体什么场景?
+			#if defined (MTK_KERNEL_POWER_OFF_CHARGING)
+				KERNEL_POWER_OFF_CHARGING_BOOT = 8,
+				LOW_POWER_OFF_CHARGING_BOOT = 9,
+			#endif
+				FASTBOOT = 99,
+				DOWNLOAD_BOOT = 100,
+				UNKNOWN_BOOT
+			} BOOTMODE;
+
+			typedef enum {
+				BR_POWER_KEY = 0,
+				BR_USB,
+				BR_RTC,
+				BR_WDT,
+				BR_WDT_BY_PASS_PWK,
+				BR_TOOL_BY_PASS_PWK,
+				BR_2SEC_REBOOT,
+				BR_UNKNOWN,
+				BR_KERNEL_PANIC,//这个是内核错误，不知道下步该怎么走 http://blog.csdn.net/liukuan73/article/details/45537889
+				BR_WDT_SW,
+				BR_WDT_HW
+			} boot_reason_t;
+
+
+
+			a. gn_boot_mode	=get_boot_mode();这个是通过mtk_boot_common.c 下的
+
+			判断系统启动的boot_mode.boot_reason的流程 G1605A
+			(mt_boot_common.c)dt_get_boot_common 这是从内核传参的过程中，从lk获取的atag -> init_boot_common然后初始化判断不同的启动模式，组包不同的字符串
+
+			创建相应的节点	->  get_boot_mode这个接口函数可以在后面获取启动的信息
+
+
+			#include <mt-plat/mtk_boot.h>
+			/* return boot mode */
+			unsigned int get_boot_mode(void)
+			{
+				init_boot_common(__LINE__);
+				return g_boot_mode;
+			}
+
+			./drivers/misc/mediatek/boot/mt_boot_common.c:32:enum boot_mode_t g_boot_mode __nosavedata = UNKNOWN_BOOT;
+			./drivers/misc/mediatek/boot/mt_boot_common.c:53:		g_boot_mode = tags->bootmode;
+			./drivers/misc/mediatek/boot/mt_boot_common.c:72:			g_boot_mode);
+			./drivers/misc/mediatek/boot/mt_boot_common.c:82:	if (UNKNOWN_BOOT != g_boot_mode) {
+			./drivers/misc/mediatek/boot/mt_boot_common.c:84:		pr_warn("%s (%d) boot_mode = %d\n", __func__, line, g_boot_mode);
+			./drivers/misc/mediatek/boot/mt_boot_common.c:88:	pr_debug("%s %d %d %d\n", __func__, line, g_boot_mode, atomic_read(&g_boot_init));
+			./drivers/misc/mediatek/boot/mt_boot_common.c:94:	pr_debug("%s %d %d %d\n", __func__, line, g_boot_mode, atomic_read(&g_boot_init));
+			./drivers/misc/mediatek/boot/mt_boot_common.c:102:	return g_boot_mode;
+			./drivers/misc/mediatek/boot/mt_boot_common.c:111:	if (g_boot_mode == META_BOOT)
+			./drivers/misc/mediatek/boot/mt_boot_common.c:122:	if (g_boot_mode == ADVMETA_BOOT)
+			./drivers/misc/mediatek/boot/mt_boot_common.c:225:	switch (g_boot_mode) {
+			./drivers/misc/mediatek/boot/mt_boot_common.c:275:	pr_debug("boot_mode = %d, state(%d,%d,%d)", g_boot_mode,
+			./drivers/power/mediatek/switch_charging.c:142:	battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
+			./drivers/power/mediatek/battery_common_fg_20.c:2245:	battery_log(BAT_LOG_CRTI,"g_gn_screenon_time=(%d), g_call_state=%d, g_boot_reason=%d, g_boot_mode=%d\n", g_gn_screenon_time, g_call_state, get_boot_reason(),get_boot_mode());
+
+
+			b.gn_boot_reason 判断启动的原因
+
+			(mt_boot_reason.c) dt_get_boot_reason跟boot_mode一样都是内核传参获取atag，获取字符串，然后读取指定信息
+
+			./drivers/misc/mediatek/aee/common/reboot-reason.c:82:	int g_boot_reason = 0;
+			./drivers/misc/mediatek/aee/common/reboot-reason.c:88:		g_boot_reason = br_ptr[12] - '0';
+			./drivers/misc/mediatek/aee/common/reboot-reason.c:89:		LOGE("g_boot_reason=%d\n", g_boot_reason);
+			./drivers/misc/mediatek/aee/common/reboot-reason.c:92:			g_boot_reason = BR_KE_REBOOT;
+			./drivers/misc/mediatek/aee/common/reboot-reason.c:94:		return sprintf(buf, "%s\n", boot_reason[g_boot_reason]);
+			./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:33:enum boot_reason_t g_boot_reason __nosavedata = BR_UNKNOWN;
+			./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:51:			g_boot_reason = br_ptr[12] - '0';	/* get boot reason */
+			./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:82:	if (BR_UNKNOWN != g_boot_reason) {
+			./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:84:		pr_warn("boot_reason = %d\n", g_boot_reason);
+			./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:88:	pr_debug("%s %d %d %d\n", __func__, line, g_boot_reason, atomic_read(&g_br_state));
+			./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:94:	pr_debug("%s %d %d %d\n", __func__, line, g_boot_reason, atomic_read(&g_br_state));
+			./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:102:	return g_boot_reason;
+			./drivers/misc/mediatek/boot_reason/mt_boot_reason.c:113:	pr_debug("boot_reason = %d, state(%d,%d,%d)", g_boot_reason,
+			./drivers/misc/mediatek/include/mt-plat/battery_meter.h:271:	FG_DAEMON_CMD_GET_BOOT_REASON,	/* g_boot_reason, */
+			./drivers/power/mediatek/battery_meter_fg_20.c:3895:			bm_debug("[fg_res] g_boot_reason = %d\n", boot_reason);
+			./drivers/power/mediatek/battery_common_fg_20.c:2248:	battery_log(BAT_LOG_CRTI,"g_gn_screenon_time=(%d), g_call_state=%d, g_boot_reason=%d, g_boot_mode=%d\n", g_gn_screenon_time, g_call_state, get_boot_reason(),get_boot_mode());
+
+		
+			c.g_gn_screenon_time 判断亮屏时间，这个是通过led亮的时间，因为守护进程10s一次，检测led是否亮的，如果亮+10s
+
+			但是这个好像有问题
+			./drivers/misc/mediatek/include/mt-plat/battery_common.h:329:extern unsigned int g_gn_screenon_time;
+			./drivers/power/mediatek/switch_charging.c:142:	battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
+			./drivers/power/mediatek/switch_charging.c:144:	if (((g_gn_screenon_time <= 30) && (g_call_state == CALL_IDLE)) || (is_enter_mmi_test == KAL_TRUE) || (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT || get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT))
+			./drivers/power/mediatek/battery_common_fg_20.c:315:unsigned int g_gn_screenon_time = 0;
+			./drivers/power/mediatek/battery_common_fg_20.c:2245:		g_gn_screenon_time = g_gn_screenon_time + 10;
+			./drivers/power/mediatek/battery_common_fg_20.c:2247:		g_gn_screenon_time = 0;
+			./drivers/power/mediatek/battery_common_fg_20.c:2248:	battery_log(BAT_LOG_CRTI,"g_gn_screenon_time=(%d), g_call_state=%d, g_boot_reason=%d, g_boot_mode=%d\n", g_gn_screenon_time, g_call_state, get_boot_reason(),get_boot_mode());
+
+
+			./drivers/misc/mediatek/leds/mt6735/leds.c:120:unsigned int mt_get_bl_brightness(void)
+			./drivers/misc/mediatek/leds/mt6735/leds_hal.h:10:extern unsigned int mt_get_bl_brightness(void);
+			./drivers/misc/mediatek/leds/leds_drv.c:511:			bl_brightness = mt_get_bl_brightness();
+			./drivers/power/mediatek/battery_common_fg_20.c:316:extern unsigned int mt_get_bl_brightness(void);
+			./drivers/power/mediatek/battery_common_fg_20.c:2244:	if(mt_get_bl_brightness() != 0)
+
+
+			
+			d.gn_call_state 判断是否处于打电话的状态
+
+			/*****************************************************************************
+			*  CallState
+			****************************************************************************/
+			#define CALL_IDLE (0)
+			#define CALL_ACTIVE (1)
+			
+			./drivers/misc/mediatek/include/mt-plat/battery_common.h:316:extern kal_bool g_call_state;
+			./drivers/power/mediatek/switch_charging.c:142:	battery_log(BAT_LOG_CRTI, "[BATTERY] bat_charge_current_not_down, g_gn_screenon_time=%d, g_call_state=%d, is_enter_mmi_test=%d, g_boot_mode=%d !\n\r", g_gn_screenon_time, g_call_state, is_enter_mmi_test, get_boot_mode());    
+			./drivers/power/mediatek/switch_charging.c:144:	if (((g_gn_screenon_time <= 30) && (g_call_state == CALL_IDLE)) || (is_enter_mmi_test == KAL_TRUE) || (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT || get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT))
+			./drivers/power/mediatek/switch_charging.c:800:			if((BMT_status.temperature < 15) || ((g_call_state != CALL_IDLE) && (!is_enter_mmi_test)))
+			./drivers/power/mediatek/switch_charging.c:805:				battery_log(BAT_LOG_CRTI, "[BATTERY] temperature = %d, g_call_state = %d, is_enter_mmi_test = %d, g_temp_CC_value = %d\n", BMT_status.temperature, g_call_state, is_enter_mmi_test, g_temp_CC_value); 
+			./drivers/power/mediatek/switch_charging.c:1062:			if((BMT_status.temperature < 15) || ((g_call_state != CALL_IDLE) && (!is_enter_mmi_test)))
+			./drivers/power/mediatek/switch_charging.c:1067:				battery_log(BAT_LOG_CRTI, "[BATTERY] temperature = %d, g_call_state = %d, is_enter_mmi_test = %d, g_temp_CC_value = %d\n", BMT_status.temperature, g_call_state, is_enter_mmi_test, g_temp_CC_value); 
+			./drivers/power/mediatek/switch_charging.c:1327:	if (BMT_status.bat_vol < TALKING_RECHARGE_VOLTAGE || g_call_state == CALL_IDLE) {
+			./drivers/power/mediatek/linear_charging.c:1317:	    || g_call_state == CALL_IDLE) {
+
+			./drivers/power/mediatek/battery_common_fg_20.c:132:unsigned int g_call_state = CALL_IDLE;
+			./drivers/power/mediatek/battery_common_fg_20.c:1535:	battery_log(BAT_LOG_CRTI, "call state = %d\n", g_call_state);
+			./drivers/power/mediatek/battery_common_fg_20.c:1536:	return sprintf(buf, "%u\n", g_call_state);
+			./drivers/power/mediatek/battery_common_fg_20.c:1543:	if (kstrtouint(buf, 10, &g_call_state) == 0) {
+			./drivers/power/mediatek/battery_common_fg_20.c:1544:		battery_log(BAT_LOG_CRTI, "call state = %d\n", g_call_state);
+			./drivers/power/mediatek/battery_common_fg_20.c:2248:	battery_log(BAT_LOG_CRTI,"g_gn_screenon_time=(%d), g_call_state=%d, g_boot_reason=%d, g_boot_mode=%d\n", g_gn_screenon_time, g_call_state, get_boot_reason(),get_boot_mode());
+			./drivers/power/mediatek/battery_common_fg_20.c:2366:	if ((g_call_state == CALL_ACTIVE) && (BMT_status.bat_vol > V_CC2TOPOFF_THRES))
+			./drivers/power/mediatek/battery_common_fg_20.c:4215:	if (g_call_state == CALL_ACTIVE
+	}
+
+
+}
+
+
+
+
+
+
+
 /************************************************************************************************************/
-	9.17G10A主板显示电池温度50~55，温度过高导致的停止充电问题
-    {
-        NTC faild
-        
-        在mtk_charger.c  charger_check_status会检查充电的状态
-        发现电池的温度为50度超过了最大的充电温度，启动保护措施，然后就停止充电了
-        (但是这里电池温度没有50度，检测可能有问题，先提高充电的最大温度)
-        这个值在dts文件里获取的
+9.17G10A主板显示电池温度50~55，温度过高导致的停止充电问题
+{
+	NTC faild
+	
+	在mtk_charger.c  charger_check_status会检查充电的状态
+	发现电池的温度为50度超过了最大的充电温度，启动保护措施，然后就停止充电了
+	(但是这里电池温度没有50度，检测可能有问题，先提高充电的最大温度)
+	这个值在dts文件里获取的
 
-        /*debug*/
-        {
-            过温保护门限设为55
 
-            mt6757.dts
-            //Gionee <gn_by_charging> <lilubao> <20170621> add fixed over temperature begin
-		    max_charge_temperature = <55 >;			// 50 -> 55
-		    //Gionee <gn_by_charging> <lilubao> <20170621> add fixed over temperature end
+	modify code
+	{
+		(mt6757.dtsi) 这里应该注意的是最高温，最低温的控制，温度变化要有一定的缓冲区，不然变化会很频繁
+		要记录一个之前的状态变量和当前的状态变量
+		/* Battery Temperature Protection */
+        mtk_temperature_recharge_support = <1 >;
+        //Gionee <gn_by_charging> <lilubao> <20170621> add fixed #87763 begin
+        max_charge_temperature = <55 >;            // 50->55
+        //Gionee <gn_by_charging> <lilubao> <20170621> add fixed #87763 end
+        max_charge_temperature_minus_x_degree = <47 >;
+        min_charge_temperature = <0 >;
+        min_charge_temperature_plus_x_degree = <6 >;
+        err_charge_temperature = <0xff >;
 
+		(mtk_charger.c）
+		if (thermal->enable_min_charge_temperature) {
+            if (temperature < thermal->min_charge_temperature) {
+                pr_err("[BATTERY] Battery Under Temperature or NTC fail %d %d!!\n\r", temperature,
+                    thermal->min_charge_temperature);
+                thermal->sm = BAT_TEMP_LOW;
+                charging = false;
+                goto stop_charging;
+            } else if (thermal->sm == BAT_TEMP_LOW) {
+                if (temperature >= thermal->min_charge_temperature_plus_x_degree) {
+                    pr_err("[BATTERY] Battery Temperature raise from %d to %d(%d), allow charging!!\n\r",
+                            thermal->min_charge_temperature,
+                            temperature,
+                            thermal->min_charge_temperature_plus_x_degree);
+                    thermal->sm = BAT_TEMP_NORMAL;
+                } else {
+                    charging = false;
+                    goto stop_charging;
+                }
+            }
         }
-    }
 
+
+        if (temperature >= thermal->max_charge_temperature) {
+            pr_err("[BATTERY] Battery over Temperature or NTC fail %d %d!!\n\r", temperature,
+                thermal->max_charge_temperature);
+            thermal->sm = BAT_TEMP_HIGH;
+            charging = false;
+            goto stop_charging;
+        } else if (thermal->sm == BAT_TEMP_HIGH) {
+            if (temperature < thermal->max_charge_temperature_minus_x_degree) {
+                pr_err("[BATTERY] Battery Temperature raise from %d to %d(%d), allow charging!!\n\r",
+                        thermal->max_charge_temperature,
+                        temperature,
+                        thermal->max_charge_temperature_minus_x_degree);
+                thermal->sm = BAT_TEMP_NORMAL;
+            } else {
+                charging = false;
+                goto stop_charging;
+            }
+        }
+	}
 }
 
 
@@ -1638,9 +2003,8 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 
-
 /************************************************************************************************************/
-9.17G10A mmi测试读取的数据有问题
+10.17G10A mmi测试读取的数据有问题
 {
 	mmi测试读取的节点在（这几个接口有问题？）
 	sys/class/power_supply/battery/
@@ -1751,7 +2115,9 @@ static void *update_vibrator_thread_default(void *priv)
 				
 		}
 
-		/*修改*/
+
+
+		modify code
 		{
 			1.往power_supply的属性里面提供新的属性
 			power_supply_property -> POWER_SUPPLY_PROP_BatteryPresentCurrent, 
@@ -1831,8 +2197,18 @@ static void *update_vibrator_thread_default(void *priv)
 
 		}    
 	}
-
 }   
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*****************************************************************************************/
@@ -1895,7 +2271,6 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 	
-	
 	MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION 这个宏是干什么的，包含哪些代码
 	
 	关闭电池是否存在才能开关机的限制,打开这个宏直接跳出检查
@@ -1914,20 +2289,19 @@ static void *update_vibrator_thread_default(void *priv)
 	}
 
 
-	还有两处
+	还有两处，这是pmic寄存器上电池存在与否的判断，判断还是要有的，但是不关机
 	mt_battery_6355.c  check_bat_protect_status
 	/*pmic_set_register_value(PMIC_BATON_TDET_EN, 1);*/
 	pmic_set_register_value(PMIC_RG_BATON_EN, 1);
 	
 	//Gionee <GN_BSP_CHG> <lilubao> <20170830> modify for platform change begin
 	dprintf(CRITICAL, "[BATTERY] No battry plug-in.but don't power off\n");
-	#if 0	
+		
 	if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
 		dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
-		mt6575_power_off();
+		//mt6575_power_off();
 		break;
 	}
-	#endif
 	//Gionee <GN_BSP_CHG> <lilubao> <20170830> modify for platform change end
 
 
@@ -1937,29 +2311,44 @@ static void *update_vibrator_thread_default(void *priv)
 		pmic_set_register_value(PMIC_RG_BATON_EN, 1);
 		//Gionee <GN_BSP_CHG> <lilubao> <20170830> modify for platform change begin
 		dprintf(CRITICAL, "[BATTERY] No battry plug-in.but don't power off\n");
-		#if 0
+
 		if (pmic_get_register_value(PMIC_RGS_BATON_UNDET) == 1) {
 			dprintf(CRITICAL, "[BATTERY] No battry plug-in. Power Off.");
-			mt6575_power_off();
+			//mt6575_power_off();
 		}
-		#endif
 		//Gionee <GN_BSP_CHG> <lilubao> <20170826> modify for platform change end
 	}
 
-
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 /***********************************************************************************************/
 12.	usb眼图问题
 {
 	近端跟远端的测试要求不一样
-	
-	高通USB眼图 80-PB524-1 A
-	phy,override
-	
-	17G10A相关的宏,通过相关的宏找代码
+	近端的要求肯定高很多，远端的衰减多
+
+
+	MTK case ID：ALPS03412756
+
+
+	17G10A相关代码
 	{
+	 这几个虽然是USB3.0的控制宏但是默认是USB2.0
+	 kernel-4.4/drivers/misc/mediatek/mu3d/Kconfig文件中，如果 USB_MU3D_DEFAULT_U2_MODE设为y，
+	 表示当前使用的是USB2.0,。敝司平台code默认是关闭USB3.0的，请知悉，感谢！	
+
 		CONFIG_USB_MU3D_DRV=y
 		CONFIG_MU3_PHY=y
 		CONFIG_U3_PHY_AHB_SUPPORT=y
@@ -1974,18 +2363,15 @@ static void *update_vibrator_thread_default(void *priv)
 
 		kernel-4.4/drivers/misc/mediatek/mu3d/
 		kernel-4.4/drivers/misc/mediatek/mu3phy/
-	
-		hal,drv,phy
 	}
 	
-	17G10A的USB体系架构
+
+	modify code
 	{
 		这两个对应的寄存器和操作的函数
 		USB_DP_P0		D31
 		USB_DM_P0		D32
 	
-		MTK case ID：ALPS03412756 
-
 		这边是从USB转uart这个功能开始的
 		1.
 		/kernel-4.4/drivers/misc/mediatek/mu3phy/mt6757/Makefile
@@ -2022,7 +2408,797 @@ static void *update_vibrator_thread_default(void *priv)
 
 
 
-/*涉及到的一些文件*/
+
+
+
+
+
+/********************************************************************************************************************/
+13.几种场景下充电温度偏高 -> mtk thermal manager
+{
+	1.确定thermal是否起作用了，thermal管了那些地方
+		因为thermal.mtc 位于device目录而且有好几个地方都有相关的文件
+	  	所以限确定项目编译用的是哪个？
+
+		先搜AndroidProducts.mk：定义一个变量——>PRODUCT_MAKEFILES，该变量的值为产品版本定义文件名的列表  
+        产品版本定义文件：对特定产品版本的定义（可多个文件，多个版本）。一般情况下，我们不需要定义所有变量（版本相关），，Build系统已经预先定义了一些组合，
+		位于build/target/product，该目录下每个文件都定义了一个组合，我们只需要继承这些预置的定义，然后再覆盖自己想要的变量定义即可
+        BroadConfig.mk：该文件用来配置硬件主板，它定义的都是设备底层的硬件特性，如设备的主板相关信息，wifi，bootloader，内核等
+
+		最后确定thermal 用的gionee_bj这个目录，之前一直以为是mediatek mt6757目录下面
+		而且编译要全编
+
+
+		这是编译之后生成的项目脚本
+		device/gionee_bj/gnbj6757_66_n/ProjectConfig.mk
+
+
+     2.相关参数什么意思，怎么改？
+	 首先跟电流相关的很重要的两个概念abcct，bcct，根据以上两个设定chrlimt
+	 {
+		bcct:battery charging current throtting
+		这个是在触发温度条件后就设定充电电流
+		abcct:adaptive battery charging current throtting
+		这个是在设定的目标温度的时候在最高和最低温度范围内动态调节电流
+		
+	 }
+
+	abcct_lcmoff 是在lcm off的时候启动的，如果灭屏的情况下温度过高设定的策略 
+	 * sscanf format <klog_on> <mtk-cl-bcct00 limit> <mtk-cl-bcct01 limit> ...
+	 * <klog_on> can only be 0 or 1
+	 * <mtk-cl-bcct00 limit> can only be positive integer or -1 to denote no limit
+
+
+    相关参数的意思
+	{	
+		前面的1是打开thermal debug log的
+		echo 1 1200 1000 800 > /proc/driver/thermal/clbcct
+
+		config文件的相关参数
+
+		/proc/driver/thermal/clabcct
+		40000 1000 200000 5 2000 500 0 3000 0 1 5000 2000
+
+
+		当前abcct的配置
+		abcct
+
+			abcct_cur_bat_chr_curr_limit 3000
+			abcct_cur_chr_input_curr_limit -1
+			abcct_pep30_cur_input_curr_limit 5000
+		
+			abcct_target_temp 44000
+			abcct_kp 1000
+			abcct_ki 200000
+			abcct_kd 5
+			abcct_max_bat_chr_curr_limit 3000
+			abcct_min_bat_chr_curr_limit 0
+			abcct_input_current_limit_on 0
+			abcct_HW_thermal_solution 3000
+			abcct_min_chr_input_curr_limit 0
+			abcct_times_of_ts_polling_interval 1
+			abcct_pep30_max_input_curr_limit 5000
+			abcct_pep30_min_input_curr_limit 2000
+		
+		
+		tzbts	这个是默认的参数，修改了几个策略  20170826 
+		/proc/driver/thermal/tzbts
+		6 100000 0 mtktsAP-sysrst 90000 0 mtk-cl-shutdown00 62000 0 mtk-cl-cam00 50000 0 abcct_lcmoff 44000 0 mtk-cl-adp-fps 42000 0 abcct 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000	
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*******************************************************************************************************************************/
+14.	电量显示不正确  -> 要熟悉电池相关参数的上报过程
+{
+	PowerManagerService -> BatteryService -> BatteryProperties.java
+	->BatteryProperties.cpp 
+
+	framework/base/services/core/java/com/android/server/power/PowerManagerService.java
+	
+	上报电池相关数据
+	private void updateIsPoweredLocked(int dirty) 
+	
+	获取电池电量
+	mBatteryLevel = mBatteryManagerInternal.getBatteryLevel();
+	
+	
+	frameworks/base/services/core/java/com/android/server/BatteryService.java
+	
+	public int getBatteryLevel() {
+	synchronized (mLock) {
+		return mBatteryProps.batteryLevel;
+	}
+
+
+	这两个文件对应的properties不对应，java多读了一个fastcharging属性
+	frameworks/base/core/java/android/os/BatteryProperties.java
+
+	./native/services/batteryservice/BatteryProperties.cpp
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************************************************************************************************************************/
+15.过压测试：NG，10V时电压不不截止，还有380ma~440ma，无电压过高提醒
+{
+	1.大致过程是先开log，然后将充电电压缓慢拧到7V～10V 然后拧到有过压提示的时候，然后分析log
+
+
+	2.过压的时候要停止充电，还要上报状态显示过压
+	{
+		软件要设定检测到充电电压大于6.5v字左右要停止充电
+	
+		rt5081那几个关于ovp的中断和中断函数是否被调用
+		打印出那几个寄存器的值
+		
+		CHG_VIN:16.5v		VBUS:14.5v
+
+		uvp/ovp
+		0x0e  bit[7:4]   uvp ,bit[3:0]ovp
+		
+		rt5081_pmu_chg_vinovp_irq_handler
+		rt5081_pmu_chg_vbusov_irq_handler    CHARGER_DEV_NOTIFY_VBUS_OVP
+		
+		rt5081_pmu_ovpctrl_ovp_d_evt_irq_handler
+		rt5081_pmu_ovpctrl_ovp_evt_irq_handler
+		
+		0xc8  ovpctrl_irq
+	
+			
+	
+		UUG P37  0x1d 这个是断开充电同时断开power path功能
+
+		rt5081有ovp功能，但是没有接那个脚,这个是内接的，ovp设定的电压是14.5V，而且不能修改
+	}
+	
+	
+	3,最后在mtk_charger.c 里面有几个notify，高低温，过压的判断加log，发现是
+	数据位数不对应导致判断一直过不去，始终相差三个数量级
+	{
+		vchr = pmic_get_vbus();
+		if (vchr > info->data.max_charger_voltage) {
+			info->notify_code |= 0x0001;
+			pr_err("[BATTERY] charger_vol(%d) > %d mV\n",
+				vchr, info->data.max_charger_voltage);
+
+
+		6500000 
+			11789	
+		
+			6.500 000    
+		11.789v
+		
+		
+		4500000
+		13400000
+	}
+
+
+	4.	停止充电之后还有power path功能，充电器直接给系统供电，应该直接关闭这个功能
+	不进充电器也不进系统
+	CHG_EN 0x12 bit[0]
+	
+
+	5.modify code
+	{	
+		首先是两个变量的数量级不一样，导致判断一直进不去，然后一点是现在的pmic很多都有power path功能，
+		给电池充电同时也会给系统供电，所以关闭给电池充电的时候还要关闭power path
+
+		(mtk_charger.c)  mtk_battery_notify_VCharger_check
+		//Gionee <gn_by_charging> <lilubao> <20170712> add for debug ovp begin
+		// difference degree between vchr and charger_voltage
+		if (vchr*1000 > info->data.max_charger_voltage) {
+			info->notify_code |= 0x0001;
+			pr_err("[BATTERY] charger_vol(%d) > %d mV\n",
+				vchr*1000, info->data.max_charger_voltage);
+		} else {
+			info->notify_code &= ~(0x0001);
+		}
+		if (info->notify_code != 0x0000)
+			pr_err("[BATTERY] BATTERY_NOTIFY_CASE_0001_VCHARGER (%x)\n",
+				info->notify_code);
+		//Gionee <gn_by_charging> <lilubao> <20170712> add for debug ovp end
+
+		(mtk_charger.c) charger_check_status
+		//Gionee <gn_by_charging> <lilubao> <20170712> add for debug ovp begin
+		int vchr=0;
+		bool en=true;
+		struct charger_device *chg_dev;
+		
+		struct battery_thermal_protection_data *thermal;
+		
+		chg_dev = info->chg1_dev;
+		//Gionee <gn_by_charging> <lilubao> <20170712> add for debug ovp end
+
+			//Gionee <gn_by_charging> <lilubao> <20170712> add for debug ovp begin
+			vchr = pmic_get_vbus();
+			//pr_err("vchr->%d,info->data.max_charger_voltage->%d\n",vchr*1000,info->data.max_charger_voltage);
+			if(vchr*1000 > info->data.max_charger_voltage){
+
+				pr_err("vchr->%d,info->data.max_charger_voltage->%d\n",vchr*1000,info->data.max_charger_voltage);
+				charging = false;
+				en=false;
+				pr_err("charging->%d,en->%d\n",charging,en);
+				
+				goto stop_charging;
+			}else {
+				charging = true;
+				en=true;
+				pr_err("charging->%d,en->%d\n",charging,en);
+				goto stop_charging;
+			}
+			//Gionee <gn_by_charging> <lilubao> <20170712> add for debug ovp end
+
+		charger_dev_enable_powerpath(chg_dev, en);
+		mtk_battery_notify_check(info);
+
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************************************************************************************************************************/
+16.	修改需要插入sim卡才能激活USB
+{
+	#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb begin
+	GN_RO_GN_USB_SIMSECURITY_SUPPORT = no
+	#Gionee <gn_by_charging> <lilubao> <20170718> add for fixed trigger usb end
+
+	这个是额外加的判断，如果去掉这个宏就没有这个功能，后面应该是根据系统实时判断标志位去决定是否要这个功能而不是一开始就写死
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************************/
+17.【GMS-CTS Verifier测试】OTG相关测试应该屏蔽
+{
+	这个device.mk是干什么用的?
+	xml文件好像用的很多，有必要弄清楚,这个应该是读取相关的配置然后加载
+
+	cts对权限有要求，权限过高会有安全隐患
+
+	把gionee/code/driver/project_common/BJ17G10_DRV_COMMON/device/gionee_bj/gnbj6757_66_n/device.mk中的下面的permissions注释掉。
+
+	USB OTG
+	PRODUCT_COPY_FILES += frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************************/
+18.高低温关机问题
+{
+	首先明确高低温测试要求
+
+	1.高温高湿测试：
+	{
+		1.手机先关机放在温度57度的温箱里面，一小时左右，大概环境温度稳定在57度，
+		2.开机，将手机放在温箱里面待机2h，此时手机要不关机
+
+		
+		这中间有几个思考分析的方向
+		{
+			首先要确定的是关机的原因
+
+			1.手机整体温度跟电池温度差多少
+			a.主板温度多少 ,电池温度多少 ,cpu温度多少 -> b.是电池温度过高导致的关机，还调电引起的 ->c. 中间出现瞬时关机现象，但是有没有关机流程，
+			cpu温度多少， 是否主板或者电池有问题,
+			{	
+				a. 搜themral相关的关键字，T_AP主板,加点log
+				b. 搜fg_drv_update_hw_status ，确定当时时间点的电池温度，整机电流，之前确实有电池温度达到60度
+				c.对比测试，插假电确定电池是否有问题，ntc接地固定确定主板，飞行模式确定整机功耗
+			}
+
+
+			2.NTC是否准确
+			{
+				这个pmic读的值是准确的的，经过校准后，温度偏低了1度
+				(mtk_battery.c)
+				force_get_tbat_internal
+			}
+
+
+			3.手机整体功耗偏高
+			飞行模式测试过程中没有关机	
+
+
+			4.对于极端条件下的温升测试
+			{
+				关闭方法如下：
+				adb shell
+				thermal_manager vendor/etc/.tp/.ht120.mtc
+
+				可以使用下面的方法来check是否关闭成功
+				cat /data/.tp/.settings
+
+				Success: it shows "vendor/etc/.tp/.ht120.mtc"
+				Fail: it shows nothing	
+			}
+
+
+			5.mtk提供的方法
+			{	
+				1.有没有在高温场景抓下uart log看？
+				高温条件下，mtklog可能录不到抓不到相关的log
+
+				2.掉电的过程中帮忙量一下vcore 26m vio18的电压，看一下掉电时序
+				vcore是buck电路
+				26m是给始终供电的
+				vio18是给pmic给 射频收发器供电的	
+			}
+	
+		}
+
+
+		这个在测试的时候没有关机，但是亮屏看温度的时候手机关机，电池温度达到了60度，操作手机一会手机瞬间关机也没有关机流程
+		但事实上手机确实是触发电池60度关机的条件的
+		
+		[  563.736795] <3>.(3)[1293:system_server][name:mtk_ts_battery&][Thermal/TZ/BATTERY][mtktsbattery_get_hw_temp] counter=1, first_time =0
+
+		[  563.736802] <3>.(3)[1293:system_server][name:mtk_ts_battery&][Thermal/TZ/BATTERY][mtktsbattery_get_hw_temp] T_Battery, 60000
+
+		[  563.736853] <3>.(3)[1293:system_server][name:mtk_ts_battery&]Power/battery_Thermal: reset, reset, reset!!!
+
+
+		这个问题确定是电池跟主板的连接接触多，导致主板很多热传递到电池上导致电池过热，所以第一点很接近，手机整体的温度跟电池的温度
+		因为以前是电池跟主板相差2度，但是这次有四五度
+
+		最后要修改电池连接器跟NTC电阻的位置
+	}
+
+	
+
+
+	
+	2.低温关机：
+	{
+		1.手机放在温箱内，温度设置为-20,放置12h后，开机放12h，中间操作手机不能关机
+		现在是飞行模式没有关机，插卡没有关机，不插卡却关机
+
+		2.结论
+		这其中是待机过程中的系统不稳定，低温环境下，电池活性低容量小，电阻大，如果电流很大，电池电压很容易被拉的很低
+		从log上看虽然关机原因是低电量，但是开机过后电池电压恢复到4.1V，如果是消耗的电池电压开机后应该也很低，关机的前前突然出现亮屏
+		系统可能被唤醒，电流有500mA左右，持续时间20s+，电池电压被拉低
+
+		所以最好能确定唤醒的原因，电池也需要改版，
+		至于唤醒主要的区别在与插卡，不插卡，这个跟modem应该有关
+	}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************************/
+19.	fuel gauge3.0相关
+{
+	电池曲线的导入		7.27
+	{
+	
+		涉及到哪些文件,哪些细节
+		{
+			mtk_battery_table.h  ，mtk_battery_property.h
+			mt6757_battery_prop_ext.dtsi,mt6757_battery_table_ext.dtsi
+		
+			GM3.0的客制化步骤
+			{
+				1.测量car_tune_value 系数
+			
+				2.利用GMAT_TOOL导出 
+				-> battery_prop_ext.dtsi
+			
+				-> ZCV table，battery_table_ext.dtsi
+			
+				3.工厂模式下利用 ATE_tool校准参数Rfg ，meta模式下修改NVRAM中存储的car_tune_value
+				这种应该是单独修正每一台机器的car_tune_value的值，因为这个值不同机器可能不一样
+			}
+		}
+	
+	
+
+		电量计相关的debug
+		{
+			具体放充电库伦值大小
+			[FGADC_intr_end][FG_INTR_IAVG]
+			read_fg_hw_info
+		
+		
+			打开电量计相关的log
+			adb shell setprop persist.mediatek.fg.log.enable 1
+		
+			手动提高fg log等级
+			adb shell
+			echo 8 > /sys/bus/platform/devices/battery/FG_daemon_log_level
+		
+			Gauge Low power mode 关闭方法
+			adb shell
+		
+			echo 3000 > /sys/devices/platform/mt-pmic/pmic_access
+		
+			cat /sys/devices/platform/mt-pmic/pmic_access
+		
+			看看出來的值是多少		regiser-> FGADC_CON  (low dropout regulator P47)
+			假設出來的值是 2319
+			用2進位查看這個値, 我們要更改bit 8 的值 (FG_SON_SLP_EN)  , 將其從 1 改成 0 (從 enable 改為disable)
+		
+			將更改後的新值(2219)透過adb command寫回register
+			echo 3000 2219 > /sys/devices/platform/mt-pmic/pmic_access
+		
+			再讀取一次值 double confirm是否讀取出來已經為新的值
+			echo 3000 > /sys/devices/platform/mt-pmic/pmic_access
+
+			cat /sys/devices/platform/mt-pmic/pmic_access    
+		}
+	
+	
+		电量计相关参数的测量以及意思
+		{
+			car_tune_value	
+			1、 先帮忙连接SP_META Tool确认下这台机器的NVRAM里面的CAR_TUNE_VALUE值的大小。
+
+			2、 通过外灌电流，然后确认下工模里读取到的电流是否有偏差。外灌电流的大小从1A->500mA->300mA-100mA>50mA->10mA往下调，
+
+			确认电流是否有偏差。前提得保证外灌电流大小的精准度。
+		
+			car_tune_value 100  ->   948mA		105
+		
+			CALIBRATE_CAR_TUNE_VALUE_BY_META_TOOL这个宏用于在工厂模式下利用ATE_TOOL校准Rfg参数
+			这个值跟板极的阻抗有关
+		
+			这个宏用于工厂校准value参数时打开，会把库仑计的系数写到一个全局变量里
+			#ifdef CALIBRATE_CAR_TUNE_VALUE_BY_META_TOOL
+			bm_notice("[fg_res] cali_car_tune = %d, default = %d, Use [cali_car_tune]\n",
+				cali_car_tune, fg_cust_data.car_tune_value);
+				fg_cust_data.car_tune_value = cali_car_tune;
+			#else
+				bm_notice("[fg_res] cali_car_tune = %d, default = %d, Use [default]\n",
+						cali_car_tune, fg_cust_data.car_tune_value);
+			#endif
+
+			1、#define DIFFERENCE_FULLOCV_ITH       400         /* mA */
+		
+			2、#define EMBEDDED_SEL 1
+
+			3、#define FG_METER_RESISTANCE    		75
+
+		}
+	}
+	
+	
+	开机充电(四个温度)，关机充电，放电等三种情况
+	{
+		
+		1.开机充电，在四个温度下测试充到满电
+		{
+			电量显示的差别很大,充电为什么底层电量还会减少
+			
+			充电过程中温度很高
+		}
+	
+	
+		2.现在关机充电遇到的情况：进电池的是2A，但是ibus上电流经常跳变，有时候3A，有时候有是1A
+		{
+			系统功耗很大，而且是间断性的跳变，这样会导致充进电池的电流很小
+			系统功耗很大可能是开机关机都有的问题，先要确定是软件还是硬件的问题
+		
+			也可能是充电器或者aicl检测(可能有偏差)到的能力很大，设定值很高，最后设定电流达到3A的时候，然后又被拉下来了
+		
+			aicl检测的是后设定一个上限，如果超过这个值就设为指定值，防止充电电流过高
+		
+			这个充电电流跳变的问题，开机关机充电都存在，什么把电流拉下来了，充电的时候底层跟上层电量显示的差异，开机电压，关机电压的问题
+		}	
+		
+		
+		3.放电时序，放电是否正常
+		{
+			建议做下放电曲线的量测，如附件是参考案例的模板。
+
+			1、 放电曲线的量测的场景：
+			一、温度25度：重载（可以重载游戏，控制电流输出为1A左右）、轻载（可以播放MP3，控制电流输出为400mA左右）
+
+			二、温度0度：重载（可以重载游戏，控制电流输出为1A左右）、轻载（可以播放MP3，控制电流输出为400mA左右）
+
+			2、 先充电充到满，即battery报Full后开始放电，用ttermpro串口工具（此工具记录时间）抓取Uart Log，直到手机关机。
+
+			3、 重点关注UI_SOC放电曲线的平滑度，及最后放电几percent（5%～1%）的在每percent keep住的时间，会不会出现类似在2%时突然Drop关机的状况。若有，则需要调整参数。
+		}
+	}
+	
+	
+	GM3.0相关的patch
+	{
+		ALPS03420707：
+		修复待机是电量计计算可能出现的异常
+	
+		ALPS03420700：
+		UI快速掉电问题，从100%迅速掉到0%
+		
+		ALPS03158638
+		ALPS03248687
+		ALPS03252445？
+		ALPS03253502
+		ALPS03258450？
+		ALPS03245474
+		ALPS03250083？
+		ALPS03287248
+		ALPS03285277
+		
+		
+		Dear customer, ALPS03434294(For_gnbj6757_66_n_alps-mp-n0.mp5-V1_P3).tar.gz released. (Download ID: REQ30000429871)
+		
+		fuelgauge 3.0的问题,文档+邮件
+		{
+			pacth申请 已申请
+			ALPS03411143 
+			Fix gauge coulomb value may abnormal in some mode / 修復待機時電量計算可能異常issue 
+
+			ALPS03158638   
+			L3500-Charger】voltage mode在低温下的修正
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+/*******************************************************************************************************************************/
+20.	底电流偏高 -> 这个主要是MTK电流的分析思路        未完成  20170924
+{
+	这里主要是android系统的睡眠唤醒机制，然后为了便于分析功耗问题
+	
+	一下是几个功耗底电流调试相关文档
+	80-p0897-1_a   
+	80-p0955-1sc_b 
+	高通bsp技术期刊 2014/11/28
+	
+
+	1.中断持锁EINT wakelock次数很多导致系统一直没有睡下去
+	lk里面sc卡配置有问题，导致频繁上报中断
+	
+	还有一个不同阶段的gpio配置
+	
+	
+	2.打印中断号，地址，wakeup.c
+	在有中断持锁的时候知道是哪些中断
+	
+	
+	3.系统的休眠，唤醒流程
+	{
+		"mem", "standby", "freeze" and "disk"
+	}
+	
+	
+	4.如何注掉一些驱动
+	
+	
+	5.系统进入suspend 还有一些低功耗模式，一些流程
+	
+	
+	5.分析思路
+
+	平均电流9mA，lcd有3mA，其他还有1mA
+	1mA这个还有待查
+	
+	
+	1.跟系统通知有关，即使飞行模式下，系统通知也会每隔一段时间会有唤醒ap检测一些信息如网络连接，想推送一些内容
+		这部分波形比较高持续时间比较长 40~60s
+		现在是每隔10min唤醒一次，去除之后电流从 11mA 降到9mA，而且稳定，电流没有跳变	
+		
+	2.短的异常波形跟中断有关，eint - 150，中断唤醒的持续时间较短5~10s 
+		初步分析跟串口同modem之间的通信有关
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]EINT_STA:  
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]: EINT Module - index:128,EINT_STA = 0x400000
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]: EINT 150 is pending
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]:  
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 F [  368.329961]-(0)[1436:system_server][name:mtk_spm_sleep&]: [SPM] dump ID_DUMP_MD_SLEEP_MODE
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server]: Resume caused by IRQ 27, SPM
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 D [  368.329961]-(0)[1436:system_server][name:mtk_wdt&]: mtk_wdt_mode_config  mode value=dd, tmp:220000dd,pid=1436
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 D [  368.329961]-(0)[1436:system_server][name:mtk_wdt&]: [WDT] resume(1)
+	01-01 08:06:14.378325 01-01 08:06:14.378324  1436  1436 E [  368.329983]-(0)[1436:system_server][name:ccci&]: [ccci1/mcd]ccci_modem_sysresume
+	01-01 08:06:14.379268 01-01 08:06:14.379267  1436  1436 E [  368.330926]-(0)[1436:system_server][name:ccci&]: [ccci1/mcd]Resume no need reset cldma for md_state=1
+	01-01 08:06:14.380476 01-01 08:06:14.380475  1436  1436 I [  368.332134]-(0)[1436:system_server][name:atf_log&]atf_time_sync: resume sync
+	01-01 08:06:14.381082 01-01 08:06:14.381081  1436  1436 E [  368.332740]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) cluster0: opp = 4 (0 - 11), freq = 1508000, volt = 0x56
+	01-01 08:06:14.382604 01-01 08:06:14.382603  1436  1436 E [  368.334262]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) cluster1: opp = 15 (0 - 9), freq = 494000, volt = 0x56
+	01-01 08:06:14.384157 01-01 08:06:14.384156  1436  1436 E [  368.335815]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) [00000001] cluster0 on, pause = 0x9, swctrl = 0x20f4 (0x56bb)
+	01-01 08:06:14.386208 01-01 08:06:14.386207  1436  1436 I [  368.337866].(0)[1436:system_server][name:cpu&]: Enabling non-boot CPUs ...
+	01-01 08:06:14.388081 01-01 08:06:14.388080     0     0 I [  368.339739]-(1)[0:swapper/1][name:cpuinfo&]: Detected VIPT I-cache on CPU1
+	01-01 08:06:14.388120 01-01 08:06:14.388119     0     0 I [  368.339778]-(1)[0:swapper/1][name:irq_gic_v3&]CPU1: found redistributor 1 region 0:0x000000000c220000
+	01-01 08:06:14.388249 01-01 08:06:14.388248     0     0 I [  368.339907]-(1)[0:swapper/1][name:smp&]CPU1: Booted secondary processor [410fd034]
+	01-01 08:06:14.389321 01-01 08:06:14.389320  1436  1436 I [  368.340979].(1)[1436:system_server][name:cpu&]: CPU1 is up
+	
+	3.lcd内屏+外屏 约有 3~4mA电流，这个导致整体的底电流在11mA+
+	
+	
+	1->
+	EINT wakelock	63		548		0		63		0		51272		2932		296780		0
+	2->
+	EINT wakelock	90		584		13		89		71		65361		2932		445681		0
+
+
+	01-01 08:06:14.636166 01-01 08:06:39.186808   228   228 E [  368.587824].(2)[228:kworker/u16:5][name:msdc&]: [msdc]msdc1, some of device s pin, dat1~3 are stuck in low!
+	01-01 08:06:14.637566 01-01 08:06:39.188208   228   228 E [  368.589224].(2)[228:kworker/u16:5][name:msdc&]: [msdc]msdc_ops_switch_volt msdc1 set voltage to 3.3V.
+
+	msdc_check_dat_1to3_high
+	msdc_ops_switch_volt
+
+
+	wakeup_reason.c   
+	irq_mtk_eic.c
+
+	max_eint_num = <160>;
+
+	mt_eint_print_status
+
+
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]EINT_STA:  
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]: EINT Module - index:128,EINT_STA = 0x400000
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]: EINT 150 is pending
+
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server][name:irq_mtk_eic&]:  
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 F [  368.329961]-(0)[1436:system_server][name:mtk_spm_sleep&]: [SPM] dump ID_DUMP_MD_SLEEP_MODE
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 I [  368.329961]-(0)[1436:system_server]: Resume caused by IRQ 27, SPM
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 D [  368.329961]-(0)[1436:system_server][name:mtk_wdt&]: mtk_wdt_mode_config  mode value=dd, tmp:220000dd,pid=1436
+	01-01 08:06:14.378303 01-01 08:06:14.378302  1436  1436 D [  368.329961]-(0)[1436:system_server][name:mtk_wdt&]: [WDT] resume(1)
+	01-01 08:06:14.378325 01-01 08:06:14.378324  1436  1436 E [  368.329983]-(0)[1436:system_server][name:ccci&]: [ccci1/mcd]ccci_modem_sysresume
+
+	01-01 08:06:14.379268 01-01 08:06:14.379267  1436  1436 E [  368.330926]-(0)[1436:system_server][name:ccci&]: [ccci1/mcd]Resume no need reset cldma for md_state=1
+	01-01 08:06:14.380476 01-01 08:06:14.380475  1436  1436 I [  368.332134]-(0)[1436:system_server][name:atf_log&]atf_time_sync: resume sync
+
+	01-01 08:06:14.381082 01-01 08:06:14.381081  1436  1436 E [  368.332740]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) cluster0: opp = 4 (0 - 11), freq = 1508000, volt = 0x56
+	01-01 08:06:14.382604 01-01 08:06:14.382603  1436  1436 E [  368.334262]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) cluster1: opp = 15 (0 - 9), freq = 494000, volt = 0x56
+	01-01 08:06:14.384157 01-01 08:06:14.384156  1436  1436 E [  368.335815]-(0)[1436:system_server][name:mtk_cpufreq_hybrid&]: [CPUHVFS] (1) [00000001] cluster0 on, pause = 0x9, swctrl = 0x20f4 (0x56bb)
+	01-01 08:06:14.386208 01-01 08:06:14.386207  1436  1436 I [  368.337866].(0)[1436:system_server][name:cpu&]: Enabling non-boot CPUs ...
+	01-01 08:06:14.388081 01-01 08:06:14.388080     0     0 I [  368.339739]-(1)[0:swapper/1][name:cpuinfo&]: Detected VIPT I-cache on CPU1
+	01-01 08:06:14.388120 01-01 08:06:14.388119     0     0 I [  368.339778]-(1)[0:swapper/1][name:irq_gic_v3&]CPU1: found redistributor 1 region 0:0x000000000c220000
+	01-01 08:06:14.388249 01-01 08:06:14.388248     0     0 I [  368.339907]-(1)[0:swapper/1][name:smp&]CPU1: Booted secondary processor [410fd034]
+	01-01 08:06:14.389321 01-01 08:06:14.389320  1436  1436 I [  368.340979].(1)[1436:system_server][name:cpu&]: CPU1 is up
+
+	01-01 08:06:14.393848 01-01 08:06:14.393847  1436  1436 I [  368.345506].(1)[1436:system_server][name:main&]PM: noirq resume of devices complete after 3.684 msecs
+
+
+
+	01-01 08:06:21.488047 01-01 08:06:46.038689  1436  1436 I [  375.439705].(0)[1436:system_server][name:wakeup&]PM: Wakeup pending, aborting suspend
+
+	01-01 08:06:21.489259 01-01 08:06:46.039901  1436  1436 I [  375.440917].(0)[1436:system_server][name:wakeup&]: last active wakeup source: EINT wakelock
+
+	01-01 08:06:21.490324 01-01 08:06:46.040966  1436  1436 W [  375.441982].(0)[1436:system_server][name:process&]:  
+	01-01 08:06:21.490956 01-01 08:06:46.041598  1436  1436 E [  375.442614].(0)[1436:system_server][name:process&]: Freezing of tasks aborted after 0.011 seconds[name:process&]
+	01-01 08:06:21.491954 01-01 08:06:46.042596  1436  1436 I [  375.443612].(0)[1436:system_server][name:process&]: Restarting tasks ... [name:process&]done.
+	01-01 08:06:21.508172 01-01 08:06:46.058814  1436  1436 I [  375.459830].(1)[1436:system_server][name:pmic_auxadc&]: [mt6355_get_auxadc_value] ch = 5, reg_val = 0x630, adc_result = 696
+	01-01 08:06:21.511222 01-01 08:06:46.061864  1436  1436 I [  375.462880].(0)[1436:system_server][name:pmic_auxadc&]: [mt6355_get_auxadc_value] ch = 2, reg_val = 0x369, adc_result = 767
+	01-01 08:06:21.512974 01-01 08:06:46.063616  1436  1436 E [  375.464632].(0)[1436:system_server][name:mtk_battery_hal&]: [fgauge_read_current] final current=691 (ratio=950)
+	01-01 08:06:21.514261 01-01 08:06:46.064903  1436  1436 E [  375.465919].(0)[1436:system_server][name:mtk_battery&]: [BattVoltToTemp] 768 24000 2800 1
+	01-01 08:06:21.515297 01-01 08:06:46.065939  1436  1436 E [  375.466955].(0)[1436:system_server][name:mtk_battery&]: [force_get_tbat] 767,768,0,69,100,27 r:50 100
+	01-01 08:06:21.516613 01-01 08:06:46.067255  1436  1436 D [  375.468271].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_block_write: reg 07 size 4
+	01-01 08:06:21.518169 01-01 08:06:46.068811  1436  1436 I [  375.469827].(0)[1436:system_server]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
+	01-01 08:06:21.519456 01-01 08:06:46.070098  1436  1436 D [  375.471114].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 21 data c0
+	01-01 08:06:21.520657 01-01 08:06:46.071299  1436  1436 D [  375.472315].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask f0
+	01-01 08:06:21.521933 01-01 08:06:46.072575  1436  1436 D [  375.473591].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 21 data 01
+	01-01 08:06:21.523070 01-01 08:06:46.073712  1436  1436 D [  375.474728].(0)[1436:system_server]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask 01
+	01-01 08:06:21.539516 01-01 08:06:46.090158   235   235 I [  375.491174].(0)[235:hps_main]MobiCore mcd: Cpu 1 is going to die
+	01-01 08:06:21.542572 01-01 08:06:46.093214   235   235 I [  375.494230].(0)[235:hps_main][name:smp&]CPU1: shutdown
+	01-01 08:06:21.543753 01-01 08:06:46.094395   235   235 I [  375.495411].(0)[235:hps_main][name:psci&]psci: CPU1 killed.
+	01-01 08:06:21.546277 01-01 08:06:46.096919   235   235 I [  375.497935].(0)[235:hps_main]MobiCore mcd: Cpu 1 is dead
+
+	
+	sd卡模块去除
+	cust_mt6757_msdc.dtsi
+	&mmc1 {
+		clk_src = /bits/ 8 <MSDC30_CLKSRC_200MHZ>;
+		bus-width = <4>;
+		max-frequency = <200000000>;
+		msdc-sys-suspend;
+		cap-sd-highspeed;
+		sd-uhs-sdr12;
+		sd-uhs-sdr25;
+		sd-uhs-sdr50;
+		sd-uhs-sdr104;
+		sd-uhs-ddr50;
+		pinctl = <&mmc1_pins_default>;
+		pinctl_sdr104 = <&mmc1_pins_sdr104>;
+		pinctl_sdr50 = <&mmc1_pins_sdr50>;
+		pinctl_ddr50 = <&mmc1_pins_ddr50>;
+		register_setting = <&mmc1_register_setting_default>;
+		host_function = /bits/ 8 <MSDC_SD>;
+		cd_level = /bits/ 8 <MSDC_CD_LOW>;
+		cd-gpios = <&pio 30 0>;
+		status = "okay";
+		vmmc-supply = <&mt_pmic_vmch_ldo_reg>;
+		vqmmc-supply = <&mt_pmic_vmc_ldo_reg>;
+	};
+
+
+	其中的
+	status = "okay";
+	修改为：
+	status = "disabled";
+	}
+	
+	这个直接这样改是有问题的
+}
+
+
+
+
+
+
+
+
+
+/*相关的文件*/
 {
 dtsi文件(这个目录下很多文件都用到了):
 	kernel-4.4/archarm64/boot/dts/mediatek/mt6757.dtsi  ，rt5081.dtsi  , mt6355.dtsi
@@ -2064,7 +3240,7 @@ keyboard 的目录
 温升相关源码的目录
 17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/drivers/misc/mediatek/thermal
 配置文件(这个目录下有很多初始化的东西)
-17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/device/mediatek/mt6757
+17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/device/gionee_bj/
 
 
 编译相关的脚本工具
@@ -2074,6 +3250,13 @@ keyboard 的目录
 	mtk_battery_property.h	
 	mt6757_battery_table_ext.dtsi
 	mt6757_battery_prop_ext.dtsi
+
+
+performance相关的代码目录
+kernel-4.4/drivers/misc/mediatek/base/power
+vendor/mediatek/proprietary/hardware/perfservice/mt6757/app_list/perfservapplist.txt
+
+		
 }
 
 
@@ -2084,27 +3267,6 @@ keyboard 的目录
 
 
 
-/*充电测试数据*/
-{
-	#开机充电时序
-	20170807
-
-
-
-
-
-
-	#关机充电时序
-
-
-
-
-
-
-	#放电时序
-
-
-}
 
 
 

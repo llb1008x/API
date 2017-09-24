@@ -43,6 +43,7 @@ linux内核：
 
 
 
+
 battery：
 
 	android 4.4 电池电量管理底层分析(C\C++层) 

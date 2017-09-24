@@ -3,11 +3,13 @@
  *如果要修改代码：参照下面的方式
  */
 
+
 1.添加的调试代码,调试的等级需要根据情况调整
 
 //GioneeDrv LiLuBao 20161009 modify for platform change begin
 battery_log(BAT_LOG_FULL, "wait event 1\n");
 //GioneeDrv LiLuBao 20161009 modify for platform change end
+
 
 
 自己添加的宏

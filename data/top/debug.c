@@ -1,10 +1,4 @@
 
-
-
-
-
-
-	
 GNSPR#94168,100297
 {
 	94168
@@ -163,8 +157,6 @@ GNSPR#94168,100297
 	
 	
 	
-	
-	
 	pt_trigger -> pt_low_vol_callback -> flashlight_pt_store -> register_low_battery_notify(&pt_low_vol_callback, LOW_BATTERY_PRIO_FLASHLIGHT);
 	
 	 
@@ -172,8 +164,9 @@ GNSPR#94168,100297
 	
 
 
+	闪光灯有双闪，哪双闪？电流分别是多少？开启闪光灯的时间大概是多少？怎么修改低电保护延迟的判断时间？
 
-	现在需要实际测试开闪光灯拍照的时候，电流电压变化？
+	而低电量开启闪光灯，电流很大，rt5081要输出很大的功率，但是低电条件下输入能力不足，导致电池电压被拉的很低，
 
 	
 }	
@@ -183,283 +176,85 @@ GNSPR#94168,100297
 
 
 
-
-
-
-
-
-/*************************************************************************************************/
-
-高低温关机问题
-{
-	
-	ALPS03508073  低温  ALPS03505310  高温
-	{
-		有没有在高温场景抓下uart log看？
-		掉电或者关机 mtklog可能没有录到相关的log
-		
- 		掉电的过程中帮忙量一下vcore 26m vio18的电压，看一下掉电时序
- 		26m是时钟晶振给pmu，wifi/bt
- 		vio18 是pmic上的引脚
- 		vcore 
-	
-	
-	}
-	
-	
-	关机的几个判断逻辑
-	{
-		struct shutdown_condition {
-			bool is_overheat;
-			bool is_soc_zero_percent;
-			bool is_uisoc_one_percent;
-			bool is_under_shutdown_voltage;
-			bool is_dlpt_shutdown;
-		};
-		
-		
-		(mtk_power_mis.c ) power_misc_routine_thread 这个线程里面用于执行等待队列，和shutdown的回调函数shutdown_event_handler
-		
-		->shutdown_event_handler 回调函数里面对上面物种关机条件进行判断  -> set_shutdown_cond 这个是在(mtk_battery.c)由上层写相应的值传达指令
-		
-		这里还有一个shutdown_cond_flag 这个标志位是从节点传过来的，应该是是否执行关机条件的判断
-
-	}
-	
-	
-	
-	
-	
-	
-	低温关机
-	{
-		时间点 201709111700 ~ 201709120930		   
-		温度-20：
-		开机电压显示3.4v+，
-
-	}
-    
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-试产问题  20170912
-{
-	
-
-	3.充电时序问题
-	
-	
-	
-	
-	4.usb充电问题
-	{
-		产品定义用的是USB2.0但是软件定义的是USB3.0的
-		
-	
-	}
-	
-}
-
-
-
-
-
-
-
-/*********************************************************************************************************************************
-*
-*
-*********************************************************************************************************************************/
-
-
-
+/*********************************************************************************************************************************/
 17G06A
 {
-
-关机充电
-{
-	
-	Android Bootloader - UART_DM Initialized!!!
-	[0] welcome to lk
-
-	[10] platform_init()
-	[10] target_init()
-	
-	
-	[40] pm8x41_get_is_cold_boot: cold boot
-	[40] Qseecom Init Done in Appsbl
-	
-	
-	[90] Waiting for the RPM to populate smd channel table
-	
-	
-	高通关机充电
-	/* In case of fastboot reboot,adb reboot or if we see the power key
-	* pressed we do not want go into charger mode.
-	* fastboot reboot is warm boot with PON hard reset bit not set
-	* adb reboot is a cold boot with PON hard reset bit set
-	*/
-	
-	80-nm620-1_b_pmic_pon-reset_software_drivers_overview.pdf
-	
-	重启的类型：OTST3, KPD_PWR_N, PS_HOLD
-	
-	
-	dVdd_rb，xVdd_rb
-	
-	pon_resin_n_reset_s1_timer
-	
-	
-	
-Kernel command line: sched_enable_hmp=1 console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 
-androidboot.bootdevice=7824900.sdhci earlycon=msm_hsl_uart,0x78B0000 buildvariant=eng androidboot.emmc=true androidboot.verifiedbootstate=green androidboot.veritymode=enforcing 
-
-androidboot.keymaster=1 androidboot.serialno=665cd078
-
-androidboot.mode=charger androidboot.authorized_kernel=true androidboot.baseband=msm printk.disable_uart=9 mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_ft8006m_720p_video:1:none:cfg:single_dsi
-
-	这些参数在 （aboot.c）unsigned char *update_cmdline(const char * cmdline) , 获取cmdline
-	（init.c）target_pause_for_battery_charge获取关机状态插入充电器的动作还是fastboot，adb等pon	
-	init.c文件还有获取组合按键动作
-	
-	
-
-	Every reset happens in different stages and each stage timer is
-	configurable.
-
-	Stage 1 – For each of the triggers, an interrupt is sent to the MSM to warn it about the
-	shutdown. We can configure the amount of time (S1_Timer) the debounced trigger must
-	be held before a bark is sent to the MSM using this register:
-	PON_XXX_RESET_S1_TIMER.
-	Stage 2 – Once the interrupt is sent to the MSM, the PMIC waits for a reply for S2_TIMER
-	period before it performs the desired shutdown. We can configure the amount of time the
-	debounced trigger using this register: PON_XXX_RESET_S2_TIMER.
-	Stage 3 – This stage is independent of S1 and S2. If trigger is held for an extended period
-	of time (default 64 sec), a forced xVdd shutdown occurs. Which means it is an abrupt
-	power down and it does not follow a graceful shutdown procedure.
-
-	PAGE 20
-	This guarantees that there is a way out for unexpected hangups
-	Reset all PMIC registers	
-	
-	
-
-	log关键字
+	1.关机充电存在充电电流跳变问题
 	{
-		log_bat_status	 查找电量
-	}
+		
+		Android Bootloader - UART_DM Initialized!!!
+		[0] welcome to lk
 
+		[10] platform_init()
+		[10] target_init()
+		
+		
+		[40] pm8x41_get_is_cold_boot: cold boot
+		[40] Qseecom Init Done in Appsbl
+		
+		
+		[90] Waiting for the RPM to populate smd channel table
+		
+		
+		高通关机充电
+		/* In case of fastboot reboot,adb reboot or if we see the power key
+		* pressed we do not want go into charger mode.
+		* fastboot reboot is warm boot with PON hard reset bit not set
+		* adb reboot is a cold boot with PON hard reset bit set
+		*/
+		
+		80-nm620-1_b_pmic_pon-reset_software_drivers_overview.pdf
+		
+		重启的类型：OTST3, KPD_PWR_N, PS_HOLD
+		
+		
+		dVdd_rb，xVdd_rb
+		
+		pon_resin_n_reset_s1_timer
+		
+		
+		
+		Kernel command line: sched_enable_hmp=1 console=ttyHSL0,115200,n8 androidboot.console=ttyHSL0 androidboot.hardware=qcom msm_rtb.filter=0x237 ehci-hcd.park=3 lpm_levels.sleep_disabled=1 
+		androidboot.bootdevice=7824900.sdhci earlycon=msm_hsl_uart,0x78B0000 buildvariant=eng androidboot.emmc=true androidboot.verifiedbootstate=green androidboot.veritymode=enforcing 
 
-	
-	过压
-	{
-		 usbin_ov_handler 过压的回调函数
-		 
-		 
-			<6>[ 3224.196260] *(0)[306:irq/223-usbin-s]SMBCHG: src_detect_handler:  chip->usb_present = 0 usb_present = 1 src_detect = 1 hvdcp_3_det_ignore_uv=0
-			<6>[ 3224.196281] *(0)[306:irq/223-usbin-s]SMBCHG: handle_usb_insertion: chip->usb_present = 1 Enable USB ID pin 
-			<6>[ 3224.196352] *(0)[306:irq/223-usbin-s]SMBCHG: handle_usb_insertion: triggered
-			<6>[ 3224.196395] *(0)[306:irq/223-usbin-s]SMBCHG: handle_usb_insertion: inserted type = 4 (SDP)
-			<6>[ 3224.196407] *(0)[306:irq/223-usbin-s]SMBCHG: smbchg_change_usb_supply_type: Type 4: setting mA = 100
-			<6>[ 3224.196419] *(0)[306:irq/223-usbin-s]SMBCHG: smbchg_set_usb_current_max: USB current_ma = 100
-			<6>[ 3224.196612] *(0)[306:irq/223-usbin-s]SMBCHG: smbchg_set_usb_current_max: usb type = 4 current set to 150 mA
-			<6>[ 3224.196650] *(0)[306:irq/223-usbin-s]SMBCHG: get_parallel_psy: parallel charger not found
-			<6>[ 3224.196823] *(1)[309:irq/227-power-o]SMBCHG: power_ok_handler: triggered: 0x01
-			<6>[ 3224.196833] *(0)[306:irq/223-usbin-s]SMBCHG: handle_usb_insertion: setting usb psy present = 1
-	
-	}
+		androidboot.keymaster=1 androidboot.serialno=665cd078
 
+		androidboot.mode=charger androidboot.authorized_kernel=true androidboot.baseband=msm printk.disable_uart=9 mdss_mdp.panel=1:dsi:0:qcom,mdss_dsi_ft8006m_720p_video:1:none:cfg:single_dsi
 
+		这些参数在 （aboot.c）unsigned char *update_cmdline(const char * cmdline) , 获取cmdline
+		（init.c）target_pause_for_battery_charge获取关机状态插入充电器的动作还是fastboot，adb等pon	
+		init.c文件还有获取组合按键动作
+		
+		
+
+		Every reset happens in different stages and each stage timer is
+		configurable.
+
+		Stage 1 – For each of the triggers, an interrupt is sent to the MSM to warn it about the
+		shutdown. We can configure the amount of time (S1_Timer) the debounced trigger must
+		be held before a bark is sent to the MSM using this register:
+		PON_XXX_RESET_S1_TIMER.
+		Stage 2 – Once the interrupt is sent to the MSM, the PMIC waits for a reply for S2_TIMER
+		period before it performs the desired shutdown. We can configure the amount of time the
+		debounced trigger using this register: PON_XXX_RESET_S2_TIMER.
+		Stage 3 – This stage is independent of S1 and S2. If trigger is held for an extended period
+		of time (default 64 sec), a forced xVdd shutdown occurs. Which means it is an abrupt
+		power down and it does not follow a graceful shutdown procedure.
+
+		PAGE 20
+		This guarantees that there is a way out for unexpected hangups
+		Reset all PMIC registers	
+		
+		log关键字
+		{
+			log_bat_status	 查找电量
+		}
+
+ 	}
 
 }
 
 
-
-
-
-
-
-
-
-
-
-
-	温升debug
-	{
-		adb push msm_tsens_logging /data/
-		adb shell
-		chmod 777 /data/msm_tsens_logging
-		/data/msm_tsens_logging 500 10800000 &
-		参数解释： 500ms的间隔，10800000--10800s运行总时间（3个小时 能够复现了吧）;
-
-		测完后，取出数据：
-		adb pull /data/tsens_logger.csv
-		发给我；
-	}
-	
-	
-	
-	
-	
-}
 
 
 
