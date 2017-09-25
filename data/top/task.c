@@ -150,21 +150,21 @@
 17G06A
 {
 
-	温升debug
-	{
-		adb push msm_tsens_logging /data/
-		adb shell
-		chmod 777 /data/msm_tsens_logging
-		/data/msm_tsens_logging 500 10800000 &
-		参数解释： 500ms的间隔，10800000--10800s运行总时间（3个小时 能够复现了吧）;
 
-		测完后，取出数据：
-		adb pull /data/tsens_logger.csv
-		发给我；
-	}
-	
+
+
+
+
+
 
 }
+
+
+
+
+
+
+
 
 
 

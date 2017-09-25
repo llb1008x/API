@@ -431,6 +431,92 @@ kernel
 
 
 
+
+
+
+/**************************************************************************************************************************************************/
+/*相关的文件*/
+{
+	dtsi文件(这个目录下很多文件都用到了):
+		kernel-4.4/archarm64/boot/dts/mediatek/mt6757.dtsi  ，rt5081.dtsi  , mt6355.dtsi
+		
+	dws文件:
+		vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k57pv1_6mtee_pre/dct/dct/codegen.dws
+		vendor/mediatek/proprietary/bootable/bootloader/lk/target/k57pv1_6mtee_pre/dct/dct/codegen.dws
+		kernel-4.4/drivers/misc/mediatek/dws/mt6757/k57pv1_6mtee_pre.dws
+	
+	
+	电池参数相关的文件
+			mt6757.dtsi,rt5081.dtsi
+			mtk_charging.h ，mtk_charging_intf.h(快充)
+			mtk_battery_meter.h ,mtk_battery_meter_table.h
+			pmic_throttling_dlpt.c读电池客制化参数，mtk_battery_property.h
+	
+	
+			  mtk_charger.c跟mtk_charger_intf.h对应
+			mtk_battery.c跟mtk_battery.h对应 
+			
+	
+	GM3.0 定义的宏CONFIG_MTK_GAUGE_VERSION=30
+			./arch/arm64/configs/k57pv1_6mtee_pre_debug_defconfig:377:CONFIG_MTK_GAUGE_VERSION=30
+			./arch/arm64/configs/k57pv1_6mtee_pre_defconfig:361:CONFIG_MTK_GAUGE_VERSION=30
+			./arch/arm64/boot/dts/mediatek/mt6757.dtsi:1216:#if (CONFIG_MTK_GAUGE_VERSION == 30)
+	
+	rt5081的目录
+	17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/pmic/rt5081/
+		
+	
+	keyboard 的目录
+	17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/input/keyboard/mediatek/
+	
+	
+	马达的目录
+	17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/vibrator
+	
+	
+	温升相关源码的目录
+	17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/drivers/misc/mediatek/thermal
+	配置文件(这个目录下有很多初始化的东西)
+	17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/device/gionee_bj/
+	
+	
+	编译相关的脚本工具
+		android_mtk_6757_mp/gionee/config/tools
+	
+	电池曲线
+		mtk_battery_property.h	
+		mt6757_battery_table_ext.dtsi
+		mt6757_battery_prop_ext.dtsi
+	
+	
+	performance相关的代码目录
+	kernel-4.4/drivers/misc/mediatek/base/power
+	vendor/mediatek/proprietary/hardware/perfservice/mt6757/app_list/perfservapplist.txt
+		
+}
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*debug*/
 /*************************************************************************************************************************************/
 1.关闭软件关机重启
@@ -2803,7 +2889,7 @@ out:
 		这个问题确定是电池跟主板的连接接触多，导致主板很多热传递到电池上导致电池过热，所以第一点很接近，手机整体的温度跟电池的温度
 		因为以前是电池跟主板相差2度，但是这次有四五度
 
-		最后要修改电池连接器跟NTC电阻的位置
+		这个是因为电池连接器的正负极跟NTC靠的比较近，而NTC在电池保护板的上，在电池连接器的下面，所以亮屏大电流的时候靠的比较近，温度很容易升高
 	}
 
 	
@@ -3198,66 +3284,6 @@ out:
 
 
 
-/*相关的文件*/
-{
-dtsi文件(这个目录下很多文件都用到了):
-	kernel-4.4/archarm64/boot/dts/mediatek/mt6757.dtsi  ，rt5081.dtsi  , mt6355.dtsi
-	
-dws文件:
-	vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/k57pv1_6mtee_pre/dct/dct/codegen.dws
-	vendor/mediatek/proprietary/bootable/bootloader/lk/target/k57pv1_6mtee_pre/dct/dct/codegen.dws
-	kernel-4.4/drivers/misc/mediatek/dws/mt6757/k57pv1_6mtee_pre.dws
-
-
-电池参数相关的文件
-		mt6757.dtsi,rt5081.dtsi
-		mtk_charging.h ，mtk_charging_intf.h(快充)
-		mtk_battery_meter.h ,mtk_battery_meter_table.h
-		pmic_throttling_dlpt.c读电池客制化参数，mtk_battery_property.h
-
-
-  		mtk_charger.c跟mtk_charger_intf.h对应
-		mtk_battery.c跟mtk_battery.h对应 
-        
-
-GM3.0 定义的宏CONFIG_MTK_GAUGE_VERSION=30
-		./arch/arm64/configs/k57pv1_6mtee_pre_debug_defconfig:377:CONFIG_MTK_GAUGE_VERSION=30
-		./arch/arm64/configs/k57pv1_6mtee_pre_defconfig:361:CONFIG_MTK_GAUGE_VERSION=30
-		./arch/arm64/boot/dts/mediatek/mt6757.dtsi:1216:#if (CONFIG_MTK_GAUGE_VERSION == 30)
-
-rt5081的目录
-17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/pmic/rt5081/
-	
-
-keyboard 的目录
-17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/input/keyboard/mediatek/
-
-
-马达的目录
-17G05A/L30_6757_17G05A_N0.MP5_161227_ALPS/android_mtk_6757_mp/kernel-4.4/drivers/misc/mediatek/vibrator
-
-
-温升相关源码的目录
-17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/drivers/misc/mediatek/thermal
-配置文件(这个目录下有很多初始化的东西)
-17G10A/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/device/gionee_bj/
-
-
-编译相关的脚本工具
-	android_mtk_6757_mp/gionee/config/tools
-
-电池曲线
-	mtk_battery_property.h	
-	mt6757_battery_table_ext.dtsi
-	mt6757_battery_prop_ext.dtsi
-
-
-performance相关的代码目录
-kernel-4.4/drivers/misc/mediatek/base/power
-vendor/mediatek/proprietary/hardware/perfservice/mt6757/app_list/perfservapplist.txt
-
-		
-}
 
 
 
