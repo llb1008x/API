@@ -371,6 +371,10 @@ other：
 	http://blog.csdn.net/zhang_danf/article/details/52788336
 
 
+	高通msm8994启动流程简介
+	http://blog.csdn.net/finewind/article/details/46469645
+
+
 
 
 

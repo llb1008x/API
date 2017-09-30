@@ -995,3 +995,114 @@
 
 
 
+
+
+
+
+
+
+
+
+
+/***************************************************************************************************************************************/
+6.关机充电存在充电电流跳变问题
+{
+
+	Qcom case:03116844
+	{
+		1.aicl不是旨在插入充电器的时候检测充电器的能力吗？为什么还要每隔180S检测一次
+
+		---充电器插入的时候会启动AICL 检测，充电过程中硬件也会定时去做AICL rerun ,原因qpnp-smbcharger.txt 已经解释了，硬件AICL 默认是enable，默认rerun时间是180S。
+
+		- qcom,force-aicl-rerun:	A boolean property which upon set will enable the
+			AICL rerun by default along with the deglitch time
+			configured to long interval (20 ms). Also, specifying
+			this property will not adjust the AICL deglitch time
+			dynamically for handling the battery over-voltage
+			oscillations when the charger is headroom limited.
+			
+		- qcom,aicl-rerun-period-s	If force-aicl-rerun is on, this property dictates
+			how often aicl is reran in seconds. Possible values
+			are
+			SCHG - 45, 90, 180, and 360.
+			SCHG_LITE - 3 (2.8), 6 (5.6), 11 (11.3), 23 (22.5),
+			45, 90, 180 and 360
+
+		2.我们17G16A使用的msm8937平台，但是关机充电没有这个问题，这两个平台差不多啊
+		---如之前电话沟通，每次的测试结果可能都不同，请多测试几次对比下波形图和数据，这两个平台是没有差异可以多测试几次对比下。
+	
+	
+		qpnp-smbcharger.c:
+		+ #define DEBUG
+		- static int smbchg_debug_mask;
+		+ static int smbchg_debug_mask = 0xFF;
+
+		qpnp-fg.c:
+		+ #define DEBUG
+		- static int fg_debug_mask;
+		+ static int fg_debug_mask = 0xFF; 
+	
+	
+		BoardConfig.mk
+		# let charger mode enter suspend
+		BOARD_CHARGER_ENABLE_SUSPEND := true
+
+		请check这个宏在你们项目里面定义了，这个是使能关机充电enable suspend的，请检查下 
+	}
+
+	
+	
+	
+	具体情况:
+	   这个现在的情况是软件设定1A 用5V/1A的充电器，跳变特别频繁，curr-bat跟curr-charger 都有几十次跳变，电流跳变到100mA有的为0mA
+	   软件设定1.5A 用5V/1A充电器，跳变情况少一点，大概都是在10次左右
+
+	分析进展：				 高通case ID:03116844 
+	  1.暂时没有解决问题，可以稳定复现
+	  2.之前认为可能的有电池电容问题，验证修改后不是电容的问题
+	  3.高通认为仪器不够精确建议用示波器等更精密的仪器测量，但是如果是仪器问题，开机充电没有跳变，其他项目开机关机也没有这个问题，应该不是仪器精确度的问题
+	  主要是关机充电的时候log太少，很难抓到跳变点的log ，charger的log全都打开了
+		
+	  4.充电器功率不匹配，导致频繁检测充电器能力问题，但是设定1A,用5V/1A的跳变的更多，也不是这个问题
+	  这个存在一定的可能性
+	  软件			充电器功率
+	  关机充电
+			1A			5V/1A			跳变很多，而且这个跳变似乎是有一定规律的
+							5V/2A			这个恒流充电阶段没有往下跳变
+			1.5A		 	5V/1A			跳变少一点，10此左右 	
+
+	  开机充电		
+			1A			5V/1A			这个也存在充电电流跳变
+	  
+	  这个是测出关机充电有充电电流跳变问题，开机充电是用APK测的，测试时间是3s一次，可能没有采集到数据
+	  
+
+
+	  所以说这个很有可能跟检测充电器的能力有关		aicl  reg :ICL_STS
+	  {
+		  qpnp-smbcharger.c     qpnp-smbcharger.txt这个里面是解释
+		  force_aicl_rerun硬件强制默认执行aicl 时间180S
+	  
+		  
+		  这几个关键字包含的代码要熟悉
+		  {
+			qpnp-smbcharger.c
+				  smbchg_change_usb_supply_type 
+			  
+				  smbchg_default_dcp_icl_ma		这个是设置usbin的电流
+				  
+			msm8917-pmi8937-qrd-sku5.dtsi	
+				  fastchg-current-ma			这个是设置进电池的电流
+				 
+			  increment_aicl_count		resetting: elp
+			  aicl_done_handler: triggered, aicl:		
+		  }
+		  
+		  /*解决办法*/
+		  smbchg_default_dcp_icl_ma=1000;这样充电器的能力只有1000mA，不会有充电电流跳变
+		  这个是设置USBIN的电流，也就是说如果用能力更大的充电器，也只能冲到1A
+		  因为之前软件上USBIN电流2A，而充电器能力又不够，所以一直在检测，而硬件检测会断开充电
+		  导致充电电流降到0
+	  }
+	  
+ }

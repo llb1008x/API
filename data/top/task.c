@@ -34,6 +34,37 @@
 
 
 
+17G06A log关键字
+{
+	src_detect_handler	，handle_usb_insertion	充电检测
+	
+	Enable USB ID pin 
+	
+	
+	关闭sensors
+	2. Please follow below steps to disable sensor to test again.
+	#1
+	LINUX\android\device\qcom\common\rootdir\etc\init.qcom.sh
+	...
+	//start_sensor
+	#2.
+	adsp_proc\qdsp6\main\src\main.c
+	#if defined(SIM)
+	volatile boolean RunSensors = FALSE;
+	#else
+	volatile boolean RunSensors = TRUE; // Change to FALSE from TRUE
+	#endif
+
+
+
+	缩写	
+	RPM:Resource Power Manager
+	PBL:Primary Boot Loader	
+	SBL:Secondary Boot Loader
+	RMR:Reset Management Register
+	SDI:系统调试镜像
+	MBA：modem boot authenticator
+}
 
 
 
