@@ -214,10 +214,32 @@
 				strobe_timeout = <1200>;
 	
 	
+	
+	
+	
 			(rt5081_pmu_fled.c) rt5081_pmu_reg_update_bits这个是写寄存器的
 			int rt5081_pmu_reg_update_bits(struct rt5081_pmu_chip *chip, u8 addr,u8 mask, u8 data)
 		
 			//Gionee <GN_BSP_CHG> <lilubao> <20170929> add for debug flashlight begin
+	
+			
+			dev_dbg_ratelimited(chip->dev, "%s: reg %02x data %02x\n", __func__,
+		addr, data);
+		
+		
+				ret=rt5081_pmu_reg_update_bits(fled_data->chip,RT5081_PMU_REG_FLEDVMIDTRKCTRL1,
+			RT5081_FLED_FIXED_MODE_MASK,0x4f);	// vmid -> 4.0v
+			
+			
+			int rt5081_pmu_reg_read(struct rt5081_pmu_chip *chip, u8 addr)
+			
+			rt5081_fled_set_mode
+			
+				
+		
+			#define RT5081_PMU_REG_FLEDVMIDTRKCTRL1	(0x7A)
+			#define RT5081_PMU_REG_FLEDVMIDRTM	(0x7B)
+			#define RT5081_PMU_REG_FLEDVMIDTRKCTRL2	(0x7C)
 	
 		}
 

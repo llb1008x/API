@@ -4,7 +4,7 @@
 	> Mail: 
 	> Created Time: 2017年09月29日 星期五 08时40分10秒
 
-hello kernel module
+hello world kernel module
  ************************************************************************/
 
 #include <linux/module.h>
@@ -28,3 +28,4 @@ static void _exit hello_exit(void)
 module_init(hello_init);
 module_exit(hello_exit);
 MODULE_LICENSE("GPL");
+MODULE_AUTHOR("lilubao@126.com");
