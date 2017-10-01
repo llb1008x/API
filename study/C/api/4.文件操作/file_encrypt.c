@@ -49,6 +49,20 @@ int get_file_size(FILE *fp)
 }
 
 
+/*
+    从文件中读出内容
+*/
+char *read_src_file(FILE *fp,int len)
+{
+    char *buf;
+    
+    buf=(char *)malloc(len);    //动态申请一块内存，用来存储文件内容 
+    fread(buf,len,1,fp);
+    printf("sub buf->%s\n",buf);
+
+    return buf;
+}
+
 
 int main()
 {
@@ -65,7 +79,7 @@ int main()
     printf("dest->%s,src->%s\n",dest_file_name,src_file_name);
     
 //2.打开要加密的文件
-    fp_en=fopen(dest_file_name,"ab");
+    fp_en=fopen(src_file_name,"ab");
     if(!fp_en){
     
         printf("open faild!\n");
@@ -79,9 +93,8 @@ int main()
     
     
 //4.读取文件内容
-    buf=(char *)malloc(len);   //动态申请一块内存，用来存储文件内容 
-    fread(buf,len,1,fp_en);
-    printf("buf->%s\n",buf);
+    buf=read_src_file(fp_en,len);
+    printf("main buf->%s\n",buf);
     
     
     free(buf);
