@@ -40,7 +40,22 @@ QCOM
 		}
 
 		thanks
+		
+		//Gionee <GN_BSP_CHG> <lilubao> <20171009> modify for redetect battery id begin
+		这边有几个文件需要看看，
+		bootable/bootloader/lk/dev/pmic/pm8x41/pm8x41.c
+		bootable/bootloader/lk/target/msm8952/init.c
+		
+		单编lk是  -i  aboot	
+		
+		pm_sbl_boot_oem.c
 	}
+	
+	
+	
+	
+	
+	
 	
 	
 	03138699 :gsm模式下待机电流高(current is too high under gsm standby)

@@ -34,11 +34,16 @@
 
 
 
+
+
+
 17G06A log关键字
 {
 	src_detect_handler	，handle_usb_insertion	充电检测
 	
 	Enable USB ID pin 
+	
+	FG: log_bat_status
 	
 	
 	关闭sensors
@@ -64,6 +69,10 @@
 	RMR:Reset Management Register
 	SDI:系统调试镜像
 	MBA：modem boot authenticator
+	FLCB：perform fast low current boot
+	APSD：performs automatic power source detection
+	MPSS:modem processor subsystem
+	APSS:Applications processor subsystem
 }
 
 
@@ -189,6 +198,15 @@
 
 
 }
+
+
+
+
+
+
+
+
+
 
 
 
