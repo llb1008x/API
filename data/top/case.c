@@ -3,17 +3,40 @@
 
 QCOM
 {
-	03155938:【OTG】T卡插入读卡器通过OTG线与手机连接，进行插拔操作，手机出现不识别U盘现象
-
-
-
-
-
 
 
 	03154979:PMI8937平台，手机battery ID接触稍晚，手机不开机，请提供在SBL里re-detected ID的方法；
 	{
-		这个问题是工厂扣电池的时候如果bat id接触点扣的晚，即使后面再扣好还是不开机
+		首先要弄清楚这个问题的情况：
+		{
+			battery_id没扣好，按下powerkey，再接上，不能开机
+			如果是第一次上电没扣好，然后直接接上
+	
+	
+			这个问题是工厂扣电池的时候如果bat id接触点扣的晚，即使后面再扣好还是不开机
+		
+			//Gionee <GN_BSP_CHG> <lilubao> <20171009> modify for redetect battery id begin
+			boot_log_message("in  pm_device_init, after by lilubao");
+			
+			
+			这边有几个文件需要看看，
+			bootable/bootloader/lk/dev/pmic/pm8x41/pm8x41.c
+			bootable/bootloader/lk/target/msm8952/init.c
+		
+			单编lk是  -i  aboot	
+		 
+			pm_sbl_boot_oem.c
+		
+			pm_sbl_boot.c
+			
+		
+			(sbl1_hw.c) sbl1_hw_init -> (boot_extern_pmic_interface.c ) boot_pm_device_init -> (pm_sbl_boot.c) pm_device_init
+		
+		}
+
+		
+		
+		
 
 		Hi,
 		Below is an example for battery ID re-detection in LK, you can use it or refer to it and add related code in SBL.
@@ -41,16 +64,49 @@ QCOM
 
 		thanks
 		
-		//Gionee <GN_BSP_CHG> <lilubao> <20171009> modify for redetect battery id begin
-		这边有几个文件需要看看，
-		bootable/bootloader/lk/dev/pmic/pm8x41/pm8x41.c
-		bootable/bootloader/lk/target/msm8952/init.c
-		
-		单编lk是  -i  aboot	
-		
-		pm_sbl_boot_oem.c
+
+
+		Dear customer:
+
+		if your team has not customized qc sbl code.
+		it is much better add battery re_detect code in function
+
+		pm_sbl_chg_check_weak_battery_status
+		{
+		..............
+		LOGD(" re_detected_battery_id begin")
+		++ re_detected_battery_id.
+		LOGD(" re_detected_battery_id end")
+
+		//Check Battery presence
+		CHG_VERIFY(pm_smbchg_bat_if_get_bat_pres_status(device_index, &bat_present));
+		if( !bat_present )
+		{
+		LOGD("Booting up to HLOS: Charger is Connected and NO battery");
+		err_flag |= pm_smbchg_bat_if_set_min_sys_volt(device_index, 3600); // Set Vsysmin to 3.6V if battery absent
+		return err_flag;
+		}
+
+		}
+
+		if still not work, pls show me your code and sbl log.
+
+		Thanks!
 	}
 	
+	
+	
+	
+	
+	
+	03162128：【OTG】连接U盘-手机未识别-再次操作不恢复-多次插拔U盘恢复
+	{
+		2.in fstab.qcom
+		/devices/platform/msm_hsusb_host/usb* /storage/usbotg vfat nosuid,nodev wait,voldmanaged=usbotg:auto
+		and refer to kba-170505012756_1 to grab the log. 
+		
+	}
+
 	
 	
 	
