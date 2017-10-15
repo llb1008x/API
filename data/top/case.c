@@ -3,9 +3,33 @@
 
 QCOM
 {
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	03162128：【OTG】连接U盘-手机未识别-再次操作不恢复-多次插拔U盘恢复
+	{
+		2.in fstab.qcom
+		/devices/platform/msm_hsusb_host/usb* /storage/usbotg vfat nosuid,nodev wait,voldmanaged=usbotg:auto
+		and refer to kba-170505012756_1 to grab the log. 
+	
+	
+		kba-170505012756 这个文件里的命令好像不起作用，log没有变化	
+	}
+	
+	
 
 
-	03154979:PMI8937平台，手机battery ID接触稍晚，手机不开机，请提供在SBL里re-detected ID的方法；
+
+
+
+
+	pass 03154979:PMI8937平台，手机battery ID接触稍晚，手机不开机，请提供在SBL里re-detected ID的方法；
 	{
 		首先要弄清楚这个问题的情况：
 		{
@@ -15,7 +39,7 @@ QCOM
 	
 			这个问题是工厂扣电池的时候如果bat id接触点扣的晚，即使后面再扣好还是不开机
 		
-			//Gionee <GN_BSP_CHG> <lilubao> <20171009> modify for redetect battery id begin
+			//Gionee <GN_BSP_CHG> <lilubao> <20171011> modify for redetect battery id begin
 			boot_log_message("in  pm_device_init, after by lilubao");
 			
 			
@@ -32,27 +56,27 @@ QCOM
 		
 			(sbl1_hw.c) sbl1_hw_init -> (boot_extern_pmic_interface.c ) boot_pm_device_init -> (pm_sbl_boot.c) pm_device_init
 		
+			pm_version_detect 
 		}
 
-		
-		
-		
+
 
 		Hi,
 		Below is an example for battery ID re-detection in LK, you can use it or refer to it and add related code in SBL.
 		pm8x41.h
-		+void battery_id_redetection();
+		void battery_id_redetection();
+		
 		pm8x41.c
-		+void battery_id_redetection()
-		+{
-		+uint8_t reg = 0x80;
-		+pm8xxx_reg_write (2, 0x4150,0x80, 0); // set 0x80 to 0x4150
-		+pm8xxx_reg_write (2, 0x4051,0, 0);//clear 0x4051
-		+pm8xxx_reg_write (2, 0x4051,0x18, 0); //set 0x18 to 0x4051
-		+pm8xxx_reg_write (2, 0x4051,0x19, 0); //set 0x19 to 0x4051
-		+mdelay(1000);
-		+pm8xxx_reg_write (2, 0x4051, 0,0); //clear 0x4051
-		+pm8xxx_reg_write (2, 0x4150,0x80, 0); // clear 0x4150
+		void battery_id_redetection()
+		{
+		uint8_t reg = 0x80;
+			pm8xxx_reg_write (2, 0x4150,0x80, 0); // set 0x80 to 0x4150
+			pm8xxx_reg_write (2, 0x4051,0, 0);//clear 0x4051
+			pm8xxx_reg_write (2, 0x4051,0x18, 0); //set 0x18 to 0x4051
+			pm8xxx_reg_write (2, 0x4051,0x19, 0); //set 0x19 to 0x4051
+			mdelay(1000);
+			pm8xxx_reg_write (2, 0x4051, 0,0); //clear 0x4051
+			pm8xxx_reg_write (2, 0x4150,0x80, 0); // clear 0x4150
 		}
 		android\bootable\bootloader\lk\target\msm89xx\init.c
 		void target_init(void)
@@ -93,22 +117,6 @@ QCOM
 
 		Thanks!
 	}
-	
-	
-	
-	
-	
-	
-	03162128：【OTG】连接U盘-手机未识别-再次操作不恢复-多次插拔U盘恢复
-	{
-		2.in fstab.qcom
-		/devices/platform/msm_hsusb_host/usb* /storage/usbotg vfat nosuid,nodev wait,voldmanaged=usbotg:auto
-		and refer to kba-170505012756_1 to grab the log. 
-		
-	}
-
-	
-	
 	
 	
 	
