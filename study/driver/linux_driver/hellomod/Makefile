@@ -1,11 +1,11 @@
 #指定生成可加载模块的名称  
-obj-m:=hellodemo.o  
+obj-m += hellodemo.o  
   
 #实际是指向你自己创建的内核代码树的路径，build是个软连接  
-KERDIR=/lib/modules/$(shell uname -r)/build  
+KERDIR := /home/llb/project/PRO/exnyos4412/kernel/iTop4412_Kernel_3.0  
   
 #编译模块的当前路径  
-CURDIR=$(shell pwd)  
+CURDIR ?= $(shell pwd)  
   
 #make后默认自动跳转到这里执行，make功能比较多，有兴趣的可以网上搜下  
 all:  
