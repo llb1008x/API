@@ -375,6 +375,8 @@ other：
 	http://blog.csdn.net/finewind/article/details/46469645
 
 
+	高通batterydata电池曲线数据学习
+	https://www.2cto.com/kf/201601/488126.html
 
 
 

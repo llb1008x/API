@@ -1113,9 +1113,100 @@
 
 
 
-
-
-
-
-
+ /******************************************************************************************************************************************/
+ 7.PMI8937平台，手机battery ID接触稍晚，手机不开机，请提供在SBL里re-detected ID的方法；
+ {
+	 case id:03154979
+	 
+	 首先要弄清楚这个问题的情况：
+	 {
+		 battery_id没扣好，按下powerkey，再接上，不能开机
+		 如果是第一次上电没扣好，然后直接接上
  
+ 
+		 这个问题是工厂扣电池的时候如果bat id接触点扣的晚，即使后面再扣好还是不开机
+	 
+		 //Gionee <GN_BSP_CHG> <lilubao> <20171011> modify for redetect battery id begin
+		 boot_log_message("in  pm_device_init, after by lilubao");
+		 
+		 
+		 这边有几个文件需要看看，
+		 bootable/bootloader/lk/dev/pmic/pm8x41/pm8x41.c
+		 bootable/bootloader/lk/target/msm8952/init.c
+	 
+		 单编lk是  -i  aboot	
+	  
+		 pm_sbl_boot_oem.c
+	 
+		 pm_sbl_boot.c
+		 
+	 
+		 (sbl1_hw.c) sbl1_hw_init -> (boot_extern_pmic_interface.c ) boot_pm_device_init -> (pm_sbl_boot.c) pm_device_init
+	 
+		 pm_version_detect 
+	 }
+
+
+
+	 Hi,
+	 Below is an example for battery ID re-detection in LK, you can use it or refer to it and add related code in SBL.
+	 pm8x41.h
+	 void battery_id_redetection();
+	 
+	 pm8x41.c
+	 void battery_id_redetection()
+	 {
+	 uint8_t reg = 0x80;
+		 pm8xxx_reg_write (2, 0x4150,0x80, 0); // set 0x80 to 0x4150
+		 pm8xxx_reg_write (2, 0x4051,0, 0);//clear 0x4051
+		 pm8xxx_reg_write (2, 0x4051,0x18, 0); //set 0x18 to 0x4051
+		 pm8xxx_reg_write (2, 0x4051,0x19, 0); //set 0x19 to 0x4051
+		 mdelay(1000);
+		 pm8xxx_reg_write (2, 0x4051, 0,0); //clear 0x4051
+		 pm8xxx_reg_write (2, 0x4150,0x80, 0); // clear 0x4150
+	 }
+	 android\bootable\bootloader\lk\target\msm89xx\init.c
+	 void target_init(void)
+	 {
+	 ....
+	 +battery_id_redetection();
+	 +dprintf(CRITICAL, "add battery_id_redetection\n");
+	 }
+
+	 thanks
+	 
+
+
+	 Dear customer:
+
+	 if your team has not customized qc sbl code.
+	 it is much better add battery re_detect code in function
+
+	 pm_sbl_chg_check_weak_battery_status
+	 {
+	 ..............
+	 LOGD(" re_detected_battery_id begin")
+	 ++ re_detected_battery_id.
+	 LOGD(" re_detected_battery_id end")
+
+	 //Check Battery presence
+	 CHG_VERIFY(pm_smbchg_bat_if_get_bat_pres_status(device_index, &bat_present));
+	 if( !bat_present )
+	 {
+	 LOGD("Booting up to HLOS: Charger is Connected and NO battery");
+	 err_flag |= pm_smbchg_bat_if_set_min_sys_volt(device_index, 3600); // Set Vsysmin to 3.6V if battery absent
+	 return err_flag;
+	 }
+
+	 }
+
+	 if still not work, pls show me your code and sbl log.
+
+	 Thanks!
+ }
+ 
+
+
+
+
+
