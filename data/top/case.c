@@ -4,35 +4,7 @@
 QCOM
 {
 		
-		
-		
-		
-		
-		
-		
-		
-		
-	03162128：【OTG】连接U盘-手机未识别-再次操作不恢复-多次插拔U盘恢复
-	{
-		2.in fstab.qcom
-		/devices/platform/msm_hsusb_host/usb* /storage/usbotg vfat nosuid,nodev wait,voldmanaged=usbotg:auto
-		and refer to kba-170505012756_1 to grab the log. 
-	
-	
-		kba-170505012756 这个文件里的命令好像不起作用，log没有变化	
-	}
-	
-	
 
-
-
-
-
-
-
-	
-	
-	
 	
 	03138699 :gsm模式下待机电流高(current is too high under gsm standby)
 	{
