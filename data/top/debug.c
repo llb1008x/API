@@ -5,18 +5,7 @@
 {
 
 
-
-
-
-
-
-
-
-
-
-
-
-		pass,适配平均电流apk，上报电量计的值
+		适配平均电流apk，上报电量计的值
 		{
 			{
 				1.首先要知道电量计是什么函数或者变量获取的，单位，数值是什么？
@@ -136,8 +125,89 @@
 17G06A
 {
 
-		温升问题：
+
+		马达震动强度
+		GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，进MMI硬件测试也如此，多次操作如此，清除后台未恢复，重启未恢复 验证10台7台
+		{
+			motor,vibrate,vibrator,haptic这三个马达震动相关
+			17G06A 关键字是VIB_DRV
+			qcom,qpnp-haptic
+			
+			qcom,lra-auto-res-mode : auto resonance technique, four different modes
+			"none" : no auto resonance
+			"zxd" : zero crossing based discontinuous method
+			"qwd" : quarter wave drive method
+			"max-qwd" : Maximum QWD
+			"zxd-eop" : ZXD + End of pattern (This is the Default)
+			
+			估计跟这个有关
+			brake-pattern，wave-play-rate-us
+			
+			相关文件：
+				qpnp-haptic.c，qpnp-haptic.txt，
+				msm-pmi8937.dtsi，
+				VibratorService.java	
+
+			//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic begin
+			pr_err("in [%s] by lilubao before\n",__func__);
+			//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic end
+			
+			
+			qpnp_haptics: REG_0xc00a = 0x0
+			qpnp_haptics: REG_0xc00b = 0x0
+			qpnp_haptics: REG_0xc00c = 0x0
+			qpnp_haptics: REG_0xc046 = 0x0
+			qpnp_haptics: REG_0xc048 = 0x1
+			qpnp_haptics: REG_0xc04c = 0x1
+			qpnp_haptics: REG_0xc04d = 0x1
+			qpnp_haptics: REG_0xc04e = 0x0
+			qpnp_haptics: REG_0xc04f = 0x0
+			qpnp_haptics: REG_0xc051 = 0x22
+			qpnp_haptics: REG_0xc052 = 0x1
+			qpnp_haptics: REG_0xc053 = 0x1
+			qpnp_haptics: REG_0xc054 = 0x1c
+			qpnp_haptics: REG_0xc055 = 0x4
+			qpnp_haptics: REG_0xc056 = 0x1
+			qpnp_haptics: REG_0xc057 = 0x0
+			qpnp_haptics: REG_0xc058 = 0x1
+			qpnp_haptics: REG_0xc05c = 0xf
+			qpnp_haptics: REG_0xc05e = 0x0
+			qpnp_haptics: REG_0xc060 = 0x0
+			qpnp_haptics: REG_0xc061 = 0x0
+			qpnp_haptics: REG_0xc062 = 0x0
+			qpnp_haptics: REG_0xc063 = 0x0
+			qpnp_haptics: REG_0xc064 = 0x0
+			qpnp_haptics: REG_0xc065 = 0x0
+			qpnp_haptics: REG_0xc066 = 0x0
+			qpnp_haptics: REG_0xc067 = 0x0
+			qpnp_haptics: REG_0xc070 = 0x0
+			qpnp_haptics: REG_0xc0e3 = 0x80
+
+			
+			
+			其实这里问题的关键应该是如何控制马达，如何让他震动，震动时间，强度，震动频率
+			{
+			
+			
+			}
 		
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		温升问题：
 		
 		GNSPR#120797,待机界面进相机 慢动作摄影,摄影过程中双指进行缩放,操作1min后一直重复提示电池温度过高,
 		查看电池温度55度》退出相机后再操作恢复 验证2台,1台出现,共出现1次
