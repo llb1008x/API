@@ -379,6 +379,12 @@ other：
 	https://www.2cto.com/kf/201601/488126.html
 
 
+	千万别乱用单位：详解电池的mAh和Wh的区别
+	http://libattery.ofweek.com/2015-06/ART-36001-11002-28964256.html
+
+
+
+
 
 
 集中解决一些问题:

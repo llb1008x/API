@@ -1,97 +1,128 @@
 
 
 
+
+
+
+
+
+pmic给cpu供电的
+
+
+这个问题是在MTK，高通平台都要做
+适配平均电流apk，上报电量计的值
+{
+
+	现在的问题是电量计能上报数值，但是这个数据似乎不对，单位有问题
+	MTK是相对的，充电电量计涨，放电电量计减小，所以相对变化是正确的
+	QCOM是按照电量跟电压计算的，有一个参考轴，电量计不会有负值，相对准确一点
+	电量计跟电量之间是正向关系的
+
+	{
+		1.首先要知道电量计是什么函数或者变量获取的，单位，数值是什么？
+	
+		2.创建相关的节点，上层怎么读取数据，要不要经过转换
+	
+	
+	Qcom
+		qpnp-smbcharger.c
+	
+		static ssize_t coulomb_count_show(struct device* dev, struct device_attribute* attr, char* buf)
+		{
+			struct power_supply *psy = dev_get_drvdata(dev);
+			struct smbchg_chip *chip = container_of(psy,
+						struct smbchg_chip, batt_psy);
+			int coulomb_count, rc;
+			rc = get_property_from_fg(chip, POWER_SUPPLY_PROP_CHARGE_NOW_RAW, &coulomb_count);
+			//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+			pr_err("in [%s] by lilubao use coulomb count\n",__FUNCTION__);
+			//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
+			return sprintf(buf, "%d\n", coulomb_count/1000);
+		}
+	
+		static DEVICE_ATTR(coulomb_count, 0664, coulomb_count_show, NULL);
+	
+		//Gionee <GN_BSP_CHG> <liujiang> <20170408> add for 107204 begin
+		rc = device_create_file(chip->batt_psy.dev, &dev_attr_coulomb_count); 
+		//Gionee <GN_BSP_CHG> <liujiang> <20170408> add for 107204 end
+	
+	
+		frameworks/base/services/core/java/com/android/server/DrvInspectCoulomb_count.java
+	
+	
+		MTK平台通过什么获取电量计参数的
+	
+		battery_meter_ctrl(BATTERY_METER_CMD_GET_FG_HW_CAR, &fg_coulomb);
+	
+	
+	
+	MTK
+		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+		static ssize_t show_coulomb_count(struct device* dev, struct device_attribute* attr, char* buf)
+		{
+			int coulomb_count;
+
+			pr_err("in show_coulomb_count before by lilubao\n");
+
+			battery_meter_ctrl(BATTERY_METER_CMD_GET_FG_HW_CAR, &coulomb_count);
+			return sprintf(buf, "%d\n", coulomb_count);
+
+
+		}
+
+		static DEVICE_ATTR(coulomb_count, 0664,show_coulomb_count, NULL);
+		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
+	
+	
+		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+		ret_device_file = device_create_file(&(dev->dev), &dev_attr_coulomb_count);
+		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+	
+	
+	}
+
+	/sys/class/power_supply/battery/coulomb_count
+	向上层暴露库仑计的值，单位0.1mAh。mtk平台和高通平台统一
+
+	log_bat_status
+
+	fg_cap_learning_check
+
+	//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+
+	DEVICE_ATTR
+
+	rc = get_property_from_fg(chip, POWER_SUPPLY_PROP_CHARGE_NOW_RAW, &coulomb_count);
+	./sys/devices/soc/qpnp-smbcharger-17/power_supply/battery/coulomb_count
+	
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 17G10A
 {
 
 
-		适配平均电流apk，上报电量计的值
-		{
-			{
-				1.首先要知道电量计是什么函数或者变量获取的，单位，数值是什么？
-			
-				2.创建相关的节点，上层怎么读取数据，要不要经过转换
-			
-			
-				qpnp-smbcharger.c
-			
-				static ssize_t coulomb_count_show(struct device* dev, struct device_attribute* attr, char* buf)
-				{
-					struct power_supply *psy = dev_get_drvdata(dev);
-					struct smbchg_chip *chip = container_of(psy,
-								struct smbchg_chip, batt_psy);
-					int coulomb_count, rc;
-					rc = get_property_from_fg(chip, POWER_SUPPLY_PROP_CHARGE_NOW_RAW, &coulomb_count);
-					//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-					pr_err("in [%s] by lilubao use coulomb count\n",__FUNCTION__);
-					//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
-					return sprintf(buf, "%d\n", coulomb_count/1000);
-				}
-			
-				static DEVICE_ATTR(coulomb_count, 0664, coulomb_count_show, NULL);
-			
-				//Gionee <GN_BSP_CHG> <liujiang> <20170408> add for 107204 begin
-				rc = device_create_file(chip->batt_psy.dev, &dev_attr_coulomb_count); 
-				//Gionee <GN_BSP_CHG> <liujiang> <20170408> add for 107204 end
-			
-			
-				frameworks/base/services/core/java/com/android/server/DrvInspectCoulomb_count.java
-			
-			
-				MTK平台通过什么获取电量计参数的
-			
-				battery_meter_ctrl(BATTERY_METER_CMD_GET_FG_HW_CAR, &fg_coulomb);
-			
-			
-				//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-				static ssize_t show_coulomb_count(struct device* dev, struct device_attribute* attr, char* buf)
-				{
-					int coulomb_count;
-	
-					pr_err("in show_coulomb_count before by lilubao\n");
 
-					battery_meter_ctrl(BATTERY_METER_CMD_GET_FG_HW_CAR, &coulomb_count);
-					return sprintf(buf, "%d\n", coulomb_count);
-
-				#if	0
-					struct power_supply *psy = dev_get_drvdata(dev);
-					struct smbchg_chip *chip = container_of(psy,
-								struct smbchg_chip, batt_psy);
-					int coulomb_count, rc;
-					rc = get_property_from_fg(chip, POWER_SUPPLY_PROP_CHARGE_NOW_RAW, &coulomb_count);
-					//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-					pr_err("in [%s] by lilubao use coulomb count\n",__FUNCTION__);
-					//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
-					return sprintf(buf, "%d\n", coulomb_count/1000);
-				#endif	
-				}
-
-				static DEVICE_ATTR(coulomb_count, 0664,show_coulomb_count, NULL);
-				//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
-			
-			
-				//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-				ret_device_file = device_create_file(&(dev->dev), &dev_attr_coulomb_count);
-				//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-			
-			
-			}
-		
-			/sys/class/power_supply/battery/coulomb_count
-			向上层暴露库仑计的值，单位0.1mAh。mtk平台和高通平台统一
-
-			log_bat_status
-		
-			fg_cap_learning_check
-		
-			//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-		
-			DEVICE_ATTR
-		
-			rc = get_property_from_fg(chip, POWER_SUPPLY_PROP_CHARGE_NOW_RAW, &coulomb_count);
-			./sys/devices/soc/qpnp-smbcharger-17/power_supply/battery/coulomb_count
-	
-		}
 
 
 }
@@ -125,6 +156,51 @@
 17G06A
 {
 
+		bug类型：
+		bug原因：
+		解决方案：
+		测试建议：
+		
+		
+		125191
+		
+		OTG类问题
+		{
+			GNSPR #123451,手机内插入SD卡，OTG连接U盘复制粘贴（移动）至手机内部存储器，粘贴后显示正在更新系统媒体库，加载圈长时间不消失
+			
+			
+			GNSPR #112736,手机通过OTG线连接连接USB小风扇，使用一段时间后，OTG开关自动关闭，USB小风扇停止旋转
+				
+			
+			GNSPR #116094,T卡插入读卡器通过OTG线与手机连接，进行插拔操作，手机出现不识别U盘现象
+			
+			
+			GNSPR #116162,U盘通过OTG线连接手机，进入文件管理，选择U盘进行增加删除操作，拔掉U盘，连接PC或连接手机进行查看，被删除的文件没有删除
+			
+			
+			GNSPR #120204,开启反向充电和OTG,连接U盘，拔掉T卡，进入存储和USB查看仍显示U向盘正常使用，对比17G16也是如此，17G07无此现象
+		
+		
+			测试了多个版本，多批手机 和多个小电扇，没找到规律； 应该是 硬件不稳定，软件识别不了； 暂时没有解决方案；
+		
+			底层实际上U盘已经读到了，只不过是 一直在检查文件系统错误，这个快的话只有2～3秒，慢的话 要10多秒； 有的U盘甚至要20多秒； 从log看还没检查完就拔掉了，最多的是等了13秒，请 多等待一下 应该就可以了；如果 等很久 还不行 再报 bug，并提供log 分析；
+			
+			兼容性问题
+		
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
 
 		马达震动强度
 		GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，进MMI硬件测试也如此，多次操作如此，清除后台未恢复，重启未恢复 验证10台7台
@@ -132,6 +208,7 @@
 			motor,vibrate,vibrator,haptic这三个马达震动相关
 			17G06A 关键字是VIB_DRV
 			qcom,qpnp-haptic
+			Turning vibrator on
 			
 			qcom,lra-auto-res-mode : auto resonance technique, four different modes
 			"none" : no auto resonance
@@ -141,7 +218,7 @@
 			"zxd-eop" : ZXD + End of pattern (This is the Default)
 			
 			估计跟这个有关
-			brake-pattern，wave-play-rate-us
+			brake-pattern，wave-play-rate-us,vmax-mv这个是控制输出功率的
 			
 			相关文件：
 				qpnp-haptic.c，qpnp-haptic.txt，
