@@ -205,7 +205,7 @@ pm8909_chg: qcom,charger {
                      status= "disabled";
   
                      qcom,chgr@1000{
-                            reg= <0x1000 0x100>;
+                             = <0x1000 0x100>;
                             interrupts=   <0x0 0x10 0x7>,
                                           <0x0 0x10 0x6>,
                                           <0x0 0x10 0x5>,
