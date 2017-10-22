@@ -383,6 +383,11 @@ other：
 	http://libattery.ofweek.com/2015-06/ART-36001-11002-28964256.html
 
 
+	android socket编程 
+	http://blog.csdn.net/xl19862005/article/details/8517921
+
+
+
 
 
 

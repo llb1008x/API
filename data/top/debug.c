@@ -6,12 +6,15 @@
 
 
 
-pmic给cpu供电的
 
 
-这个问题是在MTK，高通平台都要做
-适配平均电流apk，上报电量计的值
+
+
+pass，适配平均电流apk，上报电量计的值
 {
+	TVB，pmic给cpu供电的，如果关机或者掉电的话，应该没有电，如果有电就是没有关机
+	
+	这个问题是在MTK，高通平台都要做
 
 	现在的问题是电量计能上报数值，但是这个数据似乎不对，单位有问题
 	MTK是相对的，充电电量计涨，放电电量计减小，所以相对变化是正确的
@@ -96,10 +99,87 @@ pmic给cpu供电的
 	./sys/devices/soc/qpnp-smbcharger-17/power_supply/battery/coulomb_count
 	
 
-
 }
 
 
+
+pass，马达震动强度
+GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，进MMI硬件测试也如此，多次操作如此，清除后台未恢复，重启未恢复 验证10台7台
+{
+	插入充电器震动value=300,一般触摸震动是10~30那种，就是说这个是正常触摸震动的时候处于
+	pending状态然后插入充电器，无法调用震动，后面可能执行震动，也可能不执行，但是又把充电器拔出
+	马达就不执行震动了，
+	就可能是操作太快，马达震动还未响应
+
+	motor,vibrate,vibrator,haptic这三个马达震动相关
+	17G06A 关键字是VIB_DRV
+	qcom,qpnp-haptic
+	Turning vibrator on
+	
+	qcom,lra-auto-res-mode : auto resonance technique, four different modes
+	"none" : no auto resonance
+	"zxd" : zero crossing based discontinuous method
+	"qwd" : quarter wave drive method
+	"max-qwd" : Maximum QWD
+	"zxd-eop" : ZXD + End of pattern (This is the Default)
+	
+	估计跟这个有关
+	brake-pattern，wave-play-rate-us,vmax-mv这个是控制输出功率的
+	
+	相关文件：
+		qpnp-haptic.c，qpnp-haptic.txt，
+		msm-pmi8937.dtsi，
+		VibratorService.java	
+
+	//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic begin
+	pr_err("in [%s] by lilubao before\n",__func__);
+	//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic end
+	
+	
+	qpnp_haptics: REG_0xc00a = 0x0
+	qpnp_haptics: REG_0xc00b = 0x0
+	qpnp_haptics: REG_0xc00c = 0x0
+	qpnp_haptics: REG_0xc046 = 0x0
+	qpnp_haptics: REG_0xc048 = 0x1
+	qpnp_haptics: REG_0xc04c = 0x1
+	qpnp_haptics: REG_0xc04d = 0x1
+	qpnp_haptics: REG_0xc04e = 0x0
+	qpnp_haptics: REG_0xc04f = 0x0
+	qpnp_haptics: REG_0xc051 = 0x22
+	qpnp_haptics: REG_0xc052 = 0x1
+	qpnp_haptics: REG_0xc053 = 0x1
+	qpnp_haptics: REG_0xc054 = 0x1c
+	qpnp_haptics: REG_0xc055 = 0x4
+	qpnp_haptics: REG_0xc056 = 0x1
+	qpnp_haptics: REG_0xc057 = 0x0
+	qpnp_haptics: REG_0xc058 = 0x1
+	qpnp_haptics: REG_0xc05c = 0xf
+	qpnp_haptics: REG_0xc05e = 0x0
+	qpnp_haptics: REG_0xc060 = 0x0
+	qpnp_haptics: REG_0xc061 = 0x0
+	qpnp_haptics: REG_0xc062 = 0x0
+	qpnp_haptics: REG_0xc063 = 0x0
+	qpnp_haptics: REG_0xc064 = 0x0
+	qpnp_haptics: REG_0xc065 = 0x0
+	qpnp_haptics: REG_0xc066 = 0x0
+	qpnp_haptics: REG_0xc067 = 0x0
+	qpnp_haptics: REG_0xc070 = 0x0
+	qpnp_haptics: REG_0xc0e3 = 0x80
+
+	
+	
+	其实这里问题的关键应该是如何控制马达，如何让他震动，震动时间，强度，震动频率
+	{
+		vmax-mv这个是控制输出的，可以控制马达震动强度
+		direct模式是直接以恒定的输出，所以没有波形
+		
+		qcom,wave-samples如果是其他的模式可以通过这个1~5bit控制放大的倍率
+		qcom,wave-samples = [3e 3e 3e 3e 3e 3e 3e 3e];
+  	    qcom,play-mode : must be one of "buffer", "direct", "pwm" or "audio"
+	
+	}
+
+}
 
 
 
@@ -162,7 +242,61 @@ pmic给cpu供电的
 		测试建议：
 		
 		
-		125191
+		
+		GNSPR#123200,关机状态》连接充电器-测试机R31电量为29%，测试机R32电量为33%-充电图标-显示的充电浮动图差距太大（对比大金刚2也有此现象）》
+		验证10台10台100%
+		{
+			现象：电量为29%是橙色的，32%是绿色的，而且两个的浮动比例差距很大
+			
+			首先要确定关机充电在哪？充电图标怎么显示的，如何控制变化？
+			{
+				控制代码在healthd目录下面
+				GN_Q_BSP_POWEROFF_CHARGER_UI_TYPE := AMIGO_UI_720P
+				
+				生成的logo在$$(TARGET_ROOT_OUT)/res/images/charger目录下
+			
+			}
+			
+			
+			//Gionee <GN_BSP_CHG> <lilubao> <201710120> modify for healthd begin
+			LOGE("in [%s] by lilubao after\n",__FUNCTION__);
+			//Gionee <GN_BSP_CHG> <lilubao> <201710120> modify for healthd end
+			
+			phone
+			./sbin/healthd
+
+			pc
+			./symbols/sbin/healthd
+			./obj/EXECUTABLES/healthd_intermediates/healthd
+			./obj/EXECUTABLES/healthd_intermediates/LINKED/healthd
+			./obj/EXECUTABLES/healthd_intermediates/PACKED/healthd
+			./root/sbin/healthd
+			./recovery/root/sbin/healthd
+		
+		
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		OTG类问题
 		{
@@ -192,89 +326,7 @@ pmic给cpu供电的
 		
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
-
-
-		马达震动强度
-		GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，进MMI硬件测试也如此，多次操作如此，清除后台未恢复，重启未恢复 验证10台7台
-		{
-			motor,vibrate,vibrator,haptic这三个马达震动相关
-			17G06A 关键字是VIB_DRV
-			qcom,qpnp-haptic
-			Turning vibrator on
-			
-			qcom,lra-auto-res-mode : auto resonance technique, four different modes
-			"none" : no auto resonance
-			"zxd" : zero crossing based discontinuous method
-			"qwd" : quarter wave drive method
-			"max-qwd" : Maximum QWD
-			"zxd-eop" : ZXD + End of pattern (This is the Default)
-			
-			估计跟这个有关
-			brake-pattern，wave-play-rate-us,vmax-mv这个是控制输出功率的
-			
-			相关文件：
-				qpnp-haptic.c，qpnp-haptic.txt，
-				msm-pmi8937.dtsi，
-				VibratorService.java	
-
-			//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic begin
-			pr_err("in [%s] by lilubao before\n",__func__);
-			//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic end
-			
-			
-			qpnp_haptics: REG_0xc00a = 0x0
-			qpnp_haptics: REG_0xc00b = 0x0
-			qpnp_haptics: REG_0xc00c = 0x0
-			qpnp_haptics: REG_0xc046 = 0x0
-			qpnp_haptics: REG_0xc048 = 0x1
-			qpnp_haptics: REG_0xc04c = 0x1
-			qpnp_haptics: REG_0xc04d = 0x1
-			qpnp_haptics: REG_0xc04e = 0x0
-			qpnp_haptics: REG_0xc04f = 0x0
-			qpnp_haptics: REG_0xc051 = 0x22
-			qpnp_haptics: REG_0xc052 = 0x1
-			qpnp_haptics: REG_0xc053 = 0x1
-			qpnp_haptics: REG_0xc054 = 0x1c
-			qpnp_haptics: REG_0xc055 = 0x4
-			qpnp_haptics: REG_0xc056 = 0x1
-			qpnp_haptics: REG_0xc057 = 0x0
-			qpnp_haptics: REG_0xc058 = 0x1
-			qpnp_haptics: REG_0xc05c = 0xf
-			qpnp_haptics: REG_0xc05e = 0x0
-			qpnp_haptics: REG_0xc060 = 0x0
-			qpnp_haptics: REG_0xc061 = 0x0
-			qpnp_haptics: REG_0xc062 = 0x0
-			qpnp_haptics: REG_0xc063 = 0x0
-			qpnp_haptics: REG_0xc064 = 0x0
-			qpnp_haptics: REG_0xc065 = 0x0
-			qpnp_haptics: REG_0xc066 = 0x0
-			qpnp_haptics: REG_0xc067 = 0x0
-			qpnp_haptics: REG_0xc070 = 0x0
-			qpnp_haptics: REG_0xc0e3 = 0x80
-
-			
-			
-			其实这里问题的关键应该是如何控制马达，如何让他震动，震动时间，强度，震动频率
-			{
-			
-			
-			}
-		
-		}
-
-
-
-
-
-
+、
 
 
 
@@ -343,12 +395,7 @@ pmic给cpu供电的
 
 			这个问题驱动电源是无法改善的，更该会影响系统性能，请 从相机功耗优化的出发点考虑
 			
-			
-			
-			
-			
-			
-			
+
 			{
 				msm-thermal
 				
