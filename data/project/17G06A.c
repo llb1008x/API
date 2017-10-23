@@ -1117,7 +1117,7 @@
  7.PMI8937平台，手机battery ID接触稍晚，手机不开机，请提供在SBL里re-detected ID的方法；
  {
 	 case id:03154979
-	 
+
 	 首先要弄清楚这个问题的情况：
 	 {
 		 battery_id没扣好，按下powerkey，再接上，不能开机
@@ -1156,7 +1156,9 @@
 	 pm8x41.c
 	 void battery_id_redetection()
 	 {
-	 uint8_t reg = 0x80;
+	 	 uint8_t reg = 0x80;
+		
+		 //可能不是调用这个函数，可以找这个文件下的其他类似函数 
 		 pm8xxx_reg_write (2, 0x4150,0x80, 0); // set 0x80 to 0x4150
 		 pm8xxx_reg_write (2, 0x4051,0, 0);//clear 0x4051
 		 pm8xxx_reg_write (2, 0x4051,0x18, 0); //set 0x18 to 0x4051
@@ -1193,9 +1195,10 @@
 	 CHG_VERIFY(pm_smbchg_bat_if_get_bat_pres_status(device_index, &bat_present));
 	 if( !bat_present )
 	 {
-	 LOGD("Booting up to HLOS: Charger is Connected and NO battery");
-	 err_flag |= pm_smbchg_bat_if_set_min_sys_volt(device_index, 3600); // Set Vsysmin to 3.6V if battery absent
-	 return err_flag;
+	 	LOGD("Booting up to HLOS: Charger is Connected and NO battery");
+	 	err_flag |= pm_smbchg_bat_if_set_min_sys_volt(device_index, 3600); // Set Vsysmin to 3.6V if battery absent
+		 
+		 return err_flag;
 	 }
 
 	 }
@@ -1210,3 +1213,159 @@
 
 
 
+
+
+
+
+
+
+/****************************************************************************************************************************/
+8.调试马达震动强度
+GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，进MMI硬件测试也如此，多次操作如此，清除后台未恢复，重启未恢复 验证10台7台
+{
+
+	motor,vibrate,vibrator,haptic这三个马达震动相关
+	17G06A 关键字是VIB_DRV
+	qcom,qpnp-haptic
+	Turning vibrator on
+	
+	qcom,lra-auto-res-mode : auto resonance technique, four different modes
+	"none" : no auto resonance
+	"zxd" : zero crossing based discontinuous method
+	"qwd" : quarter wave drive method
+	"max-qwd" : Maximum QWD
+	"zxd-eop" : ZXD + End of pattern (This is the Default)
+	
+	控制马达的输出功率可以控制马达的震动强度
+	vmax-mv
+	当然如果是其他模式可以输出waveform的waveform bits的[1 5]可以控制输出当大的倍率
+
+	制动模式，最直接有效的是硬件的控制waveform为当前波形的同大相反波形，还有软件制动
+	也是输出相应的延缓波形，
+	brake-pattern
+	
+	相关文件：
+		qpnp-haptic.c，qpnp-haptic.txt，
+		msm-pmi8937.dtsi，
+		VibratorService.java	
+
+	//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic begin
+	pr_err("in [%s] by lilubao before\n",__func__);
+	//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic end
+	
+
+	
+	其实这里问题的关键应该是如何控制马达，如何让他震动，震动时间，强度，震动频率?
+	{
+		vmax-mv这个是控制输出的，可以控制马达震动强度
+		direct模式是直接以恒定的输出，所以没有波形
+		
+		qcom,wave-samples如果是其他的模式可以通过这个1~5bit控制放大的倍率
+		qcom,wave-samples = [3e 3e 3e 3e 3e 3e 3e 3e];
+  	    qcom,play-mode : must be one of "buffer", "direct", "pwm" or "audio"
+	
+	}
+
+
+	这个是插入充电器未震动的可能原因
+	{
+		插入充电器震动value=300,一般触摸震动是10~30那种，就是说这个是正常触摸震动的时候处于
+		pending状态然后插入充电器，无法调用震动，后面可能执行震动，也可能不执行，但是又把充电器拔出
+		马达就不执行震动了，
+		就可能是操作太快，马达震动还未响应
+	}
+
+}
+
+
+
+
+
+
+/****************************************************************************************************************************/
+9.适配平均电流apk，上报电量计的值
+{
+	TVB，pmic给cpu供电的，如果关机或者掉电的话，应该没有电，如果有电就是没有关机
+	
+	这个问题是在MTK，高通平台都要做
+
+	现在的问题是电量计能上报数值，但是这个数据似乎不对，单位有问题
+	MTK是相对的，充电电量计涨，放电电量计减小，所以相对变化是正确的
+	QCOM是按照电量跟电压计算的，有一个参考轴，电量计不会有负值，相对准确一点
+	电量计跟电量之间是正向关系的
+
+
+	/sys/class/power_supply/battery/coulomb_count
+	向上层暴露库仑计的值，单位0.1mAh。mtk平台和高通平台统一
+
+
+	{
+	Qcom
+		qpnp-smbcharger.c
+	
+		static ssize_t coulomb_count_show(struct device* dev, struct device_attribute* attr, char* buf)
+		{
+			struct power_supply *psy = dev_get_drvdata(dev);
+			struct smbchg_chip *chip = container_of(psy,
+						struct smbchg_chip, batt_psy);
+			int coulomb_count, rc;
+			rc = get_property_from_fg(chip, POWER_SUPPLY_PROP_CHARGE_NOW_RAW, &coulomb_count);
+			//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+			pr_err("in [%s] by lilubao use coulomb count\n",__FUNCTION__);
+			//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
+			return sprintf(buf, "%d\n", coulomb_count/1000);
+		}
+	
+		static DEVICE_ATTR(coulomb_count, 0664, coulomb_count_show, NULL);
+	
+		//Gionee <GN_BSP_CHG> <liujiang> <20170408> add for 107204 begin
+		rc = device_create_file(chip->batt_psy.dev, &dev_attr_coulomb_count); 
+		//Gionee <GN_BSP_CHG> <liujiang> <20170408> add for 107204 end
+	
+	
+		这个文件是他们测试相关功能是否有效，不再正是版本上使用
+		frameworks/base/services/core/java/com/android/server/DrvInspectCoulomb_count.java
+	
+	
+	MTK
+		
+		MTK平台通过什么获取电量计参数的
+		battery_meter_ctrl(BATTERY_METER_CMD_GET_FG_HW_CAR, &fg_coulomb);
+
+		mtk_battery.c
+		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+		static ssize_t show_coulomb_count(struct device* dev, struct device_attribute* attr, char* buf)
+		{
+			int coulomb_count;
+
+			pr_err("coulomb_count apply for application\n");
+
+			battery_meter_ctrl(BATTERY_METER_CMD_GET_FG_HW_CAR, &coulomb_count);
+			return sprintf(buf, "%d\n", coulomb_count);
+		}
+
+		static DEVICE_ATTR(coulomb_count, 0664,show_coulomb_count, NULL);
+
+		int custom_init_batt_supply_sysfs(struct power_supply *psy)
+		{
+			int rc = 0;
+			rc = device_create_file(&(psy->dev), &dev_attr_coulomb_count); 
+			return rc;
+		}
+		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
+
+	    //Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+		custom_init_batt_supply_sysfs(battery_main.psy);
+		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
+
+		init.mt6757.rc
+		#Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin    
+		#coulomb_count 
+			chown system system /sys/class/power_supply/battery/coulomb_count
+			chmod 0660 /sys/class/power_supply/battery/coulomb_count
+		#Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
+		
+	
+	}
+
+}

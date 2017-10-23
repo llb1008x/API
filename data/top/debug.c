@@ -6,180 +6,108 @@
 
 
 
-
-
-
-
-pass，适配平均电流apk，上报电量计的值
+pass,GNSPR#125379,【OTG】U盘通过OTG线连接手机，进入文件管理器选择分类浏览，选择文档查看，本地文档中无PPTX文档
 {
-	TVB，pmic给cpu供电的，如果关机或者掉电的话，应该没有电，如果有电就是没有关机
+	这个在目录浏览中可以看到U盘，就是说U盘的文件系统已经被挂载了，也可以识别文件，功能是正常的
 	
-	这个问题是在MTK，高通平台都要做
+	但是在分类文档内没有看到ppt，分类文档是客制化的apk，可能是分类文档内没有扫描U盘的文档，把文件的路径
+	存储到相应的地方
+	
+	MediaScannerReceiver扫描多媒体文件,MediaProvider,FileManager_IntentBuilder
+	INTERNAL_VOLUME，EXTERNAL_VOLUME内置盘符，外置盘符
 
-	现在的问题是电量计能上报数值，但是这个数据似乎不对，单位有问题
-	MTK是相对的，充电电量计涨，放电电量计减小，所以相对变化是正确的
-	QCOM是按照电量跟电压计算的，有一个参考轴，电量计不会有负值，相对准确一点
-	电量计跟电量之间是正向关系的
+	主要代码路径：
+	/home/llb/project/PRO/source/17G06A/L33_QCOM_8920_17G16A_170605_ALPS/packages_qcom_mp/providers/MediaProvider
+	
+	
+	 /storage/emulated/0 u盘的路径，/storage/B4FE-5315手机给u盘挂载的路径
+	 
+	10-23 10:24:28.881 10385 10385 D MediaScannerReceiver: action: android.intent.action.MEDIA_MOUNTED path: /storage/B4FE-5315 externalStoragePath: /storage/emulated/0	
+	10-23 10:24:28.900 10385 10385 V MediaScannerReceiver: directory: /storage/emulated/0
+	10-23 10:24:28.900 10385 10385 V MediaScannerReceiver: directory: /storage/B4FE-5315
+	10-23 10:24:28.901 10385 10385 D MediaScannerReceiver: otg is mounted,path: /storage/B4FE-5315
+	10-23 10:24:28.901 10385 10385 V MediaScannerReceiver: scanDir /storage/B4FE-5315
+	
+	10-23 10:24:29.079 10385 13947 D MediaScannerService: handleScanDirectory /storage/B4FE-5315
+	10-23 10:24:29.080 10385 13947 D MediaScannerService: start scanning volume external: [/storage/B4FE-5315]
+	10-23 10:24:29.080 10385 13947 D MediaScannerService: scan>>>: volumeName = external, directories = [/storage/B4FE-5315]
+	10-23 10:24:29.081  1604  1809 I perm_ctrl: pkgName:com.android.providers.media, permission:android.permission.WAKE_LOCK GRANTED
+	
+	
+	检查文件的一些信息，是否是压缩文档，是否私有的
+	10-23 10:25:05.333 10371 10371 D FileManager_CompressedUtility: isCompressedFile, type: /storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt
+	10-23 10:25:05.334 10371 10371 D FileManager_IntentBuilder: viewFile, filePath: /storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt, isPrivacy: false params:null
+	10-23 10:25:05.337  1604  2342 D SettingsInterface:  from settings cache , name = encrypt_notice_hide_mode , value = null
+	10-23 10:25:05.338 10371 10371 D FileManager_WpsOfficeHelper: size: 0
+	10-23 10:25:05.339 10371 10371 D FileManager_IntentBuilder: isImage, type: application/vnd.ms-powerpoint
+	10-23 10:25:05.339 10371 10371 D FileManager_IntentBuilder: isVideoSupport, type: application/vnd.ms-powerpoint
+	10-23 10:25:05.341 10371 10371 D FileManager_IntentBuilder: startActivity, intent: Intent { act=android.intent.action.VIEW dat=file:///storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt typ=application/vnd.ms-powerpoint flg=0x10008000 }
+	10-23 10:25:05.378  1604  2067 I perm_ctrl: pkgName:com.gn.drivingpattern, permission:android.permission.DEVICE_POWER GRANTED
+	10-23 10:25:05.380  1604  2895 I ActivityManager: START u0 {act=android.intent.action.VIEW dat=file:///storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt typ=application/vnd.ms-powerpoint flg=0x10008000 cmp=android/com.amigo.internal.app.AmigoResolverActivity} from uid 10007 pid 10371 on display 0
+	
+	
+	
+	这个过程应该是利用MediaProvider这个类扫描文件系统下的文件，将路径组织成newUri=content://media/external/file/4041，然后放到cache中
+	10-23 10:24:50.280 10385 13947 V MediaProvider: insertFile: before insert values=/storage/B4FE-5315/.Trash-1000/files/Windows Xp Sp3.5.iso
+	10-23 10:24:50.282 10385 13947 V MediaProvider: insertFile: after  insert values=/storage/B4FE-5315/.Trash-1000/files/Windows Xp Sp3.5.iso returned: 4041
+	10-23 10:24:50.282 10385 13947 V MediaProvider: insertInternal<<<: return newUri=content://media/external/file/4041
+	10-23 10:24:50.282 10385 13947 V MediaProvider: insertInternal>>>: content://media/external/file, value=mime_type=application/mspowerpoint _data=/storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt title=MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?_size=6098944 is_drm=false date_modified=1505098774 format=47750, match=700
+	10-23 10:24:50.282 10385 13947 V MediaProvider: insertFile>>>: uri=content://media/external/file, mediaType=0, values=mime_type=application/mspowerpoint _data=/storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt title=MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?_size=6098944 is_drm=false date_modified=1505098774 format=47750
+	10-23 10:24:50.292 10385 13947 V MediaProvider: Returning cached entry for /storage/B4FE-5315/test
+	
+	
+	这个应该是上层文件管理apk的问题
 
-	{
-		1.首先要知道电量计是什么函数或者变量获取的，单位，数值是什么？
-	
-		2.创建相关的节点，上层怎么读取数据，要不要经过转换
-	
-	
-	Qcom
-		qpnp-smbcharger.c
-	
-		static ssize_t coulomb_count_show(struct device* dev, struct device_attribute* attr, char* buf)
-		{
-			struct power_supply *psy = dev_get_drvdata(dev);
-			struct smbchg_chip *chip = container_of(psy,
-						struct smbchg_chip, batt_psy);
-			int coulomb_count, rc;
-			rc = get_property_from_fg(chip, POWER_SUPPLY_PROP_CHARGE_NOW_RAW, &coulomb_count);
-			//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-			pr_err("in [%s] by lilubao use coulomb count\n",__FUNCTION__);
-			//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
-			return sprintf(buf, "%d\n", coulomb_count/1000);
-		}
-	
-		static DEVICE_ATTR(coulomb_count, 0664, coulomb_count_show, NULL);
-	
-		//Gionee <GN_BSP_CHG> <liujiang> <20170408> add for 107204 begin
-		rc = device_create_file(chip->batt_psy.dev, &dev_attr_coulomb_count); 
-		//Gionee <GN_BSP_CHG> <liujiang> <20170408> add for 107204 end
-	
-	
-		frameworks/base/services/core/java/com/android/server/DrvInspectCoulomb_count.java
-	
-	
-		MTK平台通过什么获取电量计参数的
-	
-		battery_meter_ctrl(BATTERY_METER_CMD_GET_FG_HW_CAR, &fg_coulomb);
-	
-	
-	
-	MTK
-		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-		static ssize_t show_coulomb_count(struct device* dev, struct device_attribute* attr, char* buf)
-		{
-			int coulomb_count;
-
-			pr_err("in show_coulomb_count before by lilubao\n");
-
-			battery_meter_ctrl(BATTERY_METER_CMD_GET_FG_HW_CAR, &coulomb_count);
-			return sprintf(buf, "%d\n", coulomb_count);
-
-
-		}
-
-		static DEVICE_ATTR(coulomb_count, 0664,show_coulomb_count, NULL);
-		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
-	
-	
-		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-		ret_device_file = device_create_file(&(dev->dev), &dev_attr_coulomb_count);
-		//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-	
-	
-	}
-
-	/sys/class/power_supply/battery/coulomb_count
-	向上层暴露库仑计的值，单位0.1mAh。mtk平台和高通平台统一
-
-	log_bat_status
-
-	fg_cap_learning_check
-
-	//Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count begin
-
-	DEVICE_ATTR
-
-	rc = get_property_from_fg(chip, POWER_SUPPLY_PROP_CHARGE_NOW_RAW, &coulomb_count);
-	./sys/devices/soc/qpnp-smbcharger-17/power_supply/battery/coulomb_count
-	
 
 }
 
 
 
-pass，马达震动强度
-GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，进MMI硬件测试也如此，多次操作如此，清除后台未恢复，重启未恢复 验证10台7台
+
+
+
+
+
+
+
+pass,GNSPR#123200,关机状态》连接充电器-测试机R31电量为29%，测试机R32电量为33%-充电图标-显示的充电浮动图差距太大（对比大金刚2也有此现象）》
+验证10台10台100%
 {
-	插入充电器震动value=300,一般触摸震动是10~30那种，就是说这个是正常触摸震动的时候处于
-	pending状态然后插入充电器，无法调用震动，后面可能执行震动，也可能不执行，但是又把充电器拔出
-	马达就不执行震动了，
-	就可能是操作太快，马达震动还未响应
-
-	motor,vibrate,vibrator,haptic这三个马达震动相关
-	17G06A 关键字是VIB_DRV
-	qcom,qpnp-haptic
-	Turning vibrator on
+	现象：电量为29%是橙色的，32%是绿色的，而且两个的浮动比例差距很大
 	
-	qcom,lra-auto-res-mode : auto resonance technique, four different modes
-	"none" : no auto resonance
-	"zxd" : zero crossing based discontinuous method
-	"qwd" : quarter wave drive method
-	"max-qwd" : Maximum QWD
-	"zxd-eop" : ZXD + End of pattern (This is the Default)
-	
-	估计跟这个有关
-	brake-pattern，wave-play-rate-us,vmax-mv这个是控制输出功率的
-	
-	相关文件：
-		qpnp-haptic.c，qpnp-haptic.txt，
-		msm-pmi8937.dtsi，
-		VibratorService.java	
-
-	//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic begin
-	pr_err("in [%s] by lilubao before\n",__func__);
-	//Gionee <GN_BSP_CHG> <lilubao> <20171018> add for haptic end
-	
-	
-	qpnp_haptics: REG_0xc00a = 0x0
-	qpnp_haptics: REG_0xc00b = 0x0
-	qpnp_haptics: REG_0xc00c = 0x0
-	qpnp_haptics: REG_0xc046 = 0x0
-	qpnp_haptics: REG_0xc048 = 0x1
-	qpnp_haptics: REG_0xc04c = 0x1
-	qpnp_haptics: REG_0xc04d = 0x1
-	qpnp_haptics: REG_0xc04e = 0x0
-	qpnp_haptics: REG_0xc04f = 0x0
-	qpnp_haptics: REG_0xc051 = 0x22
-	qpnp_haptics: REG_0xc052 = 0x1
-	qpnp_haptics: REG_0xc053 = 0x1
-	qpnp_haptics: REG_0xc054 = 0x1c
-	qpnp_haptics: REG_0xc055 = 0x4
-	qpnp_haptics: REG_0xc056 = 0x1
-	qpnp_haptics: REG_0xc057 = 0x0
-	qpnp_haptics: REG_0xc058 = 0x1
-	qpnp_haptics: REG_0xc05c = 0xf
-	qpnp_haptics: REG_0xc05e = 0x0
-	qpnp_haptics: REG_0xc060 = 0x0
-	qpnp_haptics: REG_0xc061 = 0x0
-	qpnp_haptics: REG_0xc062 = 0x0
-	qpnp_haptics: REG_0xc063 = 0x0
-	qpnp_haptics: REG_0xc064 = 0x0
-	qpnp_haptics: REG_0xc065 = 0x0
-	qpnp_haptics: REG_0xc066 = 0x0
-	qpnp_haptics: REG_0xc067 = 0x0
-	qpnp_haptics: REG_0xc070 = 0x0
-	qpnp_haptics: REG_0xc0e3 = 0x80
-
-	
-	
-	其实这里问题的关键应该是如何控制马达，如何让他震动，震动时间，强度，震动频率
+	首先要确定关机充电在哪？充电图标怎么显示的，如何控制变化？
 	{
-		vmax-mv这个是控制输出的，可以控制马达震动强度
-		direct模式是直接以恒定的输出，所以没有波形
+		控制代码在healthd目录下面
+		GN_Q_BSP_POWEROFF_CHARGER_UI_TYPE := AMIGO_UI_720P
 		
-		qcom,wave-samples如果是其他的模式可以通过这个1~5bit控制放大的倍率
-		qcom,wave-samples = [3e 3e 3e 3e 3e 3e 3e 3e];
-  	    qcom,play-mode : must be one of "buffer", "direct", "pwm" or "audio"
+		生成的logo在$$(TARGET_ROOT_OUT)/res/images/charger目录下
 	
 	}
+	
+	
+	//Gionee <GN_BSP_CHG> <lilubao> <201710120> modify for healthd begin
+	LOGE("in [%s] by lilubao after\n",__FUNCTION__);
+	//Gionee <GN_BSP_CHG> <lilubao> <201710120> modify for healthd end
+	
+	phone
+	./sbin/healthd
+
+	pc
+	./symbols/sbin/healthd
+	./obj/EXECUTABLES/healthd_intermediates/healthd
+	./obj/EXECUTABLES/healthd_intermediates/LINKED/healthd
+	./obj/EXECUTABLES/healthd_intermediates/PACKED/healthd
+	./root/sbin/healthd
+	./recovery/root/sbin/healthd
 
 }
+
+
+
+
+
+
+
 
 
 
@@ -242,48 +170,38 @@ GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，�
 		测试建议：
 		
 		
-		
-		GNSPR#123200,关机状态》连接充电器-测试机R31电量为29%，测试机R32电量为33%-充电图标-显示的充电浮动图差距太大（对比大金刚2也有此现象）》
-		验证10台10台100%
-		{
-			现象：电量为29%是橙色的，32%是绿色的，而且两个的浮动比例差距很大
-			
-			首先要确定关机充电在哪？充电图标怎么显示的，如何控制变化？
-			{
-				控制代码在healthd目录下面
-				GN_Q_BSP_POWEROFF_CHARGER_UI_TYPE := AMIGO_UI_720P
-				
-				生成的logo在$$(TARGET_ROOT_OUT)/res/images/charger目录下
-			
-			}
-			
-			
-			//Gionee <GN_BSP_CHG> <lilubao> <201710120> modify for healthd begin
-			LOGE("in [%s] by lilubao after\n",__FUNCTION__);
-			//Gionee <GN_BSP_CHG> <lilubao> <201710120> modify for healthd end
-			
-			phone
-			./sbin/healthd
 
-			pc
-			./symbols/sbin/healthd
-			./obj/EXECUTABLES/healthd_intermediates/healthd
-			./obj/EXECUTABLES/healthd_intermediates/LINKED/healthd
-			./obj/EXECUTABLES/healthd_intermediates/PACKED/healthd
-			./root/sbin/healthd
-			./recovery/root/sbin/healthd
+		
+		
+		GNSPR#121275,开启手电筒后台播放音乐》进入游戏捕鱼电玩城后，按home键退出，点击app键卡顿，手电筒自动关闭，下拉状态栏手电筒图标显示开启，
+		点击关闭后再次开启无异常 1台出现1次
+		{
+			首先要确定问题的log在哪个位置，跟哪些代码有关
+			
+			闪光灯
+			drivers/media/platform/msm/camera_v2/sensor/flash/msm_flash.c
+			
+			相关的代码：
+			kernel/msm-3.18/drivers/leds/leds-qpnp.c
+			
+			lut:Look Up Table参考表格
+			LPG:light pulse generator
+			VDD_TORCH，VDD_FLASH
+			
+			
+			VPH_PWR can droop when the flash strobes and battery are low, or if other high current
+			applications are running. If VPH_PWR droops too low, such as less than 2.5 V, UVLO might
+			occur and cause the device to crash.
+			To prevent UVLO events, the flash module monitors the VPH_PWR. If VPH_PWR is less than
+			the VPH_PWR_DROOP_THRESHOLD, the hardware clamps the current to the programmed
+			clamp current (software default is 200 mA). The VPH_PWR_DROOP_THRESHOLD software
+			default is 3 V.
+			If the current is less than the programmed clamp current when VPH_PWR hits the threshold, the
+			current does not continue to rise to match the clamp current. Instead, it levels off until the flash
+			strobe event ends.
 		
 		
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 		
 		
@@ -326,14 +244,30 @@ GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，�
 		
 		
 		
-、
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 
 
-
-
-
-
-
+		
+		
+		
+		
+		
+		
 
 
 		温升问题：
