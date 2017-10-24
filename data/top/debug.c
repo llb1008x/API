@@ -199,8 +199,38 @@ pass,GNSPR#123200,关机状态》连接充电器-测试机R31电量为29%，测�
 			If the current is less than the programmed clamp current when VPH_PWR hits the threshold, the
 			current does not continue to rise to match the clamp current. Instead, it levels off until the flash
 			strobe event ends.
-		
-		
+			
+			dump pimc register
+			80-NL708-1
+			
+			电源管理关掉了闪光灯
+			frameworks/base/core/java/android/os/PowerManager.java
+			10-08 11:51:35.249  1804  1804 E PowerManager: setTorchBrightness:0
+			
+			
+			drivers/media/platform/msm/camera_v2/sensor/flash/msm_flash.c
+			
+			
+			
+			Run the following commands to test each flash or torch LED individually:
+			adb shell "echo 255 > /sys/class/leds/led:flash_0/brightness"
+			adb shell "echo 1 > /sys/class/leds/led:switch/brightness"
+			
+			Run the following commands to enable flash:
+			adb shell "echo 255 > /sys/class/leds/led:flash_0/brightness"
+			adb shell "echo 255 > /sys/class/leds/led:flash_1/brightness"
+			adb shell "echo 1 > /sys/class/leds/led:switch/brightness"
+			
+			Run the following commands to disable flash
+			adb shell "echo 0 > /sys/class/leds/led:flash_0/brightness"
+			adb shell "echo 0 > /sys/class/leds/led:flash_1/brightness"
+			adb shell "echo 0 > /sys/class/leds/led:switch/brightness"
+			
+			Run the following commands to turn on torch:
+			adb shell "echo 100 > /sys/class/leds/led:torch_0/brightness"
+			adb shell "echo 100 > /sys/class/leds/led:torch_1/brightnes"
+
+			//Gionee <GN_BSP_CHG> <lilubao> <20171024> modify for torch begin
 		}
 		
 		
