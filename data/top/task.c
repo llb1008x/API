@@ -45,22 +45,12 @@
 	
 	FG: log_bat_status
 	
+	usbid_change_handler		插入otg检测
 	
-	关闭sensors
-	2. Please follow below steps to disable sensor to test again.
-	#1
-	LINUX\android\device\qcom\common\rootdir\etc\init.qcom.sh
-	...
-	//start_sensor
-	#2.
-	adsp_proc\qdsp6\main\src\main.c
-	#if defined(SIM)
-	volatile boolean RunSensors = FALSE;
-	#else
-	volatile boolean RunSensors = TRUE; // Change to FALSE from TRUE
-	#endif
-
-
+	MediaScannerReceiver		扫描u盘文件
+	FileManager_CompressedUtility
+	
+	
 
 	缩写	
 	RPM:Resource Power Manager

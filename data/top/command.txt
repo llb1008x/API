@@ -665,7 +665,19 @@ qcom 烧写 当然要换路径
 		**编译android原生代码相关的命令(这个要实践，搭建android开发环境，编译原生代码)
 
 
-
+		关闭sensors
+		2. Please follow below steps to disable sensor to test again.
+		#1
+		LINUX\android\device\qcom\common\rootdir\etc\init.qcom.sh
+		...
+		//start_sensor
+		#2.
+		adsp_proc\qdsp6\main\src\main.c
+		#if defined(SIM)
+		volatile boolean RunSensors = FALSE;
+		#else
+		volatile boolean RunSensors = TRUE; // Change to FALSE from TRUE
+		#endif
 
 6.linux 下常用命令
 
@@ -760,7 +772,9 @@ qcom 烧写 当然要换路径
 
 		sudo apt-get -f install
 
-		
+
+		sudo fdisk -l	
+		sudo df -T -h
 
 7.通过ftp挂在烧写服务器上的rom(当然也可以用文件系统直接登陆，拷贝rom包到本地)
 
