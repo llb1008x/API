@@ -6,6 +6,7 @@
 
 
 
+
 pass,GNSPR#125379,【OTG】U盘通过OTG线连接手机，进入文件管理器选择分类浏览，选择文档查看，本地文档中无PPTX文档
 {
 	这个在目录浏览中可以看到U盘，就是说U盘的文件系统已经被挂载了，也可以识别文件，功能是正常的
@@ -15,6 +16,7 @@ pass,GNSPR#125379,【OTG】U盘通过OTG线连接手机，进入文件管理器�
 	
 	MediaScannerReceiver扫描多媒体文件,MediaProvider,FileManager_IntentBuilder
 	INTERNAL_VOLUME，EXTERNAL_VOLUME内置盘符，外置盘符
+	usbid_change_handler: triggered
 
 	主要代码路径：
 	/home/llb/project/PRO/source/17G06A/L33_QCOM_8920_17G16A_170605_ALPS/packages_qcom_mp/providers/MediaProvider
@@ -65,11 +67,6 @@ pass,GNSPR#125379,【OTG】U盘通过OTG线连接手机，进入文件管理器�
 
 
 
-
-
-
-
-
 pass,GNSPR#123200,关机状态》连接充电器-测试机R31电量为29%，测试机R32电量为33%-充电图标-显示的充电浮动图差距太大（对比大金刚2也有此现象）》
 验证10台10台100%
 {
@@ -107,6 +104,17 @@ pass,GNSPR#123200,关机状态》连接充电器-测试机R31电量为29%，测�
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 OTG类问题
 {
 	GNSPR #123451,手机内插入SD卡，OTG连接U盘复制粘贴（移动）至手机内部存储器，粘贴后显示正在更新系统媒体库，加载圈长时间不消失
@@ -129,6 +137,8 @@ OTG类问题
 	底层实际上U盘已经读到了，只不过是 一直在检查文件系统错误，这个快的话只有2～3秒，慢的话 要10多秒； 有的U盘甚至要20多秒； 从log看还没检查完就拔掉了，最多的是等了13秒，请 多等待一下 应该就可以了；如果 等很久 还不行 再报 bug，并提供log 分析；
 	
 	兼容性问题
+	
+	amigoOtgController.java
 
 }
 
@@ -198,6 +208,25 @@ OTG类问题
 /*********************************************************************************************************************************/
 17G06A
 {
+		SD卡
+			http://blog.csdn.net/zqixiao_09/article/details/51039378
+			Linux SD卡驱动开发(一) —— SD 相关基础概念 
+
+
+		热插拔事件的处理
+
+		
+		USB
+			http://blog.csdn.net/zqixiao_09/article/details/50984412
+			Linux USB 驱动开发实例（一） —— USB摄像头驱动实现源码分析 
+			Linux USB 驱动开发（一）—— USB设备基础概念 
+			http://blog.csdn.net/zqixiao_09/article/details/50984074
+
+
+
+
+
+
 
 		GNSPR#122265，连接充电器，长按电源键关机，关机完成后，长按电源键5s测机不开机，只显示在关机充电图标界面，
 		（在充电图标界面长按电源键则可以开机），用户体检不佳 暂未恢复 对比17G16-T0119版本有此现象，对比17G02-T2638版本无此现象，
@@ -249,23 +278,55 @@ OTG类问题
 			(healthd_mode_charger.cpp) set_key_callback -> update_input_state -> input_callback
 			
 			
+			//Gionee <GN_BSP_CHG> <lilubao> <201710125> modify for healthd begin
+			LOGE("in [%s] by lilubao after\n",__FUNCTION__);
+			//Gionee <GN_BSP_CHG> <lilubao> <201710125> modify for healthd end
 			
-			//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd begin
+			drivers/video/msm/mdss/mdss_dsi_panel.c 
+			mdss_dsi_panel_bl_ctrl  控制背光		
 
 		
 		}
 
 
 
-
-
-
-
-
-
-
-
 	
+		GNSPR#120204,【品质】开启反向充电和OTG,连接U盘，拔掉T卡，进入存储和USB查看仍显示U向盘正常使用，对比17G16也是如此，
+		17G07无此现象【必现】
+		{
+			这个是读卡器拔掉之后u盘仍然可以使用，但是我本地的是拔掉之后立刻消失的
+			
+			T卡在19：01插入，中间拔出但是系统并没有unmount掉
+			所以中间一直可以显示u盘可以使用，因为挂载扫描到的entries一直保留没有删除
+			直到19:02才unmount掉，可能是上次eject失败
+			10-03 19:01:21.572 6061 6061 D MediaScannerReceiver: action: android.intent.action.MEDIA_MOUNTED path: /storage/3856-0FF8 externalStoragePath: /storage/emulated/0
+
+			10-03 19:02:37.465 6061 6061 D MediaScannerReceiver: action: android.intent.action.MEDIA_UNMOUNTED path: /storage/3856-0FF8 externalStoragePath: /storage/emulated/0
+
+			10-03 19:02:37.465 6061 6061 D MediaScannerReceiver: unmount storage /storage/3856-0FF8
+			10-03 19:02:37.465 1188 4644 D SettingsInterface: from settings cache , name = sys_storage_threshold_percentage , value = null
+			10-03 19:02:37.466 6061 6061 D MediaProvider: Trigger to delete all entries again because miss eject intent.
+					
+			我本地试了T卡+读卡器通过OTG连接手机，中间拔掉T卡，U盘盘符很快消失，17G16A也是很快消失
+			请测试更换读卡器和T卡测试是否还有这样的问题	
+			
+			
+			将T卡插入读卡器，通过OTG线插入手机端，然后拔出T卡，但是U盘盘符仍然存在，也能进入U盘
+			从demsg看，udbid并没有下电(1192插入，5~10s内拔除)，u盘盘符一直存在直到把OTG线拔出
+
+			<6>[ 1192.000644] *(0)[307:irq/212-usbid-c]SMBCHG: usbid_change_handler: setting usb psy OTG = 1
+			<6>[ 1192.000968] *(0)[307:irq/212-usbid-c]SMBCHG: usbid_change_handler: OTG detected
+			<6>[ 1296.776107] *(0)[307:irq/212-usbid-c]SMBCHG: usbid_change_handler: triggered
+			<6>[ 1296.776156] *(0)[307:irq/212-usbid-c]SMBCHG: usbid_change_handler: setting usb psy OTG = 0	
+					
+					
+			MediaScannerReceiver
+			usbid_change_handler
+		}
+
+
+
+
 
 
 
@@ -532,8 +593,6 @@ OTG类问题
 			current does not continue to rise to match the clamp current. Instead, it levels off until the flash
 			strobe event ends.
 			
-			dump pimc register
-			80-NL708-1
 			
 			电源管理关掉了闪光灯
 			frameworks/base/core/java/android/os/PowerManager.java
@@ -569,14 +628,7 @@ OTG类问题
 		
 
 		
-		
-
-
-		
-		
-		
-		
-		
+	
 
 
 		温升问题：
@@ -655,6 +707,31 @@ OTG类问题
 
 
 /*****************************************************************************************************/	
+
+Based on these selections, the following information can be used to help resolve issues problems in this particular area:
+
+To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
+
+80-P2485-18 : MSM8937 System Drivers PMIC Overview
+80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
+80-NV610-43 : System Drivers PMIC Dead Battery Charging Overview
+80-NV610-44 : MSM8937.LA Charger SW User Guide
+
+For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
+
+80-NR097-1 : PMIC Software Master Document
+80-NR097-2 : PMIC Software KB Solution Master Document
+
+
+80-NL708-1		dump pimc register
+
+
+
+
+
+
+
+
 关机充电的流程
 {
 	Android Bootloader - UART_DM Initialized!!!

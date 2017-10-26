@@ -387,6 +387,12 @@ other：
 	http://blog.csdn.net/xl19862005/article/details/8517921
 
 
+	Android热插拔事件处理详解 
+	https://yq.aliyun.com/articles/63629
+
+
+	Linux USB 驱动开发实例（一） —— USB摄像头驱动实现源码分析 
+	http://blog.csdn.net/zqixiao_09/article/details/50984412
 
 
 
