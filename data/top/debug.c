@@ -223,7 +223,73 @@ OTG类问题
 			http://blog.csdn.net/zqixiao_09/article/details/50984074
 
 
+		GNSPR#129375,取出冗余log
+		{
+			//Gionee <GN_BSP_CHG> <lilubao> <201710127> remove redundant log begin
+			
+			//Gionee <GN_BSP_CHG> <lilubao> <201710127> remove redundant log end
+			
+			1.haptic 
+				qpnp-haptic.c,qpnp_hap_td_enable
+				pr_err("@@@qpnp_hap_td_enable: @value=%d, @hap->timeout_ms=%d\n", value, hap->timeout_ms);
+				
+			2.charger
+				qpnp-smbcharger.c,dump_chg_regs 在smbcharger中定义的但是在fg中调用的
+				static int smbchg_debug_mask = 0x36; 
+			
+				qpnp-fg.c, log_bat_status
+				static int fg_debug_mask = 0xE4;
+			
+			3.thermal
+				msm_thermal.c,msm_thermal_update_freq
+				
+			4.warning log
+			 cut here 一种是创建文件节点的权限不匹配
+			 因为coulomb_count，但是这个节点只有show，没有shore
+			 static DEVICE_ATTR(coulomb_count, 0664, coulomb_count_show, NULL);
+			 这里是Attribute coulomb_count: write permission without 'store'
+				<4>[    2.707612] *(3)[56:kworker/u8:2]------------[ cut here ]------------
+				<4>[    2.707623] *(3)[56:kworker/u8:2]WARNING: CPU: 3 PID: 56 at /home/gncompiler/data/MAIN_GIT_REPO_CODE/BJ17G06A_MAIN_REPO/L33_QCOM_8920_17G16A_170605_ALPS/L33_QCOM_8920_17G16A_170605_ALPS/android_qcom_mp/kernel/msm-3.18/drivers/base/core.c:548 device_create_file+0x80/0xb0()
+				<4>[    2.707629] *(3)[56:kworker/u8:2]Attribute coulomb_count: write permission without 'store'
+				<4>[    2.707633] *(3)[56:kworker/u8:2]Modules linked in:
+				<4>[    2.707642] -(3)[56:kworker/u8:2]CPU: 3 PID: 56 Comm: kworker/u8:2 Tainted: G        W      3.18.31-perf #1
+				<4>[    2.707648] -(3)[56:kworker/u8:2]Hardware name: Qualcomm Technologies, Inc. MSM8917-PMI8937 QRD SKU5 (DT)
+				<4>[    2.707656] -(3)[56:kworker/u8:2]Workqueue: deferwq deferred_probe_work_func
+				<0>[    2.707663] -(3)[56:kworker/u8:2]Call trace:
+				<4>[    2.710924] -(3)[56:kworker/u8:2][<ffffffc000089afc>] dump_backtrace+0x0/0x270
+				<4>[    2.710933] -(3)[56:kworker/u8:2][<ffffffc000089d80>] show_stack+0x14/0x1c
+				<4>[    2.710940] -(3)[56:kworker/u8:2][<ffffffc000d41008>] dump_stack+0x80/0xa4
+				<4>[    2.710949] -(3)[56:kworker/u8:2][<ffffffc0000a2f70>] warn_slowpath_common+0x8c/0xb0
+				<4>[    2.710957] -(3)[56:kworker/u8:2][<ffffffc0000a2ff4>] warn_slowpath_fmt+0x60/0x80
+				<4>[    2.710964] -(3)[56:kworker/u8:2][<ffffffc00053b3ac>] device_create_file+0x80/0xb0
+				<4>[    2.710973] -(3)[56:kworker/u8:2][<ffffffc000866328>] smbchg_probe+0x1cbc/0x1e90
+				<4>[    2.710983] -(3)[56:kworker/u8:2][<ffffffc00094d018>] spmi_drv_probe+0x14/0x1c
+				<4>[    2.710991] -(3)[56:kworker/u8:2][<ffffffc00053fe78>] driver_probe_device+0x1cc/0x3d4
+				<4>[    2.710999] -(3)[56:kworker/u8:2][<ffffffc0005400ac>] __device_attach+0x2c/0x4c
+				<4>[    2.711007] -(3)[56:kworker/u8:2][<ffffffc00053dfc0>] bus_for_each_drv+0x7c/0xac
+				<4>[    2.711014] -(3)[56:kworker/u8:2][<ffffffc00053fc24>] device_attach+0x70/0x9c
+				<4>[    2.711022] -(3)[56:kworker/u8:2][<ffffffc00053f0e4>] bus_probe_device+0x2c/0xa0
+				<4>[    2.711030] -(3)[56:kworker/u8:2][<ffffffc00053f618>] deferred_probe_work_func+0xa0/0xd0
+				<4>[    2.711039] -(3)[56:kworker/u8:2][<ffffffc0000b9664>] process_one_work+0x25c/0x438
+				<4>[    2.711047] -(3)[56:kworker/u8:2][<ffffffc0000ba078>] worker_thread+0x324/0x440
+				<4>[    2.711055] -(3)[56:kworker/u8:2][<ffffffc0000be2a0>] kthread+0xf0/0xf8
+				<4>[    2.711084] *(3)[56:kworker/u8:2]---[ end trace 57e0f4aa44787eec ]---	
+		
+		}
+		
+		
+		To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
 
+		80-P2485-18 : MSM8937 System Drivers PMIC Overview
+		80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
+		80-NV610-48 : PMIC GPIO and MPP Software Configuration
+
+		For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
+
+		80-NR097-1 : PMIC Software Master Document
+		80-NR097-2 : PMIC Software KB Solution Master Document
+
+	
 
 
 
@@ -236,6 +302,20 @@ OTG类问题
 				S10C 在关机充电条件下，长按powerkey，不会亮屏，长按时间从按下开始，4~5s内重启
 				而17G06A长按会先亮屏，灯灭屏之后，才重新计时，导致时间较长
 				从log上看，长按powerkey，先是down，0.21s之后又up，导致认为是短按，亮屏
+				
+				
+			亮屏条件下检测到up，开始计时
+			[ 15.993615] *(2)[324:charger]charger: [15986] key[116] down
+			[ 16.054725] *(2)[324:charger]charger: reboot_timeout->17986,now->16026
+
+			这个长按之后可以在4~5s内重启
+
+			但是在灭屏条件下长按有问题
+			[ 13.154409] *(1)[324:charger]charger: [13154] key[116] down
+			[ 13.154498] *(1)[324:charger]charger: reboot_timeout->15154,now->13154
+
+			灭屏条件下长按先亮屏但是同时会上报按键抬起的动作，但是按键一直是按着的
+			[ 13.760229] *(1)[324:charger]charger: [13760] key[116] up (was down for 0.606sec)
 			
 			
 			
@@ -282,8 +362,42 @@ OTG类问题
 			LOGE("in [%s] by lilubao after\n",__FUNCTION__);
 			//Gionee <GN_BSP_CHG> <lilubao> <201710125> modify for healthd end
 			
+			
+			//Gionee <GN_BSP_CHG> <lilubao> <201710125> modify for healthd begin
+			pr_err("in [%s] by lilubao after\n",__FUNCTION__);
+			//Gionee <GN_BSP_CHG> <lilubao> <201710125> modify for healthd end
+			
+			
+			
 			drivers/video/msm/mdss/mdss_dsi_panel.c 
 			mdss_dsi_panel_bl_ctrl  控制背光		
+			
+			
+			
+			[   13.154827] *(1)[324:charger]charger: in [healthd_mode_charger_heartbeat] by lilubao before
+			[   13.154837] *(1)[324:charger]charger: in [handle_input_state] by lilubao before
+			[   13.154846] *(1)[324:charger]charger: in [process_key] by lilubao before
+			[   13.154855] *(1)[324:charger]charger: 1111111111111 by lilubao
+			[   13.154866] *(1)[324:charger]charger: reboot_timeout->15154,now->13154
+			[   13.154879] *(1)[324:charger]charger: charger->batt_anim->capacity->37,charger->boot_min_cap->0
+			[   13.154888] *(1)[324:charger]charger: 6666666666666666 by lilubao
+			[   13.154897] *(1)[324:charger]charger: in [set_next_key_check] by lilubao before
+			[   13.154907] *(1)[324:charger]charger: in [set_next_key_check] by lilubao after
+			[   13.154916] *(1)[324:charger]charger: bbbbbbbbbbbbbb by lilubao
+			[   13.154925] *(1)[324:charger]charger: in [process_key] by lilubao after
+			[   13.154934] *(1)[324:charger]charger: in [handle_input_state] by lilubao after
+			[   13.154944] *(1)[324:charger]charger: in [healthd_mode_charger_heartbeat] by lilubao after
+			[   13.740015] *(0)[352:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
+
+			[   13.752729] *0)PM: Some devices failed to suspend, or early wake event detected
+
+			[   13.760122] *(0)[352:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
+			[   13.760161] *(1)[324:charger]charger: in [input_callback] by lilubao before
+			[   13.760175] *(1)[324:charger]charger: 11111111111
+			[   13.760191] *(1)[324:charger]charger: in [update_input_state] by lilubao before 
+			[   13.760203] *(1)[324:charger]charger: ev->code->116,ev->value->0
+			[   13.760216] *(1)[324:charger]charger: in [set_key_callback] by lilubao before
+			[   13.760229] *(1)[324:charger]charger: [13760] key[116] up (was down for 0.606sec)
 
 		
 		}
