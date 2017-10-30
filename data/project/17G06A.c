@@ -1365,7 +1365,304 @@ GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，�
 			chmod 0660 /sys/class/power_supply/battery/coulomb_count
 		#Gionee <GN_BSP_CHG> <lilubao> <20171016> add for update coulomb_count end
 		
-	
+		这个还有一个问题就是权限问题，创建节点的时候只有一个read函数，没有write所以分配权限不应该有写
+		权限
+		static DEVICE_ATTR(coulomb_count, 0444,show_coulomb_count, NULL);
 	}
+
+}
+
+
+
+
+/******************************************************************************************/
+10.GNSPR#125379,【OTG】U盘通过OTG线连接手机，进入文件管理器选择分类浏览，选择文档查看，本地文档中无PPTX文档
+{
+	这个在目录浏览中可以看到U盘，就是说U盘的文件系统已经被挂载了，也可以识别文件，功能是正常的
+	
+	但是在分类文档内没有看到ppt，分类文档是客制化的apk，可能是分类文档内没有扫描U盘的文档，把文件的路径
+	存储到相应的地方
+	
+	MediaScannerReceiver扫描多媒体文件,MediaProvider,FileManager_IntentBuilder
+	INTERNAL_VOLUME，EXTERNAL_VOLUME内置盘符，外置盘符
+	usbid_change_handler: triggered
+
+	主要代码路径：
+	/home/llb/project/PRO/source/17G06A/L33_QCOM_8920_17G16A_170605_ALPS/packages_qcom_mp/providers/MediaProvider
+	
+	
+	 /storage/emulated/0 u盘的路径，/storage/B4FE-5315手机给u盘挂载的路径
+	 
+	10-23 10:24:28.881 10385 10385 D MediaScannerReceiver: action: android.intent.action.MEDIA_MOUNTED path: /storage/B4FE-5315 externalStoragePath: /storage/emulated/0	
+	10-23 10:24:28.900 10385 10385 V MediaScannerReceiver: directory: /storage/emulated/0
+	10-23 10:24:28.900 10385 10385 V MediaScannerReceiver: directory: /storage/B4FE-5315
+	10-23 10:24:28.901 10385 10385 D MediaScannerReceiver: otg is mounted,path: /storage/B4FE-5315
+	10-23 10:24:28.901 10385 10385 V MediaScannerReceiver: scanDir /storage/B4FE-5315
+	
+	10-23 10:24:29.079 10385 13947 D MediaScannerService: handleScanDirectory /storage/B4FE-5315
+	10-23 10:24:29.080 10385 13947 D MediaScannerService: start scanning volume external: [/storage/B4FE-5315]
+	10-23 10:24:29.080 10385 13947 D MediaScannerService: scan>>>: volumeName = external, directories = [/storage/B4FE-5315]
+	10-23 10:24:29.081  1604  1809 I perm_ctrl: pkgName:com.android.providers.media, permission:android.permission.WAKE_LOCK GRANTED
+	
+	
+	检查文件的一些信息，是否是压缩文档，是否私有的
+	10-23 10:25:05.333 10371 10371 D FileManager_CompressedUtility: isCompressedFile, type: /storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt
+	10-23 10:25:05.334 10371 10371 D FileManager_IntentBuilder: viewFile, filePath: /storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt, isPrivacy: false params:null
+	10-23 10:25:05.337  1604  2342 D SettingsInterface:  from settings cache , name = encrypt_notice_hide_mode , value = null
+	10-23 10:25:05.338 10371 10371 D FileManager_WpsOfficeHelper: size: 0
+	10-23 10:25:05.339 10371 10371 D FileManager_IntentBuilder: isImage, type: application/vnd.ms-powerpoint
+	10-23 10:25:05.339 10371 10371 D FileManager_IntentBuilder: isVideoSupport, type: application/vnd.ms-powerpoint
+	10-23 10:25:05.341 10371 10371 D FileManager_IntentBuilder: startActivity, intent: Intent { act=android.intent.action.VIEW dat=file:///storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt typ=application/vnd.ms-powerpoint flg=0x10008000 }
+	10-23 10:25:05.378  1604  2067 I perm_ctrl: pkgName:com.gn.drivingpattern, permission:android.permission.DEVICE_POWER GRANTED
+	10-23 10:25:05.380  1604  2895 I ActivityManager: START u0 {act=android.intent.action.VIEW dat=file:///storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt typ=application/vnd.ms-powerpoint flg=0x10008000 cmp=android/com.amigo.internal.app.AmigoResolverActivity} from uid 10007 pid 10371 on display 0
+	
+	
+	
+	这个过程应该是利用MediaProvider这个类扫描文件系统下的文件，将路径组织成newUri=content://media/external/file/4041，然后放到cache中
+	10-23 10:24:50.280 10385 13947 V MediaProvider: insertFile: before insert values=/storage/B4FE-5315/.Trash-1000/files/Windows Xp Sp3.5.iso
+	10-23 10:24:50.282 10385 13947 V MediaProvider: insertFile: after  insert values=/storage/B4FE-5315/.Trash-1000/files/Windows Xp Sp3.5.iso returned: 4041
+	10-23 10:24:50.282 10385 13947 V MediaProvider: insertInternal<<<: return newUri=content://media/external/file/4041
+	10-23 10:24:50.282 10385 13947 V MediaProvider: insertInternal>>>: content://media/external/file, value=mime_type=application/mspowerpoint _data=/storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt title=MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?_size=6098944 is_drm=false date_modified=1505098774 format=47750, match=700
+	10-23 10:24:50.282 10385 13947 V MediaProvider: insertFile>>>: uri=content://media/external/file, mediaType=0, values=mime_type=application/mspowerpoint _data=/storage/B4FE-5315/test/MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?ppt title=MTK骞冲彴鐢垫睜鍏呯數杩囩▼鍙婂揩閫熷厖鐢典粙缁?_size=6098944 is_drm=false date_modified=1505098774 format=47750
+	10-23 10:24:50.292 10385 13947 V MediaProvider: Returning cached entry for /storage/B4FE-5315/test
+	
+}
+
+
+
+/********************************************************************************************************/
+11.GNSPR#123200,关机状态》连接充电器-测试机R31电量为29%，测试机R32电量为33%-充电图标-显示的充电浮动图差距太大（对比大金刚2也有此现象）》
+验证10台10台100%
+{
+	现象：电量为29%是橙色的，32%是绿色的，而且两个的浮动比例差距很大
+	
+	首先要确定关机充电在哪？充电图标怎么显示的，如何控制变化？
+	{
+		高通关机充电代码主要在healthd目录下，
+
+		高通控制代码在healthd目录下面
+		GN_Q_BSP_POWEROFF_CHARGER_UI_TYPE := AMIGO_UI_720P
+		
+		生成的logo在$$(TARGET_ROOT_OUT)/res/images/charger目录下
+		在out目录下查找
+
+
+
+		MTK主要在vendor目录下
+		vendor/mediatek/proprietary/external/
+
+		vendor/mediatek/proprietary/bootable/bootloader/lk/
+
+		CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT	控制关机充电图标
+
+	}
+	
+	//Gionee <GN_BSP_CHG> <lilubao> <201710120> modify for healthd begin
+	LOGE("in [%s] by lilubao after\n",__FUNCTION__);
+	//Gionee <GN_BSP_CHG> <lilubao> <201710120> modify for healthd end
+	
+	phone
+	./sbin/healthd
+
+	编译其实只要编kernel就行了
+
+	amigo的关机充电logo分成五类 浮动差距打应该是正常的，图标本身分的也不是很细
+	0~10,10~30,30~70,70~99,100
+
+
+}
+
+
+/***********************************************************************************************************/
+12.GNSPR#129375,取出冗余log
+{
+	//Gionee <GN_BSP_CHG> <lilubao> <201710127> remove redundant log begin
+	封板去除冗余的log跟warning
+	
+	1.haptic 
+		qpnp-haptic.c,qpnp_hap_td_enable
+		pr_err("@@@qpnp_hap_td_enable: @value=%d, @hap->timeout_ms=%d\n", value, hap->timeout_ms);
+		
+	2.charger
+		qpnp-smbcharger.c,dump_chg_regs 在smbcharger中定义的但是在fg中调用的
+		static int smbchg_debug_mask = 0x36; 
+	
+		qpnp-fg.c, log_bat_status
+		static int fg_debug_mask = 0xE4;
+	
+	3.thermal
+		msm_thermal.c,msm_thermal_update_freq
+		
+	4.warning log
+	 cut here 一种是创建文件节点的权限不匹配
+	 因为coulomb_count，但是这个节点只有show，没有shore
+	 static DEVICE_ATTR(coulomb_count, 0664, coulomb_count_show, NULL);
+	 	Attribute coulomb_count: write permission without 'store'
+		<4>[    2.707612] *(3)[56:kworker/u8:2]------------[ cut here ]------------
+		<4>[    2.707623] *(3)[56:kworker/u8:2]WARNING: CPU: 3 PID: 56 at /home/gncompiler/data/MAIN_GIT_REPO_CODE/BJ17G06A_MAIN_REPO/L33_QCOM_8920_17G16A_170605_ALPS/L33_QCOM_8920_17G16A_170605_ALPS/android_qcom_mp/kernel/msm-3.18/drivers/base/core.c:548 device_create_file+0x80/0xb0()
+		<4>[    2.707629] *(3)[56:kworker/u8:2]Attribute coulomb_count: write permission without 'store'
+		<4>[    2.707633] *(3)[56:kworker/u8:2]Modules linked in:
+		<4>[    2.707642] -(3)[56:kworker/u8:2]CPU: 3 PID: 56 Comm: kworker/u8:2 Tainted: G        W      3.18.31-perf #1
+		<4>[    2.707648] -(3)[56:kworker/u8:2]Hardware name: Qualcomm Technologies, Inc. MSM8917-PMI8937 QRD SKU5 (DT)
+		<4>[    2.707656] -(3)[56:kworker/u8:2]Workqueue: deferwq deferred_probe_work_func
+		<0>[    2.707663] -(3)[56:kworker/u8:2]Call trace:
+		<4>[    2.710924] -(3)[56:kworker/u8:2][<ffffffc000089afc>] dump_backtrace+0x0/0x270
+		<4>[    2.710933] -(3)[56:kworker/u8:2][<ffffffc000089d80>] show_stack+0x14/0x1c
+		<4>[    2.710940] -(3)[56:kworker/u8:2][<ffffffc000d41008>] dump_stack+0x80/0xa4
+		<4>[    2.710949] -(3)[56:kworker/u8:2][<ffffffc0000a2f70>] warn_slowpath_common+0x8c/0xb0
+		<4>[    2.710957] -(3)[56:kworker/u8:2][<ffffffc0000a2ff4>] warn_slowpath_fmt+0x60/0x80
+		<4>[    2.710964] -(3)[56:kworker/u8:2][<ffffffc00053b3ac>] device_create_file+0x80/0xb0
+		<4>[    2.710973] -(3)[56:kworker/u8:2][<ffffffc000866328>] smbchg_probe+0x1cbc/0x1e90
+		<4>[    2.710983] -(3)[56:kworker/u8:2][<ffffffc00094d018>] spmi_drv_probe+0x14/0x1c
+		<4>[    2.710991] -(3)[56:kworker/u8:2][<ffffffc00053fe78>] driver_probe_device+0x1cc/0x3d4
+		<4>[    2.710999] -(3)[56:kworker/u8:2][<ffffffc0005400ac>] __device_attach+0x2c/0x4c
+		<4>[    2.711007] -(3)[56:kworker/u8:2][<ffffffc00053dfc0>] bus_for_each_drv+0x7c/0xac
+		<4>[    2.711014] -(3)[56:kworker/u8:2][<ffffffc00053fc24>] device_attach+0x70/0x9c
+		<4>[    2.711022] -(3)[56:kworker/u8:2][<ffffffc00053f0e4>] bus_probe_device+0x2c/0xa0
+		<4>[    2.711030] -(3)[56:kworker/u8:2][<ffffffc00053f618>] deferred_probe_work_func+0xa0/0xd0
+		<4>[    2.711039] -(3)[56:kworker/u8:2][<ffffffc0000b9664>] process_one_work+0x25c/0x438
+		<4>[    2.711047] -(3)[56:kworker/u8:2][<ffffffc0000ba078>] worker_thread+0x324/0x440
+		<4>[    2.711055] -(3)[56:kworker/u8:2][<ffffffc0000be2a0>] kthread+0xf0/0xf8
+		<4>[    2.711084] *(3)[56:kworker/u8:2]---[ end trace 57e0f4aa44787eec ]---	
+
+}
+
+
+
+
+/*************************************************************************************************/
+13.GNSPR#120204,【品质】开启反向充电和OTG,连接U盘，拔掉T卡，进入存储和USB查看仍显示U向盘正常使用，对比17G16也是如此，
+17G07无此现象【必现】
+{
+	这个是读卡器拔掉之后u盘仍然可以使用，但是我本地的是拔掉之后立刻消失的
+	
+	T卡在19：01插入，中间拔出但是系统并没有unmount掉
+	所以中间一直可以显示u盘可以使用，因为挂载扫描到的entries一直保留没有删除
+	直到19:02才unmount掉，可能是上次eject失败
+	10-03 19:01:21.572 6061 6061 D MediaScannerReceiver: action: android.intent.action.MEDIA_MOUNTED path: /storage/3856-0FF8 externalStoragePath: /storage/emulated/0
+
+	10-03 19:02:37.465 6061 6061 D MediaScannerReceiver: action: android.intent.action.MEDIA_UNMOUNTED path: /storage/3856-0FF8 externalStoragePath: /storage/emulated/0
+
+	10-03 19:02:37.465 6061 6061 D MediaScannerReceiver: unmount storage /storage/3856-0FF8
+	10-03 19:02:37.465 1188 4644 D SettingsInterface: from settings cache , name = sys_storage_threshold_percentage , value = null
+	10-03 19:02:37.466 6061 6061 D MediaProvider: Trigger to delete all entries again because miss eject intent.
+			
+	我本地试了T卡+读卡器通过OTG连接手机，中间拔掉T卡，U盘盘符很快消失，17G16A也是很快消失
+	请测试更换读卡器和T卡测试是否还有这样的问题	
+	
+	
+	将T卡插入读卡器，通过OTG线插入手机端，然后拔出T卡，但是U盘盘符仍然存在，也能进入U盘
+	从demsg看，udbid并没有下电(1192插入，5~10s内拔除)，u盘盘符一直存在直到把OTG线拔出
+
+	<6>[ 1192.000644] *(0)[307:irq/212-usbid-c]SMBCHG: usbid_change_handler: setting usb psy OTG = 1
+	<6>[ 1192.000968] *(0)[307:irq/212-usbid-c]SMBCHG: usbid_change_handler: OTG detected
+	<6>[ 1296.776107] *(0)[307:irq/212-usbid-c]SMBCHG: usbid_change_handler: triggered
+	<6>[ 1296.776156] *(0)[307:irq/212-usbid-c]SMBCHG: usbid_change_handler: setting usb psy OTG = 0	
+			
+			
+	MediaScannerReceiver
+	usbid_change_handler
+
+	正常使用的时候从读卡器端拔出T卡，usbid仍然有电，而otg外设是通过usbid判断是插入还是拔出的，
+	这个还跟读卡器有关，有的读卡器拔掉T的时候会下电，盘符会立刻小时，有的读卡器不会下电，所以一直显示
+	还挂载在上面
+}
+
+
+
+
+/***********************************************************************************************************/
+GNSPR #116094,T卡插入读卡器通过OTG线与手机连接，进行插拔操作，手机出现不识别U盘现象
+{
+	测试期间底层OTG设备检测到22次插入，但是上层只有17次mount到u盘，
+	没有mount到的是不识别的，u盘插拔次数比较快，导致有时候还没挂载上，又拔出了，然后有插入
+	
+	可能u盘插拔太快，u盘mount到了，然后太快拔出，系统没有立刻unmount，导致下一次插入的时候无法
+	挂载上
+	
+	<3>[ 1491.629076] *(1)[14424:sdcard]FAT-fs (sda1): Directory bread(block 31538) failed
+	<3>[ 1776.836933] *(0)[10026:kworker/0:1]usb 1-1: device not accepting address 5, error -71
+	<3>[ 1776.837054] *(0)[10026:kworker/0:1]usb usb1-port1: unable to enumerate USB device
+	
+	
+
+	OTG 开关打开，插入otg设备
+	<6>[ 3591.190768] *(6)[6216:Binder:3191_5]SMBCHG: gn_Open_Otg_Func: before gn_Open_Otg_Func
+	<6>[ 3591.300595] *(6)[6216:Binder:3191_5]SMBCHG: gn_Open_Otg_Func: gn_Open_Otg_Func is_otg_present = 0
+	<6>[ 3591.360931] *(6)[6216:Binder:3191_5]SMBCHG: gn_Open_Otg_Func: gn_Open_Otg_Func is done.
+	<6>[ 3591.360953] *(6)[6216:Binder:3191_5]SMBCHG: store_otg_mode: store_otg_mode gn_otg_charge_switch_State = 1
+	<6>[ 3591.380641] *(6)[7138:Binder:3191_B]SMBCHG: show_otg_mode: show_otg_mode gn_otg_charge_switch_State = 1
+	<7>[ 3598.588499] *(2)[3185:kworker/2:4]SMBCHG: dump_chg_reg: OTG Config 11F0=0F 11F1=68 11F2=00 11F3=03 11F4=00 11F5=A0 11F6=00 11F7=00 11F8=B8 11F9=A1 11FA=00 11FB=00 11FC=05 11FD=0B 11FE=04 11FF=00
+	<6>[ 3601.012527] *(7)[341:irq/222-usbid-c]SMBCHG: usbid_change_handler: setting usb psy OTG = 1
+	<6>[ 3601.012583] *(7)[341:irq/222-usbid-c]SMBCHG: usbid_change_handler: OTG detected
+	<6>[ 3601.025184] *(5)[82:kworker/u16:1]msm_otg 78db000.usb: phy_reset: success
+	<6>[ 3601.131472] *(5)[82:kworker/u16:1]msm_otg 78db000.usb: USB exited from low power mode
+	<6>[ 3601.131559] *(5)[82:kworker/u16:1]SMBCHG: smbchg_otg_pulse_skip_disable: disabling pulse skip, reason 1
+	<6>[ 3601.131619] *(5)[82:kworker/u16:1]SMBCHG: smbchg_otg_pulse_skip_disable: disabled pulse skip
+	<6>[ 3601.161047] *(5)[82:kworker/u16:1]SMBCHG: smbchg_otg_regulator_enable: Enabling OTG Boost
+	<6>[ 3601.164666] *(4)[82:kworker/u16:1]msm_otg 78db000.usb: phy_reset: success
+	
+	
+	//fail
+	<6>[ 1762.008645] *(3)[9318:kworker/u8:9]SMBCHG: smbchg_otg_regulator_enable: Enabling OTG Boost
+	<6>[ 1762.010417] *(3)[9318:kworker/u8:9]msm_otg 78db000.usb: phy_reset: success
+	<6>[ 1762.118344] *(3)[9318:kworker/u8:9]msm_hsusb_host msm_hsusb_host: EHCI Host Controller
+	<6>[ 1762.119088] *(3)[9318:kworker/u8:9]msm_hsusb_host msm_hsusb_host: new USB bus registered, assigned bus number 1
+	<6>[ 1762.121049] *(3)[9318:kworker/u8:9]msm_hsusb_host msm_hsusb_host: irq 255, io mem 0x078db000
+	<6>[ 1762.137076] *(3)[9318:kworker/u8:9]msm_hsusb_host msm_hsusb_host: USB 2.0 started, EHCI 1.00
+	<6>[ 1762.137567] *(3)[9318:kworker/u8:9]usb usb1: New USB device found, idVendor=1d6b, idProduct=0002
+	<6>[ 1762.137580] *(3)[9318:kworker/u8:9]usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+	<6>[ 1762.137593] *(3)[9318:kworker/u8:9]usb usb1: Product: EHCI Host Controller
+	<6>[ 1762.137604] *(3)[9318:kworker/u8:9]usb usb1: Manufacturer: Linux 3.18.31-perf ehci_hcd
+	<6>[ 1762.137616] *(3)[9318:kworker/u8:9]usb usb1: SerialNumber: msm_hsusb_host
+
+	<6>[ 1762.141546] *(3)[9318:kworker/u8:9]hub 1-0:1.0: USB hub found
+	<6>[ 1762.142145] *(3)[9318:kworker/u8:9]hub 1-0:1.0: 1 port detected
+	<3>[ 1762.178410] -(0)[0:swapper/0]i2c-msm-v2 78b6000.i2c: NACK: slave not responding, ensure its powered: msgs(n:1 cur:0 tx) bc(rx:0 tx:2) mode:FIFO slv_addr:0x1d MSTR_STS:0x0d1300c8 OPER:0x00000090
+	<3>[ 1762.178596] *(0)[283:kworker/u8:4]usb-type-c-pericom 2-001d: i2c write to [1d] failed -107
+	<3>[ 1762.178609] *(0)[283:kworker/u8:4]usb-type-c-pericom 2-001d: i2c access failed
+
+	<6>[ 1762.457631] *(3)[1694:kworker/3:2]usb 1-1: new full-speed USB device number 2 using msm_hsusb_host
+	<3>[ 1762.747030] *(3)[1694:kworker/3:2]usb 1-1: device descriptor read/64, error -71
+	<3>[ 1763.158431] *(3)[1694:kworker/3:2]usb 1-1: device descriptor read/64, error -71
+	<6>[ 1763.387643] *(3)[1694:kworker/3:2]usb 1-1: new full-speed USB device number 3 using msm_hsusb_host
+	<3>[ 1763.647667] *(3)[1694:kworker/3:2]usb 1-1: device descriptor read/64, error -71
+	<3>[ 1764.058560] *(3)[1694:kworker/3:2]usb 1-1: device descriptor read/64, error -71
+	<6>[ 1764.287712] *(3)[1694:kworker/3:2]usb 1-1: new full-speed USB device number 4 using msm_hsusb_host
+	<3>[ 1764.798566] *(3)[1694:kworker/3:2]usb 1-1: device not accepting address 4, error -71
+	<6>[ 1764.918475] *(3)[1694:kworker/3:2]usb 1-1: new full-speed USB device number 5 using msm_hsusb_host
+	<3>[ 1765.467825] *(3)[1694:kworker/3:2]usb 1-1: device not accepting address 5, error -71
+
+	<3>[ 1765.467923] *(3)[1694:kworker/3:2]usb usb1-port1: unable to enumerate USB device
+	<6>[ 1765.486699] *(3)[1694:kworker/3:2]msm_otg 78db000.usb: USB in low power mode
+	<3>[ 1766.517578] *(0)[3166:Binder:1229_8]pangfei GetCamState 125 camstate = 0
+	<3>[ 1766.517594] *(0)[3166:Binder:1229_8]Torch_state_show:1098 [Torch]show camstate : 0 , state: 0 
+	<3>[ 1766.528395] *(1)[9599:Binder:1229_D]pangfei GetCamState 125 camstate = 0
+	<3>[ 1766.528414] *(1)[9599:Binder:1229_D]Torch_state_show:1098 [Torch]show camstate : 0 , state: 0 
+	<7>[ 1766.532892] *(1)[1277:Binder:1229_1][VIB_DRV]<<qpnp_hap_td_enable 1685>> @@@qpnp_hap_td_enable: @value=0, @hap->timeout_ms=15000
+	<3>[ 1766.938072] *(2)[9598:Binder:1229_C]pangfei GetCamState 125 camstate = 0
+	<3>[ 1766.938086] *(2)[9598:Binder:1229_C]Torch_state_show:1098 [Torch]show camstate : 0 , state: 0 
+	<3>[ 1767.033947] *(0)[14000:kworker/0:5]FG: log_bat_status: soc=5278 vbat=3821999 ibat=396573 ocv=3877846 esr=104797 temp=410 vchg=4989440
+	<7>[ 1767.034034] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: CHGR Status 100B=02 100C=2E 100D=70 100E=80 100F=00 1010=00
+	<7>[ 1767.034235] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: CHGR Config 10F0=0F 10F1=03 10F2=10 10F3=01 10F4=2E 10F5=00 10F6=00 10F7=00 10F8=03 10F9=03 10FA=0F 10FB=47 10FC=40 10FD=3F 10FE=00 10FF=09
+	<7>[ 1767.034435] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: OTG Config 11F0=0F 11F1=68 11F2=00 11F3=03 11F4=00 11F5=02 11F6=04 11F7=00 11F8=88 11F9=A1 11FA=00 11FB=1B 11FC=1B 11FD=0C 11FE=1F 11FF=00
+	<7>[ 1767.034455] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: BAT_IF Status 1210=00
+	<7>[ 1767.034474] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: BAT_IF Command 1242=01
+	<7>[ 1767.034625] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: BAT_IF Config 12F0=0F 12F1=04 12F2=26 12F3=C7 12F4=00 12F5=03 12F6=03 12F7=33 12F8=16 12F9=00 12FA=C6 12FB=37
+	<7>[ 1767.034753] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: USB Status 1307=0B 1308=01 1309=00 130A=00 130B=00 130C=00 130D=00 130E=0F 130F=FF 1310=01
+	<7>[ 1767.034773] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: USB Command 1340=13
+	<7>[ 1767.034852] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: USB Config 13F0=0F 13F1=00 13F2=19 13F3=04 13F4=01 13F5=AB
+	<7>[ 1767.034871] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: MISC Status 1608=00
+	<7>[ 1767.034890] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: MISC Status 1610=00
+	<7>[ 1767.035090] *(0)[14000:kworker/0:5]SMBCHG: dump_chg_reg: MISC CFG 16F0=0F 16F1=00 16F2=84 16F3=02 16F4=25 16F5=B8 16F6=18 16F7=B6 16F8=40 16F9=0D 16FA=0E 16FB=9B 16FC=F9 16FD=06 16FE=F3 16FF=02
+	<7>[ 1767.048134] *(0)[537:ABA_THREAD]mdss_dsi_panel_bklt_pwm: bklt_ctrl=0 pwm_period=50 pwm_gpio=1021 pwm_lpg_chan=0
+	<7>[ 1767.048146] *(0)[537:ABA_THREAD]mdss_dsi_panel_bklt_pwm: ndx=0 level=118 duty=23
+	<6>[ 1771.226547] *(2)[58:kworker/u8:3]msm_otg 78db000.usb: USB exited from low power mode
+
+
+
+	<6>[ 1771.232307] *(0)[297:irq/212-usbid-c]SMBCHG: usbid_change_handler: triggered
+	<6>[ 1771.232338] *(0)[297:irq/212-usbid-c]SMBCHG: usbid_change_handler: setting usb psy OTG = 0
+
 
 }

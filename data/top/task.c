@@ -45,10 +45,16 @@
 	
 	FG: log_bat_status
 	
-	usbid_change_handler		插入otg检测
+	usbid_change_handler		插入otg检测，usbid引脚变化会产生这个中断
 	
 	MediaScannerReceiver		扫描u盘文件
-	FileManager_CompressedUtility
+
+	MediaScannerReceiver		扫描多媒体文件
+	MediaProvider,FileManager_IntentBuilder
+	INTERNAL_VOLUME，EXTERNAL_VOLUME内置盘符，外置盘符
+
+	VIB_DRV						马达相关的log
+
 	
 	
 

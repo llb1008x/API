@@ -176,6 +176,94 @@ Windows平台下
 
 
 
+usb stack
+{
+      
+    msm_otg (msm_otg_driver)
+       
+    msm_hsusb (usb_driver)
+    
+    28nm PHY
+    – Ci13xxx_udc.c
+    – Ci13xxx_msm.c
+    android_usb (android_platform_driver)
+   
+    28nm PHY – msm_otg.c
+    android.c
+    msm_hsusb_host (ehci_msm_driver)
+    ehci-msm.c
+    ehci-msm2.c   
+    
+    
+    Similarly, platform devices defined for the USB function drivers have platform drivers
+    implemented in driver-specific files, e.g.:
+    usb_mass_storage(fsg_platform_driver):[f_mass_storage.c]
+    rndis(rndis_platform_driver)[f_rndis.c]
+    usb_diag(usb_diag_driver)[f_diag.c]   
+    
+    
+    
+    usb core probe
+    {
+        msm_otg_probe() [msm_otg.c]
+        Enables USB_HS1 peripheral bus clock (hs_pclk or cc_usb_hs1_hclk)
+        Enables 3.3 and 1.8 VREGs
+        Maps memory mapped (physical address) HS-USB OTG core registers to kernel address
+        space
+        Dynamically initializes the OTG state machine work queue
+        Creates a new worker thread, k_otg, to queue the OTG work queue, etc.
+         Registers the IRQ handler, i.e., msm_otg_irq
+         Registers the callback function for PMIC ID and VBUS notifications
+        ehci_msm_probe() [ehci-msm.c]; platform driver registration occurs in the EHCI host
+        controller driver (ehc-hcd.c) init function
+
+        Creates and initializes usb_hcd, used by the USB core
+        Initializes the ehci-msm host controller-specific driver structure or instance:
+        msm_hc_driver (type hc_driver) instance defined in ehci-msm.c
+        Registration with core is deferred
+        Registers the host driver with the OTG by calling otg_set_host()
+        Calls otg_set_peripheral()
+
+        usb_create_hcd
+        The HCD probe is called before DCD. Consequently, by the time the DCD registers with
+        OTG, HCD is already registered. As both DCD and HCD are registered, OTG kicks the
+        state machine. The OTG state machine initial state is OTG_STATE_UNDEFINED. In
+        this state, the USB hardware is reset and based on the ID/VBUS status, HCD/DCD is
+        activated.
+        ci13xxx_msm_probe() [ci13xxx_msm.c]
+        Maps the USB registers from physical to kernel address space
+        Calls udc_probe() [ci13xxx_udc.c]
+        
+        
+        Initializes structure variables
+        Assigns callbacks for the USB gadget driver usb_gadget_ops
+        Initializes driver hardware bank register values
+        
+       
+        Allocates and initializes a struct ci13xxx device assigned to _udc
+        Saves an offsetted base address for different register I/O APIs, i.e., hw_aread(),
+        hw_cread()
+        Calls device_register() to register it to the system
+        Calls otg_set_peripheral()
+        Creates debugfs files, if enabled
+        
+        
+        android_probe() [android.c]
+        Registers a composite driver, android_usb
+        Populates entries for the Android device of type android_dev, using platform data of the
+        android_usb_device platform device
+    
+        composite_setup() is called during the USB device enumeration to handle standard USB setup
+        requests.
+    
+    }
+    
+
+
+
+}
+
+
 
 
 
