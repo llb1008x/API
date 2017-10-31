@@ -55,20 +55,28 @@
 
 	VIB_DRV						马达相关的log
 
-	
-	
 
 	缩写	
-	RPM:Resource Power Manager
-	PBL:Primary Boot Loader	
-	SBL:Secondary Boot Loader
-	RMR:Reset Management Register
-	SDI:系统调试镜像
-	MBA：modem boot authenticator
-	FLCB：perform fast low current boot
-	APSD：performs automatic power source detection
-	MPSS:modem processor subsystem
-	APSS:Applications processor subsystem
+	{
+		RPM:Resource Power Manager
+		PBL:Primary Boot Loader	
+		SBL:Secondary Boot Loader
+		RMR:Reset Management Register
+		SDI:系统调试镜像
+		MBA：modem boot authenticator
+		FLCB：perform fast low current boot
+		APSD：performs automatic power source detection
+		MPSS:modem processor subsystem
+		APSS:Applications processor subsystem
+	
+		VINTF Vendor Interface
+		HIDL HAL Interface Definition Language
+		VTS Vendor Test Suite
+		NDK Native Development Kit
+		VNDK Vendor NDK
+		LKM Loadable Kernel Modules
+		ABI Application Binary Interface
+	}
 }
 
 
@@ -162,6 +170,10 @@
 
 	#电量显示有问题	
 	常温 充电到5%、15%、30%、50%时，电池电量与ZCV曲线对应电量百分比差值大于5%
+	Dear customer,
+	这题贵司需要解决的问题：电量小于50%时，扣掉电池静置30min后，测量电池电压查ZCV table得出的DOD0，和将电池放回到手机后手机显示的D0相差较大，认为这个电量显示不准确。
+
+	针对这个问题，可以认为为D0 init误差过大，可以开启daemon log，复现抓取Log，搜索关键字dod_init_result，对比下ui_soc的值取得hwocv/swocv/rtc中的哪个，理论上你的上述操作应该取hwocv才对。
 
 
 	#USB充电充电电流频繁跳变，不稳定。USB是2.0的

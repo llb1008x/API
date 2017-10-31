@@ -43,46 +43,124 @@ OTG类问题
 
 
 
+{
+	SD卡
+		http://blog.csdn.net/zqixiao_09/article/details/51039378
+		Linux SD卡驱动开发(一) —— SD 相关基础概念 
+
+
+	热插拔事件的处理
+
+
+	USB
+		http://blog.csdn.net/zqixiao_09/article/details/50984412
+		Linux USB 驱动开发实例（一） —— USB摄像头驱动实现源码分析 
+		Linux USB 驱动开发（一）—— USB设备基础概念 
+		http://blog.csdn.net/zqixiao_09/article/details/50984074
+		
+		
+	ANDROID TREBLE OVERVIEW                                          80-PE644-1
+	ANDROID TREBLE VNDK OVERVIEW                                     80-PE644-2
+	ANDROID TREBLE HIDL OVERVIEW                                     80-PE644-3
+	ANDROID TREBLE KERNEL OVERVIEW                                   80-PE644-4
+	ANDROID TREBLE VTS OVERVIEW                                      80-PE644-5
+	VERIFIED BOOT 2.0 INTRODUCTION                                   80-PE644-6
+	SELINUX OVERVIEW AND UPDATE FOR ANDROID O        				 80-PE644-7
+	
+
+	
+	Android O 前期预研之一：Android Treble 计划
+	http://blog.csdn.net/ljp1205/article/details/77684550	
+	
+	
+	GNSPR#122265
+	To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
+
+	80-P2485-18 : MSM8937 System Drivers PMIC Overview
+	80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
+	80-NV610-48 : PMIC GPIO and MPP Software Configuration
+
+	For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
+
+	80-NR097-1 : PMIC Software Master Document
+	80-NR097-2 : PMIC Software KB Solution Master Document
 
 
 
 
 
+	To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
+
+	80-P2485-18 : MSM8937 System Drivers PMIC Overview
+	80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
+	80-NV610-43 : System Drivers PMIC Dead Battery Charging Overview
+	80-NV610-44 : MSM8937.LA Charger SW User Guide
+
+	For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
+
+	80-NR097-1 : PMIC Software Master Document
+	80-NR097-2 : PMIC Software KB Solution Master Document
 
 
-
-
-
+	80-NL708-1		dump pimc register	
+	
+}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 17G10A
 {
+	GNSPR #128052,【品质压力】测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，重启恢复
+	{
+		(mtk_chg_type_det.c) mt_charger_set_property,power_supply_property
+		->
+		dump_charger_name -> (mtk_usb.c) mt_usb_connect
+		
+		(mtk_charger.c) mtk_charger_int_handler
+		
+		wakeup_fg_algo 唤醒电量计的各种原因 然后封装fgd_msg上报给nl_send_to_user  user space
+		typedef enum {
+			FG_INTR_0 = 0,
+			FG_INTR_TIMER_UPDATE  = 1,
+			FG_INTR_BAT_CYCLE = 2,
+			FG_INTR_CHARGER_OUT = 4,
+			FG_INTR_CHARGER_IN = 8,
+			FG_INTR_FG_TIME =		16,
+			FG_INTR_BAT_INT1_HT =	32,
+			FG_INTR_BAT_INT1_LT =	64,
+			FG_INTR_BAT_INT2_HT =	128,
+			FG_INTR_BAT_INT2_LT =	256,
+			FG_INTR_BAT_TMP_HT =	512,
+			FG_INTR_BAT_TMP_LT =	1024,
+			FG_INTR_BAT_TIME_INT =	2048,
+			FG_INTR_NAG_C_DLTV =	4096,
+			FG_INTR_FG_ZCV = 8192,
+			FG_INTR_SHUTDOWN = 16384,
+			FG_INTR_RESET_NVRAM = 32768,
+			FG_INTR_BAT_PLUGOUT = 65536,
+			FG_INTR_IAVG = 0x20000,
+			FG_INTR_VBAT2_L = 0x40000,
+			FG_INTR_VBAT2_H = 0x80000,
+			FG_INTR_CHR_FULL = 0x100000,
+			FG_INTR_DLPT_SD = 0x200000,
+			FG_INTR_BAT_TMP_C_HT = 0x400000,
+			FG_INTR_BAT_TMP_C_LT = 0x800000,
+			FG_INTR_BAT_INT1_CHECK = 0x1000000,
+			FG_INTR_DUMP_INFO = 0x2000000,
 
+		} FG_INTERRUPT_FLAG;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+		
+	}
+	
+	
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -100,56 +178,6 @@ OTG类问题
 /*********************************************************************************************************************************/
 17G06A
 {
-		SD卡
-			http://blog.csdn.net/zqixiao_09/article/details/51039378
-			Linux SD卡驱动开发(一) —— SD 相关基础概念 
-
-
-		热插拔事件的处理
-
-		
-		USB
-			http://blog.csdn.net/zqixiao_09/article/details/50984412
-			Linux USB 驱动开发实例（一） —— USB摄像头驱动实现源码分析 
-			Linux USB 驱动开发（一）—— USB设备基础概念 
-			http://blog.csdn.net/zqixiao_09/article/details/50984074
-
-
-
-		
-		GNSPR#122265
-		To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
-
-		80-P2485-18 : MSM8937 System Drivers PMIC Overview
-		80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
-		80-NV610-48 : PMIC GPIO and MPP Software Configuration
-
-		For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
-
-		80-NR097-1 : PMIC Software Master Document
-		80-NR097-2 : PMIC Software KB Solution Master Document
-
-	
-
-		
-		
-		To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
-		
-		80-P2485-18 : MSM8937 System Drivers PMIC Overview
-		80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
-		80-NV610-43 : System Drivers PMIC Dead Battery Charging Overview
-		80-NV610-44 : MSM8937.LA Charger SW User Guide
-		
-		For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
-		
-		80-NR097-1 : PMIC Software Master Document
-		80-NR097-2 : PMIC Software KB Solution Master Document
-		
-		
-		80-NL708-1		dump pimc register
-
-
-
 
 		GNSPR#122265，连接充电器，长按电源键关机，关机完成后，长按电源键5s测机不开机，只显示在关机充电图标界面，
 		（在充电图标界面长按电源键则可以开机），用户体检不佳 暂未恢复 对比17G16-T0119版本有此现象，对比17G02-T2638版本无此现象，

@@ -395,6 +395,7 @@ other：
 	http://blog.csdn.net/zqixiao_09/article/details/50984412
 
 
+	github android open source project :https://github.com/aosp-mirror
 
 
 
