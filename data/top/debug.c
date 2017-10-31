@@ -67,6 +67,7 @@ OTG类问题
 	VERIFIED BOOT 2.0 INTRODUCTION                                   80-PE644-6
 	SELINUX OVERVIEW AND UPDATE FOR ANDROID O        				 80-PE644-7
 	
+	Bus 003 Device 021: ID 058f:6387 Alcor Micro Corp. Flash Drive
 
 	
 	Android O 前期预研之一：Android Treble 计划
@@ -281,6 +282,9 @@ OTG类问题
 			[   13.760203] *(1)[324:charger]charger: ev->code->116,ev->value->0
 			[   13.760216] *(1)[324:charger]charger: in [set_key_callback] by lilubao before
 			[   13.760229] *(1)[324:charger]charger: [13760] key[116] up (was down for 0.606sec)
+			
+			
+			连接PC的条件下，关机充电灭屏长按powerkey正常，4~5s震动
 
 		
 		}

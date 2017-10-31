@@ -3,6 +3,38 @@
 
 QCOM
 {
+
+	03190526:GNSPR#122265，连接充电器，长按电源键关机，关机完成后，长按电源键5s测机不开机，只显示在关机充电图标界面
+	{
+		亮屏条件下检测到up，开始计时
+		[ 15.993615] *(2)[324:charger]charger: [15986] key[116] down
+		[ 16.054725] *(2)[324:charger]charger: reboot_timeout->17986,now->16026
+
+		这个长按之后可以在4~5s内重启
+
+		但是在灭屏条件下长按有问题
+		[ 13.154409] *(1)[324:charger]charger: [13154] key[116] down
+		[ 13.154498] *(1)[324:charger]charger: reboot_timeout->15154,now->13154
+
+		灭屏条件下长按先亮屏但是同时会上报按键抬起的动作，但是按键一直是按着的
+		[ 13.760229] *(1)[324:charger]charger: [13760] key[116] up (was down for 0.606sec)
+		
+		
+		Dear customer
+		用串口输入如下打开debug log命令，抓灭屏按power键重启log
+		echo 1 > /sys/module/msm_show_resume_irq/parameters/debug_mask
+		echo 'func __qpnpint_handle_irq +p' > /sys/kernel/debug/dynamic_debug/control
+		echo 8 > proc/sys/kernel/printk
+
+		thanks.
+	
+	}
+
+
+
+
+
+
 		
 	03179131:GNSPR #124362,故事锁屏界面，power键亮屏，连接充电器，无振动提示，再次操作恢复正常 验证2台20次出现2次
 	{

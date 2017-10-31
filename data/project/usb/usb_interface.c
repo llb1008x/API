@@ -3,13 +3,14 @@
 
 
 一个USB设置可以有多个配置，在初始化的过程中，会选择一个默认的配置，选择的方法根据驱动实现而不一样，linux usb会选择第一个标准的配置。
-	else if (udev->descriptor.bDeviceClass !=
-		USB_CLASS_VENDOR_SPEC &&
-		(desc && desc->bInterfaceClass !=
-		USB_CLASS_VENDOR_SPEC)) {
-		best = c;
-		break;
-	}
+
+else if (udev->descriptor.bDeviceClass !=
+	USB_CLASS_VENDOR_SPEC &&
+	(desc && desc->bInterfaceClass !=
+	USB_CLASS_VENDOR_SPEC)) {
+	best = c;
+	break;
+}
 	
 比较的是配置里的class,还有配置第一个接口的第一个设置的class。如果不是VENDOR自己定义的class，也就是标准的class，linux就会选择其为默认的configuration.
 
@@ -63,16 +64,19 @@ fields set to zero and then the endpoint descriptors for that setting, followed 
 and its associated endpoint descriptors. The second interface descriptor’s bInterfaceNumber field would
 also be set to zero, but the bAlternateSetting field of the second interface descriptor would be set to one.
 
-事实上这个interface描述符，就是设置描述符，这个描述符的其中一项叫做bInterfaceNumber，指的就是这个设置是属于哪 个接口。比如一个接口包含2个设置，那么就会有2个interface描述符，两个描述符里的bInterfaceNumber设置都为0，但是第一个设 置的bAlternateSetting为0， 第二个设置的bAlternateSetting为1。这样就区分开来了。
+事实上这个interface描述符，就是设置描述符，这个描述符的其中一项叫做bInterfaceNumber，指的就是这个设置是属于哪 个接口。比如一个接口包含2个设置，那么就会有2个interface描述符，两个描述符里的
+bInterfaceNumber设置都为0，但是第一个设 置的bAlternateSetting为0， 第二个设置的bAlternateSetting为1。这样就区分开来了。
 
 假如一共有5个设置，2个接口。这5个设置，2个属于接口1， 3个属于接口2.
 则就会有2个struct usb_interface,第一个usb_interface里的altsetting有2个，第二个有3个。
 协议里规定，接口的默认设置总是0号设置。
 
 
-至于endpoint描述符，它是属于设置的，每个设置都会有endpoint描述符，也就是每个接口的设置都表示一种功能，既然是实现了功 能，那就必须通过endpoint来传输数据，那到底是用到了几个endpoint呢？每个endpoint的属性是？所以每个接口的设置里就会有 endpoint的描述符。
+至于endpoint描述符，它是属于设置的，每个设置都会有endpoint描述符，也就是每个接口的设置都表示一种功能，既然是实现了功 能，那就必须通过endpoint来传输数据，那到底是用到了几个endpoint呢？每个endpoint
+的属性是？所以每个接口的设置里就会有 endpoint的描述符。
 
-endpoint有个特性，要么只能input,要么只能output,但是也有一个特殊的endpoint，就是endpoint 0,每个USB设备都有这么一个endpoint0,除此endpoint，其他都只能单工的。而且每个endpoint每次传输的大小也不一样，所以就 有了这么个endpoint描述符来对其进行描述。
+endpoint有个特性，要么只能input,要么只能output,但是也有一个特殊的endpoint，就是endpoint 0,每个USB设备都有这么一个endpoint0,除此endpoint，其他都只能单工的。而且每个endpoint每次传输的大小也不一样，
+所以就 有了这么个endpoint描述符来对其进行描述。
 
 
 这里比较费解的就是接口和设置的关系，现在这么一分析就清楚多了。
