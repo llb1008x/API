@@ -117,6 +117,17 @@ OTG类问题
 	
 17G10A
 {
+
+	
+
+
+
+
+
+
+
+
+
 	GNSPR #128052,【品质压力】测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，重启恢复
 	{
 		(mtk_chg_type_det.c) mt_charger_set_property,power_supply_property
@@ -179,6 +190,127 @@ OTG类问题
 /*********************************************************************************************************************************/
 17G06A
 {
+	GNSPR#130660,打开OTG按钮，通过OTG充电线给辅助机（大金刚2 T119版本）充电10分钟以上，电流自动断开，开关按钮自动关闭
+	{
+		
+	
+	}
+
+
+
+
+
+
+
+
+
+
+	dump pimc register,80-NL708-1
+	{
+
+		Mount debug file system
+			adb shell mount -t debugfs none /sys/kernel/debug
+			cd /sys/kernel/debug/spmi/spmi-0
+			
+		Set number of bytes to read/write
+			echo 1 > count
+		
+		Set address
+			echo 0x8041 > address
+		
+		write 
+			echo 0x11 > data
+		
+		read 
+			cat data
+			
+			
+		Example – Set GPIO1 to output high and read back other parameters
+			adb shell mount -t debugfs none /sys/kernel/debug
+			cd /sys/kernel/debug/spmi/spmi-0
+			echo 1 > count
+			echo 0xC040 > address // MODE_CTL
+			echo 0x11 > data
+			// DO + HIGH
+			echo 0xC041 > address // DIG_VIN_CTL
+			cat data	
+					
+
+
+
+		SPMI Debug-FS support
+		
+		Hierarchy schema:
+		/sys/kernel/debug/spmi
+			   /help            -- Static help text
+			   /spmi-0          -- Directory for SPMI bus 0
+			   /spmi-0/address  -- Starting register address for reads or writes
+			   /spmi-0/count    -- Number of registers to read (only used for reads)
+			   /spmi-0/data     -- Initiates the SPMI read (formatted output)
+			   /spmi-0/data_raw -- Initiates the SPMI raw read or write
+			   /spmi-n          -- Directory for SPMI bus n
+
+		To perform SPMI read or write transactions, you need to first write the
+		address of the slave device register to the 'address' file.  For read
+		transactions, the number of bytes to be read needs to be written to the
+		'count' file.
+
+		The 'address' file specifies the 20-bit address of a slave device register.
+		The upper 4 bits 'address[19..16]' specify the slave identifier (SID) for
+		the slave device.  The lower 16 bits specify the slave register address.
+
+		Reading from the 'data' file will initiate a SPMI read transaction starting
+		from slave register 'address' for 'count' number of bytes.
+
+		Writing to the 'data' file will initiate a SPMI write transaction starting
+		from slave register 'address'.  The number of registers written to will
+		match the number of bytes written to the 'data' file.
+
+		Example: Read 4 bytes starting at register address 0x1234 for SID 2
+
+		echo 0x21234 > address
+		echo 4 > count
+		cat data
+
+		Example: Write 3 bytes starting at register address 0x1008 for SID 1
+
+		echo 0x11008 > address
+		echo 0x01 0x02 0x03 > data
+
+		Note that the count file is not used for writes.  Since 3 bytes are
+		written to the 'data' file, then 3 bytes will be written across the
+		SPMI bus.
+		
+		
+		
+		static struct fg_mem_data fg_data[FG_DATA_MAX] = {
+			/*       ID           Address, Offset, Length, Value*/
+			DATA(BATT_TEMP,       0x550,   2,      2,     -EINVAL),
+			DATA(OCV,             0x588,   3,      2,     -EINVAL),
+			DATA(VOLTAGE,         0x5CC,   1,      2,     -EINVAL),
+			DATA(CURRENT,         0x5CC,   3,      2,     -EINVAL),
+			DATA(BATT_ESR,        0x554,   2,      2,     -EINVAL),
+			DATA(BATT_ESR_COUNT,  0x558,   2,      2,     -EINVAL),
+			DATA(BATT_SOC,        0x56C,   1,      3,     -EINVAL),
+			DATA(CC_CHARGE,       0x570,   0,      4,     -EINVAL),
+			DATA(VINT_ERR,        0x560,   0,      4,     -EINVAL),
+			DATA(CPRED_VOLTAGE,   0x540,   0,      2,     -EINVAL),
+			DATA(BATT_ID,         0x594,   1,      1,     -EINVAL),
+			DATA(BATT_ID_INFO,    0x594,   3,      1,     -EINVAL),
+		};
+		
+	//Gionee <GN_BSP_CHG> <lilubao> <20171101> modify for pmic register dump begin
+	dev_err(&sdev->dev, "in [%s] by lilubao addr->%d,buf->%s,len->%d,sid->%d\n",
+		__FUNCTION__,addr,buf,len,sid);
+	//Gionee <GN_BSP_CHG> <lilubao> <20171101> modify for pmic register dump end
+	
+	}
+
+
+
+
+
+
 
 		GNSPR#122265，连接充电器，长按电源键关机，关机完成后，长按电源键5s测机不开机，只显示在关机充电图标界面，
 		（在充电图标界面长按电源键则可以开机），用户体检不佳 暂未恢复 对比17G16-T0119版本有此现象，对比17G02-T2638版本无此现象，
