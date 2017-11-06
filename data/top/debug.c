@@ -218,11 +218,8 @@
         	从charger/main.cpp 开始
         	main
         	
-        	（android 关机/重启）Android关机/重启流程解析
-        	http://blog.csdn.net/lxl584685501/article/details/45747967
-        	
-        	深度剖析安卓Framebuffer设备驱动 
-        	https://yq.aliyun.com/articles/10411
+
+
         
         }
         
