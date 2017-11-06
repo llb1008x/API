@@ -1,43 +1,6 @@
 
 
 
-
-OTG类问题
-{
-	GNSPR #123451,手机内插入SD卡，OTG连接U盘复制粘贴（移动）至手机内部存储器，粘贴后显示正在更新系统媒体库，加载圈长时间不消失
-	
-	
-	GNSPR #112736,手机通过OTG线连接连接USB小风扇，使用一段时间后，OTG开关自动关闭，USB小风扇停止旋转
-		
-	
-	GNSPR #116094,T卡插入读卡器通过OTG线与手机连接，进行插拔操作，手机出现不识别U盘现象
-	
-	
-	GNSPR #116162,U盘通过OTG线连接手机，进入文件管理，选择U盘进行增加删除操作，拔掉U盘，连接PC或连接手机进行查看，被删除的文件没有删除
-	
-	
-	GNSPR #120204,开启反向充电和OTG,连接U盘，拔掉T卡，进入存储和USB查看仍显示U向盘正常使用，对比17G16也是如此，17G07无此现象
-
-
-	测试了多个版本，多批手机 和多个小电扇，没找到规律； 应该是 硬件不稳定，软件识别不了； 暂时没有解决方案；
-
-	底层实际上U盘已经读到了，只不过是 一直在检查文件系统错误，这个快的话只有2～3秒，慢的话 要10多秒； 有的U盘甚至要20多秒； 从log看还没检查完就拔掉了，最多的是等了13秒，请 多等待一下 应该就可以了；如果 等很久 还不行 再报 bug，并提供log 分析；
-	
-	兼容性问题
-	
-	amigoOtgController.java
-
-}
-
-
-
-
-
-
-
-
-
-
 {
 	SD卡
 		http://blog.csdn.net/zqixiao_09/article/details/51039378
@@ -170,9 +133,9 @@ OTG类问题
 	 	
 	 	首先确定logo是在哪确定的类型，跟哪些有关？
 	 	gnbj6757_66_n.mk	BOOT_LOGO := hd720
-	 	//Gionee <GN_BSP_CHG> <lilubao> <20171102> modify for gionee kpoc_logo begin	
+	 	//Gionee <GN_BSP_CHG> <lilubao> <20171105> modify for gionee kpoc_logo begin	
 	 	LOG_ANIM("11 in [%s] by lilubao before\n",__FUNCTION__);
-	 	//Gionee <GN_BSP_CHG> <lilubao> <20171102> modify for gionee kpoc_logo end
+	 	//Gionee <GN_BSP_CHG> <lilubao> <20171105> modify for gionee kpoc_logo end
 	 	
 	 	hd720_kernel.bmp,hd720_uboot.bmp 这几个图片不一样，粗了一点
 	 	logo这个图片也要改
@@ -232,6 +195,41 @@ OTG类问题
         
         SUPPORT_CARRIEREXPRESS_PACK
         MTK_CARRIEREXPRESS_PACK
+        
+        
+        
+        
+        MTK平台的关机充电
+        {
+        	关键字：
+        		kpoc_charger
+        		ChargingAnimation 充电动画
+        	代码：	
+        	vendor/mediatek/proprietary/external
+        	vendor/mediatek/proprietary/bootable/bootloader/lk
+        	
+        	
+        	ro.hardware,famebuffer，surface flinger
+        	这两个动画模式	应该是famebuffer模式
+        	DRAW_ANIM_MODE_SURFACE
+        	DRAW_ANIM_MODE_FB
+        	
+        	
+        	从charger/main.cpp 开始
+        	main
+        	
+        	（android 关机/重启）Android关机/重启流程解析
+        	http://blog.csdn.net/lxl584685501/article/details/45747967
+        	
+        	深度剖析安卓Framebuffer设备驱动 
+        	https://yq.aliyun.com/articles/10411
+        
+        }
+        
+        
+        
+        
+        
 	 	
 	 }
 
@@ -542,6 +540,12 @@ OTG类问题
 			/device/qcom/msm8917/BoardConfig.mk
 			- BOARD_CHARGER_ENABLE_SUSPEND := true
 			+ #BOARD_CHARGER_ENABLE_SUSPEND := true
+			
+			
+			这个问题的主要原因是，灭屏时候系统休眠，这时候按power键唤醒，但是由于关机充电唤醒没有任何地方去加锁导致系统会马上休眠，
+			休眠后系统的按键信息没有来的及上报到关机充电里面，导致没有检测到power键按下唤醒的动作，所以会导致长按不能重启，只有在长按10S强制S2 reset 重启，
+			所以我们disable 掉关机充电的 suspend功能，由于关机充电系统是由充电器供电，所以不会影响充电电流，目前都是disable 掉关机充电的suspend功能。
+
 		}
 
 
@@ -677,6 +681,19 @@ OTG类问题
 
 			{
 				msm-thermal
+				
+				modem thermal manage
+					Level 0 – No restriction, full modem performance
+					Level 1 – Requests the modem to run the data throughput reduction algorithms
+					Level 2 – MTPL back off / PUCCH back off
+					Level 3 – Puts the modem into Limited Service mode, in which only emergency 911
+					calls allowed
+					
+				 thermal-engine -o
+				 
+				 /vendor/qcom/proprietary/thermal-engine/	
+					
+				80-N9649-1 Thermal Tuning Procedure	
 
 			}
 	
