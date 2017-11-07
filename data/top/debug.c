@@ -66,6 +66,171 @@
 }	
 	
 	
+ GNSPR#102837,测试机电量高于30%》关机状态插充电器后，屏幕弹出低电量充电图标，5s后到测试机正常充电图标界面（对比m7无此现象），多次操作仍如此》重启未恢复，
+ 暂未恢复 验证10台10台100%
+ {
+ 	这个应该是关机充电logo仍然用MTK原始的，需要适配成gionee amigo的关机充电logo
+ 	
+ 	G1605A修改
+ 	{
+ 		bootloader/lk
+ 	
+ 		vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.h:86://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.h:96://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/bootable/bootloader/lk/project/gnbj6737t_66_m0.mk:13:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/bootable/bootloader/lk/project/gnbj6737t_66_m0.mk:16:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.c:260://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.c:328://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/rules.mk:88:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/rules.mk:184:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:225:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:231:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:238://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:257://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:295:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/platform.c:782:			//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/platform.c:785:			//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end	
+
+
+		external/libshowlogo/
+		
+		vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.h:109://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.h:123://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:647://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:701://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:734:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:740:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:754:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:760:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/external/libshowlogo/charging_animation.h:110://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/libshowlogo/charging_animation.h:115://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.c:269://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.c:574://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.c:620:    //GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.c:669:    //GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+
+
+		external/charger/
+
+		vendor/mediatek/proprietary/external/charger/common.cpp:143:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/charger/common.cpp:153:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+		vendor/mediatek/proprietary/external/charger/bootlogo.cpp:132:    //GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+		vendor/mediatek/proprietary/external/charger/bootlogo.cpp:159:    //GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+ 	
+ 	}
+ 	
+ 	
+ 	
+ 	首先确定logo是在哪确定的类型，跟哪些有关？
+ 	gnbj6757_66_n.mk	BOOT_LOGO := hd720
+ 	//Gionee <GN_BSP_CHG> <lilubao> <20171105> modify for gionee kpoc_logo begin	
+ 	LOG_ANIM("11 in [%s] by lilubao before\n",__FUNCTION__);
+ 	//Gionee <GN_BSP_CHG> <lilubao> <20171105> modify for gionee kpoc_logo end
+ 	
+ 	logo这个图片也
+ 	android_mtk_mp/vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/
+ 	
+ 	编译
+ 	
+ 	out/target/product/gnbj6757_66_n/system/vendor/bin/kpoc_charger
+	out/target/product/gnbj6757_66_n/system/vendor/lib/libshowlogo.so
+ 	
+ 	
+ 	charger_thread,kpoc_charger
+ 	
+  	./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/charger/
+  	./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/libshowlogo/
+  	
+  	
+  	
+  	关机充电logo调用过程
+  	这个是调用关机动画的函数
+  	fill_animation_battery_new
+ 	
+ 	关机充电logo的档位
+ 	typedef enum
+	{
+		AMIGO_EMPTY_LEVEL=0,     //capacity from 0% to 9%
+		AMIGO_LOW_LEVEL,         //capacity from 10% to 30%
+		AMIGO_MID_LEVEL,         //capacity from 31% to60%
+		AMIGO_HIGH_LEVEL,         //capacity from 61% to 99%
+		AMIGO_FULL_LEVEL,
+		AMIGO_FAILED_LEVEL
+	}AMIGO_BATTERY_LEVEL;
+	
+	
+	关机充电动画在各个挡的位移
+	typedef enum
+	{
+		AMIGO_BATFULL_ANIM = 0,
+		AMIGO_BATEMPTY_START_ANIM = 1,
+		AMIGO_BATLOW_START_ANIM = 13,
+		AMIGO_BATMID_START_ANIM = 25,
+		AMIGO_BATHIGH_START_ANIM = 37,
+		AMIGO_BATLOW_PERCENT = 49,
+		AMIGO_BATLOW_NUM_0 = 50,
+		AMIGO_BATMID_PERCENT = 60,
+		AMIGO_BATMID_NUM_0 = 61,
+		AMIGO_BATHIGH_PERCENT = 71,
+		AMIGO_BATHIGH_NUM_0 = 72
+	}AMIGO_PIC_OFFSET_MAP;
+	
+	
+	$(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_charger_ov.raw \		82
+    $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_kpoc_charge.raw \		83
+    $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_low_battery.raw \		84
+    $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_black.raw \					85
+    $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_lowtemp.raw \			86
+    $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_hightemp.raw			87
+    
+    
+
+    
+    
+    
+    MTK平台的关机充电
+    {
+    	关键字：
+    		kpoc_charger
+    		ChargingAnimation 充电动画
+    	代码：	
+    	vendor/mediatek/proprietary/external
+    	vendor/mediatek/proprietary/bootable/bootloader/lk
+    	
+    	
+    	ro.hardware,famebuffer，surface flinger
+    	这两个动画模式	应该是famebuffer模式
+    	DRAW_ANIM_MODE_SURFACE
+    	DRAW_ANIM_MODE_FB
+    	
+    	
+    	从charger/main.cpp 开始
+    	main
+
+    }
+        	
+}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -76,227 +241,79 @@
 17G10A
 {
 
-	 GNSPR#102837,测试机电量高于30%》关机状态插充电器后，屏幕弹出低电量充电图标，5s后到测试机正常充电图标界面（对比m7无此现象），多次操作仍如此》重启未恢复，
-	 暂未恢复 验证10台10台100%
-	 {
-	 	这个应该是关机充电logo仍然用MTK原始的，需要适配成gionee amigo的关机充电logo
-	 	
-	 	G1605A修改
-	 	{
-	 		bootloader/lk
-	 	
-	 		vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.h:86://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.h:96://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/bootable/bootloader/lk/project/gnbj6737t_66_m0.mk:13:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/bootable/bootloader/lk/project/gnbj6737t_66_m0.mk:16:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.c:260://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.c:328://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/rules.mk:88:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/rules.mk:184:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:225:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:231:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:238://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:257://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:295:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/platform.c:782:			//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/platform.c:785:			//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end	
 
-
-			external/libshowlogo/
-			
-			vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.h:109://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.h:123://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:647://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:701://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:734:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:740:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:754:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/libshowlogo/charging_animation.cpp:760:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/external/libshowlogo/charging_animation.h:110://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/libshowlogo/charging_animation.h:115://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.c:269://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.c:574://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.c:620:    //GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/libshowlogo/show_animation_common.c:669:    //GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-
-
-			external/charger/
-
-			vendor/mediatek/proprietary/external/charger/common.cpp:143:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/charger/common.cpp:153:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-			vendor/mediatek/proprietary/external/charger/bootlogo.cpp:132:    //GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-			vendor/mediatek/proprietary/external/charger/bootlogo.cpp:159:    //GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-	 	
-	 	}
-	 	
-	 	
-	 	
-	 	首先确定logo是在哪确定的类型，跟哪些有关？
-	 	gnbj6757_66_n.mk	BOOT_LOGO := hd720
-	 	//Gionee <GN_BSP_CHG> <lilubao> <20171105> modify for gionee kpoc_logo begin	
-	 	LOG_ANIM("11 in [%s] by lilubao before\n",__FUNCTION__);
-	 	//Gionee <GN_BSP_CHG> <lilubao> <20171105> modify for gionee kpoc_logo end
-	 	
-	 	hd720_kernel.bmp,hd720_uboot.bmp 这几个图片不一样，粗了一点
-	 	logo这个图片也要改
-	 	android_mtk_mp/vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/
-	 	
-	 	编译
-	 	
-	 	out/target/product/gnbj6757_66_n/system/vendor/bin/kpoc_charger
- 		out/target/product/gnbj6757_66_n/system/vendor/lib/libshowlogo.so
-	 	
-	 	
-	 	charger_thread,kpoc_charger
-	 	
-	  	./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/charger/
-	  	./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/libshowlogo/
-	  	
-	  	
-	  	
-	  	关机充电logo调用过程
-	  	这个是调用关机动画的函数
-	  	fill_animation_battery_new
-	 	
-	 	关机充电logo的档位
-	 	typedef enum
-		{
-			AMIGO_EMPTY_LEVEL=0,     //capacity from 0% to 9%
-			AMIGO_LOW_LEVEL,         //capacity from 10% to 30%
-			AMIGO_MID_LEVEL,         //capacity from 31% to60%
-			AMIGO_HIGH_LEVEL,         //capacity from 61% to 99%
-			AMIGO_FULL_LEVEL,
-			AMIGO_FAILED_LEVEL
-		}AMIGO_BATTERY_LEVEL;
-		
-		
-		typedef enum
-		{
-			AMIGO_BATFULL_ANIM = 0,
-			AMIGO_BATEMPTY_START_ANIM = 1,
-			AMIGO_BATLOW_START_ANIM = 13,
-			AMIGO_BATMID_START_ANIM = 25,
-			AMIGO_BATHIGH_START_ANIM = 37,
-			AMIGO_BATLOW_PERCENT = 49,
-			AMIGO_BATLOW_NUM_0 = 50,
-			AMIGO_BATMID_PERCENT = 60,
-			AMIGO_BATMID_NUM_0 = 61,
-			AMIGO_BATHIGH_PERCENT = 71,
-			AMIGO_BATHIGH_NUM_0 = 72
-		}AMIGO_PIC_OFFSET_MAP;
-		
-		$(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_charger_ov.raw \		82
-        $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_kpoc_charge.raw \		83
-        $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_low_battery.raw \		84
-        $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_black.raw \					85
-        $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_lowtemp.raw \			86
-        $(BOOT_LOGO_DIR)/$(BASE_LOGO)/$(BASE_LOGO)_amigo_hightemp.raw			87
-        
-        
-        SUPPORT_CARRIEREXPRESS_PACK
-        MTK_CARRIEREXPRESS_PACK
-        
-        
-        
-        
-        MTK平台的关机充电
-        {
-        	关键字：
-        		kpoc_charger
-        		ChargingAnimation 充电动画
-        	代码：	
-        	vendor/mediatek/proprietary/external
-        	vendor/mediatek/proprietary/bootable/bootloader/lk
-        	
-        	
-        	ro.hardware,famebuffer，surface flinger
-        	这两个动画模式	应该是famebuffer模式
-        	DRAW_ANIM_MODE_SURFACE
-        	DRAW_ANIM_MODE_FB
-        	
-        	
-        	从charger/main.cpp 开始
-        	main
-        	
-
-
-        
-        }
-        
         
         
         
         
 	 	
-	 }
-
-	
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-	GNSPR #128052,【品质压力】测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，重启恢复
-	{
-		(mtk_chg_type_det.c) mt_charger_set_property,power_supply_property
-		->
-		dump_charger_name -> (mtk_usb.c) mt_usb_connect
-		
-		(mtk_charger.c) mtk_charger_int_handler
-		
-		wakeup_fg_algo 唤醒电量计的各种原因 然后封装fgd_msg上报给nl_send_to_user  user space
-		typedef enum {
-			FG_INTR_0 = 0,
-			FG_INTR_TIMER_UPDATE  = 1,
-			FG_INTR_BAT_CYCLE = 2,
-			FG_INTR_CHARGER_OUT = 4,
-			FG_INTR_CHARGER_IN = 8,
-			FG_INTR_FG_TIME =		16,
-			FG_INTR_BAT_INT1_HT =	32,
-			FG_INTR_BAT_INT1_LT =	64,
-			FG_INTR_BAT_INT2_HT =	128,
-			FG_INTR_BAT_INT2_LT =	256,
-			FG_INTR_BAT_TMP_HT =	512,
-			FG_INTR_BAT_TMP_LT =	1024,
-			FG_INTR_BAT_TIME_INT =	2048,
-			FG_INTR_NAG_C_DLTV =	4096,
-			FG_INTR_FG_ZCV = 8192,
-			FG_INTR_SHUTDOWN = 16384,
-			FG_INTR_RESET_NVRAM = 32768,
-			FG_INTR_BAT_PLUGOUT = 65536,
-			FG_INTR_IAVG = 0x20000,
-			FG_INTR_VBAT2_L = 0x40000,
-			FG_INTR_VBAT2_H = 0x80000,
-			FG_INTR_CHR_FULL = 0x100000,
-			FG_INTR_DLPT_SD = 0x200000,
-			FG_INTR_BAT_TMP_C_HT = 0x400000,
-			FG_INTR_BAT_TMP_C_LT = 0x800000,
-			FG_INTR_BAT_INT1_CHECK = 0x1000000,
-			FG_INTR_DUMP_INFO = 0x2000000,
-
-		} FG_INTERRUPT_FLAG;
-
-		FG_POWER_SUPPLY
-		FG_MEM_DEBUG_READS
-	}
-	
-	
 }
+
+	
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+GNSPR #128052,【品质压力】测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，重启恢复
+{
+	(mtk_chg_type_det.c) mt_charger_set_property,power_supply_property
+	->
+	dump_charger_name -> (mtk_usb.c) mt_usb_connect
+	
+	(mtk_charger.c) mtk_charger_int_handler
+	
+	wakeup_fg_algo 唤醒电量计的各种原因 然后封装fgd_msg上报给nl_send_to_user  user space
+	typedef enum {
+		FG_INTR_0 = 0,
+		FG_INTR_TIMER_UPDATE  = 1,
+		FG_INTR_BAT_CYCLE = 2,
+		FG_INTR_CHARGER_OUT = 4,
+		FG_INTR_CHARGER_IN = 8,
+		FG_INTR_FG_TIME =		16,
+		FG_INTR_BAT_INT1_HT =	32,
+		FG_INTR_BAT_INT1_LT =	64,
+		FG_INTR_BAT_INT2_HT =	128,
+		FG_INTR_BAT_INT2_LT =	256,
+		FG_INTR_BAT_TMP_HT =	512,
+		FG_INTR_BAT_TMP_LT =	1024,
+		FG_INTR_BAT_TIME_INT =	2048,
+		FG_INTR_NAG_C_DLTV =	4096,
+		FG_INTR_FG_ZCV = 8192,
+		FG_INTR_SHUTDOWN = 16384,
+		FG_INTR_RESET_NVRAM = 32768,
+		FG_INTR_BAT_PLUGOUT = 65536,
+		FG_INTR_IAVG = 0x20000,
+		FG_INTR_VBAT2_L = 0x40000,
+		FG_INTR_VBAT2_H = 0x80000,
+		FG_INTR_CHR_FULL = 0x100000,
+		FG_INTR_DLPT_SD = 0x200000,
+		FG_INTR_BAT_TMP_C_HT = 0x400000,
+		FG_INTR_BAT_TMP_C_LT = 0x800000,
+		FG_INTR_BAT_INT1_CHECK = 0x1000000,
+		FG_INTR_DUMP_INFO = 0x2000000,
+
+	} FG_INTERRUPT_FLAG;
+
+	FG_POWER_SUPPLY
+	FG_MEM_DEBUG_READS
+}
+
 
 
 
@@ -542,6 +559,19 @@
 			这个问题的主要原因是，灭屏时候系统休眠，这时候按power键唤醒，但是由于关机充电唤醒没有任何地方去加锁导致系统会马上休眠，
 			休眠后系统的按键信息没有来的及上报到关机充电里面，导致没有检测到power键按下唤醒的动作，所以会导致长按不能重启，只有在长按10S强制S2 reset 重启，
 			所以我们disable 掉关机充电的 suspend功能，由于关机充电系统是由充电器供电，所以不会影响充电电流，目前都是disable 掉关机充电的suspend功能。
+			
+			
+			
+			Case Type: Bug/Issue
+
+			New Comment: Dear customer
+			wakelock 就是给节点 sys/power/wake_lock 写加锁或者解锁, 例如，
+			echo  mmm > sys/power/wake_lock  加锁锁的名字叫mmm
+			echo  mmm > sys/power/wake_unlock  解锁mmm
+
+			本质都是关机充电情况下组织系统进入深度休眠。
+
+			thanks.
 
 		}
 
@@ -692,6 +722,37 @@
 					
 				80-N9649-1 Thermal Tuning Procedure	
 
+			}
+			
+			
+			debug
+			{ 
+				Enable more logging for KTM
+				echo 8 > /proc/sys/kernel/printk
+				echo 'file msm_thermal.c +p' > /sys/kernel/debug/dynamic_debug/control
+				
+				
+				adb	logcat –v time –s ThermalEngine
+				
+				
+				adb shell thermal-engine –o
+				
+				
+				adb pull /etc/thermal-engine.conf
+				adb
+				remount
+				<edit>
+				adb push thermal-engine.conf /etc/
+			
+			
+				adb push msm_tsens_logging /data
+				adb shell
+				chmod 777 /data/msm_tsens_logging
+				./msm_tsens_logging a b &
+				
+				
+				stop thermal-engine
+				start thermal-engine –d
 			}
 	
 		
