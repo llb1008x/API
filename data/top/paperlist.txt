@@ -404,6 +404,21 @@ other：
 
 	github android open source project :https://github.com/aosp-mirror
 
+	Linux SD卡驱动开发(一) —— SD 相关基础概念 
+	http://blog.csdn.net/zqixiao_09/article/details/51039378
+
+
+	Linux USB 驱动开发实例（一） —— USB摄像头驱动实现源码分析 
+	http://blog.csdn.net/zqixiao_09/article/details/50984412
+
+	
+	Linux USB 驱动开发（一）—— USB设备基础概念 
+	http://blog.csdn.net/zqixiao_09/article/details/50984074
+
+
+	Android O 前期预研之一：Android Treble 计划
+	http://blog.csdn.net/ljp1205/article/details/77684550	
+	
 
 
 集中解决一些问题:
