@@ -1362,4 +1362,29 @@ int mtk_pe20_init(struct charger_manager *pinfo)
 
 
 	
-}	
+}
+
+
+
+
+24.rt5081插入充电器的时候读取中断信息
+这段对于寄存器，位的操作
+ 
+for (i = 0; i < 16; i++) {
+	stat_chg[i] = stat_old[i] ^ stat_new[i];
+	valid_chg[i] = (stat_new[i] & rt5081_irqr_filter[i]) |
+			(~stat_new[i] & rt5081_irqf_filter[i]);
+	data[i] |= (stat_chg[i] & valid_chg[i]);
+	data[i] &= ~mask[i];
+	if (!data[i])
+		continue;
+	for (j = 0; j < 8; j++) {
+		if (!(data[i] & (1 << j)))
+			continue;
+		ret = irq_find_mapping(chip->irq_domain, i * 8 + j);
+		if (ret)
+			handle_nested_irq(ret);
+		else
+			dev_err(chip->dev, "unmapped %d %d\n", i, j);
+	}
+}

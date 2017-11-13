@@ -30,6 +30,11 @@
 	获取lte rspr信号强弱	
 	GnGetLteLevel(), rsrpIconLevel =1, standard LTE, mLteRsrp =-116,isCampOnLte =true
 	
+	
+	插入充电器
+	mtk_charger_int_handler，dump_charger_name，mt_charger_set_property
+	rt5081_enable_chgdet_flow
+	
 }
 
 
