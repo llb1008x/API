@@ -5,18 +5,8 @@
 	1.电量计
 	80-VT310-123
 	80-NV610-44
-	
-
 
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -68,7 +58,7 @@
 	80-NL708-1		dump pimc register	
 	
 	
-	
+	decidegc
 
 }	
 	
@@ -92,12 +82,80 @@
 17G10A
 {
 	
+	
+	
+	GNSPR#103678,通话：接听或者挂断电话时，振动的同时会有崩的一声
+	{
+		这里主要是调试马达的震动强度，因为马达的震感有点强
+	
+		文档
+		{	
+			输出的强度应该跟output voltage有关，
+			The output voltage is based on the duty cycle of the provided PWM signal, where the OD_CLAMP[7:0] bit in
+			 register 0x17 sets the full-scale amplitude
+			 
+			pwm模式强度靠调整占空比改变 the strength of vibration is determined by the duty cycle 
+		
+			A waveform identifier is an integer value referring to the index position of a waveform in the RAM library
+			 
+	
+			The smart-loop architecture is an advanced closed-loop system that optimizes the performance of the actuator
+		and allows for failure detection. The architecture consists of automatic resonance tracking and reporting (for an
+		LRA), automatic level calibration, accelerated startup and braking, diagnostics routines, and other proprietary
+		algorithms.
+	
+	
+			The RATED_VOLTAGE[7:0] bit in register 0x16 sets the rated voltage for the closed-loop drive modes.
+		
+			In open-loop mode, the RATED_VOLTAGE[7:0] bit is ignored. Instead, the OD_CLAMP[7:0] bit (in register 0x17)
+	is used to set the rated voltage for the open-loop drive modes.
 
+			The DRV2604L slave address is 0x5A (7-bit), or 1011010 in binary.
+		
+		}
+		
+		
+		相关的代码
+		{
+			关键字
+			{
+				vibrate,haptic,pwm,drv2604l
+				
+				OD_CLAMP[7:0],DATA_FORMAT_RTP,RATED_VOLTAGE[7:0]
+				
+				//Gionee <gn_by_charging> <lilubao> <20171114> add for change vibrate end
+			}
+			
+			当前项目的配置是什么样的
+			{
+				static struct actuator_data DRV2604L_actuator={
+					.device_type = LRA,
+					.rated_vol = 0x46,
+					.over_drive_vol = 0x7a,
+					.LRAFreq = 235,
+				};
+				
+				
+				pDrv2604Platdata->GpioTrigger=0;
+				pDrv2604Platdata->loop=CLOSE_LOOP;
+				pDrv2604Platdata->RTPFormat=Signed;
+				pDrv2604Platdata->BIDIRInput=BiDirectional;
+				
+				P30 各种模式配置的解释
+				
+				P22 Rated Voltage Programming 0x16 额定电压
+				
+				Overdrive Voltage-Clamp Programming
+				
+				CLAMP voltage s	钳位电压
+			
+			}
+			
+			
+		
+		}
 
-
-
-
-
+	}
 
 
 
@@ -191,34 +249,26 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	
-	GNSPR#128052
+	GNSPR#128052,测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，
+	重启恢复
 	{
-	
-	
-	
+
 		Dear Customer，
 
 		您好，如果您的测试版本是eng版本，请把selinux关掉试试，即adb shell setenforce 0；
 		或者是加上如下selinux 规则试试，谢谢！
 		#====================== untrusted_app.te ======================
 		allow untrusted_app mtp_device:chr_file rw_file_perms; 	
+		
+		
+		等待测试复测,这里有一个selinux是什么，有什么作用
+		1.user版本不能修改selinux的开关；
+		2.如果要编译untrust_app.te，单独编译boot就可以生效；
 	}
+
+
+
 
 
 
@@ -244,50 +294,6 @@
 	}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-	GNSPR#103678,通话：接听或者挂断电话时，振动的同时会有崩的一声
-	{
-		调试震动强度
-		
-		输出的强度应该跟output voltage有关，
-		The output voltage is based on the duty cycle of the provided PWM signal, where the OD_CLAMP[7:0] bit in
-		 register 0x17 sets the full-scale amplitude
-		 
-		pwm模式强度靠调整占空比改变 the strength of vibration is determined by the duty cycle 
-		
-		A waveform identifier is an integer value referring to the index position of a waveform in the RAM library
-		 
-	
-		The smart-loop architecture is an advanced closed-loop system that optimizes the performance of the actuator
-	and allows for failure detection. The architecture consists of automatic resonance tracking and reporting (for an
-	LRA), automatic level calibration, accelerated startup and braking, diagnostics routines, and other proprietary
-	algorithms.
-	
-	
-		The RATED_VOLTAGE[7:0] bit in register 0x16 sets the rated voltage for the closed-loop drive modes.
-		
-		In open-loop mode, the RATED_VOLTAGE[7:0] bit is ignored. Instead, the OD_CLAMP[7:0] bit (in register 0x17)
-is used to set the rated voltage for the open-loop drive modes.
-
-		The DRV2604L slave address is 0x5A (7-bit), or 1011010 in binary.
-	
-	
-	}
 
 
 
