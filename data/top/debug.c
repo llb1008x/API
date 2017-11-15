@@ -10,9 +10,6 @@
 
 
 
-
-
-
 {
 
 
@@ -59,6 +56,11 @@
 	
 	
 	decidegc
+	
+	NTC温度电压转换函数，看看过程什么样的
+	force_get_tbat_internal 温度转换函数
+
+
 
 }	
 	
@@ -150,9 +152,6 @@
 				CLAMP voltage s	钳位电压
 			
 			}
-			
-			
-		
 		}
 
 	}
@@ -234,6 +233,12 @@
 		
 			DatagramSocket.java
 			//Gionee <GN_BSP_CHG> <lilubao> <20171113> modify for CTS begin
+			
+			
+			贵司提GTS问题前可以先关注MOL
+			进入MediaTek On-Line-> Quick Start-> GMS快速入门->GMS认证相关->GTS5.0r2常见问题.
+			请参考如下branch自行到PMS上申请patch
+			alps-mp-n0.mp5 ALPS03603867 
 		
 		
 		}
@@ -424,6 +429,18 @@
 17G06A
 {
 
+	PPT 测试 power performance  thermal
+	{
+		usb-type-c-pericom
+		CONFIG_USB_EXT_TYPE_C_PERICOM
+	
+	}
+
+
+
+
+
+
 	金刚3续航问题
 	{
 		1.GNSPR#133023,【视频续航】金刚3视频续航（外放）比华为畅享7平均电流高50mA左右
@@ -433,19 +450,6 @@
 		3.中批比T2机械手臂时间差一个小时
 
 	}
-
-
-
-
-	余下的BUG
-	{
-		force_get_tbat_internal 温度转换函数
-		
-	}
-
-
-
-
 
 
 
