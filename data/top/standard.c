@@ -1388,3 +1388,33 @@ for (i = 0; i < 16; i++) {
 			dev_err(chip->dev, "unmapped %d %d\n", i, j);
 	}
 }
+
+
+
+
+25.扫描路径下的文件
+static int scan_dir(const char *dirname)
+{
+    char devname[PATH_MAX];
+    char *filename;
+    DIR *dir;
+    struct dirent *de;
+    dir = opendir(dirname);
+    if(dir == NULL)
+        return -1;
+    strcpy(devname, dirname);
+    filename = devname + strlen(devname);
+    *filename++ = '/';
+    while((de = readdir(dir))) {
+        if(de->d_name[0] == '.' &&
+           (de->d_name[1] == '\0' ||
+            (de->d_name[1] == '.' && de->d_name[2] == '\0')))
+            continue;
+        strcpy(filename, de->d_name);
+        KPOC_LOGI("%s(), open_device %s\n", __FUNCTION__, devname);
+        open_device(devname);
+    }
+    closedir(dir);
+    return 0;
+}
+

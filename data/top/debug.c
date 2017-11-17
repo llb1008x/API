@@ -1,14 +1,5 @@
 
 
-预研
-{
-	1.电量计
-	80-VT310-123
-	80-NV610-44
-
-}
-
-
 
 {
 
@@ -84,6 +75,117 @@
 17G10A
 {
 	
+	近期W919项目为了满足生产需求，T3-3更新了一颗speaker 2557的物料，此物料不可兼容，因此区分版本维护：
+	1.T3-3前面批次机器，请刷版本尾号为AB的版本
+	2.T3-3以及之后批次机器，请刷版本尾号AA的版本
+
+	目前大家手里机器都是T3-3前的，所以测试和开发请根据手中机器状态刷AB版本。
+
+	如果刷错版本会遇到扬声器各类场景无声的问题！！！
+	版本情况：
+	BJ17G10A-T0148-171116AB --可刷T3-3之前机器
+	BJ17G10A-T0147-171116AB --代码问题，扬声器无声
+	BJ17G10A-T0146-171114AA --代码问题，扬声器无声
+	BJ17G10A-T0145-171114AA --可刷T3-3及之后机器
+	
+	
+	
+	
+	
+	GNSPR#100830,充电时按开机键开机，测试值是6.83s，标准值是4.5s，超出标准值2.33s
+	{
+		现在的关机充电条件下按powerkey到亮logo时间太长
+		
+		相关代码
+		{
+			key_chontrol.cpp  key_control
+			
+			linux-event-codes.h描述event
+		
+		}
+		
+		
+		现在主要分两部分分析：powerkey+usb handshake
+		{
+			//powerkey
+			
+			
+
+			[PMIC] pl pmic powerkey Release
+			[PMIC] pmic_IsUsbCableIn 1
+			[PLFM] USB/charger boot!
+			[PMIC] PMIC_POWER_HOLD ON
+
+
+
+			mtk detect key function pmic_detect_homekey MTK_PMIC_RST_KEY = 17
+			[PMIC] pl pmic FCHRKEY Release
+
+
+
+
+			[   11.483398] <4>.(4)[295:kpoc_charger]charger: draw_with_interval... key_trigger_suspend = 0
+			[   11.499852] <4>.(4)[70:pmic_thread][name:pmic_irq&][PMIC] [PMIC_INT] addr[0x854]=0x1
+			[   11.500840] <4>.(4)[70:pmic_thread][name:kpd&]kpd: Power Key generate, pressed=1
+			[   11.501783] <4>.(4)[70:pmic_thread][name:hal_kpd&]kpd: kpd: (pressed) HW keycode =116 using PMIC
+			[   11.502868] <4>.(4)[70:pmic_thread][name:aed&](pressed) HW keycode powerkey
+			[   11.503837] <4>.(4)[276:kpoc_charger]charger: key_control: event.type:1,116:1
+			[   11.504766] <4>.(4)[276:kpoc_charger]charger: key_control: event.type:0,0:0
+			[   11.505666] <4>.(4)[296:kpoc_charger]charger: pwr key long press check start
+
+
+
+
+			//usb handshake
+
+			[SEC] read '0x8800000'
+			0x4D,0x4D,0x4D,0x4D,0x4,0x0,0x0,0x0,
+			[LIB] seclib_img_auth_load_sig [LIB] CFG read size '0x2000' '0x3C'
+			0x4D4D4D4D
+			[LIB] SEC CFG 'v4' exists
+			[LIB] HW DEC
+			GCPU Enhance,V1.1
+			[LIB] SEC CFG is valid. Lock state is 1 
+			[BLDR] Starting tool handshake.
+			€€€€€€€€€€€[BLDR] Tool connection is unlocked
+			[platform_vusb_on] VUSB33 is on
+			[platform_vusb_on] VA10 is on
+			[platform_vusb_on] VA10 select to 0.9V
+			rt5081_enable_chgdet_flow: en = 0
+			rt5081_enable_chgdet_flow: en = 1
+			mtk_ext_chgdet: usb_stats = 0x00000020
+			mtk_ext_chgdet: chg type = 1
+
+			[PLFM] USB cable in
+			[TOOL] USB enum timeout (Yes), handshake timeout(Yes)
+			[TOOL] Enumeration(Start)
+			HS is detected
+			HS is detected
+			[TOOL] Enumeration(End): OK 524ms 
+			usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0][TOOL] : usb listen timeout
+			[TOOL] <USB> cannot detect tools!
+			[TOOL] <UART> listen  ended, receive size:0!
+
+			[TOOL] <UART> wait sync time 150ms->5ms
+			[TOOL] <UART> receieved data: ()
+		
+		}
+		
+		
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	GNSPR#103678,通话：接听或者挂断电话时，振动的同时会有崩的一声
@@ -132,7 +234,7 @@
 			{
 				static struct actuator_data DRV2604L_actuator={
 					.device_type = LRA,
-					.rated_vol = 0x46,
+					.rated_vol = 0x46,	//1.8V
 					.over_drive_vol = 0x7a,
 					.LRAFreq = 235,
 				};
@@ -150,11 +252,14 @@
 				Overdrive Voltage-Clamp Programming
 				
 				CLAMP voltage s	钳位电压
+				
+				控制输出的主要是Rated Voltage
 			
 			}
 		}
 
 	}
+
 
 
 
@@ -433,7 +538,26 @@
 	{
 		usb-type-c-pericom
 		CONFIG_USB_EXT_TYPE_C_PERICOM
-	
+		
+		fuseblower qcom  的secure boot
+		
+		//Gionee <GN_BSP_CHG> <lilubao> <20171115> modify for remove typr-c begin
+		
+
+		对于高通平台项目的签名方式要注意以下几点：
+		{
+			1. 压缩包名以 BJ_G1602A （具体项目名）打头；
+			2. 必须 zip 格式（一定要在linux下压缩）；
+			3. zip压缩包内不能包含目录；
+			4. 压缩包内必须包含的文件列表：
+				8976_fuseblower_USER.xml  ,8976_secimage.xml   
+				这两个文件在L33_QCOM_8920_17G16A_170605_MODEM/gionee/BJ17G06/MSM8917.LA.3.0/common/sectools/config/目录下
+				有高通平台的签名工具，xml里面是各种key和相关的镜像
+				
+				sign_img_list.txt
+				需要签名的镜像文件
+		}
+
 	}
 
 
