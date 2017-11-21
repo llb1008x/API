@@ -3,8 +3,7 @@
 {
 	fg_drv_update_hw_status  电量计上报一些硬件信息
 	
-	[FGADC_intr_end][FG_INTR_IAVG]
-	read_fg_hw_info
+	[FGADC_intr_end][FG_INTR_CHARGER_IN][read_fg_hw_info] 
 	
 	FG_DAEMON_CMD_GET_VBAT
 	FG_DAEMON_CMD_GET

@@ -63,7 +63,7 @@
 		adb shell "setprop persist.adb.tcp.port 5555"
 		
 
-		Disconnect the device from the PC USB, and do the following from your command prompt using adb over WiFi (replace "192.168.68.167" with your device's IP address):
+		Disconnect the device from the PC USB, and do the following from your command prompt using adb over WiFi (replace "192.168.68.167" with your device  IP address):
 
 		adb connect 192.168.68.167 
 	}
@@ -135,7 +135,7 @@
 	高通平台adb 命令控制GPIO状态的方法高通有对应文档，但尝试后不能用，如有需要请按如下方法使用：
 
     In sdm660, it has north/center/south tlmm, each tlmm has different base register address, like north tlmm is 0x3000000+NORTH,
-you could check pinctrl-sdm660.c to get each gpio's base register address .
+you could check pinctrl-sdm660.c to get each gpio's base register address .'
 
     #define NORTH 0x00900000 
     #define CENTER 0x00500000 
@@ -470,9 +470,11 @@ qcom 烧写 当然要换路径
 
 		*#837500#      察看手机版本
 
-		*#837504#	察看系统的一些信息
+		*#837504#	   察看系统的一些信息
 
+		*#837726#	   老化测试
 
+		*#837004#      appsiper配置打开很多内容
 
 
 5.项目编译相关的命令：

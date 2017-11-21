@@ -53,6 +53,21 @@
 
 
 
+
+
+	近期W919项目为了满足生产需求，T3-3更新了一颗speaker 2557的物料，此物料不可兼容，因此区分版本维护：
+	1.T3-3前面批次机器，请刷版本尾号为AB的版本
+	2.T3-3以及之后批次机器，请刷版本尾号AA的版本
+
+	目前大家手里机器都是T3-3前的，所以测试和开发请根据手中机器状态刷AB版本。
+
+	如果刷错版本会遇到扬声器各类场景无声的问题！！！
+	版本情况：
+	BJ17G10A-T0148-171116AB --可刷T3-3之前机器
+	BJ17G10A-T0147-171116AB --代码问题，扬声器无声
+	BJ17G10A-T0146-171114AA --代码问题，扬声器无声
+	BJ17G10A-T0145-171114AA --可刷T3-3及之后机器
+
 }	
 	
 	
@@ -74,19 +89,340 @@
 	
 17G10A
 {
+
+	extcon
 	
-	近期W919项目为了满足生产需求，T3-3更新了一颗speaker 2557的物料，此物料不可兼容，因此区分版本维护：
-	1.T3-3前面批次机器，请刷版本尾号为AB的版本
-	2.T3-3以及之后批次机器，请刷版本尾号AA的版本
+	GNSPR#128052,测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，
+	重启恢复
+	{
 
-	目前大家手里机器都是T3-3前的，所以测试和开发请根据手中机器状态刷AB版本。
+		Dear Customer，
 
-	如果刷错版本会遇到扬声器各类场景无声的问题！！！
-	版本情况：
-	BJ17G10A-T0148-171116AB --可刷T3-3之前机器
-	BJ17G10A-T0147-171116AB --代码问题，扬声器无声
-	BJ17G10A-T0146-171114AA --代码问题，扬声器无声
-	BJ17G10A-T0145-171114AA --可刷T3-3及之后机器
+		您好，如果您的测试版本是eng版本，请把selinux关掉试试，即adb shell setenforce 0；
+		或者是加上如下selinux 规则试试，谢谢！
+		#====================== untrusted_app.te ======================
+		allow untrusted_app mtp_device:chr_file rw_file_perms; 	
+		
+		
+		等待测试复测,这里有一个selinux是什么，有什么作用
+		1.user版本不能修改selinux的开关；
+		2.如果要编译untrust_app.te，单独编译boot就可以生效；
+		
+		
+		selinux qcom有一个fatab.com里面是一些挂载执行的命令     
+		
+		代码路径
+		external/sepolicy – Google define
+		device/qcom/sepolicy/common – Qualcomm define
+		
+		
+		Disable/enable
+		Kernel command line
+		adb shell setenforce 0
+		
+		device/qcom/sepolicy/common/qmuxd.te
+		
+		
+		G1605B_sign.mk
+		#========== Security Boot switch start==================
+		#gionee, duanyh, for verified boot, begin
+		CONFIG_GN_BSP_MTK_SBC_FLAG=y
+		MTK_SECURITY_SW_SUPPORT=yes
+		CONFIG_MTK_SECURITY_SW_SUPPORT=yes
+		MTK_SEC_CHIP_SUPPORT=yes	
+		MTK_SEC_USBDL=ATTR_SUSBDL_ENABLE
+		MTK_SEC_BOOT=ATTR_SBOOT_ENABLE
+		MTK_SEC_MODEM_AUTH=no
+		MTK_SEC_SECRO_AC_SUPPORT=yes
+		CUSTOM_SEC_AUTH_SUPPORT=no 
+		MTK_VERIFIED_BOOT_SUPPORT=yes
+		MTK_SEC_FASTBOOT_UNLOCK_SUPPORT=no 
+		MTK_SEC_FASTBOOT_UNLOCK_KEY_SUPPORT=no
+		#gionee, duanyh, for verified boot, end
+
+		#gionee ranyi add for gionee security boot start
+		GN_SECURITY_BOOT_SW_SUPPORT=yes
+		GN_SECURITY_BOOT_1.1_TRUSTZONE_KEY_SUPPORT=yes
+		#gionee ranyi add for gionee security boot end
+
+		#wangguojun add for secure boot
+		GN_VERIFIED_BOOT_GN_MP_KEY = yes
+
+		#wangguojun add for kph build
+		GN_KPH_BUILD_SUPPORT=yes
+		#========== Security Boot switch end==================
+		
+		
+		How do I disable and enable verity via adb?
+		A. adb disable-verity
+		disable dm-verity checking on USERDEBUG builds
+		adb enable-verity
+		re-enable dm-verity checking on USERDEBUG builds
+		source code: system/core/adb/commandline.cpp
+	}
+
+
+
+
+
+
+
+
+
+
+
+	GNSPR#134414，【内部体验】低电量关机状态下》连接充电器后》手动点亮屏幕一直在闪花屏 （开机起来显示28%电量）
+	{
+		
+	
+	}
+
+
+
+
+
+
+
+
+	GNSPR#103678,通话：接听或者挂断电话时，振动的同时会有崩的一声
+	{
+		这里主要是调试马达的震动强度，因为马达的震感有点强
+	
+		文档
+		{	
+			输出的强度应该跟output voltage有关，
+			The output voltage is based on the duty cycle of the provided PWM signal, where the OD_CLAMP[7:0] bit in
+			 register 0x17 sets the full-scale amplitude
+			 
+			pwm模式强度靠调整占空比改变 the strength of vibration is determined by the duty cycle 
+		
+			A waveform identifier is an integer value referring to the index position of a waveform in the RAM library
+			 
+	
+			The smart-loop architecture is an advanced closed-loop system that optimizes the performance of the actuator
+		and allows for failure detection. The architecture consists of automatic resonance tracking and reporting (for an
+		LRA), automatic level calibration, accelerated startup and braking, diagnostics routines, and other proprietary
+		algorithms.
+	
+	
+			The RATED_VOLTAGE[7:0] bit in register 0x16 sets the rated voltage for the closed-loop drive modes.
+		
+			In open-loop mode, the RATED_VOLTAGE[7:0] bit is ignored. Instead, the OD_CLAMP[7:0] bit (in register 0x17)
+		is used to set the rated voltage for the open-loop drive modes.
+
+			The DRV2604L slave address is 0x5A (7-bit), or 1011010 in binary.
+		
+		}
+		
+		
+		相关的代码
+		{
+			关键字
+			{
+				vibrate,haptic,pwm,drv2604l
+				
+				OD_CLAMP[7:0],DATA_FORMAT_RTP,RATED_VOLTAGE[7:0]
+				
+				//Gionee <GN_BY_CHG> <lilubao> <20171114> add for change vibrate end
+			}
+			
+			当前项目的配置是什么样的
+			{
+				static struct actuator_data DRV2604L_actuator={
+					.device_type = LRA,
+					.rated_vol = 0x46,	//1.8V
+					.over_drive_vol = 0x7a,
+					.LRAFreq = 235,
+				};
+				
+				
+				pDrv2604Platdata->GpioTrigger=0;
+				pDrv2604Platdata->loop=CLOSE_LOOP;
+				pDrv2604Platdata->RTPFormat=Signed;
+				pDrv2604Platdata->BIDIRInput=BiDirectional;
+				
+				P30 各种模式配置的解释
+				
+				P22 Rated Voltage Programming 0x16 额定电压
+				
+				Overdrive Voltage-Clamp Programming
+				
+				CLAMP voltage s	钳位电压
+				
+				控制输出的主要是Rated Voltage
+			
+			}
+		}
+		
+		
+		现在确定是硬件结构的问题还是软件的问题？
+		[FAQ11345][Speech] 来电接听瞬间概率会有咔的一声
+		
+		
+		同音频，硬件，结构的工程师共同确认了一下
+		这个在挂断电话的时候听筒能听到挂断声音，同时还有震动的声音
+		是因为，17G10A整机大部分是金属结构，特别是外壳，马达震动的时候，震动很容易传递
+		到整个机器
+
+		结构工程师有一个减弱的方案，就是修改转轴部分材料，但是容易影响外观，而且效果减小不多
+
+		做了一个对比实验：
+		1.关掉震动，没有问题
+		2.调低震动强度，有问题
+		3.扣掉听筒，飞线远离主板，没有问题
+		4.在3的基础上，听原来听筒的位置，有问题，是整机震动的声音
+
+		即是说这个问题与软件无关，是金属材料机身容易传递震动
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	省电适配参数导入
+	{
+		    电量百分比 	电池满电情况下的放电时间（hour）（home界面、最大亮度，永不灭屏）电池满电情况下的放电时间 （h） 	备注
+			100% - 90% 	1:30:00 	1.第一次格式化升级完成后测试
+			2.插入单张SIM卡（信号稳定）和T卡
+			3.默认设置，显示--休眠设为“无限时”
+			4.处于home界面 关闭桌面动态天气
+			5.亮度调整为最大
+			6.尽可能多几台机器一起测试，取平均值
+			7.静置放电
+			90% - 80% 	1:01:00
+			80% - 70% 	1:05:00
+			70% - 60% 	1:08:00
+			60% - 50% 	1:04:00
+			50% - 40% 	1:06:00
+			40% - 30% 	1:06:00
+			30% - 20% 	1:06:00
+			20% - 10% 	1:07:00
+			10% - 关机 	1:18:00
+
+
+
+			进入极致省电模式 	待机电流（mA）(灭屏，均在home界面） 	备注
+			出厂状态下，电量1%，进入极致省电模式 	8.52 	1.插入单张SIM卡（信号稳定）和T卡
+			2.电量在1%
+			3.每组数据测试15分钟以上；
+
+
+			电池电量 	mAh
+			查看电池毫安数 	3000mAh
+
+			充电方式 	mA
+			AC充电 	2097.902mA
+			USB充电 	652.173mA
+
+			初始屏幕亮度 	整数值 	备注
+			出厂设置亮度值 	337.61mA 	1.此亮度值为 设置--显示 内的亮度值范围0~255   
+
+			　 	测试条件 	整机电流(mA)(亮屏，均在home界面) 	备注
+			情形1 	第一次格式化升级完成后，插入单张SIM卡和T卡状态下的工作电流(100%亮度) 	240.49 	1.去掉桌面动态天气
+			2.显示-休眠改为“无限时”
+			3.home界面（除亮度外，其他条件相同）
+			4.每组数据测试15分钟以上；
+			情形2 	  情形1 + 75%屏幕亮度 	214.89
+			情形3 	  情形1 + 50%屏幕亮度 	182.74
+			情形4 	  情形1 + 25%屏幕亮度 	158.79
+
+			这里面一系列参数都是在
+			packages_mtk_mp/gionee/private/BJ17G10A01_A/apps/Amigo_SystemManager/config.xml 里面配置的
+	}
+
+
+
+
+
+
+
+
+	GNSPR#109502,后台播放音乐，进浏览器，插充电器无振动，不显示充电，也没有指示灯，拔掉充电器手机振动一下，再次插充电器恢复
+	{
+		//Gionee <GN_BSP_CHG> <lilubao> <20171120> add for debug begin
+		增加了部分log， rt5081_pmu_charger.c ,gn_ti_drv2604l.c
+	
+	}
+
+
+
+
+
+
+
+	GNSPR#113442,【品质压力】待机界面》手机连接电脑USB端口-手机下拉通知栏-无USB连接显示-插拔数据线仍如此》
+	清除后台未恢复-清除数据未恢复-重启恢复 	
+	{
+		
+		从log上看，mIsMonkeyTest running !!!! updateUsbNotification id = 0，可能测试之前做了monkeytest或者cts的测试
+		测试条例没有跑完
+		在monkeytest和cts的测试中会disable usb，停止发送广播导致连接usb没有弹框
+
+		09-14 15:58:49.984703 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONNECTED, SUBSYSTEM=android_usb, SEQNUM=3224, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+		09-14 15:58:49.984939 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONNECTED
+		09-14 15:58:49.986844 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=connect
+		09-14 15:58:49.988841 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
+		09-14 15:58:49.989022 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
+		09-14 15:58:49.991562 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=DISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3225, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+		09-14 15:58:49.991680 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=DISCONNECTED
+		09-14 15:58:50.093651 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONNECTED, SUBSYSTEM=android_usb, SEQNUM=3227, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+		09-14 15:58:50.093784 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONNECTED
+		09-14 15:58:50.093982 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=connect
+		09-14 15:58:50.094170 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
+		09-14 15:58:50.094220 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
+		09-14 15:58:50.173255 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONFIGURED, SUBSYSTEM=android_usb, SEQNUM=3228, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+		09-14 15:58:50.173373 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONFIGURED
+		09-14 15:58:50.173519 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=configure
+		09-14 15:58:50.173661 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
+		09-14 15:58:50.173702 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
+		09-14 15:58:50.175024 1127 1517 V WindowManager: Changing focus from Window{13ef238 u0 com.gionee.amisystem/com.android.launcher2.Launcher} to Window{bab8a35 u0 StatusBar} Callers=com.android.server.wm.WindowManagerService.relayoutWindow:3179 com.android.server.wm.Session.relayout:265 android.view.IWindowSession$Stub.onTransact:286 com.android.server.wm.Session.onTransact:178
+		09-14 15:58:50.175166 1127 1517 D WindowManager: Input focus has changed to Window{bab8a35 u0 StatusBar}
+		09-14 15:58:57.360301 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=DISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3234, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+		09-14 15:58:57.360415 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=DISCONNECTED
+		09-14 15:58:57.360589 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=HWDISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3235, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+	
+	
+		本地通过*#837004#暗码进入后选择monkeytest会disable usb，而monkeytest需要重启或者跑完才会关闭，而cts相当于apk
+		有很多条，很多apk，跑完一条后会卸载相应的apk
+		mIsMonkeyTest running !!!! updateUsbNotification id 在usbdevicemanager.java 里面有updateUsbNotification 根据不同的usb配置
+		设置id为不同的title上后update 
+	}
+
+
+	
+	
+	
+	
+	
+	GNSPR#135244,【老化测试】W919 机型 T0143 版本，充电测试未通过在电流测试中，老化测试异常
+	{
+		这里的问题是battery plug out 还是charger out
+		bat_plug_out这个是电池拔出的log吗？
+		mtk_battery.c
+		battery_meter_ctrl(BATTERY_METER_CMD_GET_BOOT_BATTERY_PLUG_STATUS, &plugout_status_new);
+		
+		
+		[fg_drv_update_hw_status] current:534 270 state:0 0 car:-220 -220 bat:4237 4243 chr:4834 4834 hwocv:1234 1234 bat_plug_out:1 1 tmp:34 34 imix 18750 rac 546
+		
+		[dod_init_result] NVRAM_ready 1 Embedded 1 plug_out 1 is_hwocv_unreliable 0 rtc_invalid 0 rtc_ui_soc 4300 two_sec_reboot 0 old_data.ui_soc 4374
+	
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -176,236 +512,6 @@
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	GNSPR#103678,通话：接听或者挂断电话时，振动的同时会有崩的一声
-	{
-		这里主要是调试马达的震动强度，因为马达的震感有点强
-	
-		文档
-		{	
-			输出的强度应该跟output voltage有关，
-			The output voltage is based on the duty cycle of the provided PWM signal, where the OD_CLAMP[7:0] bit in
-			 register 0x17 sets the full-scale amplitude
-			 
-			pwm模式强度靠调整占空比改变 the strength of vibration is determined by the duty cycle 
-		
-			A waveform identifier is an integer value referring to the index position of a waveform in the RAM library
-			 
-	
-			The smart-loop architecture is an advanced closed-loop system that optimizes the performance of the actuator
-		and allows for failure detection. The architecture consists of automatic resonance tracking and reporting (for an
-		LRA), automatic level calibration, accelerated startup and braking, diagnostics routines, and other proprietary
-		algorithms.
-	
-	
-			The RATED_VOLTAGE[7:0] bit in register 0x16 sets the rated voltage for the closed-loop drive modes.
-		
-			In open-loop mode, the RATED_VOLTAGE[7:0] bit is ignored. Instead, the OD_CLAMP[7:0] bit (in register 0x17)
-	is used to set the rated voltage for the open-loop drive modes.
-
-			The DRV2604L slave address is 0x5A (7-bit), or 1011010 in binary.
-		
-		}
-		
-		
-		相关的代码
-		{
-			关键字
-			{
-				vibrate,haptic,pwm,drv2604l
-				
-				OD_CLAMP[7:0],DATA_FORMAT_RTP,RATED_VOLTAGE[7:0]
-				
-				//Gionee <gn_by_charging> <lilubao> <20171114> add for change vibrate end
-			}
-			
-			当前项目的配置是什么样的
-			{
-				static struct actuator_data DRV2604L_actuator={
-					.device_type = LRA,
-					.rated_vol = 0x46,	//1.8V
-					.over_drive_vol = 0x7a,
-					.LRAFreq = 235,
-				};
-				
-				
-				pDrv2604Platdata->GpioTrigger=0;
-				pDrv2604Platdata->loop=CLOSE_LOOP;
-				pDrv2604Platdata->RTPFormat=Signed;
-				pDrv2604Platdata->BIDIRInput=BiDirectional;
-				
-				P30 各种模式配置的解释
-				
-				P22 Rated Voltage Programming 0x16 额定电压
-				
-				Overdrive Voltage-Clamp Programming
-				
-				CLAMP voltage s	钳位电压
-				
-				控制输出的主要是Rated Voltage
-			
-			}
-		}
-
-	}
-
-
-
-
-
-
-	
-	GNSPR#110553,【GMS-CTS测试】CtsHostsideNetworkTests测试项faileds
-	{
-		先了解一下CTS干什么的，
-		{
-			google官网关于cts的介绍，android设备的兼容性测试
-			https://source.android.google.cn/compatibility/
-			
-			device.mk这个文件很重要，内容也很多
-			xml文件好像用的很多，有必要弄清楚,这个应该是读取相关的配置然后加载
-			xml文件配置了系统所需要的资源，rc,mk等需要的脚本，宏和默认的设置
-		
-
-			cts对权限有要求，权限过高会有安全隐患
-
-			把gionee/code/driver/project_common/BJ17G10_DRV_COMMON/device/gionee_bj/gnbj6757_66_n/device.mk中的下面的permissions注释掉。
-
-			USB OTG
-			PRODUCT_COPY_FILES += frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml
-			
-		}
-	
-	
-		MTK提case
-		{
-			若是CTS问题,请提供:
-			1.单跑此项case的mtklog
-			2.单跑此项case的cts log(在android-cts\repository\logs目录下)
-			3.单跑此项case的cts report(在android-cts\repository\results 目录下)
-
-			Please help to provide below informations when submitting CTS issues:
-			1.the mtklog after running the failed case individually 
-			2.the cts log（under the folder:android-cts\repository\logs ）
-			3.the cts report(unnder the folder:android-cts\repository\results )
-
-	
-	
-			我们同平台的另一个项目S10 也fail了
-			但是两个高通平台的项目17G08A，17G06A，ok，环境应该没有问题
-			android版本是否有影响，17G10A用的是7.0，17G08A用的是7.1.1 
-		
-
-	
-			您好，据我了解和其他用户反馈，高通平台有专门合了一个O版本的patch，所以会和MTK平台表现不一样，
-			合入该patch之后就算在IPv4下也可以测试pass，贵司可以试一下：
-
-			https://android.googlesource.com/platform/libcore/+/3a50b32e2abec315948e1947450cd0f7c0c82b2d
-			建議可以參考這個patch 改動.
-			只要合入 ojluni/src/main/java/java/net/DatagramSocket.java 的patch. 
-		
-		
-		
-			diff --git a/ojluni/src/main/java/java/net/DatagramSocket.java b/ojluni/src/main/java/java/net/DatagramSocket.java
-			old mode 100644
-			new mode 100755
-			index 7577e63..a6f09fa
-			--- a/ojluni/src/main/java/java/net/DatagramSocket.java
-			+++ b/ojluni/src/main/java/java/net/DatagramSocket.java
-			@@ -679,6 +679,11 @@
-			public void send(DatagramPacket p) throws IOException {
-			InetAddress packetAddress = null;
-			synchronized (p) {
-			+ // ----- BEGIN android -----
-			+ if (pendingConnectException != null) {
-			+ throw new SocketException("Pending connect failure", pendingConnectException);
-			+ }
-			+ // ----- END android -----
-			if (isClosed())
-			throw new SocketException("Socket is closed");
-			checkAddress (p.getAddress(), "send");
-		
-			DatagramSocket.java
-			//Gionee <GN_BSP_CHG> <lilubao> <20171113> modify for CTS begin
-			
-			
-			贵司提GTS问题前可以先关注MOL
-			进入MediaTek On-Line-> Quick Start-> GMS快速入门->GMS认证相关->GTS5.0r2常见问题.
-			请参考如下branch自行到PMS上申请patch
-			alps-mp-n0.mp5 ALPS03603867 
-		
-		
-		}
-
-	}
-
-
-
-
-
-
-
-
-
-
-	
-	GNSPR#128052,测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，
-	重启恢复
-	{
-
-		Dear Customer，
-
-		您好，如果您的测试版本是eng版本，请把selinux关掉试试，即adb shell setenforce 0；
-		或者是加上如下selinux 规则试试，谢谢！
-		#====================== untrusted_app.te ======================
-		allow untrusted_app mtp_device:chr_file rw_file_perms; 	
-		
-		
-		等待测试复测,这里有一个selinux是什么，有什么作用
-		1.user版本不能修改selinux的开关；
-		2.如果要编译untrust_app.te，单独编译boot就可以生效；
-	}
-
-
-
-
-
-
-
-
-
-	GNSPR#113817,卡1移动4G卡2电信4G》连接2A充电器充电3小时-前1小时正常测试后2小时待机-电量一直保持在26%-进MMI-硬件测试-充电-充电电流显示0
-	换充电器充电30S后充电电流归0-插拔充电器未恢复》保留现象中 验证10台2台出现共2次
-	{
-		分析：充电器充电电流为0,不充电，充电器是否有问题，USB口是否有问题
-		
-		充电器检测流程是什么样的？
-		{
-			充电器状态相关的中断寄存器： 0xD0~0xD5
-			USB的status :0x27 	
-			
-			mtk_charger_int_handler，dump_charger_name，mt_charger_set_property
-			rt5081_enable_chgdet_flow
-		
-		}
-	
-		手机的USB口可能
-	}
-
-
-
-
 
 
 
@@ -541,8 +647,25 @@
 		
 		fuseblower qcom  的secure boot
 		
-		//Gionee <GN_BSP_CHG> <lilubao> <20171115> modify for remove typr-c begin
 		
+		pericom-type-c@1d {
+			compatible = "pericom,usb-type-c";
+			reg = <0x1d>;
+			vdd_io-supply = <&pm8917_l5>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <97 2>;	/* TLMM 97, TRIGGER_FALLING */
+			pericom,enb-gpio = <&tlmm 131 0x1>;	/* active low */
+			pinctrl-names = "default";
+			pinctrl-0 = <&usbc_int_default>;
+			//Gionee <GN_BSP_CHG> <lilubao> <20171115> modify for remove typr-c begin
+			status = "disabled";
+			//Gionee <GN_BSP_CHG> <lilubao> <20171115> modify for remove typr-c end
+		};
+		
+		06量产分支
+		bj17g06a_main_dev
+		
+		status = "disabled";
 
 		对于高通平台项目的签名方式要注意以下几点：
 		{

@@ -3535,7 +3535,7 @@ out:
 
 
 /**************************************************************************************************************/
-pass,GNSPR#102837,测试机电量高于30%》关机状态插充电器后，屏幕弹出低电量充电图标，5s后到测试机正常充电图标界面（对比m7无此现象），多次操作仍如此》
+22.GNSPR#102837,测试机电量高于30%》关机状态插充电器后，屏幕弹出低电量充电图标，5s后到测试机正常充电图标界面（对比m7无此现象），多次操作仍如此》
 重启未恢复，暂未恢复 验证10台10台100%
 {
 	这个应该是关机充电logo仍然用MTK原始的，需要适配成gionee amigo的关机充电logo
@@ -3697,3 +3697,87 @@ pass,GNSPR#102837,测试机电量高于30%》关机状态插充电器后，屏�
 
 
 
+/**************************************************************************************************************************/
+23.	GNSPR#110553,【GMS-CTS测试】CtsHostsideNetworkTests测试项faileds
+{
+	先了解一下CTS干什么的，
+	{
+		google官网关于cts的介绍，android设备的兼容性测试
+		https://source.android.google.cn/compatibility/
+		
+		device.mk这个文件很重要，内容也很多
+		xml文件好像用的很多，有必要弄清楚,这个应该是读取相关的配置然后加载
+		xml文件配置了系统所需要的资源，rc,mk等需要的脚本，宏和默认的设置
+	
+
+		cts对权限有要求，权限过高会有安全隐患
+
+		把gionee/code/driver/project_common/BJ17G10_DRV_COMMON/device/gionee_bj/gnbj6757_66_n/device.mk中的下面的permissions注释掉。
+
+		USB OTG
+		PRODUCT_COPY_FILES += frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml
+		
+	}
+
+
+	MTK提case
+	{
+		若是CTS问题,请提供:
+		1.单跑此项case的mtklog
+		2.单跑此项case的cts log(在android-cts\repository\logs目录下)
+		3.单跑此项case的cts report(在android-cts\repository\results 目录下)
+
+		Please help to provide below informations when submitting CTS issues:
+		1.the mtklog after running the failed case individually 
+		2.the cts log（under the folder:android-cts\repository\logs ）
+		3.the cts report(unnder the folder:android-cts\repository\results )
+
+
+
+		我们同平台的另一个项目S10 也fail了
+		但是两个高通平台的项目17G08A，17G06A，ok，环境应该没有问题
+		android版本是否有影响，17G10A用的是7.0，17G08A用的是7.1.1 
+	
+
+
+		您好，据我了解和其他用户反馈，高通平台有专门合了一个O版本的patch，所以会和MTK平台表现不一样，
+		合入该patch之后就算在IPv4下也可以测试pass，贵司可以试一下：
+
+		https://android.googlesource.com/platform/libcore/+/3a50b32e2abec315948e1947450cd0f7c0c82b2d
+		建議可以參考這個patch 改動.
+		只要合入 ojluni/src/main/java/java/net/DatagramSocket.java 的patch. 
+	
+	
+	
+		diff --git a/ojluni/src/main/java/java/net/DatagramSocket.java b/ojluni/src/main/java/java/net/DatagramSocket.java
+		old mode 100644
+		new mode 100755
+		index 7577e63..a6f09fa
+		--- a/ojluni/src/main/java/java/net/DatagramSocket.java
+		+++ b/ojluni/src/main/java/java/net/DatagramSocket.java
+		@@ -679,6 +679,11 @@
+		public void send(DatagramPacket p) throws IOException {
+		InetAddress packetAddress = null;
+		synchronized (p) {
+		+ // ----- BEGIN android -----
+		+ if (pendingConnectException != null) {
+		+ throw new SocketException("Pending connect failure", pendingConnectException);
+		+ }
+		+ // ----- END android -----
+		if (isClosed())
+		throw new SocketException("Socket is closed");
+		checkAddress (p.getAddress(), "send");
+	
+		DatagramSocket.java
+		//Gionee <GN_BSP_CHG> <lilubao> <20171113> modify for CTS begin
+		
+		
+		贵司提GTS问题前可以先关注MOL
+		进入MediaTek On-Line-> Quick Start-> GMS快速入门->GMS认证相关->GTS5.0r2常见问题.
+		请参考如下branch自行到PMS上申请patch
+		alps-mp-n0.mp5 ALPS03603867 
+	
+	
+	}
+
+}
