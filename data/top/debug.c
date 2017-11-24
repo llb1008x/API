@@ -4,8 +4,6 @@
 {
 
 
-
-
 	ANDROID TREBLE OVERVIEW                                          80-PE644-1
 	ANDROID TREBLE VNDK OVERVIEW                                     80-PE644-2
 	ANDROID TREBLE HIDL OVERVIEW                                     80-PE644-3
@@ -89,190 +87,192 @@
 	
 17G10A
 {
-
-	extcon
-	
-	GNSPR#128052,测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，
-	重启恢复
+	GNSPR#101075，待机界面进入相机，相机黑屏5s后自动恢复
 	{
-
-		Dear Customer，
-
-		您好，如果您的测试版本是eng版本，请把selinux关掉试试，即adb shell setenforce 0；
-		或者是加上如下selinux 规则试试，谢谢！
-		#====================== untrusted_app.te ======================
-		allow untrusted_app mtp_device:chr_file rw_file_perms; 	
+		压力测试,之前的温度已经很高了
 		
-		
-		等待测试复测,这里有一个selinux是什么，有什么作用
-		1.user版本不能修改selinux的开关；
-		2.如果要编译untrust_app.te，单独编译boot就可以生效；
-		
-		
-		selinux qcom有一个fatab.com里面是一些挂载执行的命令     
-		
-		代码路径
-		external/sepolicy – Google define
-		device/qcom/sepolicy/common – Qualcomm define
-		
-		
-		Disable/enable
-		Kernel command line
-		adb shell setenforce 0
-		
-		device/qcom/sepolicy/common/qmuxd.te
-		
-		
-		G1605B_sign.mk
-		#========== Security Boot switch start==================
-		#gionee, duanyh, for verified boot, begin
-		CONFIG_GN_BSP_MTK_SBC_FLAG=y
-		MTK_SECURITY_SW_SUPPORT=yes
-		CONFIG_MTK_SECURITY_SW_SUPPORT=yes
-		MTK_SEC_CHIP_SUPPORT=yes	
-		MTK_SEC_USBDL=ATTR_SUSBDL_ENABLE
-		MTK_SEC_BOOT=ATTR_SBOOT_ENABLE
-		MTK_SEC_MODEM_AUTH=no
-		MTK_SEC_SECRO_AC_SUPPORT=yes
-		CUSTOM_SEC_AUTH_SUPPORT=no 
-		MTK_VERIFIED_BOOT_SUPPORT=yes
-		MTK_SEC_FASTBOOT_UNLOCK_SUPPORT=no 
-		MTK_SEC_FASTBOOT_UNLOCK_KEY_SUPPORT=no
-		#gionee, duanyh, for verified boot, end
-
-		#gionee ranyi add for gionee security boot start
-		GN_SECURITY_BOOT_SW_SUPPORT=yes
-		GN_SECURITY_BOOT_1.1_TRUSTZONE_KEY_SUPPORT=yes
-		#gionee ranyi add for gionee security boot end
-
-		#wangguojun add for secure boot
-		GN_VERIFIED_BOOT_GN_MP_KEY = yes
-
-		#wangguojun add for kph build
-		GN_KPH_BUILD_SUPPORT=yes
-		#========== Security Boot switch end==================
-		
-		
-		How do I disable and enable verity via adb?
-		A. adb disable-verity
-		disable dm-verity checking on USERDEBUG builds
-		adb enable-verity
-		re-enable dm-verity checking on USERDEBUG builds
-		source code: system/core/adb/commandline.cpp
-	}
-
-
-
-
-
-
-
-
-
-
-
-	GNSPR#134414，【内部体验】低电量关机状态下》连接充电器后》手动点亮屏幕一直在闪花屏 （开机起来显示28%电量）
-	{
-		
-	
-	}
-
-
-
-
-
-
-
-
-	GNSPR#103678,通话：接听或者挂断电话时，振动的同时会有崩的一声
-	{
-		这里主要是调试马达的震动强度，因为马达的震感有点强
-	
-		文档
-		{	
-			输出的强度应该跟output voltage有关，
-			The output voltage is based on the duty cycle of the provided PWM signal, where the OD_CLAMP[7:0] bit in
-			 register 0x17 sets the full-scale amplitude
-			 
-			pwm模式强度靠调整占空比改变 the strength of vibration is determined by the duty cycle 
-		
-			A waveform identifier is an integer value referring to the index position of a waveform in the RAM library
-			 
-	
-			The smart-loop architecture is an advanced closed-loop system that optimizes the performance of the actuator
-		and allows for failure detection. The architecture consists of automatic resonance tracking and reporting (for an
-		LRA), automatic level calibration, accelerated startup and braking, diagnostics routines, and other proprietary
-		algorithms.
-	
-	
-			The RATED_VOLTAGE[7:0] bit in register 0x16 sets the rated voltage for the closed-loop drive modes.
-		
-			In open-loop mode, the RATED_VOLTAGE[7:0] bit is ignored. Instead, the OD_CLAMP[7:0] bit (in register 0x17)
-		is used to set the rated voltage for the open-loop drive modes.
-
-			The DRV2604L slave address is 0x5A (7-bit), or 1011010 in binary.
-		
-		}
-		
-		
-		相关的代码
+		case ID:ALPS03628177
 		{
-			关键字
+			Dear customer
+				您的意思是压力测试，手机升温后此问题才会发生么？那有可能是升温后，cpu性能被限制打出的。
+			您帮忙抓一份userdebug版本的systrace+mtklog，正常与不正常时候的对比log给我们check下。感谢
+		
+		
+			Dear customer
+				抓systrace的方式可以上我司DCC下载文档How_to_use_ftrace_to_Customer.pptx 后面几页有介绍具体操作步骤：
+				基本上来说就是使用我司ftrace_all_in_one工具，
+				1、设置tag，文档中介绍的是手动使用adb命令设置。我给您release一个bat文件，设置camera需要的tag，您在抓取之前直接先运行此bat文件就好。
+				2、运行catch.bat
+				3、复现问题
+				4、停止抓取
+				具体操作请参考文档中的说明（请帮忙使用userdebug版本的load）。
+
+				感谢
+		
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+	关机充电相关的几个BUG
+	{
+			GNSPR#134414，【内部体验】低电量关机状态下》连接充电器后》手动点亮屏幕一直在闪花屏 （开机起来显示28%电量）
 			{
-				vibrate,haptic,pwm,drv2604l
-				
-				OD_CLAMP[7:0],DATA_FORMAT_RTP,RATED_VOLTAGE[7:0]
-				
-				//Gionee <GN_BY_CHG> <lilubao> <20171114> add for change vibrate end
-			}
+				现象：低电量关机充电条件，然后关机之后电量出现跳变
+		
+		
+				分析：
+				{
+					1.造成插充电器低电的原因，虽然是识别了DCP，但是aicl电流一直是100mA，所以造成了充的少耗的多，
+					最后虽然上层UI显示是1%，但是底层是负值，因为插着充电器才没有关机
 			
-			当前项目的配置是什么样的
+			
+					2.电量跳变的原因，之前电量应该是多少？
+			
+			
+					3.花屏是跟系统起来电压有关还是本身的原因？
+			
+			
+					4.是否跟关机充电logo有关?
+			
+			
+					5.开机初始化的电池电压，电流等相关参数应该怎么搜？
+		
+				}
+
+				//Gionee <GN_BY_CHG> <lilubao> <20171122> add for debug kpoc charging begin
+				
+				
+				之前插入充电器的情况是什么样？充电器的识别情况？
+				read_boot_battery_plug_out_status
+				
+				[   80.454636]  (5)[72:dlpt_notify_thr][DLPT_final] 2615,0,84,84,1,5500
+				DLPT_final 低电保护 
+				
+				[   80.866102]  (4)[186:battery_thread]gn_boot_reason->2,gn_boot_mode->2,gn_call_state->0,gn_screenon_time->80
+				之前是通过有操作过recovery 进入recovery是升级还是回复出厂设置？recovery+插了充电器的操作
+				
+				之前电池电压是4.07V 
+				[   80.873337]  (5)[262:fuelgauged_stat][fg_res] FG_DAEMON_CMD_GET_VBAT = 40750
+	
+			}
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+	去除冗余和不合理的log,代码逻辑
+	{
+			rt5081的 mivr中断enable跟disable不匹配
+			[    2.457134]  (4)[238:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_power_path: en = 1
+			[    2.457141]  (4)[238:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_mivr: mivr = 4400000 (0x05)
+
+
+			[    2.457274]  (4)[238:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_irq: (chg_mivr) en = 1
+			[    2.457289] -(4)[238:charger_thread]------------[ cut here ]------------
+			[    2.457293] -(4)[238:charger_thread]WARNING: CPU: 4 PID: 238 at /data/MAIN_GIT_REPO_CODE/BJ17G10A_MAIN_REPO/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/kernel/irq/manage.c:513 enable_irq+0x88/0xcc()
+			[    2.457308] -(4)[238:charger_thread]Unbalanced enable for IRQ 166
+			[    2.457315] -(4)[238:charger_thread]CPU: 4 PID: 238 Comm: charger_thread Tainted: G        W       4.4.15 #1
+			[    2.457321] -(4)[238:charger_thread]Hardware name: MT6757CD (DT)
+			[    2.457326] -(4)[238:charger_thread]Call trace:
+			[    2.457330] -(4)[238:charger_thread][<ffffffc00008a328>] dump_backtrace+0x0/0x14c
+			[    2.457339] -(4)[238:charger_thread][<ffffffc00008a488>] show_stack+0x14/0x1c
+			[    2.457344] -(4)[238:charger_thread][<ffffffc000337830>] dump_stack+0x8c/0xb0
+			[    2.457353] -(4)[238:charger_thread][<ffffffc00009e5f8>] warn_slowpath_fmt+0xc0/0xf4
+			[    2.457360] -(4)[238:charger_thread][<ffffffc0000fd32c>] enable_irq+0x88/0xcc
+			[    2.457365] -(4)[238:charger_thread][<ffffffc0004d8090>] rt5081_enable_power_path+0x148/0x190
+			[    2.457375] -(4)[238:charger_thread][<ffffffc0009388a0>] charger_dev_enable_powerpath+0x24/0x34
+			[    2.457384] -(4)[238:charger_thread][<ffffffc00093bcf0>] charger_routine_thread+0x378/0x6a8
+			[    2.457392] -(4)[238:charger_thread][<ffffffc0000be29c>] kthread+0xdc/0xf0
+			[    2.457400] -(4)[238:charger_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
+			[    2.457407] -(4)[238:charger_thread]---[ end trace 644ae300f92f6883 ]---
+	
+	}
+	
+
+
+
+
+
+
+
+
+
+
+
+	GNSPR#109803,关机状态，连接充电器，显示电量灭屏后，短按两次电源键1s，出现开机画面，再次操作恢复
+	{
+		启动之后的boot_reason 是4,wdt_by_pass_pwk,然后这个现象是在系统跑到kernel之后的
+		按键的检测问题应该是在kernel出现问题的		
+		{
+			首先这个boot_reason 有哪些原因？
+			SW,HW,kernel panic 按键检测到短按所以会重启，这个应该是系统硬件初始化的时候读取寄存器传递的值g_boot_arg
+			
+			kernel 部分按键的处理在kpd.c 中断回调函数 kpd_pwrkey_pmic_handler
+			void kpd_pwrkey_pmic_handler(unsigned long pressed)
 			{
-				static struct actuator_data DRV2604L_actuator={
-					.device_type = LRA,
-					.rated_vol = 0x46,	//1.8V
-					.over_drive_vol = 0x7a,
-					.LRAFreq = 235,
-				};
-				
-				
-				pDrv2604Platdata->GpioTrigger=0;
-				pDrv2604Platdata->loop=CLOSE_LOOP;
-				pDrv2604Platdata->RTPFormat=Signed;
-				pDrv2604Platdata->BIDIRInput=BiDirectional;
-				
-				P30 各种模式配置的解释
-				
-				P22 Rated Voltage Programming 0x16 额定电压
-				
-				Overdrive Voltage-Clamp Programming
-				
-				CLAMP voltage s	钳位电压
-				
-				控制输出的主要是Rated Voltage
-			
+			//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 begin
+				if(1==s_gn_clam)
+				{
+					return ;
+				}
+				else
+				{
+					kpd_print("Power Key generate, pressed=%ld\n", pressed);
+					if (!kpd_input_dev) {
+						kpd_print("KPD input device not ready\n");
+						return;
+				}
+				kpd_pmic_pwrkey_hal(pressed);
+			#if (defined(CONFIG_ARCH_MT8173) || defined(CONFIG_ARCH_MT8163))
+				if (pressed) /* keep the lock while the button in held pushed */
+					wake_lock(&pwrkey_lock);
+				else /* keep the lock for extra 500ms after the button is released */
+					wake_lock_timeout(&pwrkey_lock, HZ/2);
+					//这一部分的处理就是说在释放powerkey之后还有500ms持锁
+			#endif
+				}
 			}
+			//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 end
+		}		
+		
+		6355的 MT6355_TOPSTATUS这个寄存器有homekey跟powerkey的检测
+		preloader的keypad.c mtk_detect_key 检测按键
+		
+		按键相关的input子系统内定的编号
+		linux-event-codes.h
+		
+		
+		{
+			相关的宏	
+			BR_WDT_BY_PASS_PWK,MTK_KERNEL_POWER_OFF_CHARGING,kpoc_flag
+			
+
+			<3>[   10.779316]  (7)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->10
+			<3>[   20.786597]  (5)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->20
+			<3>[   30.792217]  (0)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->30
 		}
 		
-		
-		现在确定是硬件结构的问题还是软件的问题？
-		[FAQ11345][Speech] 来电接听瞬间概率会有咔的一声
-		
-		
-		同音频，硬件，结构的工程师共同确认了一下
-		这个在挂断电话的时候听筒能听到挂断声音，同时还有震动的声音
-		是因为，17G10A整机大部分是金属结构，特别是外壳，马达震动的时候，震动很容易传递
-		到整个机器
-
-		结构工程师有一个减弱的方案，就是修改转轴部分材料，但是容易影响外观，而且效果减小不多
-
-		做了一个对比实验：
-		1.关掉震动，没有问题
-		2.调低震动强度，有问题
-		3.扣掉听筒，飞线远离主板，没有问题
-		4.在3的基础上，听原来听筒的位置，有问题，是整机震动的声音
-
-		即是说这个问题与软件无关，是金属材料机身容易传递震动
+		按键检测的流程大概是这样的：
+		底层6355接收到按键触发的中断然后通过handler回调到(kpd.c)kpd_pwrkey_pmic_handler，这里有wake_lock持锁，按下的时候持锁，
+		释放的时候还会持锁500ms，然后时（hal_kpd.c）kpd_pmic_pwrkey_hal 将按键的时间上报给input子系统的，(key_control.cpp) 之后应该是通过input
+		子系统下面的fd节点，这里面是一个线程通过轮询的方式，如果有变化就会判断下一步亮屏关机充电的动画还是灭屏或者是重启之类的
 
 	}
 
@@ -281,153 +281,6 @@
 
 
 
-
-
-
-
-
-
-	
-	省电适配参数导入
-	{
-		    电量百分比 	电池满电情况下的放电时间（hour）（home界面、最大亮度，永不灭屏）电池满电情况下的放电时间 （h） 	备注
-			100% - 90% 	1:30:00 	1.第一次格式化升级完成后测试
-			2.插入单张SIM卡（信号稳定）和T卡
-			3.默认设置，显示--休眠设为“无限时”
-			4.处于home界面 关闭桌面动态天气
-			5.亮度调整为最大
-			6.尽可能多几台机器一起测试，取平均值
-			7.静置放电
-			90% - 80% 	1:01:00
-			80% - 70% 	1:05:00
-			70% - 60% 	1:08:00
-			60% - 50% 	1:04:00
-			50% - 40% 	1:06:00
-			40% - 30% 	1:06:00
-			30% - 20% 	1:06:00
-			20% - 10% 	1:07:00
-			10% - 关机 	1:18:00
-
-
-
-			进入极致省电模式 	待机电流（mA）(灭屏，均在home界面） 	备注
-			出厂状态下，电量1%，进入极致省电模式 	8.52 	1.插入单张SIM卡（信号稳定）和T卡
-			2.电量在1%
-			3.每组数据测试15分钟以上；
-
-
-			电池电量 	mAh
-			查看电池毫安数 	3000mAh
-
-			充电方式 	mA
-			AC充电 	2097.902mA
-			USB充电 	652.173mA
-
-			初始屏幕亮度 	整数值 	备注
-			出厂设置亮度值 	337.61mA 	1.此亮度值为 设置--显示 内的亮度值范围0~255   
-
-			　 	测试条件 	整机电流(mA)(亮屏，均在home界面) 	备注
-			情形1 	第一次格式化升级完成后，插入单张SIM卡和T卡状态下的工作电流(100%亮度) 	240.49 	1.去掉桌面动态天气
-			2.显示-休眠改为“无限时”
-			3.home界面（除亮度外，其他条件相同）
-			4.每组数据测试15分钟以上；
-			情形2 	  情形1 + 75%屏幕亮度 	214.89
-			情形3 	  情形1 + 50%屏幕亮度 	182.74
-			情形4 	  情形1 + 25%屏幕亮度 	158.79
-
-			这里面一系列参数都是在
-			packages_mtk_mp/gionee/private/BJ17G10A01_A/apps/Amigo_SystemManager/config.xml 里面配置的
-	}
-
-
-
-
-
-
-
-
-	GNSPR#109502,后台播放音乐，进浏览器，插充电器无振动，不显示充电，也没有指示灯，拔掉充电器手机振动一下，再次插充电器恢复
-	{
-		//Gionee <GN_BSP_CHG> <lilubao> <20171120> add for debug begin
-		增加了部分log， rt5081_pmu_charger.c ,gn_ti_drv2604l.c
-	
-	}
-
-
-
-
-
-
-
-	GNSPR#113442,【品质压力】待机界面》手机连接电脑USB端口-手机下拉通知栏-无USB连接显示-插拔数据线仍如此》
-	清除后台未恢复-清除数据未恢复-重启恢复 	
-	{
-		
-		从log上看，mIsMonkeyTest running !!!! updateUsbNotification id = 0，可能测试之前做了monkeytest或者cts的测试
-		测试条例没有跑完
-		在monkeytest和cts的测试中会disable usb，停止发送广播导致连接usb没有弹框
-
-		09-14 15:58:49.984703 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONNECTED, SUBSYSTEM=android_usb, SEQNUM=3224, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
-		09-14 15:58:49.984939 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONNECTED
-		09-14 15:58:49.986844 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=connect
-		09-14 15:58:49.988841 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
-		09-14 15:58:49.989022 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
-		09-14 15:58:49.991562 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=DISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3225, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
-		09-14 15:58:49.991680 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=DISCONNECTED
-		09-14 15:58:50.093651 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONNECTED, SUBSYSTEM=android_usb, SEQNUM=3227, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
-		09-14 15:58:50.093784 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONNECTED
-		09-14 15:58:50.093982 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=connect
-		09-14 15:58:50.094170 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
-		09-14 15:58:50.094220 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
-		09-14 15:58:50.173255 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONFIGURED, SUBSYSTEM=android_usb, SEQNUM=3228, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
-		09-14 15:58:50.173373 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONFIGURED
-		09-14 15:58:50.173519 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=configure
-		09-14 15:58:50.173661 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
-		09-14 15:58:50.173702 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
-		09-14 15:58:50.175024 1127 1517 V WindowManager: Changing focus from Window{13ef238 u0 com.gionee.amisystem/com.android.launcher2.Launcher} to Window{bab8a35 u0 StatusBar} Callers=com.android.server.wm.WindowManagerService.relayoutWindow:3179 com.android.server.wm.Session.relayout:265 android.view.IWindowSession$Stub.onTransact:286 com.android.server.wm.Session.onTransact:178
-		09-14 15:58:50.175166 1127 1517 D WindowManager: Input focus has changed to Window{bab8a35 u0 StatusBar}
-		09-14 15:58:57.360301 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=DISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3234, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
-		09-14 15:58:57.360415 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=DISCONNECTED
-		09-14 15:58:57.360589 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=HWDISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3235, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
-	
-	
-		本地通过*#837004#暗码进入后选择monkeytest会disable usb，而monkeytest需要重启或者跑完才会关闭，而cts相当于apk
-		有很多条，很多apk，跑完一条后会卸载相应的apk
-		mIsMonkeyTest running !!!! updateUsbNotification id 在usbdevicemanager.java 里面有updateUsbNotification 根据不同的usb配置
-		设置id为不同的title上后update 
-	}
-
-
-	
-	
-	
-	
-	
-	GNSPR#135244,【老化测试】W919 机型 T0143 版本，充电测试未通过在电流测试中，老化测试异常
-	{
-		这里的问题是battery plug out 还是charger out
-		bat_plug_out这个是电池拔出的log吗？
-		mtk_battery.c
-		battery_meter_ctrl(BATTERY_METER_CMD_GET_BOOT_BATTERY_PLUG_STATUS, &plugout_status_new);
-		
-		
-		[fg_drv_update_hw_status] current:534 270 state:0 0 car:-220 -220 bat:4237 4243 chr:4834 4834 hwocv:1234 1234 bat_plug_out:1 1 tmp:34 34 imix 18750 rac 546
-		
-		[dod_init_result] NVRAM_ready 1 Embedded 1 plug_out 1 is_hwocv_unreliable 0 rtc_invalid 0 rtc_ui_soc 4300 two_sec_reboot 0 old_data.ui_soc 4374
-	
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	GNSPR#100830,充电时按开机键开机，测试值是6.83s，标准值是4.5s，超出标准值2.33s
 	{
 		现在的关机充电条件下按powerkey到亮logo时间太长
@@ -511,6 +364,127 @@
 	
 	}
 	
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+	
+	
+	GNSPR#128052,测机连接电脑USB端口，下拉状态栏显示USB已连接，传文件打开，电脑不显示便捷设备，换电脑，插拔USB端口不恢复，
+	重启恢复
+	{
+
+		Dear Customer，
+
+		您好，如果您的测试版本是eng版本，请把selinux关掉试试，即adb shell setenforce 0；
+		或者是加上如下selinux 规则试试，谢谢！
+		#====================== untrusted_app.te ======================
+		allow untrusted_app mtp_device:chr_file rw_file_perms; 	
+		
+		
+		等待测试复测,这里有一个selinux是什么，有什么作用
+		1.user版本不能修改selinux的开关；
+		2.如果要编译untrust_app.te，单独编译boot就可以生效；
+		
+		
+		selinux qcom有一个fatab.com里面是一些挂载执行的命令     
+		
+		代码路径
+		external/sepolicy – Google define
+		device/qcom/sepolicy/common – Qualcomm define
+		
+		
+		Disable/enable
+		Kernel command line
+		adb shell setenforce 0
+		
+		device/qcom/sepolicy/common/qmuxd.te
+		
+		
+		G1605B_sign.mk
+		#========== Security Boot switch start==================
+		#gionee, duanyh, for verified boot, begin
+		CONFIG_GN_BSP_MTK_SBC_FLAG=y
+		MTK_SECURITY_SW_SUPPORT=yes
+		CONFIG_MTK_SECURITY_SW_SUPPORT=yes
+		MTK_SEC_CHIP_SUPPORT=yes	
+		MTK_SEC_USBDL=ATTR_SUSBDL_ENABLE
+		MTK_SEC_BOOT=ATTR_SBOOT_ENABLE
+		MTK_SEC_MODEM_AUTH=no
+		MTK_SEC_SECRO_AC_SUPPORT=yes
+		CUSTOM_SEC_AUTH_SUPPORT=no 
+		MTK_VERIFIED_BOOT_SUPPORT=yes
+		MTK_SEC_FASTBOOT_UNLOCK_SUPPORT=no 
+		MTK_SEC_FASTBOOT_UNLOCK_KEY_SUPPORT=no
+		#gionee, duanyh, for verified boot, end
+
+		#gionee ranyi add for gionee security boot start
+		GN_SECURITY_BOOT_SW_SUPPORT=yes
+		GN_SECURITY_BOOT_1.1_TRUSTZONE_KEY_SUPPORT=yes
+		#gionee ranyi add for gionee security boot end
+
+		#wangguojun add for secure boot
+		GN_VERIFIED_BOOT_GN_MP_KEY = yes
+
+		#wangguojun add for kph build
+		GN_KPH_BUILD_SUPPORT=yes
+		#========== Security Boot switch end==================
+		
+		
+		How do I disable and enable verity via adb?
+		A. adb disable-verity
+		disable dm-verity checking on USERDEBUG builds
+		adb enable-verity
+		re-enable dm-verity checking on USERDEBUG builds
+		source code: system/core/adb/commandline.cpp
+	}
+
+
+
+
+
+	GNSPR#109502,后台播放音乐，进浏览器，插充电器无振动，不显示充电，也没有指示灯，拔掉充电器手机振动一下，再次插充电器恢复
+	{
+		//Gionee <GN_BSP_CHG> <lilubao> <20171120> add for debug begin
+		增加了部分log， rt5081_pmu_charger.c ,gn_ti_drv2604l.c
+	
+	}
+
+
+
+	
+	
+	
+	GNSPR#135244,【老化测试】W919 机型 T0143 版本，充电测试未通过在电流测试中，老化测试异常
+	{
+		这里的问题是battery plug out 还是charger out
+		bat_plug_out这个是电池拔出的log吗？
+		mtk_battery.c
+		battery_meter_ctrl(BATTERY_METER_CMD_GET_BOOT_BATTERY_PLUG_STATUS, &plugout_status_new);
+		
+		
+		[fg_drv_update_hw_status] current:534 270 state:0 0 car:-220 -220 bat:4237 4243 chr:4834 4834 hwocv:1234 1234 bat_plug_out:1 1 tmp:34 34 imix 18750 rac 546
+		
+		[dod_init_result] NVRAM_ready 1 Embedded 1 plug_out 1 is_hwocv_unreliable 0 rtc_invalid 0 rtc_ui_soc 4300 two_sec_reboot 0 old_data.ui_soc 4374
+	
+	}
+	
+	
+	
+	
+
 	
 
 
@@ -806,147 +780,6 @@
 	//Gionee <GN_BSP_CHG> <lilubao> <20171101> modify for pmic register dump end
 	
 	}
-
-
-
-
-
-
-
-		GNSPR#122265，连接充电器，长按电源键关机，关机完成后，长按电源键5s测机不开机，只显示在关机充电图标界面，
-		（在充电图标界面长按电源键则可以开机），用户体检不佳 暂未恢复 对比17G16-T0119版本有此现象，对比17G02-T2638版本无此现象，
-		验证10台10台100%
-		{
-			分析：
-				S10C 在关机充电条件下，长按powerkey，不会亮屏，长按时间从按下开始，4~5s内重启
-				而17G06A长按会先亮屏，灯灭屏之后，才重新计时，导致时间较长
-				从log上看，长按powerkey，先是down，0.21s之后又up，导致认为是短按，亮屏
-				
-			{	
-				亮屏条件下检测到up，开始计时
-				[ 15.993615] *(2)[324:charger]charger: [15986] key[116] down
-				[ 16.054725] *(2)[324:charger]charger: reboot_timeout->17986,now->16026
-
-				这个长按之后可以在4~5s内重启
-
-				但是在灭屏条件下长按有问题
-				[ 13.154409] *(1)[324:charger]charger: [13154] key[116] down
-				[ 13.154498] *(1)[324:charger]charger: reboot_timeout->15154,now->13154
-
-				灭屏条件下长按先亮屏但是同时会上报按键抬起的动作，但是按键一直是按着的
-				[ 13.760229] *(1)[324:charger]charger: [13760] key[116] up (was down for 0.606sec)
-			}
-			
-			
-			[   14.206991] *(0)[337:charger]charger: [14206] key[116] down
-
-			[   14.430061] *(0)[365:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
-			[   14.444072] *0)PM: Some devices failed to suspend, or early wake event detected
-			[   14.452183] *(2)[365:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
-
-			[   14.452223] *(0)[337:charger]charger: [14452] key[116] up (was down for 0.246sec)
-			
-			
-			healthd目录下有main函数，根据传入的字符串决定是关机充电还是recovery，然后传递相应的函数接口
-			switch (ch) {
-		        case 'c':
-		            healthd_mode_ops = &charger_ops;
-		            break;
-		        case 'r':
-		            healthd_mode_ops = &recovery_ops;
-		            break;
-		        case '?':
-		        default: ...
-            }
-            
-            static struct healthd_mode_ops charger_ops = {
-				.init = healthd_mode_charger_init,
-				.preparetowait = healthd_mode_charger_preparetowait,
-				.heartbeat = healthd_mode_charger_heartbeat,
-				.battery_update = healthd_mode_charger_battery_update,
-			};
-			
-			
-			这应该跟healthd目录下的按键处理有关
-			按键处理的主要在healthd_mode_charger_heartbeat，
-			(healthd_mode_charger.cpp) handle_input_state  ->  process_key
-			主要问题应该在process_key这个判断里面
-			
-			
-			
-			(healthd_mode_charger.cpp) set_key_callback -> update_input_state -> input_callback
-			
-			
-			//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd begin
-			LOGE("in [%s] by lilubao after\n",__FUNCTION__);
-			//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd end
-			
-			
-			//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd begin
-			pr_err("in [%s] by lilubao after\n",__FUNCTION__);
-			//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd end
-			
-			
-			
-			drivers/video/msm/mdss/mdss_dsi_panel.c 
-			mdss_dsi_panel_bl_ctrl  控制背光		
-			
-			[   13.154827] *(1)[324:charger]charger: in [healthd_mode_charger_heartbeat] by lilubao before
-			[   13.154837] *(1)[324:charger]charger: in [handle_input_state] by lilubao before
-			[   13.154846] *(1)[324:charger]charger: in [process_key] by lilubao before
-			[   13.154855] *(1)[324:charger]charger: 1111111111111 by lilubao
-			[   13.154866] *(1)[324:charger]charger: reboot_timeout->15154,now->13154
-			[   13.154879] *(1)[324:charger]charger: charger->batt_anim->capacity->37,charger->boot_min_cap->0
-			[   13.154888] *(1)[324:charger]charger: 6666666666666666 by lilubao
-			[   13.154897] *(1)[324:charger]charger: in [set_next_key_check] by lilubao before
-			[   13.154907] *(1)[324:charger]charger: in [set_next_key_check] by lilubao after
-			[   13.154916] *(1)[324:charger]charger: bbbbbbbbbbbbbb by lilubao
-			[   13.154925] *(1)[324:charger]charger: in [process_key] by lilubao after
-			[   13.154934] *(1)[324:charger]charger: in [handle_input_state] by lilubao after
-			[   13.154944] *(1)[324:charger]charger: in [healthd_mode_charger_heartbeat] by lilubao after
-			[   13.740015] *(0)[352:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
-
-			[   13.752729] *0)PM: Some devices failed to suspend, or early wake event detected
-
-			[   13.760122] *(0)[352:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
-			[   13.760161] *(1)[324:charger]charger: in [input_callback] by lilubao before
-			[   13.760175] *(1)[324:charger]charger: 11111111111
-			[   13.760191] *(1)[324:charger]charger: in [update_input_state] by lilubao before 
-			[   13.760203] *(1)[324:charger]charger: ev->code->116,ev->value->0
-			[   13.760216] *(1)[324:charger]charger: in [set_key_callback] by lilubao before
-			[   13.760229] *(1)[324:charger]charger: [13760] key[116] up (was down for 0.606sec)
-			
-			
-			连接PC的条件下，关机充电灭屏长按powerkey正常，4~5s震动
-
-		
-		
-			please disable CHARGER_ENABLE_SUSPEND test, modify as below:
-
-			/device/qcom/msm8917/BoardConfig.mk
-			- BOARD_CHARGER_ENABLE_SUSPEND := true
-			+ #BOARD_CHARGER_ENABLE_SUSPEND := true
-			
-			
-			这个问题的主要原因是，灭屏时候系统休眠，这时候按power键唤醒，但是由于关机充电唤醒没有任何地方去加锁导致系统会马上休眠，
-			休眠后系统的按键信息没有来的及上报到关机充电里面，导致没有检测到power键按下唤醒的动作，所以会导致长按不能重启，只有在长按10S强制S2 reset 重启，
-			所以我们disable 掉关机充电的 suspend功能，由于关机充电系统是由充电器供电，所以不会影响充电电流，目前都是disable 掉关机充电的suspend功能。
-			
-			
-			
-			Case Type: Bug/Issue
-
-			New Comment: Dear customer
-			wakelock 就是给节点 sys/power/wake_lock 写加锁或者解锁, 例如，
-			echo  mmm > sys/power/wake_lock  加锁锁的名字叫mmm
-			echo  mmm > sys/power/wake_unlock  解锁mmm
-
-			本质都是关机充电情况下组织系统进入深度休眠。
-
-			thanks.
-
-		}
-
 
 
 

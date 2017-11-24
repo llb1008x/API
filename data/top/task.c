@@ -34,6 +34,9 @@
 	mtk_charger_int_handler，dump_charger_name，mt_charger_set_property
 	rt5081_enable_chgdet_flow
 	
+	系统初始化的电压电量
+	dod_init_result
+	
 }
 
 
@@ -81,6 +84,8 @@
 		LKM Loadable Kernel Modules
 		ABI Application Binary Interface
 	}
+	
+	extcon 插拔检测
 }
 
 

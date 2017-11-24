@@ -1572,7 +1572,7 @@ GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，�
 
 
 /***********************************************************************************************************/
-GNSPR #116094,T卡插入读卡器通过OTG线与手机连接，进行插拔操作，手机出现不识别U盘现象
+14.GNSPR #116094,T卡插入读卡器通过OTG线与手机连接，进行插拔操作，手机出现不识别U盘现象
 {
 	测试期间底层OTG设备检测到22次插入，但是上层只有17次mount到u盘，
 	没有mount到的是不识别的，u盘插拔次数比较快，导致有时候还没挂载上，又拔出了，然后有插入
@@ -1664,5 +1664,154 @@ GNSPR #116094,T卡插入读卡器通过OTG线与手机连接，进行插拔操�
 	<6>[ 1771.232307] *(0)[297:irq/212-usbid-c]SMBCHG: usbid_change_handler: triggered
 	<6>[ 1771.232338] *(0)[297:irq/212-usbid-c]SMBCHG: usbid_change_handler: setting usb psy OTG = 0
 
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************************************************************/
+15.GNSPR#122265，连接充电器，长按电源键关机，关机完成后，长按电源键5s测机不开机，只显示在关机充电图标界面，
+（在充电图标界面长按电源键则可以开机），用户体检不佳 暂未恢复 对比17G16-T0119版本有此现象，对比17G02-T2638版本无此现象，
+验证10台10台100%
+{
+	分析：
+		S10C 在关机充电条件下，长按powerkey，不会亮屏，长按时间从按下开始，4~5s内重启
+		而17G06A长按会先亮屏，灯灭屏之后，才重新计时，导致时间较长
+		从log上看，长按powerkey，先是down，0.21s之后又up，导致认为是短按，亮屏
+		
+	{	
+		亮屏条件下检测到up，开始计时
+		[ 15.993615] *(2)[324:charger]charger: [15986] key[116] down
+		[ 16.054725] *(2)[324:charger]charger: reboot_timeout->17986,now->16026
+
+		这个长按之后可以在4~5s内重启
+
+		但是在灭屏条件下长按有问题
+		[ 13.154409] *(1)[324:charger]charger: [13154] key[116] down
+		[ 13.154498] *(1)[324:charger]charger: reboot_timeout->15154,now->13154
+
+		灭屏条件下长按先亮屏但是同时会上报按键抬起的动作，但是按键一直是按着的
+		[ 13.760229] *(1)[324:charger]charger: [13760] key[116] up (was down for 0.606sec)
+	}
+	
+	
+	[   14.206991] *(0)[337:charger]charger: [14206] key[116] down
+
+	[   14.430061] *(0)[365:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
+	[   14.444072] *0)PM: Some devices failed to suspend, or early wake event detected
+	[   14.452183] *(2)[365:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
+
+	[   14.452223] *(0)[337:charger]charger: [14452] key[116] up (was down for 0.246sec)
+	
+	
+	healthd目录下有main函数，根据传入的字符串决定是关机充电还是recovery，然后传递相应的函数接口
+	switch (ch) {
+		case 'c':
+			healthd_mode_ops = &charger_ops;
+			break;
+		case 'r':
+			healthd_mode_ops = &recovery_ops;
+			break;
+		case '?':
+		default: ...
+	}
+	
+	static struct healthd_mode_ops charger_ops = {
+		.init = healthd_mode_charger_init,
+		.preparetowait = healthd_mode_charger_preparetowait,
+		.heartbeat = healthd_mode_charger_heartbeat,
+		.battery_update = healthd_mode_charger_battery_update,
+	};
+	
+	
+	这应该跟healthd目录下的按键处理有关
+	按键处理的主要在healthd_mode_charger_heartbeat，
+	(healthd_mode_charger.cpp) handle_input_state  ->  process_key
+	主要问题应该在process_key这个判断里面
+	
+	
+	
+	(healthd_mode_charger.cpp) set_key_callback -> update_input_state -> input_callback
+	
+	
+	//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd begin
+	LOGE("in [%s] by lilubao after\n",__FUNCTION__);
+	//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd end
+	
+	
+	//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd begin
+	pr_err("in [%s] by lilubao after\n",__FUNCTION__);
+	//Gionee <GN_BSP_CHG> <lilubao> <20171025> modify for healthd end
+	
+	
+	
+	drivers/video/msm/mdss/mdss_dsi_panel.c 
+	mdss_dsi_panel_bl_ctrl  控制背光		
+	
+	[   13.154827] *(1)[324:charger]charger: in [healthd_mode_charger_heartbeat] by lilubao before
+	[   13.154837] *(1)[324:charger]charger: in [handle_input_state] by lilubao before
+	[   13.154846] *(1)[324:charger]charger: in [process_key] by lilubao before
+	[   13.154855] *(1)[324:charger]charger: 1111111111111 by lilubao
+	[   13.154866] *(1)[324:charger]charger: reboot_timeout->15154,now->13154
+	[   13.154879] *(1)[324:charger]charger: charger->batt_anim->capacity->37,charger->boot_min_cap->0
+	[   13.154888] *(1)[324:charger]charger: 6666666666666666 by lilubao
+	[   13.154897] *(1)[324:charger]charger: in [set_next_key_check] by lilubao before
+	[   13.154907] *(1)[324:charger]charger: in [set_next_key_check] by lilubao after
+	[   13.154916] *(1)[324:charger]charger: bbbbbbbbbbbbbb by lilubao
+	[   13.154925] *(1)[324:charger]charger: in [process_key] by lilubao after
+	[   13.154934] *(1)[324:charger]charger: in [handle_input_state] by lilubao after
+	[   13.154944] *(1)[324:charger]charger: in [healthd_mode_charger_heartbeat] by lilubao after
+	[   13.740015] *(0)[352:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
+
+	[   13.752729] *0)PM: Some devices failed to suspend, or early wake event detected
+
+	[   13.760122] *(0)[352:charger]msm_thermal:msm_thermal_update_freq Freq mitigation task is not initialized
+	[   13.760161] *(1)[324:charger]charger: in [input_callback] by lilubao before
+	[   13.760175] *(1)[324:charger]charger: 11111111111
+	[   13.760191] *(1)[324:charger]charger: in [update_input_state] by lilubao before 
+	[   13.760203] *(1)[324:charger]charger: ev->code->116,ev->value->0
+	[   13.760216] *(1)[324:charger]charger: in [set_key_callback] by lilubao before
+	[   13.760229] *(1)[324:charger]charger: [13760] key[116] up (was down for 0.606sec)
+	
+	
+	连接PC的条件下，关机充电灭屏长按powerkey正常，4~5s震动
+
+
+
+	please disable CHARGER_ENABLE_SUSPEND test, modify as below:
+
+	/device/qcom/msm8917/BoardConfig.mk
+	- BOARD_CHARGER_ENABLE_SUSPEND := true
+	+ #BOARD_CHARGER_ENABLE_SUSPEND := true
+	
+	
+	这个问题的主要原因是，灭屏时候系统休眠，这时候按power键唤醒，但是由于关机充电唤醒没有任何地方去加锁导致系统会马上休眠，
+	休眠后系统的按键信息没有来的及上报到关机充电里面，导致没有检测到power键按下唤醒的动作，所以会导致长按不能重启，只有在长按10S强制S2 reset 重启，
+	所以我们disable 掉关机充电的 suspend功能，由于关机充电系统是由充电器供电，所以不会影响充电电流，目前都是disable 掉关机充电的suspend功能。
+	
+	
+	
+	Case Type: Bug/Issue
+
+	New Comment: Dear customer
+	wakelock 就是给节点 sys/power/wake_lock 写加锁或者解锁, 例如，
+	echo  mmm > sys/power/wake_lock  加锁锁的名字叫mmm
+	echo  mmm > sys/power/wake_unlock  解锁mmm
+
+	本质都是关机充电情况下组织系统进入深度休眠。
+
+	thanks.
 
 }

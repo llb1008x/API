@@ -331,6 +331,53 @@
 		};
 	}
 
+
+
+	电池曲线相关的table,i,mah,voltage,resistance,percentage
+	<3>[    8.439090]  (4)[478:fuelgauged]MTK_FG: [fg_dump_table]table idx:255 (i,mah,voltage,resistance,percentage)
+	<3>[    8.439132]  (4)[478:fuelgauged]MTK_FG:  ( 0,    0,43857, 1455,  0) ( 1,  305,43711, 1454,105) ( 2,  609,43581, 1456,211) ( 3,  914,43462, 1452,317) ( 4, 1219,43345, 1458,423)
+	<3>[    8.439174]  (4)[478:fuelgauged]MTK_FG:  ( 5, 1524,43230, 1462,529) ( 6, 1828,43111, 1458,634) ( 7, 2133,42992, 1459,740) ( 8, 2438,42872, 1459,846) ( 9, 2742,42752, 1462,951)
+	<3>[    8.439217]  (4)[478:fuelgauged]MTK_FG:  (10, 3047,42632, 1470,1057) (11, 3352,42514, 1466,1163) (12, 3657,42396, 1469,1269) (13, 3961,42278, 1476,1375) (14, 4266,42161, 1493,1480)
+	<3>[    8.439319]  (4)[478:fuelgauged]MTK_FG:  (15, 4571,42044, 1506,1586) (16, 4875,41927, 1513,1692) (17, 5180,41811, 1525,1798) (18, 5485,41696, 1531,1904) (19, 5790,41581, 1536,2009)
+	<3>[    8.439366]  (4)[478:fuelgauged]MTK_FG:  (20, 6094,41468, 1544,2115) (21, 6399,41357, 1552,2221) (22, 6704,41246, 1562,2327) (23, 7008,41135, 1570,2432) (24, 7313,41026, 1577,2538)
+	<3>[    8.439427]  (4)[478:fuelgauged]MTK_FG:  (25, 7618,40919, 1584,2644) (26, 7923,40812, 1582,2750) (27, 8227,40709, 1588,2855) (28, 8532,40610, 1609,2961) (29, 8837,40515, 1640,3067)
+	<3>[    8.439472]  (4)[478:fuelgauged]MTK_FG:  (30, 9142,40414, 1650,3173) (31, 9446,40307, 1667,3279) (32, 9751,40202, 1673,3384) (33,10056,40100, 1685,3490) (34,10360,40009, 1699,3596)
+	<3>[    8.439517]  (4)[478:fuelgauged]MTK_FG:  (35,10665,39926, 1714,3702) (36,10970,39844, 1728,3808) (37,11275,39763, 1746,3913) (38,11579,39680, 1754,4019) (39,11884,39593, 1765,4125)
+	<3>[    8.439561]  (4)[478:fuelgauged]MTK_FG:  (40,12189,39503, 1765,4231) (41,12493,39405, 1749,4336) (42,12798,39292, 1699,4442) (43,13103,39161, 1619,4548) (44,13408,39031, 1543,4654)
+	<3>[    8.439604]  (4)[478:fuelgauged]MTK_FG:  (45,13712,38924, 1500,4759) (46,14017,38837, 1480,4865) (47,14322,38761, 1466,4971) (48,14626,38692, 1456,5077) (49,14931,38628, 1454,5183)
+	<3>[    8.439649]  (4)[478:fuelgauged]MTK_FG:  (50,15236,38568, 1452,5288) (51,15541,38512, 1450,5394) (52,15845,38458, 1454,5500) (53,16150,38407, 1459,5606) (54,16455,38357, 1460,5712)
+	<3>[    8.439693]  (4)[478:fuelgauged]MTK_FG:  (55,16759,38309, 1463,5817) (56,17064,38263, 1472,5923) (57,17369,38220, 1480,6029) (58,17674,38179, 1485,6135) (59,17978,38139, 1493,6240)
+	<3>[    8.439740]  (4)[478:fuelgauged]MTK_FG:  (60,18283,38100, 1500,6346) (61,18588,38063, 1513,6452) (62,18892,38028, 1522,6558) (63,19197,37994, 1526,6664) (64,19502,37962, 1537,6769)
+	<3>[    8.439784]  (4)[478:fuelgauged]MTK_FG:  (65,19807,37931, 1541,6875) (66,20111,37899, 1548,6981) (67,20416,37873, 1560,7087) (68,20721,37842, 1563,7193) (69,21025,37808, 1560,7298)
+	<3>[    8.439829]  (4)[478:fuelgauged]MTK_FG:  (70,21330,37766, 1534,7404) (71,21635,37717, 1508,7510) (72,21940,37662, 1490,7616) (73,22244,37617, 1479,7721) (74,22549,37574, 1480,7827)
+	<3>[    8.439874]  (4)[478:fuelgauged]MTK_FG:  (75,22854,37529, 1474,7933) (76,23159,37484, 1465,8039) (77,23463,37443, 1466,8144) (78,23768,37407, 1472,8250) (79,24073,37374, 1488,8356)
+	<3>[    8.439919]  (4)[478:fuelgauged]MTK_FG:  (80,24377,37338, 1502,8462) (81,24682,37293, 1505,8568) (82,24987,37236, 1498,8673) (83,25292,37174, 1488,8779) (84,25596,37116, 1492,8885)
+	<3>[    8.439963]  (4)[478:fuelgauged]MTK_FG:  (85,25901,37059, 1509,8991) (86,26206,36986, 1506,9097) (87,26510,36911, 1481,9202) (88,26815,36872, 1482,9308) (89,27120,36857, 1507,9414)
+	<3>[    8.440008]  (4)[478:fuelgauged]MTK_FG:  (90,27425,36844, 1541,9520) (91,27729,36831, 1587,9625) (92,28034,36809, 1647,9731) (93,28339,36761, 1703,9837) (94,28643,36595, 1680,9943)
+	<3>[    8.440053]  (4)[478:fuelgauged]MTK_FG:  (95,28948,36230, 1654,10048) (96,29253,35729, 1715,10154) (97,29558,35060, 1825,10260) (98,29862,34097, 2025,10366) (99,30167,32486, 2730,10472)
+	<3>[    8.440083]  (4)[478:fuelgauged]MTK_FG: [fg_dump_table]table idx:254 (i,mah,voltage,resistance,percentage)
+	<3>[    8.440124]  (4)[478:fuelgauged]MTK_FG:  ( 0,    0,43857, 1455,  0) ( 1,  305,43711, 1454,105) ( 2,  609,43581, 1456,211) ( 3,  914,43462, 1452,317) ( 4, 1219,43345, 1458,423)
+	<3>[    8.440165]  (4)[478:fuelgauged]MTK_FG:  ( 5, 1524,43230, 1462,529) ( 6, 1828,43111, 1458,634) ( 7, 2133,42992, 1459,740) ( 8, 2438,42872, 1459,846) ( 9, 2742,42752, 1462,951)
+	<3>[    8.440209]  (4)[478:fuelgauged]MTK_FG:  (10, 3047,42632, 1470,1057) (11, 3352,42514, 1466,1163) (12, 3657,42396, 1469,1269) (13, 3961,42278, 1476,1375) (14, 4266,42161, 1493,1480)
+	<3>[    8.440254]  (4)[478:fuelgauged]MTK_FG:  (15, 4571,42044, 1506,1586) (16, 4875,41927, 1513,1692) (17, 5180,41811, 1525,1798) (18, 5485,41696, 1531,1904) (19, 5790,41581, 1536,2009)
+	<3>[    8.440298]  (4)[478:fuelgauged]MTK_FG:  (20, 6094,41468, 1544,2115) (21, 6399,41357, 1552,2221) (22, 6704,41246, 1562,2327) (23, 7008,41135, 1570,2432) (24, 7313,41026, 1577,2538)
+	<3>[    8.440343]  (4)[478:fuelgauged]MTK_FG:  (25, 7618,40919, 1584,2644) (26, 7923,40812, 1582,2750) (27, 8227,40709, 1588,2855) (28, 8532,40610, 1609,2961) (29, 8837,40515, 1640,3067)
+	<3>[    8.440387]  (4)[478:fuelgauged]MTK_FG:  (30, 9142,40414, 1650,3173) (31, 9446,40307, 1667,3279) (32, 9751,40202, 1673,3384) (33,10056,40100, 1685,3490) (34,10360,40009, 1699,3596)
+	<3>[    8.440434]  (4)[478:fuelgauged]MTK_FG:  (35,10665,39926, 1714,3702) (36,10970,39844, 1728,3808) (37,11275,39763, 1746,3913) (38,11579,39680, 1754,4019) (39,11884,39593, 1765,4125)
+	<3>[    8.440479]  (4)[478:fuelgauged]MTK_FG:  (40,12189,39503, 1765,4231) (41,12493,39405, 1749,4336) (42,12798,39292, 1699,4442) (43,13103,39161, 1619,4548) (44,13408,39031, 1543,4654)
+	<3>[    8.440532]  (4)[478:fuelgauged]MTK_FG:  (45,13712,38924, 1500,4759) (46,14017,38837, 1480,4865) (47,14322,38761, 1466,4971) (48,14626,38692, 1456,5077) (49,14931,38628, 1454,5183)
+	<3>[    8.440579]  (4)[478:fuelgauged]MTK_FG:  (50,15236,38568, 1452,5288) (51,15541,38512, 1450,5394) (52,15845,38458, 1454,5500) (53,16150,38407, 1459,5606) (54,16455,38357, 1460,5712)
+	<3>[    8.440623]  (4)[478:fuelgauged]MTK_FG:  (55,16759,38309, 1463,5817) (56,17064,38263, 1472,5923) (57,17369,38220, 1480,6029) (58,17674,38179, 1485,6135) (59,17978,38139, 1493,6240)
+	<3>[    8.440667]  (4)[478:fuelgauged]MTK_FG:  (60,18283,38100, 1500,6346) (61,18588,38063, 1513,6452) (62,18892,38028, 1522,6558) (63,19197,37994, 1526,6664) (64,19502,37962, 1537,6769)
+	<3>[    8.440712]  (4)[478:fuelgauged]MTK_FG:  (65,19807,37931, 1541,6875) (66,20111,37899, 1548,6981) (67,20416,37873, 1560,7087) (68,20721,37842, 1563,7193) (69,21025,37808, 1560,7298)
+	<3>[    8.440757]  (4)[478:fuelgauged]MTK_FG:  (70,21330,37766, 1534,7404) (71,21635,37717, 1508,7510) (72,21940,37662, 1490,7616) (73,22244,37617, 1479,7721) (74,22549,37574, 1480,7827)
+	<3>[    8.440801]  (4)[478:fuelgauged]MTK_FG:  (75,22854,37529, 1474,7933) (76,23159,37484, 1465,8039) (77,23463,37443, 1466,8144) (78,23768,37407, 1472,8250) (79,24073,37374, 1488,8356)
+	<3>[    8.440846]  (4)[478:fuelgauged]MTK_FG:  (80,24377,37338, 1502,8462) (81,24682,37293, 1505,8568) (82,24987,37236, 1498,8673) (83,25292,37174, 1488,8779) (84,25596,37116, 1492,8885)
+	<3>[    8.440890]  (4)[478:fuelgauged]MTK_FG:  (85,25901,37059, 1509,8991) (86,26206,36986, 1506,9097) (87,26510,36911, 1481,9202) (88,26815,36872, 1482,9308) (89,27120,36857, 1507,9414)
+	<3>[    8.440936]  (4)[478:fuelgauged]MTK_FG:  (90,27425,36844, 1541,9520) (91,27729,36831, 1587,9625) (92,28034,36809, 1647,9731) (93,28339,36761, 1703,9837) (94,28643,36595, 1680,9943)
+	<3>[    8.440980]  (4)[478:fuelgauged]MTK_FG:  (95,28948,36230, 1654,10048) (96,29253,35729, 1715,10154) (97,29558,35060, 1825,10260) (98,29862,34097, 2025,10366) (99,30167,32486, 2730,10472)
+
+
 }
 
 
@@ -3781,3 +3828,209 @@ out:
 	}
 
 }
+
+
+
+
+
+
+/*******************************************************************************************************************/
+24.省电适配参数导入
+{
+	电量百分比 	电池满电情况下的放电时间（hour）（home界面、最大亮度，永不灭屏）电池满电情况下的放电时间 （h） 	备注
+	100% - 90% 	1:30:00 	1.第一次格式化升级完成后测试
+	2.插入单张SIM卡（信号稳定）和T卡
+	3.默认设置，显示--休眠设为“无限时”
+	4.处于home界面 关闭桌面动态天气
+	5.亮度调整为最大
+	6.尽可能多几台机器一起测试，取平均值
+	7.静置放电
+	90% - 80% 	1:01:00
+	80% - 70% 	1:05:00
+	70% - 60% 	1:08:00
+	60% - 50% 	1:04:00
+	50% - 40% 	1:06:00
+	40% - 30% 	1:06:00
+	30% - 20% 	1:06:00
+	20% - 10% 	1:07:00
+	10% - 关机 	1:18:00
+
+	主要看变化是否匀称
+
+	进入极致省电模式 	待机电流（mA）(灭屏，均在home界面） 	备注
+	出厂状态下，电量1%，进入极致省电模式 	8.52 	1.插入单张SIM卡（信号稳定）和T卡
+	2.电量在1%
+	3.每组数据测试15分钟以上；
+
+
+	电池电量 	mAh
+	查看电池毫安数 	3000mAh
+
+	充电方式 	mA
+	AC充电 	2097.902mA
+	USB充电 	652.173mA
+
+	初始屏幕亮度 	整数值 	备注
+	出厂设置亮度值 	337.61mA 	1.此亮度值为 设置--显示 内的亮度值范围0~255   
+
+	　 	测试条件 	整机电流(mA)(亮屏，均在home界面) 	备注
+	情形1 	第一次格式化升级完成后，插入单张SIM卡和T卡状态下的工作电流(100%亮度) 	240.49 	1.去掉桌面动态天气
+	2.显示-休眠改为“无限时”
+	3.home界面（除亮度外，其他条件相同）
+	4.每组数据测试15分钟以上；
+	情形2 	  情形1 + 75%屏幕亮度 	214.89
+	情形3 	  情形1 + 50%屏幕亮度 	182.74
+	情形4 	  情形1 + 25%屏幕亮度 	158.79
+
+	这里面一系列参数都是在
+	packages_mtk_mp/gionee/private/BJ17G10A01_A/apps/Amigo_SystemManager/config.xml 里面配置的
+}
+
+
+
+
+
+
+/*********************************************************************************************************/
+25.	GNSPR#103678,通话：接听或者挂断电话时，振动的同时会有崩的一声
+{
+	这里主要是调试马达的震动强度，因为马达的震感有点强
+
+	文档
+	{	
+		输出的强度应该跟output voltage有关，
+		The output voltage is based on the duty cycle of the provided PWM signal, where the OD_CLAMP[7:0] bit in
+			register 0x17 sets the full-scale amplitude
+			
+		pwm模式强度靠调整占空比改变 the strength of vibration is determined by the duty cycle 
+	
+		A waveform identifier is an integer value referring to the index position of a waveform in the RAM library
+			
+
+		The smart-loop architecture is an advanced closed-loop system that optimizes the performance of the actuator
+	and allows for failure detection. The architecture consists of automatic resonance tracking and reporting (for an
+	LRA), automatic level calibration, accelerated startup and braking, diagnostics routines, and other proprietary
+	algorithms.
+
+
+		The RATED_VOLTAGE[7:0] bit in register 0x16 sets the rated voltage for the closed-loop drive modes.
+	
+		In open-loop mode, the RATED_VOLTAGE[7:0] bit is ignored. Instead, the OD_CLAMP[7:0] bit (in register 0x17)
+	is used to set the rated voltage for the open-loop drive modes.
+
+		The DRV2604L slave address is 0x5A (7-bit), or 1011010 in binary.
+	
+	}
+	
+	
+	相关的代码
+	{
+		关键字
+		{
+			vibrate,haptic,pwm,drv2604l
+			
+			OD_CLAMP[7:0],DATA_FORMAT_RTP,RATED_VOLTAGE[7:0]
+			
+			//Gionee <GN_BY_CHG> <lilubao> <20171114> add for change vibrate end
+		}
+		
+		当前项目的配置是什么样的
+		{
+			static struct actuator_data DRV2604L_actuator={
+				.device_type = LRA,
+				.rated_vol = 0x46,	//1.8V
+				.over_drive_vol = 0x7a,
+				.LRAFreq = 235,
+			};
+			
+			
+			pDrv2604Platdata->GpioTrigger=0;
+			pDrv2604Platdata->loop=CLOSE_LOOP;
+			pDrv2604Platdata->RTPFormat=Signed;
+			pDrv2604Platdata->BIDIRInput=BiDirectional;
+			
+			P30 各种模式配置的解释
+			
+			P22 Rated Voltage Programming 0x16 额定电压
+			
+			Overdrive Voltage-Clamp Programming
+			
+			CLAMP voltage s	钳位电压
+			
+			控制输出的主要是Rated Voltage
+		
+		}
+	}
+	
+	
+	现在确定是硬件结构的问题还是软件的问题？
+	[FAQ11345][Speech] 来电接听瞬间概率会有咔的一声
+	
+	
+	同音频，硬件，结构的工程师共同确认了一下
+	这个在挂断电话的时候听筒能听到挂断声音，同时还有震动的声音
+	是因为，17G10A整机大部分是金属结构，特别是外壳，马达震动的时候，震动很容易传递
+	到整个机器
+
+	结构工程师有一个减弱的方案，就是修改转轴部分材料，但是容易影响外观，而且效果减小不多
+
+	做了一个对比实验：
+	1.关掉震动，没有问题
+	2.调低震动强度，有问题
+	3.扣掉听筒，飞线远离主板，没有问题
+	4.在3的基础上，听原来听筒的位置，有问题，是整机震动的声音
+
+	即是说这个问题与软件无关，是金属材料机身容易传递震动
+
+}
+
+
+
+
+
+
+/****************************************************************************************************************/
+26.	GNSPR#113442,【品质压力】待机界面》手机连接电脑USB端口-手机下拉通知栏-无USB连接显示-插拔数据线仍如此》
+清除后台未恢复-清除数据未恢复-重启恢复 	
+{
+	
+	从log上看，mIsMonkeyTest running !!!! updateUsbNotification id = 0，可能测试之前做了monkeytest或者cts的测试
+	测试条例没有跑完
+	在monkeytest和cts的测试中会disable usb，停止发送广播导致连接usb没有弹框
+
+	09-14 15:58:49.984703 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONNECTED, SUBSYSTEM=android_usb, SEQNUM=3224, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+	09-14 15:58:49.984939 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONNECTED
+	09-14 15:58:49.986844 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=connect
+	09-14 15:58:49.988841 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
+	09-14 15:58:49.989022 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
+	09-14 15:58:49.991562 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=DISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3225, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+	09-14 15:58:49.991680 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=DISCONNECTED
+	09-14 15:58:50.093651 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONNECTED, SUBSYSTEM=android_usb, SEQNUM=3227, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+	09-14 15:58:50.093784 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONNECTED
+	09-14 15:58:50.093982 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=connect
+	09-14 15:58:50.094170 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
+	09-14 15:58:50.094220 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
+	09-14 15:58:50.173255 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=CONFIGURED, SUBSYSTEM=android_usb, SEQNUM=3228, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+	09-14 15:58:50.173373 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=CONFIGURED
+	09-14 15:58:50.173519 1127 1224 D UsbDeviceManager: gndb, receive MSG_UPDATE_STATE, state=configure
+	09-14 15:58:50.173661 1127 1224 D UsbDeviceManager: mIsMonkeyTest running !!!! updateUsbNotification id = 0
+	09-14 15:58:50.173702 1127 1224 D UsbDeviceManager: monkey test is running!!! updateBsbState return here.
+	09-14 15:58:50.175024 1127 1517 V WindowManager: Changing focus from Window{13ef238 u0 com.gionee.amisystem/com.android.launcher2.Launcher} to Window{bab8a35 u0 StatusBar} Callers=com.android.server.wm.WindowManagerService.relayoutWindow:3179 com.android.server.wm.Session.relayout:265 android.view.IWindowSession$Stub.onTransact:286 com.android.server.wm.Session.onTransact:178
+	09-14 15:58:50.175166 1127 1517 D WindowManager: Input focus has changed to Window{bab8a35 u0 StatusBar}
+	09-14 15:58:57.360301 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=DISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3234, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+	09-14 15:58:57.360415 1127 1437 D UsbDeviceManager: gndb,start send MSG_UPDATE_STATE, state=DISCONNECTED
+	09-14 15:58:57.360589 1127 1437 V UsbDeviceManager: USB UEVENT: {USB_STATE=HWDISCONNECTED, SUBSYSTEM=android_usb, SEQNUM=3235, ACTION=change, DEVPATH=/devices/virtual/android_usb/android0}
+
+
+	本地通过*#837004#暗码进入后选择monkeytest会disable usb，而monkeytest需要重启或者跑完才会关闭，而cts相当于apk
+	有很多条，很多apk，跑完一条后会卸载相应的apk
+	mIsMonkeyTest running !!!! updateUsbNotification id 在usbdevicemanager.java 里面有updateUsbNotification 根据不同的usb配置
+	设置id为不同的title上后update 
+}
+
+
+
+
+
+
+
