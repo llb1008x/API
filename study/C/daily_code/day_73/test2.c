@@ -3,15 +3,20 @@
 	> Author: 
 	> Mail: 
 	> Created Time: 2017年11月17日 星期五 19时16分37秒
+	
+将字符串转化成浮点型
  ************************************************************************/
 
 #include <stdio.h>
 #include <ctype.h>
+#include <math.h>
 
 double myatof(char s[])
 {
 	double val,power;
-	int i,sign,esign,eindex;
+	int i,sign,esign,eindex=0;
+	long Enum;
+	double ret;
 	
 
 	//skip space
@@ -43,34 +48,50 @@ double myatof(char s[])
 		power *= 10;
 	}
 	printf("2 val->%f,power->%f\n",val,power);
-	printf("num->%f\n",sign*val/power);
+	printf("num->%f,i->%d\n",sign*val/power,i);
 	
 	
 	
 	//处理是否有E指数
 	if(s[i]=='e' || s[i]=='E'){
 	
-		printf("111\n");
-		i++;
-		
-		esign=(s[i]=='-')?-1:1;
-		printf("esign->%d\n",esign);
-		
-		printf("s[i]->%d\n",s[i]-'0');
-		for(;isdigit(s[i]);i++){
-		
-			eindex = eindex*10+(s[i]-'0');
-		}
-		printf("eindex->%d\n",)
+        
+        i++;
+        
+        esign=(s[i]=='-')?-1:1;
+        if(esign<0){
+       
+                i++;
+        }
+        
+        //提取E以后的数
+        while(s[i]!='\0'){
+            printf("i->%d,eindex->%d\n",i,eindex);
+            eindex=eindex*10+(s[i]-'0');
+            i++;
+        }
+        
+        printf("eindex->%d\n",eindex);
+        
+        Enum=pow(10,eindex);
+        printf("Enum->%ld\n",Enum);
 	}
 	
 	
-	return sign*val/power;
+	if(esign > 0){
+	    printf("aaa\n");
+	    ret=sign*val/power*Enum;
+	}else{
+	    printf("bbb\n");
+	    ret=sign*val/power/Enum;
+	}
+	
+	return ret;
 }
 
 int main()
 {
- 	char str[]="123.45E3";
+ 	char str[]="123.45E-3";
  	double num;
 	
 	num=myatof(str);

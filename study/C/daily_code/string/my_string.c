@@ -30,11 +30,13 @@ char *strtok(char s[], const char *delim);
 	回指向被分割出片段的指针
 
 	
+！！！这里的部分函数还是有问题，需要改进优化	
  ************************************************************************/
 
 #include <stdio.h>
 //#include <string.h>
 #include <math.h>
+#include <ctype.h>
 #include "my_string.h"
 
 //计算字符串的长度
@@ -415,6 +417,7 @@ double myatof(char s[])
 }
 
 
+#if  0
 int main(char *argv[],int argc)
 {
 
@@ -516,3 +519,5 @@ int main(char *argv[],int argc)
 	return 0;
 }
 
+
+#endif 
