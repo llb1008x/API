@@ -87,9 +87,59 @@
 	
 17G10A
 {
+	
+	
+	
+	
+	电量显示不准确
+	{
+		特别是低电量充电的时候
+		
+		MTK case ID:ALPS03624068
+		{
+			Dear Customer
+				如电话所谈：
+				[dod_init_result] HW(38596, 4779) SW(38637, 4850) OLD(38698, 4949) VBAT(37942, 3172)
+				[dod_init_result]: NVRAM_ready 1 Embedded 1 plug_out 1 is_hwocv_unreliable 0 rtc_invalid 1 rtc_ui_soc 0 two_sec_reboot 0 old_data.ui_soc 4970
+				[dod_init_result]: T_new 27 T_old 39 T_d0 27 shutdown_time 0 pmic_shutdown_time 1800 plugout_time 31 plugout_time_th 32 swocv_oldocv_diff_emb 1000
+				[dod_init_result]: <1> 38663 38698 4970 0 0 0 0
+				[dod_init_result]: fg_c_d0(38663, 4893) fg_v_d0(38698, 4950) ui_d0_soc 4970 ui_soc_opt 0
+				[dod_init_result]: force_vc_mode 0 vc_mode 0 d0_sel 0
+
+				从log：[dod_init_result]: <1> 38663 38698 4970 0 0 0 0 可以看出，开机定位到第1路，即采用关机之前NVRAM里面的old_data。所以就5%这个点来说，
+				判断到HW_OCV-OLD_SOC_TO_OCV<30mv，init flow就会认为是同一颗电池，就会拿NVRAM里面的值来进行开机电量的定位，保持5%。
+				这样做的原因是我们不希望同一颗电池在拔出和插入之后，电量会有跳变。如果判定为同一颗电池，不会根据HW_OCV去定位新的电量。
+				你们可以通过[dod_init_result] HW(38596, 4779) SW(38637, 4850) OLD(38698, 4949) VBAT(37942, 3172) 里面的HW_OCV 的值去和你们测量的OCV的值做对比，这个值显示真实的电量，看两者之间的差距。
+				如果按照电话中您所说，希望开机会尽量去逼近真实的电量，一定要通过HW_OCV去重新定位开机电量，这个时候定位的电量虽然比较准确，但是就会有很大的概率发生UI电量的跳变（尤其是在电量比较低的情况下）。
+				所以这就需要你们选择：是要UI比较平滑，客户看不到UI的跳变，认为电量比较准确，还是要UI开机时比较准确的显示电池的真实电量，但是会有很大的概率发生UI跳变。
+
+
+				关于dod_init的大概flow和GM30的测试手法，我已经申请，等有结果我会告诉您。
+				如果您有其他的问题，轻提出。
+
+				感谢！
+				
+				
+			如电话所谈：如果想修改仅为测试，可以修改mtk_battery_property.h里面的BAT_PLUG_OUT_TIME，改为30。这样修改后，开机就会根据hw_ocv的值重新定位开机电量，所以可能会引起UI的跳变。	
+		
+		
+			//Gionee <GN_BY_CHG> <lilubao> <20171127> add for debug soc begin
+		}
+	
+	}	
+
+
+
+
+
+
+
+
+	
 	GNSPR#101075，待机界面进入相机，相机黑屏5s后自动恢复
 	{
 		压力测试,之前的温度已经很高了
+		106386
 		
 		case ID:ALPS03628177
 		{
@@ -108,6 +158,32 @@
 				具体操作请参考文档中的说明（请帮忙使用userdebug版本的load）。
 
 				感谢
+				
+			复测步骤
+			{
+				2.
+				MTK 获取root
+				– adb shell setprop service.adb.root 1
+				– 进入Settings->Developer options,找到USB
+				Debugging,将此选项先取消勾选,并再次勾选上
+
+				3. adb root 查看是否已经有了root权限
+
+				4.解压压缩包里软件，
+
+				5.测试之前开启mobilelog
+				先运行 systrace-setup-tk-camera-only.bat，这个是设置需要抓取的log
+
+				6.然后运行01-catch.bat，按照press any key开始抓log，
+
+				7.然后复测这个case
+
+				8.再press any key 停止抓取ftrace
+
+				9.
+				
+				把这个目录下的SYS_TRACE和cputime.txt ，moblelog都发给我
+			}		
 		
 		}
 
@@ -202,6 +278,10 @@
 			[    2.457392] -(4)[238:charger_thread][<ffffffc0000be29c>] kthread+0xdc/0xf0
 			[    2.457400] -(4)[238:charger_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
 			[    2.457407] -(4)[238:charger_thread]---[ end trace 644ae300f92f6883 ]---
+			
+			
+			log 单词错误
+			<3>[ 7482.590048]  (2)[239:charger_thread]mtk_is_charger_on plug in, tyupe:4   
 	
 	}
 	
@@ -643,15 +723,15 @@
 
 		对于高通平台项目的签名方式要注意以下几点：
 		{
-			1. 压缩包名以 BJ_G1602A （具体项目名）打头；
+			1. 压缩包名以 BJG1602A （以BJ打头具体项目名）打头；
 			2. 必须 zip 格式（一定要在linux下压缩）；
 			3. zip压缩包内不能包含目录；
 			4. 压缩包内必须包含的文件列表：
 				8976_fuseblower_USER.xml  ,8976_secimage.xml   
 				这两个文件在L33_QCOM_8920_17G16A_170605_MODEM/gionee/BJ17G06/MSM8917.LA.3.0/common/sectools/config/目录下
 				有高通平台的签名工具，xml里面是各种key和相关的镜像
-				
-				sign_img_list.txt
+				contents.xml这个在bp_image/ 目录下有 
+				sign_img_list.txt这个不一定需要
 				需要签名的镜像文件
 		}
 

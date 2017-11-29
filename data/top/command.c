@@ -129,6 +129,10 @@
 	//输出低
 	adb shell "echo -wdout 24 0 > /sys/devices/virtual/misc/mtgpio/pin"
 
+	MTK 获取root
+	– adb shell setprop service.adb.root 1
+	– 进入Settings->Developer options,找到USB
+	Debugging,将此选项先取消勾选,并再次勾选上
 
 
 
@@ -640,6 +644,7 @@ qcom 烧写 当然要换路径
 				8976_fuseblower_USER.xml   
 				8976_secimage.xml   
 				sign_img_list.txt
+				con
 				需要签名的镜像文件
 				
 		}
