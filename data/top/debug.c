@@ -50,9 +50,6 @@
 	force_get_tbat_internal 温度转换函数
 
 
-
-
-
 	近期W919项目为了满足生产需求，T3-3更新了一颗speaker 2557的物料，此物料不可兼容，因此区分版本维护：
 	1.T3-3前面批次机器，请刷版本尾号为AB的版本
 	2.T3-3以及之后批次机器，请刷版本尾号AA的版本
@@ -65,8 +62,141 @@
 	BJ17G10A-T0147-171116AB --代码问题，扬声器无声
 	BJ17G10A-T0146-171114AA --代码问题，扬声器无声
 	BJ17G10A-T0145-171114AA --可刷T3-3及之后机器
+	
+	
+	
+	
+	
+	
+	
+	SDM660  pmic
+	{
+		
+		
+		相关的宏
+		{
+			CONFIG_QPNP_FG_GEN3		电量计	pm660_fg
+			{
+				qpnp-fg-gen3.c  fg-memif.c  fg-util.c
+			}
+			
+			CONFIG_QPNP_SMB2		charger	pm660_charger
+			{
+				step-chg-jeita.c   battery.c  qpnp-smb2.c  smb-lib.c  pmic-voter.c  storm-watch.c 
+			}
+			
+			CONFIG_WLS_CHARGER_ECH  无线充电
+			{
+				ech-wls-charger.c 
+			}
+		}
+		
+		
+		dtsi
+		{
+			msm-pm660.dtsi	
+			fg-gen3-batterydata-gionee-17g08a-atl-4v4-5060mAh.dtsi
+			sdm660-common.dtsi
+			msm-smb138x.dtsi
+			sdm660-pinctrl.dtsi
+			sdm660-qrd.dtsi
+			
+		}
+		
+		extcon 外设插拔检测
+		
+		文档号
+		{
+			evaluate 
+				80-P7905-5A
+				80-P7905-1
+			design
+				80-P8754-59
+				80-P8754-6
+				80-NN255-1
+				80-P8754-30
+				80-NR097-1
+				80-NN139-1
+			bringup
+				80-P7905-2X
+				80-P7905-4
+				80-NM620-1
+			customize
+				80-P2484-42
+				80-P2484-77
+				80-P2484-74
+				80-P8754-43
+				80-NM328-53
+			verify
+				80-P7747-7
+				80-P8754-34
+			
+			debug tool 这个很重要
+				The following debug tools for PMIC are available:
+				• How to collect a PMIC register dump?
+				(Solution #00029307)
+				• How to collect to read/write PMIC registers using
+				ADB?
+				(Solution #00029310)
+				• How to enable PMIC driver logs for debugging?
+				(Solution #00029311)	
+				For more debug information, refer to the debug
+				sections in the individual PMIC module User Guide
+				documents listed in PMIC Software Master Document
+				(80-NR097-1).			
+						
+		}
+
+	}
+	
+	
+	
+	
+	
 
 }	
+	
+	
+	
+	
+17G08A
+{
+	电量计的问题
+	相关的case：03238858，
+
+	GNSPR #138519 ,连接充电器重启手机后，锁屏界面显示充电完毕，实际上手机电量是93%，截屏后恢复
+	{
+		
+	
+	}
+
+
+	GNSPR #138056,电量94%以上100%以下连接充电器手动重启手机，重启后充电图标不显示充电，呼吸灯显示为绿色，
+	插拔充电器恢复
+	{
+	
+	
+	
+	}
+
+
+	GNSPR #138239,手机电量98%，关机充电，手机开机，锁屏界面与状态栏电量显示不一致
+	{
+	
+	
+	
+	}
+	
+
+
+}	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -88,10 +218,7 @@
 17G10A
 {
 	
-	
-	
-	
-	电量显示不准确
+	电量显示不准                                             
 	{
 		特别是低电量充电的时候
 		
@@ -123,16 +250,45 @@
 			如电话所谈：如果想修改仅为测试，可以修改mtk_battery_property.h里面的BAT_PLUG_OUT_TIME，改为30。这样修改后，开机就会根据hw_ocv的值重新定位开机电量，所以可能会引起UI的跳变。	
 		
 		
+		
+				实际判断电量到底准不准，应该用底层的SOC与查表得到的值进行对比，而不应该采用UI_SOC与查表的值进行对比。因为充电时，
+
+			电流比较大，怀疑底层的SOC与UI_SOC有比较大的偏差，因为在算法上UI_SOC会在SOC的基础上作一些藏百分比的行为。建议先看Log。
+
+			 
+
+			1、进行实验，例如充电到UI_SOC到10%时，把Log导入出来，查看此时对应的SOC大小。
+
+			2、再静置电池30分钟，查表得出值，与SOC大小进行比较。
+
+			 
+
+			搜索MTK_FG: [FGADC_intr_end]，如下方红色标注，可看出SOC、UI_SOC分别大小，看下他们的差距。
+
+			MTK_FG: [FGADC_intr_end][FG_INTR_SHUTDOWN]soc:503 fg_c_soc:2184 fg_v_soc:503 ui_soc:348 vc_diff:1681 vc_mode 0 VBAT 33730 T:[11 V 10 C 17] D0_C 10000 D0_V 10000 CAR_V -37026 Q:[38986 38986] aging 10000 bat_cycle 0 Trk[0(-201):1:0] UI[0:1] Chr[0:10000:9978] pseudo1 301  DC_ratio 100
+
+
 			//Gionee <GN_BY_CHG> <lilubao> <20171127> add for debug soc begin
 		}
 	
 	}	
 
-
-
-
-
-
+	
+	
+	
+	GNSPR#139202，去除冗余log
+	{
+		//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log begin
+		mtk_battery.c 
+		
+		g_FG_PSEUDO100_T0  这个量产之前去掉
+	
+	}
+	
+	
+	
+	
+	
 
 
 	
