@@ -37,6 +37,10 @@
 	系统初始化的电压电量
 	dod_init_result
 	
+	
+	老化测试
+	05-01 09:44:57.365345  3321  3321 I oldtest.TAG: AgingTestMainActivity=>onActivityResult:requestCode=1;resultCode=0
+	
 }
 
 
@@ -86,6 +90,9 @@
 	}
 	
 	extcon 插拔检测
+	
+	
+	acquireWakeLockInternal 获取wakelock
 }
 
 

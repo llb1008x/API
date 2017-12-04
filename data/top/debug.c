@@ -163,6 +163,14 @@
 {
 	电量计的问题
 	相关的case：03238858，
+	{
+		kba-170418012921  这是总的一些kba
+		
+		
+	
+	}
+	
+
 
 	GNSPR #138519 ,连接充电器重启手机后，锁屏界面显示充电完毕，实际上手机电量是93%，截屏后恢复
 	{
@@ -217,6 +225,19 @@
 	
 17G10A
 {
+
+	17G10A，ppt测试
+	{
+		smart PA:TI TFA 2557  功耗
+	
+	}
+
+
+
+
+
+
+
 	
 	电量显示不准                                             
 	{
@@ -323,7 +344,7 @@
 				– 进入Settings->Developer options,找到USB
 				Debugging,将此选项先取消勾选,并再次勾选上
 
-				3. adb root 查看是否已经有了root权限
+				3.adb root 查看是否已经有了root权限
 
 				4.解压压缩包里软件，
 
@@ -336,9 +357,7 @@
 
 				8.再press any key 停止抓取ftrace
 
-				9.
-				
-				把这个目录下的SYS_TRACE和cputime.txt ，moblelog都发给我
+				9.把这个目录下的SYS_TRACE和cputime.txt ，moblelog都发给我
 			}		
 		
 		}
