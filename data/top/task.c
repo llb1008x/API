@@ -140,35 +140,6 @@
 	}		
 		
 
-	#103678	接听或者挂断电话时，振动的同时会有崩的一声。
-	{
-		降低震动强度或者震动时间
-		//Gionee <GN_BSP_CHG> <lilubao> <20170829> modify for vibrator begin
-		
-		还有一个问题是开机振动偏弱
-		
-		首先要知道是调用的过程，然后是如何减小振动的强度？
-	
-	
-		pDrv2604Platdata->GpioTrigger=0;
-		pDrv2604Platdata->loop=CLOSE_LOOP;
-		pDrv2604Platdata->RTPFormat=Signed;
-		pDrv2604Platdata->BIDIRInput=BiDirectional;
-			
-	}
-	
-	
-		
-	#99348
-	手机连接电脑USB打开传文件和临时USB调试后，电脑不显示连接到手机，再次插拔USB不恢复，插其它手机可以正常识别，重启恢复
-	{
-		这个问题是连接到PC没有显示盘符，重启后恢复，08：03~08：05
-	
-		MTK case ID：ALPS03469265
-	}
-	
-
-
 	
 	#功耗相关的case还没解决
 	{
@@ -209,11 +180,136 @@
 
 
 
-
-/********************************************************************************************************************************/
-17G06A
 {
 
+android o:
+	ANDROID TREBLE OVERVIEW                                          80-PE644-1
+	ANDROID TREBLE VNDK OVERVIEW                                     80-PE644-2
+	ANDROID TREBLE HIDL OVERVIEW                                     80-PE644-3
+	ANDROID TREBLE KERNEL OVERVIEW                                   80-PE644-4
+	ANDROID TREBLE VTS OVERVIEW                                      80-PE644-5
+	VERIFIED BOOT 2.0 INTRODUCTION                                   80-PE644-6
+	SELINUX OVERVIEW AND UPDATE FOR ANDROID O        				 80-PE644-7
+	
+	Bus 003 Device 021: ID 058f:6387 Alcor Micro Corp. Flash Drive
+
+
+pmic:	
+	GNSPR#122265
+	To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
+
+	80-P2485-18 : MSM8937 System Drivers PMIC Overview
+	80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
+	80-NV610-48 : PMIC GPIO and MPP Software Configuration
+
+	For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
+
+	80-NR097-1 : PMIC Software Master Document
+	80-NR097-2 : PMIC Software KB Solution Master Document
+
+
+	To download any document directly from this solution, first login to the CreatePoint and then click on the hyperlink listed against the relevant document below.
+
+	80-P2485-18 : MSM8937 System Drivers PMIC Overview
+	80-P2485-2 : MSM8937_Linux_Android_PMIC_SW_Drivers_Overview
+	80-NV610-43 : System Drivers PMIC Dead Battery Charging Overview
+	80-NV610-44 : MSM8937.LA Charger SW User Guide
+
+	For a complete list of PMIC Software documents and Knowledge base solutions for all technology areas please refer to the following master documents:
+
+	80-NR097-1 : PMIC Software Master Document
+	80-NR097-2 : PMIC Software KB Solution Master Document
+
+
+	80-NL708-1		dump pimc register	
+	
+	
+	decidegc
+	
+	NTC温度电压转换函数，看看过程什么样的
+	force_get_tbat_internal 温度转换函数
+
+
+
+	
+	SDM660  pmic
+	{
+		
+		
+		相关的宏
+		{
+			CONFIG_QPNP_FG_GEN3		电量计	pm660_fg
+				qpnp-fg-gen3.c  fg-memif.c  fg-util.c
+			
+			CONFIG_QPNP_SMB2		charger	pm660_charger
+				step-chg-jeita.c   battery.c  qpnp-smb2.c  smb-lib.c  pmic-voter.c  storm-watch.c 
+
+			
+			CONFIG_WLS_CHARGER_ECH  无线充电
+				ech-wls-charger.c 
+			
+			
+			
+			dtsi
+				msm-pm660.dtsi	
+				fg-gen3-batterydata-gionee-17g08a-atl-4v4-5060mAh.dtsi
+				sdm660-common.dtsi
+				msm-smb138x.dtsi
+				sdm660-pinctrl.dtsi
+				sdm660-qrd.dtsi
+		}
+		
+		
+
+		
+		extcon 外设插拔检测
+		
+		文档号
+		{
+			evaluate 
+				80-P7905-5A
+				80-P7905-1
+			design
+				80-P8754-59
+				80-P8754-6
+				80-NN255-1
+				80-P8754-30
+				80-NR097-1
+				80-NN139-1
+			bringup
+				80-P7905-2X
+				80-P7905-4
+				80-NM620-1
+			customize
+				80-P2484-42
+				80-P2484-77
+				80-P2484-74
+				80-P8754-43
+				80-NM328-53
+			verify
+				80-P7747-7
+				80-P8754-34
+			
+			debug tool 这个很重要
+				The following debug tools for PMIC are available:
+				• How to collect a PMIC register dump?
+				(Solution #00029307)
+				• How to collect to read/write PMIC registers using
+				ADB?
+				(Solution #00029310)
+				• How to enable PMIC driver logs for debugging?
+				(Solution #00029311)	
+				For more debug information, refer to the debug
+				sections in the individual PMIC module User Guide
+				documents listed in PMIC Software Master Document
+				(80-NR097-1).			
+						
+		}
+
+	}
+	
+	
+	
 	高通平台显示效果qdcm工具安装以及调试具体参数相关视频和文档
 	VD80-NJ550-10SC
 	VD80-NJ550-11SC
@@ -222,13 +318,9 @@
 	VD80-NJ550-14SC
 	80-NJ550-2 W
 	80-NJ550-1 V
-
-}
-
-
-
-
-
+	
+	
+}	
 
 
 

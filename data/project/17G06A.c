@@ -1815,3 +1815,163 @@ GNSPR#119962,待机界面》点击拨号盘或虚拟按键振动声音过大，�
 	thanks.
 
 }
+
+
+
+/************************************************************************************************************************/
+16.	PPT 测试 power performance  thermal
+{
+	usb-type-c-pericom
+	CONFIG_USB_EXT_TYPE_C_PERICOM
+	
+	fuseblower qcom  的secure boot
+	
+	
+	pericom-type-c@1d {
+		compatible = "pericom,usb-type-c";
+		reg = <0x1d>;
+		vdd_io-supply = <&pm8917_l5>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <97 2>;	/* TLMM 97, TRIGGER_FALLING */
+		pericom,enb-gpio = <&tlmm 131 0x1>;	/* active low */
+		pinctrl-names = "default";
+		pinctrl-0 = <&usbc_int_default>;
+		//Gionee <GN_BSP_CHG> <lilubao> <20171115> modify for remove typr-c begin
+		status = "disabled";
+		//Gionee <GN_BSP_CHG> <lilubao> <20171115> modify for remove typr-c end
+	};
+	
+	06量产分支
+	bj17g06a_main_dev
+	
+	status = "disabled";
+
+	对于高通平台项目的签名方式要注意以下几点：
+	{
+		1. 压缩包名以 BJG1602A （以BJ打头具体项目名）打头；
+		2. 必须 zip 格式（一定要在linux下压缩）；
+		3. zip压缩包内不能包含目录；
+		4. 压缩包内必须包含的文件列表：
+			8976_fuseblower_USER.xml  ,8976_secimage.xml   
+			这两个文件在L33_QCOM_8920_17G16A_170605_MODEM/gionee/BJ17G06/MSM8917.LA.3.0/common/sectools/config/目录下
+			有高通平台的签名工具，xml里面是各种key和相关的镜像
+			contents.xml这个在bp_image/ 目录下有 
+			sign_img_list.txt这个不一定需要
+			需要签名的镜像文件
+	}
+
+}
+
+
+
+
+/**********************************************************************************************************************/
+17.GNSPR#120797,待机界面进相机 慢动作摄影,摄影过程中双指进行缩放,操作1min后一直重复提示电池温度过高,
+查看电池温度55度》退出相机后再操作恢复 验证2台,1台出现,共出现1次
+{
+	2017-10-06 15:39	电池温度55度，LCD有点偏黄，插着充电器
+	
+	情况如何：
+		插着充电器，开摄像，反复调整焦距，一段时间后提示温度过高
+
+	但是这个是压力测试，所以需要这样的强度，之前测试温度较高，紧接着做下一个测试	    
+		
+		
+	请问是在室温下测试的吗？？手机整体温度在55度附近，我们的软测、硬测、包括整机测试部，目前在室温下 还没有出现这么高的情况；
+	如果可以复现，请帮忙找一个debug版本，安排使用附件脚本 抓一份温升数据，谢谢！
+	操作方法：
+	adb push msm_tsens_logging /data/
+	adb shell
+	chmod 777 /data/msm_tsens_logging
+	/data/msm_tsens_logging 500 10800000 &
+	参数解释： 500ms的间隔，10800000--10800s运行总时间（3个小时 能够复现了吧）;
+
+	测完后，取出数据：
+	adb pull /data/tsens_logger.csv
+	发给我；   
+	
+	
+	109601 GNSPR 【品质压力】开启录屏,待机界面进相机摄像》摄像5min后提示电池温度过高》等待15min后点击确定关闭后再操作恢复 验证2台,2台出现,共出现3次 Q20 Q21 分配 高 G_国 建秋 S2-严重 W_吴 能田 2017-09-07 BJ17G16A（大金钢2）
+	109632 GNSPR 【品质压力】开启录屏》待机界面进相机摄像,摄像15min后录屏自动停止(另一台未停止),等待30min后查看录屏文件,录屏中无显示摄像界面的报错提示(实际上一直有提示电池温度过高)》重复操作恢复 验证2台,2台出现,共出现2次 Q20 Q21 申请裁决 高 G_国 建秋 S2-严重 W_吴 能田 2017-09-07 BJ17G16A（大金钢2）
+
+	目前来看 主要是 摄像负载大 热量大，导致温升较高，8940平台没有温升限制 camera 的 策略，可以考虑让camera模块 根据温度 自己控制 调节温升；
+	
+
+	高通给了一套限制camera及CPU的温升方案，可否安排使用版本测试一下； 到时候 可能会有一些 无响应 黑屏 卡顿情况； 主要 是 连拍和摄像 方面；不知道 camera 模块 是否愿意呢；
+
+	[SS-CPUS]
+	#algo_type ss
+	sampling 50
+	sensor tsens_tz_sensor9
+	device cluster1
+	set_point 85000
+	set_point_clr 55000
+	time_constant 0
+
+	CAMERA_CAMCORDER_MONITOR]
+	algo_type monitor
+	sampling 250
+	sensor tsens_tz_sensor3
+	thresholds 80000 85000 88000
+	thresholds_clr 75000 80000 85000
+	actions camera+camcorder camera+camcorder camera+camcorder
+	action_info 1+1 2+2 10+10
+	
+	
+	问题属于相机和结构问题，虽然相机没有报错，
+	相机是否可以优化摄像电流和功耗，如不能优化硬件和结构进行改善，
+
+	这个问题驱动电源是无法改善的，更该会影响系统性能，请 从相机功耗优化的出发点考虑
+	
+
+	{
+		msm-thermal
+		
+		modem thermal manage
+			Level 0 – No restriction, full modem performance
+			Level 1 – Requests the modem to run the data throughput reduction algorithms
+			Level 2 – MTPL back off / PUCCH back off
+			Level 3 – Puts the modem into Limited Service mode, in which only emergency 911
+			calls allowed
+			
+			thermal-engine -o
+			
+			/vendor/qcom/proprietary/thermal-engine/	
+			
+		80-N9649-1 Thermal Tuning Procedure	
+
+	}
+	
+	
+	debug
+	{ 
+		Enable more logging for KTM
+		echo 8 > /proc/sys/kernel/printk
+		echo 'file msm_thermal.c +p' > /sys/kernel/debug/dynamic_debug/control
+		
+		
+		adb	logcat –v time –s ThermalEngine
+		
+		
+		adb shell thermal-engine –o
+		
+		
+		adb pull /etc/thermal-engine.conf
+		adb
+		remount
+		<edit>
+		adb push thermal-engine.conf /etc/
+	
+	
+		adb push msm_tsens_logging /data
+		adb shell
+		chmod 777 /data/msm_tsens_logging
+		./msm_tsens_logging a b &
+		
+		
+		stop thermal-engine
+		start thermal-engine –d
+	}
+
+
+}

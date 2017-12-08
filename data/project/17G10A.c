@@ -25,10 +25,23 @@
 		git checkout vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6757/src/drivers/inc/clkbuf_ctl.h
 		git checkout kernel-4.4/drivers/misc/mediatek/base/power/mt6757/mtk_clkbuf_ctl.h 
 
+		近期W919项目为了满足生产需求，T3-3更新了一颗speaker 2557的物料，此物料不可兼容，因此区分版本维护：
+		1.T3-3前面批次机器，请刷版本尾号为AB的版本
+		2.T3-3以及之后批次机器，请刷版本尾号AA的版本
+
+		目前大家手里机器都是T3-3前的，所以测试和开发请根据手中机器状态刷AB版本。
+
+		如果刷错版本会遇到扬声器各类场景无声的问题！！！
+		版本情况：
+		BJ17G10A-T0148-171116AB --可刷T3-3之前机器
+		BJ17G10A-T0147-171116AB --代码问题，扬声器无声
+		BJ17G10A-T0146-171114AA --代码问题，扬声器无声
+		BJ17G10A-T0145-171114AA --可刷T3-3及之后机器
 
 		/*有时候要看源码目录下的makefile文件，他制定了编译的规则，哪些是需要的*/
 		项目脚本里哪些宏是需要的，宏包含的代码有哪些？这点很重要
 }
+
 
 
 
@@ -4028,6 +4041,70 @@ out:
 	设置id为不同的title上后update 
 }
 
+
+
+
+
+/**************************************************************************************************************************/
+27.	GNSPR#109803,关机状态，连接充电器，显示电量灭屏后，短按两次电源键1s，出现开机画面，再次操作恢复
+{
+	启动之后的boot_reason 是4,wdt_by_pass_pwk,然后这个现象是在系统跑到kernel之后的
+	按键的检测问题应该是在kernel出现问题的		
+	{
+		首先这个boot_reason 有哪些原因？
+		SW,HW,kernel panic 按键检测到短按所以会重启，这个应该是系统硬件初始化的时候读取寄存器传递的值g_boot_arg
+		
+		kernel 部分按键的处理在kpd.c 中断回调函数 kpd_pwrkey_pmic_handler
+		void kpd_pwrkey_pmic_handler(unsigned long pressed)
+		{
+		//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 begin
+			if(1==s_gn_clam)
+			{
+				return ;
+			}
+			else
+			{
+				kpd_print("Power Key generate, pressed=%ld\n", pressed);
+				if (!kpd_input_dev) {
+					kpd_print("KPD input device not ready\n");
+					return;
+			}
+			kpd_pmic_pwrkey_hal(pressed);
+		#if (defined(CONFIG_ARCH_MT8173) || defined(CONFIG_ARCH_MT8163))
+			if (pressed) /* keep the lock while the button in held pushed */
+				wake_lock(&pwrkey_lock);
+			else /* keep the lock for extra 500ms after the button is released */
+				wake_lock_timeout(&pwrkey_lock, HZ/2);
+				//这一部分的处理就是说在释放powerkey之后还有500ms持锁
+		#endif
+			}
+		}
+		//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 end
+	}		
+	
+	6355的 MT6355_TOPSTATUS这个寄存器有homekey跟powerkey的检测
+	preloader的keypad.c mtk_detect_key 检测按键
+	
+	按键相关的input子系统内定的编号
+	linux-event-codes.h
+	
+	
+	{
+		相关的宏	
+		BR_WDT_BY_PASS_PWK,MTK_KERNEL_POWER_OFF_CHARGING,kpoc_flag
+		
+
+		<3>[   10.779316]  (7)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->10
+		<3>[   20.786597]  (5)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->20
+		<3>[   30.792217]  (0)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->30
+	}
+	
+	按键检测的流程大概是这样的：
+	底层6355接收到按键触发的中断然后通过handler回调到(kpd.c)kpd_pwrkey_pmic_handler，这里有wake_lock持锁，按下的时候持锁，
+	释放的时候还会持锁500ms，然后时（hal_kpd.c）kpd_pmic_pwrkey_hal 将按键的时间上报给input子系统的，(key_control.cpp) 之后应该是通过input
+	子系统下面的fd节点，这里面是一个线程通过轮询的方式，如果有变化就会判断下一步亮屏关机充电的动画还是灭屏或者是重启之类的
+
+}
 
 
 
