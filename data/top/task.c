@@ -3,9 +3,15 @@
 {
 	fg_drv_update_hw_status  电量计上报一些硬件信息
 	
-	[FGADC_intr_end][FG_INTR_CHARGER_IN][read_fg_hw_info] 
+	GM3.0相关的log
+	[FGADC_intr_end]		
+	MTK_FG: [dod_init] swocv									初始化
+	FG_INTR_COULOMB_LT											
+	MTK_FG: [FGADC_intr_end]: 		
+	dod_init_result
 	
-	FG_DAEMON_CMD_GET_VBAT
+	FG_INTR_FG_ZCV
+	
 	FG_DAEMON_CMD_GET
 
 	控制fuel_gauge的log级
@@ -190,6 +196,16 @@ android o:
 	ANDROID TREBLE VTS OVERVIEW                                      80-PE644-5
 	VERIFIED BOOT 2.0 INTRODUCTION                                   80-PE644-6
 	SELINUX OVERVIEW AND UPDATE FOR ANDROID O        				 80-PE644-7
+	
+	{
+		 1.Kernel modularization
+		 2.HAL re-architecture (VINTF/HAL re-arch to make it as versioned & standardized APIs to Framework modules).
+		 3.Vendor/OEM module separation from system image
+	
+	}
+	
+	
+	
 	
 	Bus 003 Device 021: ID 058f:6387 Alcor Micro Corp. Flash Drive
 
