@@ -103,16 +103,50 @@ M2018
 
 
 
-	电量计的问题
+	1.电量计的问题
+	相关的bug：141642,141523,141209,140834,138519,138239,138056
+	
+	141642,电量充满过100%》 未连接充电器，待机界面查看电量显示为98%，重启手机，电量却显示100%
+	141253,（前提：重启手机，插卡1电信4G，通知栏所有设置的快捷项都为默认状态，后台运行QQ微信），功耗第5晚待机专项完成，时间待机一晚
+	（（8日20.54—9日08.08））12小时04分，次日电量为82%，长按电源键，重启手机之后电量为84% 1次
+	141209,未插充电器关机开机，电量上涨,关机开机4次，电量上涨，电量从9%上涨到15%
+	140834,待机界面》APP键进后台-手动重启完成后-手机未继续充电（手机显示96%-呼吸灯为绿色-进MMI显示已充满)》插拔充电器恢复 
+	138519,连接充电器重启手机后，锁屏界面显示充电完毕，实际上手机电量是93%，截屏后恢复
+	138239,手机电量98%，关机充电，手机开机，锁屏界面与状态栏电量显示不一致
+	138056,电量94%以上100%以下连接充电器手动重启手机，重启后充电图标不显示充电，呼吸灯显示为绿色，插拔充电器恢复。
+	
+	1.低电量开关机重启电量会增加，没有插充电器，如果插充电器会怎么样
+	2.高电量开关机重启电量不一定会变，但是充电状态会改变，显示充电截止，呼吸灯颜色变化
+	高电量也会增加
+	
+	电量多少，是否插充电器，是长按还是短按？长按重启的电量状态如何
+	
+	
+	相关的case：03257510,03238858,03249227
+
+	batterydata
+	uefi :BATTERY.PROVISION
+	kernel:fg-gen3-batterydata-gionee-17g08a-atl-4v4-5060mAh.dtsi
+	
+	
+	
+	
+	qpnp-fg-gen3.c  , smb-lib.c,smb135x-charger.c ,qpnp-smb2.c
+	
+	fg_gen3_debug_mask=0x19F;  0001 1001 1111
+	static int __debug_mask=0xFF;
+	
+
 	GNSPR #138519 ,连接充电器重启手机后，锁屏界面显示充电完毕，实际上手机电量是93%，截屏后恢复
 	{
 			
-		相关的case：03238858，03249227
+		
 		{
 			kba-170418012921  这是总的一些kba
 			
-			//Gionee <GN_BY_CHG> <lilubao> <20171206> add for debug fuel gauge begin
+			//Gionee <GN_BY_CHG> <lilubao> <20171211> add for debug fuel gauge begin
 			dev_err(chip->dev, "in [%s] by lilubao \n",__FUNCTION__);	
+			smblib_err(chg, "in [%s] by lilubao \n",__FUNCTION__);
 			
 			qcom,hold-soc-while-full;
 				Definition: A boolean property that when defined holds SOC at 100% when
@@ -126,56 +160,32 @@ M2018
 				95.
 				
 			dump.sh dump  fuel gauge寄存器   ./dump.sh > /data/kmsg.txt &
-			{
-				
-				let count=0
-
-				local utime
-				local ktime
-				local pause_time=10
-
-				if [ -n "$1" ]; then
-					pause_time=$1
-				fi
-
-
-				dump_peripheral () {
-					local base=$1
-					local size=$2
-					local dump_path=$3
-					echo $base > $dump_path/address
-					echo $size > $dump_path/count
-					cat $dump_path/data
-				}
-
-				echo "Starting dumps!"
-				echo "Dump path = $dump_path, pause time = $pause_time"
-
-				while true
-				do
-					utime=($(cat /proc/uptime))
-					ktime=${utime[0]}
-					echo "FG SRAM Dump Started at ${ktime}"
-					dump_peripheral 0 500 "/sys/kernel/debug/fg/sram"
-					uptime=($(cat /proc/uptime))
-					ktime=${utime[0]}
-					echo "FG SRAM Dump done at ${ktime}"
-					let count=$count+1
-					sleep $pause_time
-				done
 			
-			}	
-				
-			解析dump出来的寄存器 ,但是解析工具需要到windows环境暂时不行
+			
+			这里面好几个soc
+			msoc，bsoc,maint_soc,delta_soc
+			
 
-		}
 		
 	}
-
-
-
+	
+	
 
 }	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -306,118 +316,6 @@ M2018
 17G10A
 {
 	
-	不充电问题
-	{
-		GNSPR #141086,电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
-		玩游戏的时候充电电流为不足10MA
-		{
-		
-			这部分跟thermal有关，但是input设为0关闭了充电
-			//lilubao 
-			<3>[20189.850296]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-			<6>[20189.850308]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_aicr: aicr = 2300000 (0x2C)
-			<7>[20189.850319]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 13 data b0
-			<7>[20189.850327]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
-			<7>[20189.850624]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_write: reg 07 size 4
-			<6>[20189.850890]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
-			<7>[20189.850902]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_write: reg 07 data 00
-			<6>[20189.850973]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 0
-			<6>[20189.850982]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_ichg: ichg = 500000 (0x04)
-			<7>[20189.850992]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 17 data 10
-			<7>[20189.850999]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
-			<7>[20189.851136]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 17
-
-			//lilubao 
-			<3>[20189.851216]  (0)[239:charger_thread][charger]charging current is set 0mA, turn off charging !
-			<6>[20189.851225]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 0
-			<7>[20189.851234]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 12 data 00
-			
-			
-			0x27=0x60   0110 0000 
-			 SDP NSTD (by input pin of (sVBUSPG_syn & sCHGDETB & DCDT)=1)
-			 Charger port is not detected
-			 
-			 
-			 
-			 static void swchg_turn_on_cha
-			{
-				struct switch_charging_alg_data *
-				bool charging_enable = true;
-
-				if (swchgalg->state == CHR_ERRO
-					charging_enable = false;
-					pr_err("[charger]Charger Erro
-				} else if ((get_boot_mode() == 
-					charging_enable = false;
-					pr_err("[charger]In meta or a
-				} else {
-					mtk_pe20_start_algorithm(i
-					mtk_pe_start_algorithm(inf
-
-					swchg_select_charging_cur
-					if (info->chg1_data.input_cur
-						charging_enable = false;
-						pr_err("[charger]chargin
-					} else {
-						swchg_select_cv(info);
-					}
-				}
-
-				charger_dev_enable(info->chg1
-			}
-		
-			充电相关的参数
-			{
-				 DIFFERENCE_FULLOCV_ITH
-			
-			}
-
-
-		
-		
-		
-
-		
-			还有这个问题，irq不匹配的问题
-			<6>[21329.846831]  (5)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_irq: (chg_mivr) en = 1
-			<7>[21329.846844]  (5)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_read: reg e0 size 16
-			<4>[21329.846857] -(5)[239:charger_thread]------------[ cut here ]------------
-			<4>[21329.846862] -(5)[239:charger_thread]WARNING: CPU: 5 PID: 239 at /data/MAIN_GIT_REPO_CODE/BJ17G10A_MAIN_REPO/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/kernel/irq/manage.c:513 enable_irq+0x88/0xcc()
-			<4>[21329.846880] -(5)[239:charger_thread]Unbalanced enable for IRQ 166
-			<4>[21329.846887] -(5)[239:charger_thread]CPU: 5 PID: 239 Comm: charger_thread Tainted: G        W       4.4.15 #1
-			<4>[21329.846894] -(5)[239:charger_thread]Hardware name: MT6757CD (DT)
-			<0>[21329.846899] -(5)[239:charger_thread]Call trace:
-			<4>[21329.846903] -(5)[239:charger_thread][<ffffffc00008a328>] dump_backtrace+0x0/0x14c
-			<4>[21329.846913] -(5)[239:charger_thread][<ffffffc00008a488>] show_stack+0x14/0x1c
-			<4>[21329.846919] -(5)[239:charger_thread][<ffffffc0003379b0>] dump_stack+0x8c/0xb0
-			<4>[21329.846930] -(5)[239:charger_thread][<ffffffc00009e5f8>] warn_slowpath_fmt+0xc0/0xf4
-			<4>[21329.846940] -(5)[239:charger_thread][<ffffffc0000fd598>] enable_irq+0x88/0xcc
-			<4>[21329.846945] -(5)[239:charger_thread][<ffffffc0004d8310>] rt5081_enable_power_path+0x148/0x190
-			<4>[21329.846957] -(5)[239:charger_thread][<ffffffc000945750>] charger_dev_enable_powerpath+0x24/0x34
-			<4>[21329.846968] -(5)[239:charger_thread][<ffffffc000948ba0>] charger_routine_thread+0x378/0x6a8
-			<4>[21329.846976] -(5)[239:charger_thread][<ffffffc0000be268>] kthread+0xdc/0xf0
-			<4>[21329.846987] -(5)[239:charger_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
-			<4>[21329.846994] -(5)[239:charger_thread]---[ end trace a4903c9f998f3193 ]---	
-			
-			
-		
-		}	
-	}
-
-
-
-
-
-
-	
-	17G10A，ppt测试
-	{
-		smart PA:TI TFA 2557  功耗
-	
-	}
-
-
-
 	
 	电量显示不准                                             
 	{
@@ -534,9 +432,129 @@ M2018
 		}
 	
 	}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	不充电问题
+	{
+		GNSPR #141086,电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
+		玩游戏的时候充电电流为不足10MA
+		{
+		
+			这部分跟thermal有关，但是input设为0关闭了充电
+			//lilubao 
+			<3>[20189.850296]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+			<6>[20189.850308]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_aicr: aicr = 2300000 (0x2C)
+			<7>[20189.850319]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 13 data b0
+			<7>[20189.850327]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
+			<7>[20189.850624]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_write: reg 07 size 4
+			<6>[20189.850890]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
+			<7>[20189.850902]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_write: reg 07 data 00
+			<6>[20189.850973]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 0
+			<6>[20189.850982]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_ichg: ichg = 500000 (0x04)
+			<7>[20189.850992]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 17 data 10
+			<7>[20189.850999]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
+			<7>[20189.851136]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 17
+
+			//lilubao 
+			<3>[20189.851216]  (0)[239:charger_thread][charger]charging current is set 0mA, turn off charging !
+			<6>[20189.851225]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 0
+			<7>[20189.851234]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 12 data 00
+			
+			
+			0x27=0x60   0110 0000 
+			 SDP NSTD (by input pin of (sVBUSPG_syn & sCHGDETB & DCDT)=1)
+			 Charger port is not detected
+			 
+			 
+			 
+			 static void swchg_turn_on_cha
+			{
+				struct switch_charging_alg_data *
+				bool charging_enable = true;
+
+				if (swchgalg->state == CHR_ERRO
+					charging_enable = false;
+					pr_err("[charger]Charger Erro
+				} else if ((get_boot_mode() == 
+					charging_enable = false;
+					pr_err("[charger]In meta or a
+				} else {
+					mtk_pe20_start_algorithm(i
+					mtk_pe_start_algorithm(inf
+
+					swchg_select_charging_cur
+					if (info->chg1_data.input_cur
+						charging_enable = false;
+						pr_err("[charger]chargin
+					} else {
+						swchg_select_cv(info);
+					}
+				}
+
+				charger_dev_enable(info->chg1
+			}
+		
+			充电相关的参数
+			{
+				 DIFFERENCE_FULLOCV_ITH
+			
+			}
+
+
+		
+		
+		
+
+		
+			还有这个问题，irq不匹配的问题
+			<6>[21329.846831]  (5)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_irq: (chg_mivr) en = 1
+			<7>[21329.846844]  (5)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_read: reg e0 size 16
+			<4>[21329.846857] -(5)[239:charger_thread]------------[ cut here ]------------
+			<4>[21329.846862] -(5)[239:charger_thread]WARNING: CPU: 5 PID: 239 at /data/MAIN_GIT_REPO_CODE/BJ17G10A_MAIN_REPO/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/kernel/irq/manage.c:513 enable_irq+0x88/0xcc()
+			<4>[21329.846880] -(5)[239:charger_thread]Unbalanced enable for IRQ 166
+			<4>[21329.846887] -(5)[239:charger_thread]CPU: 5 PID: 239 Comm: charger_thread Tainted: G        W       4.4.15 #1
+			<4>[21329.846894] -(5)[239:charger_thread]Hardware name: MT6757CD (DT)
+			<0>[21329.846899] -(5)[239:charger_thread]Call trace:
+			<4>[21329.846903] -(5)[239:charger_thread][<ffffffc00008a328>] dump_backtrace+0x0/0x14c
+			<4>[21329.846913] -(5)[239:charger_thread][<ffffffc00008a488>] show_stack+0x14/0x1c
+			<4>[21329.846919] -(5)[239:charger_thread][<ffffffc0003379b0>] dump_stack+0x8c/0xb0
+			<4>[21329.846930] -(5)[239:charger_thread][<ffffffc00009e5f8>] warn_slowpath_fmt+0xc0/0xf4
+			<4>[21329.846940] -(5)[239:charger_thread][<ffffffc0000fd598>] enable_irq+0x88/0xcc
+			<4>[21329.846945] -(5)[239:charger_thread][<ffffffc0004d8310>] rt5081_enable_power_path+0x148/0x190
+			<4>[21329.846957] -(5)[239:charger_thread][<ffffffc000945750>] charger_dev_enable_powerpath+0x24/0x34
+			<4>[21329.846968] -(5)[239:charger_thread][<ffffffc000948ba0>] charger_routine_thread+0x378/0x6a8
+			<4>[21329.846976] -(5)[239:charger_thread][<ffffffc0000be268>] kthread+0xdc/0xf0
+			<4>[21329.846987] -(5)[239:charger_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
+			<4>[21329.846994] -(5)[239:charger_thread]---[ end trace a4903c9f998f3193 ]---	
+			
+			
+		
+		}	
+	}
+
+
+
+
+
 
 	
+	17G10A，ppt测试
+	{
+		smart PA:TI TFA 2557  功耗
 	
+	}
+
+	
+
 	
 	GNSPR#139202，去除冗余log
 	{
