@@ -120,57 +120,118 @@ M2018
 	高电量也会增加
 	
 	电量多少，是否插充电器，是长按还是短按？长按重启的电量状态如何
+	之前还有xdvdd很radc的问题先了解是什么
+	就是输入端应该有usbin还有其他几个？原理图
 	
 	
 	相关的case：03257510,03238858,03249227
-
-	batterydata
-	uefi :BATTERY.PROVISION
-	kernel:fg-gen3-batterydata-gionee-17g08a-atl-4v4-5060mAh.dtsi
-	
-	
-	
-	
-	qpnp-fg-gen3.c  , smb-lib.c,smb135x-charger.c ,qpnp-smb2.c
-	
-	fg_gen3_debug_mask=0x19F;  0001 1001 1111
-	static int __debug_mask=0xFF;
-	
-
-	GNSPR #138519 ,连接充电器重启手机后，锁屏界面显示充电完毕，实际上手机电量是93%，截屏后恢复
 	{
-			
-		
-		{
-			kba-170418012921  这是总的一些kba
-			
-			//Gionee <GN_BY_CHG> <lilubao> <20171211> add for debug fuel gauge begin
-			dev_err(chip->dev, "in [%s] by lilubao \n",__FUNCTION__);	
-			smblib_err(chg, "in [%s] by lilubao \n",__FUNCTION__);
-			
-			qcom,hold-soc-while-full;
-				Definition: A boolean property that when defined holds SOC at 100% when
-		    	the battery is full.
-
-				
-			qcom,fg-recharge-soc-thr = <99>; 
-				Definition: Percentage of monotonic SOC upon which the charging will
-				will be resumed once the charging is complete. If this
-				property is not specified, then the default value will be
-				95.
-				
-			dump.sh dump  fuel gauge寄存器   ./dump.sh > /data/kmsg.txt &
-			
-			
-			这里面好几个soc
-			msoc，bsoc,maint_soc,delta_soc
-			
-
-		
+		20171212
+		  1.目前分析可能跟重启启动的时候系统电流过大，而aicl电流小，导致充进电池的
+		  小于截止电流，所以认为是 TERMINATION或INHIBIT
+		  msm-pm660.dtsi 这几个电流目前是
+		  	qcom,fg-chg-term-current = <200>;	/* 100mA > 0.02C 200->150 */ 充电截止电流
+			qcom,fg-sys-term-current = <(-225)>;	/* 100mA + 25mA */ 显示100%
+			qcom,fg-chg-term-base-current = <175>;	/* 100mA - 25mA */ 
+		   还修改了满电跟回充的条件
+		   	qcom,hold-soc-while-full;
+			qcom,fg-recharge-soc-thr = <99>; 	
 	}
-	
-	
 
+
+	相关的内容
+	{
+	代码文件：
+		batterydata
+		uefi :BATTERY.PROVISION
+		kernel:fg-gen3-batterydata-gionee-17g08a-atl-4v4-5060mAh.dtsi
+	
+		qpnp-fg-gen3.c  , smb-lib.c	,smb135x-charger.c ,qpnp-smb2.c
+		
+		smb-lib.c
+			smblib_get_prop_batt_status
+			BATTERY_CHARGER_STATUS_1_REG 充电器时电池的状态
+			[2:0] 充进电池的状态
+			
+			smb2_batt_get_prop
+			 很多获取电池相关的信息
+		kba-170418012921  一些关于SDM660 pmic相关的kba
+		
+		SCHG_MISC_AICL_STATUS  0x0000160A
+	
+	 调试：		
+		打印寄存器信息	
+		/sys/kernel/debug/regmap/spmi0-00 
+		echo 0x1006 > address 
+		echo 100    >  count 
+		cat  		data
+		
+		dmesg | tree  1.txt   这个应该是把开机的一些log导到一个文件内
+		dump.sh dump  fuel gauge寄存器   ./dump.sh > /data/kmsg.txt &
+		
+		fg_gen3_debug_mask=0x19F;  0001 1001 1111
+		static int __debug_mask=0xFF;
+		
+				
+		//Gionee <GN_BY_CHG> <lilubao> <20171213> add for debug fuel gauge begin
+		dev_err(chip->dev, "in [%s] by lilubao \n",__FUNCTION__);	
+		smblib_err(chg, "in [%s] by lilubao \n",__FUNCTION__);
+	}
+
+		
+	debug:	
+	{
+		
+		
+	dtsi:
+		qcom,fg-chg-term-current
+		Usage:      optional
+		Value type: <u32>
+		Definition: Battery current (in mA) at which the fuel gauge will issue
+				an end of charge if the charger is configured to use the
+				fuel gauge ADC for end of charge detection. If this
+				property is not specified, then the default value used
+				will be 100mA.
+
+		qcom,fg-sys-term-current
+			Usage:      optional
+			Value type: <u32>
+			Definition: Battery current (in mA) at which the fuel gauge will try to
+					scale towards 100%. When the charge current goes above this
+					the SOC should be at 100%. If this property is not
+					specified, then the default value used will be -125mA.
+					This value has to be specified in negative values for
+					the charging current.
+
+		qcom,fg-chg-term-base-current
+			Usage:      optional
+			Value type: <u32>
+			Definition: Battery current (in mA) upper boundary at which the fuel
+					gauge will issue an end of charge during discharging. If
+					this property is not specified, then the default value used
+					will be 75mA.
+		    	
+		
+		qcom,hold-soc-while-full;
+			Definition: A boolean property that when defined holds SOC at 100% when
+	    	the battery is full.
+
+			
+		qcom,fg-recharge-soc-thr = <99>; 
+			Definition: Percentage of monotonic SOC upon which the charging will
+			will be resumed once the charging is complete. If this
+			property is not specified, then the default value will be
+			95.
+			
+
+		log关键字：
+		msoc，bsoc,maint_soc,delta_soc
+		smblib_get_charge_param: usb input current limit 	aicl调节电流
+		fg_charge_full_update								上报电量
+		ech_wls_charger_external_power_changed  			充电器检测
+		FG:
+		PMI:
+	}
 }	
 	
 	

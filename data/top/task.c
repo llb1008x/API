@@ -104,7 +104,13 @@
 
 
 
+17G08A
+{
+	fg_charge_full_update
+	FG: 
+	PMI:
 
+}
 
 
 
