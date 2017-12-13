@@ -124,6 +124,7 @@ M2018
 	就是输入端应该有usbin还有其他几个？原理图
 	
 	
+	
 	相关的case：03257510,03238858,03249227
 	{
 		20171212
@@ -136,6 +137,65 @@ M2018
 		   还修改了满电跟回充的条件
 		   	qcom,hold-soc-while-full;
 			qcom,fg-recharge-soc-thr = <99>; 	
+			
+		  2.重启之后显示充电满了
+		   所以现在要确定充满的判断条件和充电逻辑	
+		   charge_done 是判断BATTERY_CHARGER_STATUS_1_REG这个寄存器的[2:0],读寄存器
+		    000 - TRICKLE
+			001 - PRECHARGE
+			010 - FAST
+			011 - FULLON
+			100 - TAPER
+			101 - TERMINATION
+			110 - INHIBIT
+			
+			这里还有一个状态是recharge_soc，就是说如果输入还在但是充电已经截止了，要去调整回充电量
+			
+			(qpnp-fg-gen3.c)power_supply_get_property -> psy->desc->get_property(psy, psp, val)  -> (qpnp-smb2.c)get_property = smb2_batt_get_prop
+			
+			charge status
+			enum {
+				POWER_SUPPLY_STATUS_UNKNOWN = 0,
+				POWER_SUPPLY_STATUS_CHARGING,
+				POWER_SUPPLY_STATUS_DISCHARGING,
+				POWER_SUPPLY_STATUS_NOT_CHARGING,
+				POWER_SUPPLY_STATUS_FULL,
+			};
+			
+			chip->charge_done,  chip->charge_full 这两个有什么判断条件
+			判断charge done 的条件是读取寄存器 smblib_get_prop_batt_charge_done，POWER_SUPPLY_PROP_CHARGE_DONE 这一位
+			如果是TERMINATE_CHARGE,INHIBIT_CHARGE，这两个都是停止充电
+			判断chip->charge_full的条件是fg_charge_full_update,
+				if (chip->charge_done && !chip->charge_full) {
+
+
+			if (msoc >= 99 && chip->health == POWER_SUPPLY_HEALTH_GOOD) {
+
+			
+				pr_err("in [%s] by lilubao  222\n",__FUNCTION__);
+
+				fg_dbg(chip, FG_STATUS, "Setting charge_full to true\n");
+				chip->charge_full = true;
+				/*
+				 * Lower the recharge voltage so that VBAT_LT_RECHG
+				 * signal will not be asserted soon.
+				 */
+				rc = fg_set_recharge_voltage(chip,
+						AUTO_RECHG_VOLT_LOW_LIMIT_MV);
+				if (rc < 0) {
+					pr_err("Error in reducing recharge voltage, rc=%d\n",
+						rc);
+					goto out;
+				}
+			}else ...	
+			
+			
+			好几个soc 弄清楚什么意思：
+			msoc：monotonic SOC 这个是显示到UI的soc，单调的增强用户体验，比如100%跟1%
+			maintsoc:maintenance SOC 维持soc的稳定，这个soc通常跟delta_soc两个一同判断
+			bsoc:battery soc
+			
+			
 	}
 
 
@@ -223,6 +283,12 @@ M2018
 			property is not specified, then the default value will be
 			95.
 			
+		(qpnp-fg-gen3.c) fg_adjust_recharge_soc
+			/*
+			 * If the input is present and charging had been terminated, adjust
+			 * the recharge SOC threshold based on the monotonic SOC at which
+			 * the charge termination had happened.
+			 */		
 
 		log关键字：
 		msoc，bsoc,maint_soc,delta_soc
