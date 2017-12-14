@@ -72,7 +72,23 @@
 
 	VIB_DRV						马达相关的log
 
+	acquireWakeLockInternal 获取wakelock
+}
 
+
+
+
+17G08A
+{
+	fg_charge_full_update
+	FG: 
+	PMI:
+	
+	
+	
+	
+	
+	
 	缩写	
 	{
 		RPM:Resource Power Manager
@@ -93,22 +109,14 @@
 		VNDK Vendor NDK
 		LKM Loadable Kernel Modules
 		ABI Application Binary Interface
+		
+		电量计的配置在：UEFI，XBL,HLOS
+		UEFI：unified extensible firmware interface
+		全称“统一的可扩展固件接口”(Unified Extensible Firmware Interface)， 是一种详细描述类型接口的标准。
+		这种接口用于操作系统自动从预启动的操作环境，加载到一种操作系统上。
 	}
 	
 	extcon 插拔检测
-	
-	
-	acquireWakeLockInternal 获取wakelock
-}
-
-
-
-
-17G08A
-{
-	fg_charge_full_update
-	FG: 
-	PMI:
 
 }
 

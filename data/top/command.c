@@ -782,6 +782,9 @@ qcom 烧写 当然要换路径
 
 		sudo fdisk -l	
 		sudo df -T -h
+		
+		
+		od  -c file.hole
 
 7.通过ftp挂在烧写服务器上的rom(当然也可以用文件系统直接登陆，拷贝rom包到本地)
 

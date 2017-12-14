@@ -190,11 +190,16 @@ M2018
 			}else ...	
 			
 			
+			modem 侧也有控制充电的，
+			QcomChargerConfig_VbattTh_Sdm660.cfg  chargingtermcurrent
+			
+			
 			好几个soc 弄清楚什么意思：
 			msoc：monotonic SOC 这个是显示到UI的soc，单调的增强用户体验，比如100%跟1%
 			maintsoc:maintenance SOC 维持soc的稳定，这个soc通常跟delta_soc两个一同判断
 			bsoc:battery soc
 			
+			Understanding PMI8998 Fuel Gauge		80-VT310-138
 			
 	}
 
@@ -225,6 +230,21 @@ M2018
 		echo 0x1006 > address 
 		echo 100    >  count 
 		cat  		data
+		
+		
+		mem_intf
+		adb shell "echo 0 > /sys/kernel/debug/fg/sram/address"
+		adb shell "echo 4 > /sys/kernel/debug/fg/sram/count"
+		adb shell "cat /sys/kernel/debug/fg/sram/data"
+		
+		
+		kernek debug log
+		
+		echo 0x7f > /sys/module/qpnp_fg_gen3/parameters/debug_mask
+		echo 8 > /proc/sys/kernel/printk
+		dmesg > debug_log_filename
+		
+		
 		
 		dmesg | tree  1.txt   这个应该是把开机的一些log导到一个文件内
 		dump.sh dump  fuel gauge寄存器   ./dump.sh > /data/kmsg.txt &
