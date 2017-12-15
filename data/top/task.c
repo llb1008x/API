@@ -2,6 +2,13 @@
 17G10A log关键字
 {
 	fg_drv_update_hw_status  电量计上报一些硬件信息
+	[fg_drv_update_hw_status] current:18726 19824 state:1 1 car:164 217 bat:3888 3926 chr:4891 4901 hwocv:1234 1234 bat_plug_out:1 1 tmp:31 32 imix 16550 rac 448
+	car是库伦计变化 coulomb count 相当于实际电量除10
+	
+	[FGADC_intr_end][FG_INTR_COULOMB_C]soc:10000 fg_c_soc:10018 fg_v_soc:10000 ui_soc:10000 vc_diff:18 vc_mode 0 VBAT 44030 T:[29 V 29 C 34] D0_C -30 D0_V 3 CAR_V 28826 Q:[28835 28835] aging 10000 bat_cycle 0 Trk[0:0:0] UI[1:0] Chr[1:10000:0] pseudo1 0  DC_ratio 100!
+	Q:[28835 28835] 是最大电量 同样要除以10
+	
+	最好直接搜MTK_FG: [FGADC_intr_end]:
 	
 	GM3.0相关的log
 	[FGADC_intr_end]		
