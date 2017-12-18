@@ -40,8 +40,9 @@ linux内核：
 	android 关机/重启 Android关机/重启流程解析
 	http://blog.csdn.net/lxl584685501/article/details/45747967
         	
-
-
+	
+	http://blog.csdn.net/honour2sword/article/details/40213417
+	ARM中断向量表与响应流程 
 
 
 
@@ -83,15 +84,16 @@ battery：
 	看完变高手 高通Quick Charge 2.0从入门到精通
 	http://www.cnbeta.com/articles/387057.htm
 
-
+	
 	高通平台充电(modem部分)
 	http://www.docin.com/p-969643101.html
 
+	power supply框架
+	http://blog.csdn.net/rikeyone/article/details/52881615
 
-	http://blog.csdn.net/honour2sword/article/details/40213417
-	ARM中断向量表与响应流程 
-	227 547 248
-	4646
+	sdp cdp dcp及快速充电技术介绍 
+	http://blog.csdn.net/u012719256/article/details/72627022
+	
 
 USB：
 	相关的协议：
@@ -424,8 +426,7 @@ other：
 	https://www.cnblogs.com/verawang/p/5421961.html
 
 
-	sdp cdp dcp及快速充电技术介绍 
-	http://blog.csdn.net/u012719256/article/details/72627022
+
 	
 
 
