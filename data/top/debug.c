@@ -69,6 +69,16 @@
 					POWER_SUPPLY_STATUS_NOT_CHARGING,
 					POWER_SUPPLY_STATUS_FULL,
 				};
+				
+				
+				charger type
+				enum {
+					POWER_SUPPLY_CHARGE_TYPE_UNKNOWN = 0,
+					POWER_SUPPLY_CHARGE_TYPE_NONE,
+					POWER_SUPPLY_CHARGE_TYPE_TRICKLE,
+					POWER_SUPPLY_CHARGE_TYPE_FAST,
+					POWER_SUPPLY_CHARGE_TYPE_TAPER,
+				};
 			
 				chip->charge_done,  chip->charge_full 这两个有什么判断条件
 				判断charge done 的条件是读取寄存器 smblib_get_prop_batt_charge_done，POWER_SUPPLY_PROP_CHARGE_DONE 这一位
@@ -173,6 +183,20 @@
 				struct smb2 *chip = power_supply_get_drvdata(usb_psy);
 				struct smb_charger *chg = &chip->chg;
 				
+				"usb" ,"parallel" ,"bms" ,"battery"
+				struct power_supply	*fg_psy;
+				struct power_supply	*batt_psy;
+				struct power_supply	*usb_psy;
+				struct power_supply	*dc_psy;
+				struct power_supply	*parallel_psy;
+				
+				
+				struct *bms_psy = power_supply_get_by_name("bms");
+				struct fg_chip *chip = power_supply_get_drvdata(bms_psy);
+				int msoc;
+				rc = fg_get_msoc(chip, &msoc);
+	
+				
 				
 				power supply 子系统的框架,注册，管理，调用
 				
@@ -180,15 +204,129 @@
 				
 				首先确定在停止充电的时候re-enable可以充电？
 				加一个delay work 
+				chg->bb_removal_work		smblib_bb_removal_work			
 				INIT_DELAYED_WORK(&chg->bb_removal_work, smblib_bb_removal_work);
+				
 				smblib_handle_switcher_power_ok
+					schedule_delayed_work(&chg->bb_removal_work,
+					msecs_to_jiffies(BOOST_BACK_UNVOTE_DELAY_MS));
+				
+				
+	 
+			   4.这个问题需要先diable然后enable，之前只是enable可能有问题
+				当然还要加一个电量跟充电器是否存在的判断
+				rc = smblib_write(chg, CHARGING_ENABLE_CMD_REG, 0);
+				if (rc < 0) {
+					smblib_err(chg, "Couldn't disable charging rc=%d\n",
+								rc);
+					return rc;
+				}
+				rc = smblib_write(chg, CHARGING_ENABLE_CMD_REG,
+								CHARGING_ENABLE_CMD_BIT);
+				if (rc < 0) {
+					smblib_err(chg, "Couldn't enable charging rc=%d\n",
+								rc);
+					return rc;
+				}
+				
+				判断充电器是否存在
+				int smblib_get_prop_usb_present(struct smb_charger *chg,
+				union power_supply_propval *val)
+				rc = smblib_get_prop_usb_present(chg, val);
+				
+
+				smblib_get_prop_batt_capacity
+				
+				获取当前的电量 power_supply子系统应该更方便一点
+				static int smb2_batt_get_prop(struct power_supply *psy,enum power_supply_property psp,union power_supply_propval *val)
+				
+				qpnp-fg-gen3.c
+				rc = fg_get_msoc(chip, &msoc);
+				
+				
+				
+				modify
+				//Gionee <GN_BY_CHG> <lilubao> <20171219> add for debug fuel gauge begin
+				static void smb2_re_enable_charging(struct work_struct *work)
+				{
+	
+					int rc,usb_present,gn_fg_msoc;
+					u8 stat;
+					union power_supply_propval val;
+					struct smb_charger *chg = container_of(work, struct smb_charger,
+										re_enable_charging.work);
+	
+					pr_err("in [%s]\n",__FUNCTION__);
+
+					rc = smblib_get_prop_usb_present(chg, &val);
+					if (rc < 0) {
+						pr_err("Couldn't get usb present rc=%d\n", rc);
+						//return rc;
+					}
+					usb_present = val.intval;
+
+					rc = smblib_get_prop_batt_capacity(chg, &val);
+					if (rc < 0) {
+						pr_err("Couldn't get battery soc rc=%d\n", rc);
+						//return rc;
+					}
+					gn_fg_msoc = val.intval;
+
+					pr_err("in [%s] gn_fg_msoc->%d,usb_present->%d\n",__FUNCTION__,gn_fg_msoc,usb_present);
+	
+					//Gionee <GN_BY_CHG> <lilubao> <20171219> add for debug fuel gauge begin
+					if( usb_present && (gn_fg_msoc < 100) ){
+					//Gionee <GN_BY_CHG> <lilubao> <20171219> add for debug fuel gauge end
+						rc = smblib_read(chg, BATTERY_CHARGER_STATUS_1_REG, &stat);
+
+						if (rc < 0) {
+							pr_err("Couldn't read BATTERY_CHARGER_STATUS_1 rc=%d\n",rc);
+							//return rc;
+						}
+
+						stat = stat & BATTERY_CHARGER_STATUS_MASK;
+
+						if( stat == INHIBIT_CHARGE){
+
+			
+							rc = smblib_write(chg, CHARGING_ENABLE_CMD_REG, 0);
+							if (rc < 0) {
+								pr_err("Couldn't disable charging rc=%d\n",
+											rc);
+								//return rc;
+							}
+			
+							rc = smblib_write(chg, CHARGING_ENABLE_CMD_REG,
+											CHARGING_ENABLE_CMD_BIT);
+							if (rc < 0) {
+								pr_err( "Couldn't enable charging rc=%d\n",
+											rc);
+								//return rc;
+							}
+						
+						}
+					}
+
+					//return 0; 	
+				}
+				//Gionee <GN_BY_CHG> <lilubao> <20171219> add for debug fuel gauge end
+				
+				INIT_DELAYED_WORK(&chg->re_enable_charging,smb2_re_enable_charging);
+
+				#define  BOOST_RECHARGING_DELAY_MS	1000
+	
+				schedule_delayed_work(&chg->re_enable_charging,
+							msecs_to_jiffies(BOOST_RECHARGING_DELAY_MS));
+				//Gionee <GN_BY_CHG> <lilubao> <20171215> add for debug fuel gauge end
+				
+				
+				应该要思考一下debug的方式 代码要漂亮，简洁，逻辑要完整
+				添加宏，设备节点，还是在hal层添加一个调试的应用程序
 						
 		}			
 		
 		
-			
-		}
-
+		
 
 		相关的内容
 		{
@@ -205,17 +343,17 @@
 				[2:0] 充进电池的状态
 			
 				smb2_batt_get_prop
-				 很多获取电池相关的信息
+				很多获取电池相关的信息
 			
 		
 			SCHG_MISC_AICL_STATUS  				0x0000160A
 			SCHG_CHGR_CHARGING_ENABLE_CMD		0x00001042
 			SCHG_CHGR_BATTERY_CHARGER_STATUS_1	0x00001006
 			SCHG_MISC_POWER_PATH_STATUS			0x0000160B
+			SCHG_USB_INT_RT_STS					0x00001310
 			
 			
 			kba-170418012921  			一些关于SDM660 pmic相关的kba
-			
 			80-VT310-138				Understanding PMI8998 Fuel Gauge		
 	
 		 调试：		
@@ -253,11 +391,10 @@
 		}
 
 		
-		debug:	
+
 		{
-		
-		
-		dtsi:
+
+		 dtsi:
 			qcom,fg-chg-term-current
 			Usage:      optional
 			Value type: <u32>
@@ -309,6 +446,7 @@
 			log关键字：
 			msoc，bsoc,maint_soc,delta_soc
 			smblib_get_charge_param: usb input current limit 	aicl调节电流
+			smblib_get_charge_param: input current limit status 当前充电电流的状态
 			fg_charge_full_update								上报电量
 			ech_wls_charger_external_power_changed  			充电器检测
 			FG:
@@ -322,69 +460,118 @@
 	
 	
 	
+		
 	
-	
-	
-	
-	
-	
+
 	
 	
 	2.BC1.2 手机usb检测时间太长
 	{
-		apsd:Automatic Power Source Detection
 	
-		关于usb的检测
-		smblib_handle_usb_plugin
-		smblib_handle_usb_source_change
-		
-		SCHG_USB_APSD_STATUS
-		
-		debug
-			echo 'file qpnp-smbcharger.c +p' > /sys/kernel/debug/dynamic_debug/control
-			setprop "persist.hvdcp.log_level" 1
-			echo 0xFF > /sys/module/qpnp_smbcharger/parameters/debug_mask
-			
-		
-		充电器类型的检测
-		
-			充电器的类型
-			enum power_supply_type {
-				POWER_SUPPLY_TYPE_UNKNOWN = 0,										0
-				POWER_SUPPLY_TYPE_BATTERY,											1
-				POWER_SUPPLY_TYPE_UPS,												2
-				POWER_SUPPLY_TYPE_MAINS,											3
-				POWER_SUPPLY_TYPE_USB,		/* Standard Downstream Port */			4
-				POWER_SUPPLY_TYPE_USB_DCP,	/* Dedicated Charging Port */			5
-				POWER_SUPPLY_TYPE_USB_CDP,	/* Charging Downstream Port */			6
-				POWER_SUPPLY_TYPE_USB_ACA,	/* Accessory Charger Adapters */		7
-				POWER_SUPPLY_TYPE_USB_HVDCP,	/* High Voltage DCP */				8
-				POWER_SUPPLY_TYPE_USB_HVDCP_3,	/* Efficient High Voltage DCP */	9
-				POWER_SUPPLY_TYPE_USB_PD,	/* Power Delivery */
-				POWER_SUPPLY_TYPE_WIRELESS,	/* Accessory Charger Adapters */
-				POWER_SUPPLY_TYPE_USB_FLOAT,	/* Floating charger */
-				POWER_SUPPLY_TYPE_BMS,		/* Battery Monitor System */
-				POWER_SUPPLY_TYPE_PARALLEL,	/* Parallel Path */
-				POWER_SUPPLY_TYPE_MAIN,		/* Main Path */
-				POWER_SUPPLY_TYPE_WIPOWER,	/* Wipower */
-				POWER_SUPPLY_TYPE_TYPEC,	/* Type-C */
-				POWER_SUPPLY_TYPE_UFP,		/* Type-C UFP */
-				POWER_SUPPLY_TYPE_DFP,		/* TYpe-C DFP */
-			};
-
-			寄存器：
-			SCHG_USB_APSD_STATUS			0x00001307	apsd是否走完了和相关流程的判断
-			SCHG_USB_APSD_RESULT_STATUS		0x00001308 	充电器类型
-			SCHG_USB_USBIN_INPUT_STATUS		0x00001306	usbin的电压输入范围
-			
-			
-			//Gionee <GN_BY_CHG> <lilubao> <20171218> add for debug charger detect begin
-		
+		qc充电器检测的过程有哪些？各阶段用了多长时间，能不能减少？
+		{
+			apsd:Automatic Power Source Detection
+	
 			整个检测的时间：
 			slow plugin timer + enumeration timer + adapter voltage change + authentication algorithm complete + HVDCP detection
 			#define HVDCP_DET_MS 2500	-> smblib_handle_apsd_done
+
+			usb检测时间是 1.5s  0->4 
+									 	0.6s       2.4s
+			charger检测时间是 3s左右，0   ->    5   ->   9
+				
+			上层显示的时间：2.54s 显示充电，2.08s显示快充
+				
 			
 			
+			系统输入的USBIN ，DCIN 这两个分别是什么
+			usbin 从外部的 vbus usbin接入，有两个分别时pm660跟smb138x两个充电芯片输入
+			dcin 搜索直流电源输入接口,外接电源输入口，这个好像没有
+			
+			
+			apsd的状态
+			7 USBIN_LVOV 							The USBIN LVOV detected
+			6 HVDCP_CHECK_TIMEOUT 					HVDCP Detection Timeout Expired
+			5 SLOW_PLUGIN_TIMEOUT 					Slow Plugin Timeout Expired
+			4 ENUMERATION_DONE 						SDP Enumeration Done
+			3 VADP_CHANGE_DONE_AFTER_AUTH 			Adaptive Voltage Change Done after Authentication
+			2 QC_AUTH_DONE_STATUS					QC Authentication Algorithm Done
+			1 QC_CHARGER							Quick Charge Detection Done
+			0 APSD_DTC_STATUS_DONE 					APSD Detection Done
+			
+			
+			charger 充电器插入是smblib_handle_usbin_uv 
+			insert
+			<6>[ 1384.829967] PMI: smblib_handle_usbin_uv: IRQ: usbin-uv
+
+			<6>[ 1384.830987] PMI: smblib_usb_plugin_locked: enabling DPDM regulator
+			<6>[ 1384.854058] PMI: smblib_usb_plugin_locked: IRQ: usbin-plugin attached
+			
+			<6>[ 1385.468371] PMI: smblib_handle_chg_state_change: IRQ: chg-state-change
+			<3>[ 1385.567325] PMI: smblib_handle_usb_source_change: APSD_STATUS = 0x01
+
+			<6>[ 1385.567406] PMI: smblib_rerun_apsd: re-running APSD
+			
+			<6>[ 1386.848078] PMI: smblib_get_apsd_result: APSD_STATUS = 0x00
+			<6>[ 1386.848131] PMI: smblib_get_charge_param: input current limit status = 75000 (0x03)
+
+			<3>[ 1386.848161] usb real_charger_type = 0
+			
+			<6>[ 1386.947384] PMI: smblib_update_usb_type: APSD=DCP PD=0
+			
+			<6>[ 1387.308580] PMI: smblib_handle_debug: IRQ: usbin-collapse
+			<6>[ 1387.308602] PMI: smblib_handle_debug: IRQ: aicl-done
+			
+			<3>[ 1387.438065] usb real_charger_type = 5
+			
+			
+			<3>[ 1388.742128] PMI: smblib_handle_usb_source_change: APSD_STATUS = 0x43
+			<6>[ 1388.742478] PMI: smblib_get_apsd_result: APSD_STATUS = 0x43
+			<3>[ 1388.742590] [ech_wls_chrg_get_property] psp = 4.
+			<3>[ 1388.755432] ech_wls_is_online = 0
+			<6>[ 1388.760377] PMI: smblib_handle_hvdcp_check_timeout: IRQ: smblib_handle_hvdcp_check_timeout rising
+			
+			<6>[ 1389.200808] PMI: smblib_handle_hvdcp_3p0_auth_done: IRQ: hvdcp-3p0-auth-done rising; HVDCP3 detected
+			<6>[ 1389.200824] PMI: smblib_handle_sdp_enumeration_done: IRQ: sdp-enumeration-done falling
+			<6>[ 1389.200832] PMI: smblib_handle_slow_plugin_timeout: IRQ: slow-plugin-timeout falling
+			<6>[ 1389.200932] PMI: smblib_set_charge_param: buck switching frequency = 600 (0x0f)
+			<3>[ 1389.200993] PMI: smblib_handle_usb_source_change: APSD_STATUS = 0x47
+			
+			
+			<6>[ 1389.204694] PMI: smblib_get_apsd_result: APSD_STATUS = 0x47
+			<3>[ 1389.204732] [ech_wls_chrg_get_property] psp = 4.
+			<6>[ 1389.263439] PMI: smblib_handle_apsd_done: IRQ: apsd-done rising; HVDCP3 detected
+
+			
+			通过power supply 早点上报充电器的类型,现在的问题是如何上报这个事件
+			
+			power_supply_changed(chg->usb_psy);
+		}
+
+
+		相关的代码逻辑和文档
+		{
+			关于usb的检测
+			smblib_handle_usb_plugin
+			smblib_handle_usb_source_change
+			
+			寄存器：
+			SCHG_USB_APSD_STATUS						0x00001307	apsd是否走完了和相关流程的判断
+			SCHG_USB_APSD_RESULT_STATUS					0x00001308 	充电器类型
+			SCHG_USB_USBIN_INPUT_STATUS					0x00001306	usbin的电压输入范围
+			SCHG_MISC_AICL_STATUS						0x0000160A	
+			SCHG_USB_USBIN_SOURCE_CHANGE_INTRPT_ENB		0x00001369	这个是关于充电检测几个阶段的一些中断使能
+			
+			相关寄存器的基地址
+			#define CHGR_BASE	0x1000
+			#define OTG_BASE	0x1100
+			#define BATIF_BASE	0x1200
+			#define USBIN_BASE	0x1300
+			#define DCIN_BASE	0x1400
+			#define MISC_BASE	0x1600
+			#define CHGR_FREQ_BASE	0x1900
+			
+				
 			irqreturn_t smblib_handle_usb_source_change(int irq, void *data)
 			{
 				struct smb_irq_data *irq_data = data;
@@ -445,8 +632,225 @@
 				return IRQ_HANDLED;
 			}
 
+
+			充电器的类型
+			enum power_supply_type {
+				POWER_SUPPLY_TYPE_UNKNOWN = 0,										0
+				POWER_SUPPLY_TYPE_BATTERY,											1
+				POWER_SUPPLY_TYPE_UPS,												2
+				POWER_SUPPLY_TYPE_MAINS,											3
+				POWER_SUPPLY_TYPE_USB,		/* Standard Downstream Port */			4
+				POWER_SUPPLY_TYPE_USB_DCP,	/* Dedicated Charging Port */			5
+				POWER_SUPPLY_TYPE_USB_CDP,	/* Charging Downstream Port */			6
+				POWER_SUPPLY_TYPE_USB_ACA,	/* Accessory Charger Adapters */		7
+				POWER_SUPPLY_TYPE_USB_HVDCP,	/* High Voltage DCP */				8
+				POWER_SUPPLY_TYPE_USB_HVDCP_3,	/* Efficient High Voltage DCP */	9
+				POWER_SUPPLY_TYPE_USB_PD,	/* Power Delivery */
+				POWER_SUPPLY_TYPE_WIRELESS,	/* Accessory Charger Adapters */
+				POWER_SUPPLY_TYPE_USB_FLOAT,	/* Floating charger */
+				POWER_SUPPLY_TYPE_BMS,		/* Battery Monitor System */
+				POWER_SUPPLY_TYPE_PARALLEL,	/* Parallel Path */
+				POWER_SUPPLY_TYPE_MAIN,		/* Main Path */
+				POWER_SUPPLY_TYPE_WIPOWER,	/* Wipower */
+				POWER_SUPPLY_TYPE_TYPEC,	/* Type-C */
+				POWER_SUPPLY_TYPE_UFP,		/* Type-C UFP */
+				POWER_SUPPLY_TYPE_DFP,		/* TYpe-C DFP */
+			};
+			
+			power supply 中的type-c 和pd
+			{
+				POWER_SUPPLY_PROP_TYPEC_MODE,
+				POWER_SUPPLY_PROP_TYPEC_CC_ORIENTATION, /* 0: N/C, 1: CC1, 2: CC2 */
+				POWER_SUPPLY_PROP_TYPEC_POWER_ROLE,
+				POWER_SUPPLY_PROP_PD_ALLOWED,
+				POWER_SUPPLY_PROP_PD_ACTIVE,
+				POWER_SUPPLY_PROP_PD_IN_HARD_RESET,
+				POWER_SUPPLY_PROP_PD_CURRENT_MAX,
+				POWER_SUPPLY_PROP_PD_USB_SUSPEND_SUPPORTED,	
+			}
+
+			
+	
+		}
+				
+
+
 			
 			
+			
+
+			debug
+			{
+				//Gionee <GN_BY_CHG> <lilubao> <20171218> add for debug charger detect begin
+			
+				case :03267108
+			
+				echo 'file smb-lib.c +p' > /d/dynamic_debug/control
+				echo 'file qpnp-smb2.c +p' > /d/dynamic_debug/control
+				echo 8 > /proc/sys/kernel/printk 
+				
+				setprop "persist.hvdcp.log_level" 1
+				echo 0xFF > /sys/module/qpnp_smb2/parameters/debug_mask
+				
+				
+				int smblib_set_prop_pd_active( )
+				{
+				。。。。。。。。。。。
+				-----   chg->pd_active = val->intval;
+				+++   chg->pd_active = 0;
+				。。。。。。。。。。
+				}
+				我的电话0755 3665 5859.
+			}
+			
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	3.U盘识别时间过长 (32s)
+	{
+		usb眼图通过，同平台其他无此问题，
+		本地验证了，大概4~6此出现一次不识别或识别慢的问题，不是必现的
+		
+		//Gionee <GN_BY_CHG> <lilubao> <20171220> add for debug usb begin
+		
+		case ID:03272648,03264824
+		
+			1.
+			Many of the information provided in the log is not printed.
+
+			Please provide the log after adding the following code.
+			drivers/usb/gadget/configfs.c
+			drivers/usb/dwc3/dwc3-msm.c
+			drivers/usb/dwc3/gadget.c
+			kernel/drivers/usb/core/hub.c
+			#undef dev_dbg
+			#undef pr_debug
+			#define dev_dbg dev_err
+			#define pr_debug pr_err
+
+			drivers/usb/gadget/function/f_mtp.c
+			#undef DBG
+			#undef VDBG
+			#define VDBG ERROR
+			#define DBG ERROR
+
+			drivers/usb/gadget/composite.c
+			#undef INFO
+			#undef DBG
+			#undef pr_debug
+			#define INFO ERROR
+			#define DBG ERROR
+			#define pr_debug pr_err
+
+			diff --git a/drivers/usb/gadget/configfs.c b/drivers/usb/gadget/configfs.c
+			index fa05070..0ebdb2f 100644
+			--- a/drivers/usb/gadget/configfs.c
+			+++ b/drivers/usb/gadget/configfs.c
+			@@ -443,6 +443,7 @@ static int config_usb_cfg_link(
+			goto out;
+			}
+
+			+ pr_info("[oem] %s: func:%s\n", _func_, f->name);
+			/ stash the function until we bind it to the gadget /
+			list_add_tail(&f->list, &cfg->func_list);
+			ret = 0; 
+			
+			
+			See some exception information in log.
+			<3>[ 561.336568] msm-dwc3 a800000.ssusb: set core clk rate 133333333
+			<3>[ 561.507213] msm-dwc3 a800000.ssusb: block_reset ASSERT
+			<3>[ 561.508793] msm-dwc3 a800000.ssusb: block_reset DEASSERT
+			<3>[ 561.526782] msm-dwc3 a800000.ssusb: DWC3_CONTROLLER_RESET_EVENT received
+			<3>[ 561.526820] msm-dwc3 a800000.ssusb: DWC3_CONTROLLER_POST_RESET_EVENT received
+			<3>[ 561.546967] msm-dwc3 a800000.ssusb: b_idle state
+			<3>[ 561.558286] msm-dwc3 a800000.ssusb: Cable disconnected
+
+			Does the debug switch of hub.c have not been opened? No information was seen.
+
+			-------------------------------------------------------------------------------
+			2.
+			Please provide the log after adding the following code. Do not remove the dbug switch that has been added before.
+			To improve efficiency, please leave your phone number.
+
+			drivers/usb/core/hub.c
+			#undef dev_dbg
+			#undef pr_debug
+			#define dev_dbg dev_err
+			#define pr_debug pr_err
+
+			drivers/usb/host/xhci.h
+
+			#define xhci_dbg(xhci, fmt, args...) \
+			- dev_dbg(xhci_to_hcd(xhci)->self.controller , fmt , ## args)
+			+ dev_err(xhci_to_hcd(xhci)->self.controller , fmt , ## args) 
+			
+			
+			------------------------------------------------------------------------------
+			3.
+			Please add the following modifications and test.
+
+			static void
+			sd_spinup_disk(struct scsi_disk *sdkp)
+			{
+			unsigned char cmd[10];
+			unsigned long spintime_expire = 0;
+			int retries, spintime;
+			unsigned int the_result;
+			struct scsi_sense_hdr sshdr;
+			int sense_valid = 0;
+
+			spintime = 0;
+
+			/* Spin up drives, as required. Only do this at boot time */
+			/* Spinup needs to be done for module loads too. */
+			do {
+			retries = 0;
+
+			do {
+			cmd[0] = TEST_UNIT_READY;
+			memset((void *) &cmd[1], 0, 9);
+
+			the_result = scsi_execute_req(sdkp->device, cmd,
+			DMA_NONE, NULL, 0,
+			&sshdr, SD_TIMEOUT,
+			SD_MAX_RETRIES, NULL);
+
+			/*
+			* If the drive has indicated to us that it
+			* doesn't have any media in it, don't bother
+			* with any more polling.
+			*/
+			+if(retries >25)
+			+{
+			if (media_not_present(sdkp, &sshdr))
+			return;
+			+}
+			if (the_result)
+			sense_valid = scsi_sense_valid(&sshdr);
+			retries++;
+			- } while (retries < 3 &&
+			+ } while (retries < 30 &&
+			(!scsi_status_is_good(the_result) ||
+			((driver_byte(the_result) & DRIVER_SENSE) &&
+			sense_valid && sshdr.sense_key == UNIT_ATTENTION)));
+
+			Thanks!
+	
 	}
 	
 
@@ -459,6 +863,31 @@
 
 
 
+
+msm8917 替换IC
+{
+	刘工 你好
+
+	请看下面我们产品线负责软件的工程师的说明
+
+	谢谢
+
+
+	MSM8917平台的USB  phy可以做BC1.2的检测，usb phy驱动在drivers/usb/phy/phy-msm-usb.c文件
+
+	 
+
+	Charger驱动只要在检测到Adapter/USB插入后调用power_supply_set_present(usb, true)通知usb phy驱动去启动BC1.2的检测，
+	检测完毕后会回调charger驱动的external_power_changed函数。
+
+	针对使用bq24157的情况，我们会使用平台CBLPWR_N信号作为Adapter/USB插入判断，CBLPWR_N中断会调用bq2415x_cblpwr_changed()函数，
+	这个函数schdeule delay work，执行bq2415x_vbus_changed_workfunc函数，
+
+	在这个函数里会读取cblpwr_n的状态qpnp_pon_get_cblpwr_status(&bq->power_good); 让后根据cblpwr_n的状态判断adapter是插入还是拔出，
+	然后调用power_supply_set_present 通知USB phy驱动
+	
+	
+}
 
 
 
@@ -726,6 +1155,11 @@ M2018
 	
 17G10A
 {
+	
+
+
+
+
 	
 	
 	电量显示不准                                             

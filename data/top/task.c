@@ -91,11 +91,7 @@
 	FG: 
 	PMI:
 	
-	
-	
-	
-	
-	
+
 	缩写	
 	{
 		RPM:Resource Power Manager

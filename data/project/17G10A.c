@@ -3645,7 +3645,7 @@ out:
 	{
 		bootloader/lk
 	
-		vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.h:86://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+	   vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.h:86://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/lib/libshowlogo/show_animation_common.h:96://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/project/gnbj6737t_66_m0.mk:13:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/project/gnbj6737t_66_m0.mk:16:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
@@ -3746,9 +3746,81 @@ out:
 	   
 		   从charger/main.cpp 开始
 		   main
+		}
 
-	   }
-	 
+			修改高低温提示语，和温度门限
+			{
+				1.修改关机充电的提示语
+				hd720_amigo_higtemp.bmp
+				hd720_amigo_lowtemp.bmp
+				
+				hd720_amigo_hightemp.bmp
+				hd720_amigo_low_battery.bmp
+				
+				2.开机充电的保护门限
+				min_charge_temperature = <(-3)>;
+				min_charge_temperature_plus_x_degree = <0>;
+				max_charge_temperature = <55>;
+				max_charge_temperature_minus_x_degree = <50>;
+				
+				3.关机充电的第一张logo刷错了
+				应该是lk的 mk跟platform 
+				
+				#Gionee <GN_BSP_CHG> <lilubao> <20171105> modify for gionee kpoc_logo begin
+				CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT = yes
+				DEFINES += CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT
+				#Gionee <GN_BSP_CHG> <lilubao> <20171105> modify for gionee kpoc_logo end
+				
+				#if defined(CONFIG_GN_BSP_AMIGO_CHARGING_SUPPORT)
+				mt_disp_show_kpoc_charge_logo();
+
+				#elif defined(GN_MTK_BSP_LK_CHARGE_GIONEELOGO)
+					gn_disp_kpoc_lk_charge_logo();			
+				#else
+					mt_disp_show_low_battery();
+				#endif
+				
+				
+				/sys/devices/platform/charger/BatteryNotify 
+				
+				echo 1 > BatteryNotify  电池电压过高
+				echo 2 > BatteryNotify 	电池温度过高
+				
+				static void mtk_battery_notify_UI_test(struct charger_manager *info)
+				{
+					switch (info->notify_test_mode) {
+					case 1:
+						info->notify_code = 0x0001;
+						pr_debug("[%s] CASE_0001_VCHARGER\n", __func__);
+						break;
+					case 2:
+						info->notify_code = 0x0002;
+						pr_debug("[%s] CASE_0002_VBATTEMP\n", __func__);
+						break;
+					case 3:
+						info->notify_code = 0x0004;
+						pr_debug("[%s] CASE_0003_ICHARGING\n", __func__);
+						break;
+					case 4:
+						info->notify_code = 0x0008;
+						pr_debug("[%s] CASE_0004_VBAT\n", __func__);
+						break;
+					case 5:
+						info->notify_code = 0x0010;
+						pr_debug("[%s] CASE_0005_TOTAL_CHARGINGTIME\n", __func__);
+						break;
+					default:
+						pr_debug("[%s] Unknown BN_TestMode Code: %x\n",
+							__func__, info->notify_test_mode);
+					}
+				}
+	
+					vendor/mediatek/proprietary/packages/apps/BatteryWarning/res/values-zh-rCN/strings.xml
+					./system/vendor/app/BatteryWarning
+	
+				
+			}
+	   
 	 }
 		   
 }	
