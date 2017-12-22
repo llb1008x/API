@@ -3625,7 +3625,7 @@ out:
 		
 		编译
 		out/target/product/gnbj6757_66_n/system/vendor/bin/kpoc_charger
-	   out/target/product/gnbj6757_66_n/system/vendor/lib/libshowlogo.so
+	    out/target/product/gnbj6757_66_n/system/vendor/lib/libshowlogo.so
 		
 		./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/charger/
 		 ./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/libshowlogo/	

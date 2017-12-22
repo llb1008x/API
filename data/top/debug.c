@@ -11,6 +11,209 @@
 
 
 
+
+
+18Y07A
+{
+	1.bringup
+	vendor/mediatek/proprietary/custom/gnbj6763_66_n1/kernel/dct/dct/codegen.dws
+	vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/gnbj6763_66_n1/dct/dct/codegen.dws
+	vendor/mediatek/proprietary/bootable/bootloader/lk/target/gnbj6763_66_n1/dct/dct/codegen.dws
+	
+	gpio:
+	 drv_vbus
+	 usb_id
+	 gpio_chg_en
+	 eint_chg_stat
+	 
+ 	cpu :mt6763
+	pmic:mt6356
+	 
+
+
+	
+	{
+		先搜AndroidProducts.mk：定义一个变量——>PRODUCT_MAKEFILES，该变量的值为产品版本定义文件名的列表  
+        产品版本定义文件：对特定产品版本的定义（可多个文件，多个版本）。一般情况下，我们不需要定义所有变量（版本相关），，Build系统已经预先定义了一些组合，
+		位于build/target/product，该目录下每个文件都定义了一个组合，我们只需要继承这些预置的定义，然后再覆盖自己想要的变量定义即可
+        BroadConfig.mk：该文件用来配置硬件主板，它定义的都是设备底层的硬件特性，如设备的主板相关信息，wifi，bootloader，内核等
+
+		最后确定thermal 用的gionee_bj这个目录，之前一直以为是mediatek mt6757目录下面
+		而且编译要全编
+		
+		preloader 的宏开关
+		vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/gnbj6763_66_n1/gnbj6763_66_n1.mk
+	
+	}
+	
+	
+	代码和相关的文档
+	{
+		GM3.0相关
+		mtk_battery.c，mtk_gauge_class.c,mt6355_gauge.c
+		kernel-4.4/drivers/power/mediatek/mtk_battery.c
+		kernel-4.4/drivers/misc/mediatek/pmic/mtk_gauge_class.c
+		kernel-4.4/drivers/misc/mediatek/pmic/mt6355/v1/mt6355_gauge.c
+		
+		preloader
+			is_battery_exist = hw_check_battery(); 定义了MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION
+			所以直接返回了ignore bat check 不检测电池 (就是检测PMIC_RG_LDO_VBIF28_EN_ADDR ，ldo28接到bat的)
+			
+			fuel gauge 是否复位过
+			[fg_init] fg_reset_status 0 do_init_fgadc_reset 1 fg_curr_time 1 shutdown_pmic_time 1 hw_id 0x5630 sw_id 0x5630, 4068 0 0x1 0x2329 1 0
+			
+			
+			plcharg_status 阶段是否充电
+			plcharg_status = upmu_is_chr_det();
+			print("[fg_init] fg_reset_status %d do_init_fgadc_reset %d fg_curr_time %d shutdown_pmic_time %d hw_id 0x%x sw_id 0x%x, %d %d 0x%x 0x%x %d %d\n",
+			fg_reset_status, do_init_fgadc_reset, fg_curr_time, shutdown_pmic_time, hw_id, sw_id,
+			boot_vbat, shutdowntime, reset_sel, slp_en, b_moniter_pl_charg_bit, plcharg_status);
+			
+
+			1.判斷電池是否存在
+			2.對Gauge hw進行init
+			3.判斷gauge是否被reset過( 判斷是否曾拔過電池 )
+			4.讀取開機電壓 boot_vbat
+			5.讀取關機時間 shutdowntime
+			6.判斷有無發生2sec reboot
+			7.Preloader init順序有dependency,請勿更動init順序
+			
+		lk
+			(platform.c) platform_init -> (mt_battery.c) mt65xx_bat_init  -> 
+			lk阶段会停止充电，关闭power path算出电池电阻还有ocv
+			
+		kernel
+			(mtk_battery.c) battery_init 建立netlink handler 用于数据交互
+			daemo_nl_sk = netlink_kernel_create(&init_net, NETLINK_FGD, &cfg);
+			然后加载dts，初始化driver
+			
+			mtk_power_misc.c 有处理shutdown的时间，fuel guage 负责上报时间uevent，然后有这里的线程负责
+			处理关机事件 
+			pmic_throttling_dlp 低电保护，set_shutdown_cond
+			
+	}
+
+
+
+
+	log
+	{
+		[PMIC]disable usbdl wo battery
+		
+		[PMIC]init_setting
+		[PMIC] init setting date: 2017-05-10, Done
+		
+		power key is pressed
+		ignore bat check
+		[PLFM] Power key boot!
+		[PMIC]POWER_HOLD ON
+		[PMIC]PowerHold = 0x1
+		[pl_battery_init] is_fg_init:0 , force_init:0 bat:1
+		
+		
+		usb握手
+		[LIB] seclib_img_auth_load_sig [LIB] CFG read size '0x2000' '0x3C'
+		[LIB] SEC CFG doesn't exist
+		[SEC] init fail '0x3000'
+		[BLDR] Starting tool handshake.
+		€€€€€€€€€€€[MT6356] get volt 2, 48, 800000
+		[BLDR] Tool connection is unlocked
+		[platform_vusb_on] VUSB33 is on
+		[PMIC]IsUsbCableIn 0
+		[TOOL] PMIC not dectect usb cable!
+		
+		platform 
+		[25] initializing platform
+		[25] platform_init()
+	
+		
+		rt5081
+		[275] [DISP]func|disp_lcm_init
+		[275] [DISPCHECK]lcm init_power 
+		lcm_init_power:lk
+		[276] [DISPCHECK]lcm init 
+		[276] liuyuntao [LCD] lcm_init 
+		[291] liuyuntao [LCD] power_on_rt5081 
+		
+		
+		logo
+		[863] [lk logo: mt_disp_show_boot_logo 131]
+		[863] [lk logo: init_fb_screen 59]
+		[864] mt_get_logo_db_addr: 0x5e900000
+		[864] [lk logo: init_fb_screen 77]MTK_LC
+		
+		mt_charger
+		[1092] mt_charger_dump_register: ICHG = 2000mA, AICR = 500mA, MIVR = 4500mV, IEOC = 250mA
+		[1093] mt_charger_dump_register: CHG_EN = 1, CHG_STATUS = ready
+		[1094] [mt65xx_bat_init] check VBAT=4039 mV with 3450 mV
+		
+		[1098] [BATTERY] No battry plug-in. Power Off.[1099] mt6370_i2c_read_byte: I2CR[0x12] = 0x0B
+		
+		[    0.967642] <1>.(4)[1:swapper/0][name:mtk_wdt&]mtk_wdt_init ok
+		
+		
+		[    2.548796] <4>.(4)[1:swapper/0][name:mtk_chg_type_det&]mt_charger_probe
+		
+		[    2.933065] <5>.(5)[1:swapper/0][name:bootprof&]BOOTPROF:      2933.065006:initcall: pmic_mt_init    69.600000ms
+		[    2.934433] <5>.(5)[1:swapper/0][name:usb20&][MUSB]usb20_init 1658: usb20 init
+		[    2.936973] <5>.(5)[1:swapper/0][name:usb20&][MUSB]mt_usb_probe 1578: init connection_work
+		[    2.938001] <5>.(5)[1:swapper/0][name:usb20&][MUSB]mt_usb_probe 1581: keep musb->power & mtk_usb_power in the samae value
+		[    2.939792] <5>.(5)[1:swapper/0][name:usb20&][MUSB]mt_usb_probe 1609: USB probe done!
+		[    2.942409] <5>.(5)[1:swapper/0][name:usb20&][MUSB]usb20_init 1673: usb20 init ret:0
+		
+		
+		[    3.560140] <5>.(5)[1:swapper/0][name:mt6356_gauge&]mt6356_gauge_probe: starts
+		[    3.561043] <5>.(5)[1:swapper/0][name:mt6356_gauge&]mt6356_parse_dt: starts
+		
+		
+		[    3.992063] <5>.(5)[1:swapper/0][name:bootprof&]BOOTPROF:      3992.063624:initcall: imgsensor_init    38.000692ms
+		[    4.005208] <5>.(5)[1:swapper/0][name:pmic_throttling_dlpt&][register_low_battery_notify] prio_val=5
+		[    4.006346] <5>.(5)[1:swapper/0][name:pmic_throttling_dlpt&][register_battery_percent_notify] prio_val=5
+		[    4.007525] <5>.(5)[1:swapper/0][name:pmic_throttling_dlpt&][register_battery_oc_notify] prio_val=5
+		
+		
+		
+		[    4.602833] <5>.(5)[1:swapper/0]mt6370_pmu_core mt6370_pmu_core: mt6370_pmu_core_probe successfully
+		[    4.605053] <5>.(5)[1:swapper/0][name:mt6370_pmu_charger&]mt6370_pmu_charger_probe: (1.1.22_MTK)
+		[    4.606175] <5>.(5)[1:swapper/0]mt6370_pmu_charger mt6370_pmu_charger: mt_parse_dt
+		[    4.607126] <5>.(5)[1:swapper/0]mt6370_pmu_charger mt6370_pmu_charger: mt_parse_dt: no chg alias name
+		[    4.608296] <5>.(5)[1:swapper/0]mt6370_pmu_charger mt6370_pmu_charger: mt_parse_dt: no ls alias name
+		
+		[    4.829488] <5>.(5)[1:swapper/0][name:mtk_battery&]******** battery_dts_probe!! ********
+		[    4.832300] <5>.(5)[1:swapper/0][name:mtk_rtc_hal_common&]mtk_rtc_hal_common: rtc_spare_reg[14] = {a24, 255, 8}
+		
+		
+		
+		
+	}
+
+	
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 17G08A
 {
 
@@ -511,7 +714,6 @@
 			<3>[ 1385.567325] PMI: smblib_handle_usb_source_change: APSD_STATUS = 0x01
 
 			<6>[ 1385.567406] PMI: smblib_rerun_apsd: re-running APSD
-			
 			<6>[ 1386.848078] PMI: smblib_get_apsd_result: APSD_STATUS = 0x00
 			<6>[ 1386.848131] PMI: smblib_get_charge_param: input current limit status = 75000 (0x03)
 
@@ -523,7 +725,6 @@
 			<6>[ 1387.308602] PMI: smblib_handle_debug: IRQ: aicl-done
 			
 			<3>[ 1387.438065] usb real_charger_type = 5
-			
 			
 			<3>[ 1388.742128] PMI: smblib_handle_usb_source_change: APSD_STATUS = 0x43
 			<6>[ 1388.742478] PMI: smblib_get_apsd_result: APSD_STATUS = 0x43
@@ -545,7 +746,15 @@
 			
 			通过power supply 早点上报充电器的类型,现在的问题是如何上报这个事件
 			
+			smblib_update_usb_type(chg);
 			power_supply_changed(chg->usb_psy);
+			
+			rerun apsd 有
+			smblib_rerun_apsd
+			smblib_rerun_apsd_if_required	这个是初始化的时候，可以看到会有两次apsd检测
+			
+			插入充电器的调用流程
+			smblib_handle_usb_plugin ->  smblib_usb_plugin_locked (dp dm ,parallel charging)  ->  smblib_handle_usb_source_change 
 		}
 
 
@@ -674,11 +883,6 @@
 		}
 				
 
-
-			
-			
-			
-
 			debug
 			{
 				//Gionee <GN_BY_CHG> <lilubao> <20171218> add for debug charger detect begin
@@ -695,13 +899,35 @@
 				
 				int smblib_set_prop_pd_active( )
 				{
-				。。。。。。。。。。。
-				-----   chg->pd_active = val->intval;
-				+++   chg->pd_active = 0;
-				。。。。。。。。。。
+				......................
+				--- chg->pd_active = val->intval;
+				+++ chg->pd_active = 0;
+				......................
 				}
-				我的电话0755 3665 5859.
 			}
+			
+			
+			modify
+			smb-lib.c  smblib_handle_usb_source_change
+			//Gionee <GN_BY_CHG> <lilubao> <20171218> add for debug charger detect begin
+			smblib_err(chg, "APSD_STATUS before = 0x%02x\n", stat);
+			if (chg->micro_usb_mode && (stat & APSD_DTC_STATUS_DONE_BIT)
+					&& !chg->uusb_apsd_rerun_done) {
+				/*
+				 * Force re-run APSD to handle slow insertion related
+				 * charger-mis-detection.
+				 */
+
+				//Gionee <GN_BY_CHG> <lilubao> <20171218> add for debug charger detect begin
+				//update usb type for decrease time 
+				smblib_update_usb_type(chg);
+				//Gionee <GN_BY_CHG> <lilubao> <20171218> add for debug charger detect end
+
+				chg->uusb_apsd_rerun_done = true;
+				smblib_rerun_apsd(chg);
+				return IRQ_HANDLED;
+			}
+			//Gionee <GN_BY_CHG> <lilubao> <20171218> add for debug charger detect end
 			
 		
 	}
@@ -711,15 +937,7 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	3.U盘识别时间过长 (32s)
 	{
@@ -974,63 +1192,6 @@ M2018
 
 
 
-
-18Y07A
-{
-	1.bringup
-	vendor/mediatek/proprietary/custom/gnbj6763_66_n1/kernel/dct/dct/codegen.dws
-	vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/gnbj6763_66_n1/dct/dct/codegen.dws
-	vendor/mediatek/proprietary/bootable/bootloader/lk/target/gnbj6763_66_n1/dct/dct/codegen.dws
-	
-	gpio
-	 drv_vbus
-	 usb_id
-	 gpio_chg_en
-	 eint_chg_stat
-	 
-	 
-	 
-	 
-	 
-	17G10A
-	./custom/gnbj6757_66_n/kernel/dct/dct/codegen.dws
-	./bootable/bootloader/preloader/custom/gnbj6757_66_n/dct/dct/codegen.dws
-	./bootable/bootloader/lk/target/gnbj6757_66_n/dct/dct/codegen.dws
-
-
-	
-
-}
-
-
-
-	
-
-	
-	
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 17G16A
 {
