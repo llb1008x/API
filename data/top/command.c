@@ -578,7 +578,7 @@ qcom 烧写 当然要换路径
 
 
 		反编dtb文件
-		./out/target/product/gnbj6757_66_n/obj/KERNEL_OBJ/scripts/dtc/dtc  -I dtb -O dts -o  gnbj6757_66_n.dts ./out/target/product/gnbj6757_66_n/obj/KERNEL_OBJ/arch/arm64/boot/dts/mediatek/gnbj6757_66_n.dtb
+./out/target/product/gnbj6757_66_n/obj/KERNEL_OBJ/scripts/dtc/dtc  -I dtb -O dts -o  gnbj6757_66_n.dts ./out/target/product/gnbj6757_66_n/obj/KERNEL_OBJ/arch/arm64/boot/dts/mediatek/gnbj6757_66_n.dtb
 
 
 		改变电脑上java jdk javac的版本

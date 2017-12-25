@@ -60,7 +60,8 @@
 		FG_DAEMON_CMD_GET
 
 		控制fuel_gauge的log级
-		FG_daemon_log_level 	
+		FG_daemon_log_level 
+		Enable_BATDRV_LOG	
 
 		rtc记录的电量
 		BATTERY_METER_CMD_SET_RTC_UI_SOC	
@@ -3076,7 +3077,44 @@ out:
 			3、#define FG_METER_RESISTANCE    		75
 
 		}
+		
+		
+		GM3.0相关
+		{
+			mtk_battery.c，mtk_gauge_class.c,mt6355_gauge.c
+			kernel-4.4/drivers/power/mediatek/mtk_battery.c
+			kernel-4.4/drivers/misc/mediatek/pmic/mtk_gauge_class.c
+			kernel-4.4/drivers/misc/mediatek/pmic/mt6355/v1/mt6355_gauge.c
+		
+		preloader
+			is_battery_exist = hw_check_battery(); 定义了MTK_DISABLE_POWER_ON_OFF_VOLTAGE_LIMITATION
+			所以直接返回了ignore bat check 不检测电池 (就是检测PMIC_RG_LDO_VBIF28_EN_ADDR ，ldo28接到bat的)
+			
+			fuel gauge 是否复位过
+			[fg_init] fg_reset_status 0 do_init_fgadc_reset 1 fg_curr_time 1 shutdown_pmic_time 1 hw_id 0x5630 sw_id 0x5630, 4068 0 0x1 0x2329 1 0
+			
+			
+			plcharg_status 阶段是否充电
+			plcharg_status = upmu_is_chr_det();
+			print("[fg_init] fg_reset_status %d do_init_fgadc_reset %d fg_curr_time %d shutdown_pmic_time %d hw_id 0x%x sw_id 0x%x, %d %d 0x%x 0x%x %d %d\n",
+			fg_reset_status, do_init_fgadc_reset, fg_curr_time, shutdown_pmic_time, hw_id, sw_id,
+			boot_vbat, shutdowntime, reset_sel, slp_en, b_moniter_pl_charg_bit, plcharg_status);
+			
+
+			1.判斷電池是否存在
+			2.對Gauge hw進行init
+			3.判斷gauge是否被reset過( 判斷是否曾拔過電池 )
+			4.讀取開機電壓 boot_vbat
+			5.讀取關機時間 shutdowntime
+			6.判斷有無發生2sec reboot
+			7.Preloader init順序有dependency,請勿更動init順序
+		
+		}
+		
 	}
+	
+	
+	
 	
 	
 	开机充电(四个温度)，关机充电，放电等三种情况
@@ -3150,6 +3188,7 @@ out:
 			L3500-Charger】voltage mode在低温下的修正
 		}
 	}
+			
 }
 
 
