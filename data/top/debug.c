@@ -17,19 +17,265 @@
 17G10A
 {
 	
+	
+	充电相关的问题问题
+	{
+		老化测试电流不够
+			pass,GNSPR #147155	【老化测试】老化测试电流测试电流节点达到1000ma，难以通过电流测试进行老化测试
+			pass,GNSPR #141724 	【产线器件老化】老化测试过程中出现充电测试未通过
+			pass,GNSPR #135719	【老化测试】测试老化测试时 出现非异常重启在组合测试2中	
+			pass,GNSPR #146336	【产线器件老化】产线老化12个小时 出现充电测试未通过在电流测试中 出现5台
+			
+			
+		
+			pass,GNSPR #139587	【低电量验证电流专项】进MMI硬件测试-充电测试（电量为8%），插入标配1A充电器显示充电电压为4957mv，
+			充电电流一直浮动在222mA~358mA（标准值应为1000mA）》插拔充电器未恢复，充电器测试另一台测机后再次测试恢复
+			GNSPR #141086	电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
+		    玩游戏的时候充电电流为不足10MA
+		    
+		    
+		GNSPR #141086,电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
+		玩游戏的时候充电电流为不足10MA
+		{
+		
+				这部分跟thermal有关，但是input设为0关闭了充电
+				//lilubao 
+				<3>[20189.850296]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+				<6>[20189.850308]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_aicr: aicr = 2300000 (0x2C)
+				<7>[20189.850319]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 13 data b0
+				<7>[20189.850327]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
+				<7>[20189.850624]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_write: reg 07 size 4
+				<6>[20189.850890]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
+				<7>[20189.850902]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_write: reg 07 data 00
+				<6>[20189.850973]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 0
+				<6>[20189.850982]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_ichg: ichg = 500000 (0x04)
+				<7>[20189.850992]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 17 data 10
+				<7>[20189.850999]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
+				<7>[20189.851136]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 17
+
+				//lilubao 
+				<3>[20189.851216]  (0)[239:charger_thread][charger]charging current is set 0mA, turn off charging !
+				<6>[20189.851225]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 0
+				<7>[20189.851234]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 12 data 00
+			
+			
+				0x27=0x60   0110 0000 
+				 SDP NSTD (by input pin of (sVBUSPG_syn & sCHGDETB & DCDT)=1)
+				 Charger port is not detected
+				 
+				 
+				 static void swchg_turn_on_charging(struct charger_manager *info)
+				{
+					struct switch_charging_alg_data *swchgalg = info->algorithm_data;
+					bool charging_enable = true;
+
+					if (swchgalg->state == CHR_ERROR) {
+						charging_enable = false;
+						pr_err("[charger]Charger Error, turn OFF charging !\n");
+					} else if ((get_boot_mode() == META_BOOT) || ((get_boot_mode() == ADVMETA_BOOT))) {
+						charging_enable = false;
+						pr_err("[charger]In meta or advanced meta mode, disable charging.\n");
+					} else {
+						mtk_pe20_start_algorithm(info);
+						mtk_pe_start_algorithm(info);
+
+						swchg_select_charging_current_limit(info);
+						if (info->chg1_data.input_current_limit == 0 || info->chg1_data.charging_current_limit == 0) {
+							charging_enable = false;
+							pr_err("[charger]charging current is set 0mA, turn off charging !\r\n");
+						} else {
+							swchg_select_cv(info);
+						}
+					}
+
+					charger_dev_enable(info->chg1_dev, charging_enable);
+				}
+				 
+
+
+			}	
+		}		   
+		   
+		   
+		   
+		   
+		   
+		   
+		   
+		pass,GNSPR #139587	【低电量验证电流专项】进MMI硬件测试-充电测试（电量为8%），插入标配1A充电器显示充电电压为4957mv，
+		充电电流一直浮动在222mA~358mA（标准值应为1000mA）》插拔充电器未恢复，充电器测试另一台测机后再次测试恢复
+ 		{
+ 			这个是当时充电器识别成非标充导致电流设置只有500mA，亮屏进电池只有200~300mA左右
+			识别成为非标充是概率性的，有时候没有插拔好充电器就会出现这种情况
+
+			时间点：2017-5-2 05:58
+			05-02 05:46:27.434155 0 0 E [ 172.031524] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 0, Charger Unknown
+			05-02 05:57:53.785801 0 0 E [ 333.714307] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 3, Non-standard Charger
+			05-02 06:00:56.656058 0 0 E [ 516.584564] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 0, Charger Unknown
+			05-02 06:01:02.302431 0 0 E [ 522.230937] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 3, Non-standard Charger
+			05-02 06:02:20.661125 0 0 E [ 600.589631] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 0, Charger Unknown
+			05-02 06:03:10.771173 0 0 E [ 650.699679] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 4, Standard Charger
+			05-02 06:03:42.047792 0 0 E [ 681.976298] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 0, Charger Unknown
+
+			05-02 05:58:05.086952 238 238 E [ 345.015458] (0)[238:charger_thread]: force:0 thermal:-1 -1 setting:500000 500000 type:3 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+ 		
+ 		}
+		    
+		   
+		   
+		   
+		   
+		   
+		pass,GNSPR #146336	【产线器件老化】产线老化12个小时 出现充电测试未通过在电流测试中 出现5台
+		{
+			产线的是电源5V/2A,而且充电线比较长，压差比较大，所以有时候电流可能很小
+			现在标准是1000mA，所以用电源有很多机器没有通过测试，统一标准是200mA，应该可以通过
+		} 
+		    
+		    
+		    
+		    
+
+		pass，GNSPR #141724 	【产线器件老化】老化测试过程中出现充电测试未通过
+		{
+			<7>[ 2661.566148]  (0)[241:wdtk-0][thread:241][RT:2661566148084] 2017-05-01 04:49:39.879272 UTC;android time 2017-05-01 12:49:39.879272
+			
+			
+			
+			
+			main.log
+			05-01 12:49:47.199482 4699 4699 I oldtest.TAG: ChargeBroadcastReceiver=>getChargingAllValues:mFirstChargeLevel=52;mChargePlug=1;mChargeVoltage=3818;mChargeCurrent=0;mChargeLevel=46;mTemperatureAp=25
+			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: ChargeBroadcastReceiver=>getChargingAllValues:充电状态：
+			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 老化测试开始电量:52
+			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 充电方式：AC
+			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 充电电压：3818mV
+			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 充电电流：0mA
+			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 电池电量：46
+			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 电池温度：25
+			05-01 12:49:47.200629 4699 4699 I oldtest.TAG: DbDatabaseManager=>oldDatabaseManager insertTP
+			05-01 12:49:47.200656 4699 4699 I oldtest.TAG: DbDatabaseHelper=>oldDatabaseHelper inserttp
+			05-01 12:49:47.200674 4699 4699 I oldtest.TAG: DbDatabaseHelper=>scene=电流测试
+			05-01 12:49:47.209559 4699 4699 I oldtest.TAG: DbDatabaseHelper=>row=1
+			
+			
+			同BUG#147155
+		
+		}    
+		    
+		    
+		    
+		    
+		    
+		    
+		pass,GNSPR #135719	【老化测试】测试老化测试时 出现非异常重启在组合测试2中	
+		{
+			11-20 08:56:09.759403 3444 3581 I oldtest.TAG: DbDatabaseHelper=>query oldtest db time_=2017-11-20_08-56-09 issue_非异常重启
+			11-20 08:56:09.759403 3444 3581 I oldtest.TAG: 低电关机,充电器断开时间:2017-11-17 19:51:42
+			11-20 08:56:09.759403 3444 3581 I oldtest.TAG: scene=组合测试2 testtime=11-17 19:52:08
+			11-20 08:56:09.759468 3444 3581 I oldtest.TAG: ReportActvity=>queryIssue:issue.getIssue()=非异常重启
+			11-20 08:56:09.759468 3444 3581 I oldtest.TAG: 低电关机,充电器断开时间:2017-11-17 19:51:42
+			11-20 08:56:09.802517 3444 3444 I oldtest.TAG: ReportActvity=>onPostExecute:duration=3664;isdone=true
+			11-20 08:56:09.831705 3444 3444 I oldtest.TAG: ReportActvity=>getView:2017-11-20_08-56-09: 非异常重启
+			11-20 08:56:09.831705 3444 3444 I oldtest.TAG: 低电关机,充电器断开时间:2017-11-17 19:51:42
+			
+			
+			测试在测试的时候插的是usb，不是标准充电器，所以耗的电多充的电少，最后低电关机了
+
+			150064:<3>[177297.658288] (7)[236:charger_thread]Vbat=3153,I=194,VChr=4938,T=32,Soc=-24:1,CT:1:1
+			152317:<3>[177307.658305] (6)[236:charger_thread]Vbat=3150,I=-434,VChr=4920,T=32,Soc=-24:1,CT:1:1
+			154591:<3>[177317.657975] (6)[236:charger_thread]Vbat=3153,I=30,VChr=4929,T=32,Soc=-24:1,CT:1:1
+		
+		
+		}    
+		    
+		    
+		    
+		    
+		    
+		pass,GNSPR #147155	【老化测试】老化测试电流测试电流节点达到1000ma，难以通过电流测试进行老化测试    
+		{
+			01-03 18:43:43.633744 <6>[17525.419381]  (0)[242:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: VSYS = 4420mV, VBAT = 4420mV, IBAT = 1150mA, IBUS = 1500mA, VBUS = 4625mV
+			01-03 18:43:43.935567 <6>[17525.721204]  (1)[242:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: VSYS = 4450mV, VBAT = 4435mV, IBAT = 1200mA, IBUS = 1450mA, VBUS = 4625mV
+
+
+
+			01-03 18:43:43.365765 <3>[17525.151402]  (3)[242:charger_thread]Vbat=4251,I=-865,VChr=4976,T=30,Soc=86:87,CT:4:0
+			01-03 18:43:43.640270 <3>[17525.425907]  (0)[242:charger_thread]Vbat=4431,I=11970,VChr=4740,T=29,Soc=86:87,CT:4:4
+			01-03 18:43:51.144345 <3>[17532.929982]  (0)[242:charger_thread]Vbat=4238,I=1014,VChr=794,T=30,Soc=86:87,CT:0:4
+
+
+
+
+			01-03 18:43:45.937121 16094 16094 V PhoneWindow: DecorView setVisiblity: visibility = 0, Parent = ViewRoot{5ed0521 com.gionee.factorytests/com.gionee.os.autooldtest.ChargeActivity,ident = 4}, this = DecorView@c03272b[ChargeActivity]
+
+
+
+			01-03 18:43:45.937961 16094 16094 I oldtest.TAG: ChargeActivity=>mBroadcastReceiver action=android.intent.action.BATTERY_CHANGED
+			01-03 18:43:45.938362 16094 16094 I oldtest.TAG: ChargeActivity=>chargeCurrent=
+			01-03 18:43:45.938981 16094 16094 I oldtest.TAG: ChargeActivity=>chargeCurrent 2=49
+			01-03 18:43:45.939117 16094 16094 I oldtest.TAG: ChargeActivity=>chargeVoltage = 4248;current=49;mChargeTargetValue=1000;plugged=1
+
+			
+			实际电流有1200mA，但实际只有49mA，所以要确定老化测试读的数据对不对？
+			老化测试修改了，监听电流变化的sys node，原来需要10s才变化一次，所以数据可能没有即时更新
+			监听 	 BatteryAverageCurrent
+			读取电流 BatteryPresentCurrent
+			
+			集成到T210版本上
+		
+		}
+	
+	
+	
+	
+	
 	GNSPR#139202，去除冗余log
 	{
 		//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log begin
+		1.修改log等级 5 可以减少一部分
 		FG_daemon_log_level 
 		Enable_BATDRV_LOG	
 		
+		2.mt6757.dtsi
+		pwrap@1000d000 {
+			compatible = "mediatek,pwrap";
+			reg = <0 0x1000d000 0 0x1000>;
+			//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log begin
+			interrupts = <GIC_SPI 152 IRQ_TYPE_LEVEL_HIGH>;
+			//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log end
+			mt6351_pmic: mt6351 {
+				compatible = "mediatek,mt6351-pmic";
+				interrupt-controller;
+			};
+			mt6355_pmic: mt6355 {
+				compatible = "mediatek,mt6355-pmic";
+				interrupt-controller;
+			};
+		};
 		
-		启动的时候
-		preloader ,lk阶段
-		{
-			
-		}
-	
+		
+		
+		3.还有这个问题，irq不匹配的问题
+		<6>[21329.846831]  (5)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_irq: (chg_mivr) en = 1
+		<7>[21329.846844]  (5)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_read: reg e0 size 16
+		<4>[21329.846857] -(5)[239:charger_thread]------------[ cut here ]------------
+		<4>[21329.846862] -(5)[239:charger_thread]WARNING: CPU: 5 PID: 239 at /data/MAIN_GIT_REPO_CODE/BJ17G10A_MAIN_REPO/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/kernel/irq/manage.c:513 enable_irq+0x88/0xcc()
+		<4>[21329.846880] -(5)[239:charger_thread]Unbalanced enable for IRQ 166
+		<4>[21329.846887] -(5)[239:charger_thread]CPU: 5 PID: 239 Comm: charger_thread Tainted: G        W       4.4.15 #1
+		<4>[21329.846894] -(5)[239:charger_thread]Hardware name: MT6757CD (DT)
+		<0>[21329.846899] -(5)[239:charger_thread]Call trace:
+		<4>[21329.846903] -(5)[239:charger_thread][<ffffffc00008a328>] dump_backtrace+0x0/0x14c
+		<4>[21329.846913] -(5)[239:charger_thread][<ffffffc00008a488>] show_stack+0x14/0x1c
+		<4>[21329.846919] -(5)[239:charger_thread][<ffffffc0003379b0>] dump_stack+0x8c/0xb0
+		<4>[21329.846930] -(5)[239:charger_thread][<ffffffc00009e5f8>] warn_slowpath_fmt+0xc0/0xf4
+		<4>[21329.846940] -(5)[239:charger_thread][<ffffffc0000fd598>] enable_irq+0x88/0xcc
+		<4>[21329.846945] -(5)[239:charger_thread][<ffffffc0004d8310>] rt5081_enable_power_path+0x148/0x190
+		<4>[21329.846957] -(5)[239:charger_thread][<ffffffc000945750>] charger_dev_enable_powerpath+0x24/0x34
+		<4>[21329.846968] -(5)[239:charger_thread][<ffffffc000948ba0>] charger_routine_thread+0x378/0x6a8
+		<4>[21329.846976] -(5)[239:charger_thread][<ffffffc0000be268>] kthread+0xdc/0xf0
+		<4>[21329.846987] -(5)[239:charger_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
+		<4>[21329.846994] -(5)[239:charger_thread]---[ end trace a4903c9f998f3193 ]---	
+		
 	}
 	
 
@@ -87,13 +333,39 @@
 
 			MTK_FG: [FGADC_intr_end][FG_INTR_SHUTDOWN]soc:503 fg_c_soc:2184 fg_v_soc:503 ui_soc:348 vc_diff:1681 vc_mode 0 VBAT 33730 T:[11 V 10 C 17] D0_C 10000 D0_V 10000 CAR_V -37026 Q:[38986 38986] aging 10000 bat_cycle 0 Trk[0(-201):1:0] UI[0:1] Chr[0:10000:9978] pseudo1 301  DC_ratio 100
 
+		
+		
+		
+		
+		
+		
+		
+		
+			定位开机的dod_init
+			12-09 17:31:09.029360     0     0 E [   40.798592][dod_init_result]: <5> 39834 39834 6210 1 0 1 1
+
+			5 代表第五路，用hw_ocv重新点位D0,后面三个数字c_ocv=hw_ocv=39834，v_ocv=sw_ocv=hw_ocv=39834，UI=ocv_to_soc(hw_ocv)
+
+			标红的0 代表adc_reset没有发生，1代表vc_mode为c_mode，知道这两个就可以了
+
+			 
+
+			12-09 16:58:54.382134     0     0 E [  341.016964][dod_init_result]: <1> 38052 38169 3258 0 0 1 0
+
+			1代表定位到第1路开机定位采用old_data的值，UI保持与关机前的一致。标红0 1 和上一条一致
+
+
+
+
+
+
 
 			//Gionee <GN_BY_CHG> <lilubao> <20171127> add for debug soc begin
 			
 			
 			 debug:
 			 {
-			 	adb pull  /sdcard/mtklog/mobilelog    /home/llb/project/DEBUG/1.test_data/5.电量显示/log2/
+			 adb pull  /sdcard/mtklog/mobilelog    /home/llb/project/DEBUG/1.test_data/5.电量显示/log2/
 			 
 			  1. dod_init_result  这个定位的后面判断是几个类型是什么？还有后面的参数分别是什么意思
 			12-09 17:31:09.029360     0     0 E [   40.798592][dod_init_result]: <5> 39834 39834 6210 1 0 1 1
@@ -162,114 +434,9 @@
 		}
 	
 	}	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	不充电问题
-	{
-		GNSPR #141086,电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
-		玩游戏的时候充电电流为不足10MA
-		{
-		
-			这部分跟thermal有关，但是input设为0关闭了充电
-			//lilubao 
-			<3>[20189.850296]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-			<6>[20189.850308]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_aicr: aicr = 2300000 (0x2C)
-			<7>[20189.850319]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 13 data b0
-			<7>[20189.850327]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
-			<7>[20189.850624]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_write: reg 07 size 4
-			<6>[20189.850890]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
-			<7>[20189.850902]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_write: reg 07 data 00
-			<6>[20189.850973]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 0
-			<6>[20189.850982]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_ichg: ichg = 500000 (0x04)
-			<7>[20189.850992]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 17 data 10
-			<7>[20189.850999]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
-			<7>[20189.851136]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 17
-
-			//lilubao 
-			<3>[20189.851216]  (0)[239:charger_thread][charger]charging current is set 0mA, turn off charging !
-			<6>[20189.851225]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 0
-			<7>[20189.851234]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 12 data 00
-			
-			
-			0x27=0x60   0110 0000 
-			 SDP NSTD (by input pin of (sVBUSPG_syn & sCHGDETB & DCDT)=1)
-			 Charger port is not detected
-			 
-			 
-			 
-			 static void swchg_turn_on_cha
-			{
-				struct switch_charging_alg_data *
-				bool charging_enable = true;
-
-				if (swchgalg->state == CHR_ERRO
-					charging_enable = false;
-					pr_err("[charger]Charger Erro
-				} else if ((get_boot_mode() == 
-					charging_enable = false;
-					pr_err("[charger]In meta or a
-				} else {
-					mtk_pe20_start_algorithm(i
-					mtk_pe_start_algorithm(inf
-
-					swchg_select_charging_cur
-					if (info->chg1_data.input_cur
-						charging_enable = false;
-						pr_err("[charger]chargin
-					} else {
-						swchg_select_cv(info);
-					}
-				}
-
-				charger_dev_enable(info->chg1
-			}
-		
-			充电相关的参数
-			{
-				 DIFFERENCE_FULLOCV_ITH
-			
-			}
 
 
-		
-		
-		
 
-		
-			还有这个问题，irq不匹配的问题
-			<6>[21329.846831]  (5)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_irq: (chg_mivr) en = 1
-			<7>[21329.846844]  (5)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_read: reg e0 size 16
-			<4>[21329.846857] -(5)[239:charger_thread]------------[ cut here ]------------
-			<4>[21329.846862] -(5)[239:charger_thread]WARNING: CPU: 5 PID: 239 at /data/MAIN_GIT_REPO_CODE/BJ17G10A_MAIN_REPO/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/kernel/irq/manage.c:513 enable_irq+0x88/0xcc()
-			<4>[21329.846880] -(5)[239:charger_thread]Unbalanced enable for IRQ 166
-			<4>[21329.846887] -(5)[239:charger_thread]CPU: 5 PID: 239 Comm: charger_thread Tainted: G        W       4.4.15 #1
-			<4>[21329.846894] -(5)[239:charger_thread]Hardware name: MT6757CD (DT)
-			<0>[21329.846899] -(5)[239:charger_thread]Call trace:
-			<4>[21329.846903] -(5)[239:charger_thread][<ffffffc00008a328>] dump_backtrace+0x0/0x14c
-			<4>[21329.846913] -(5)[239:charger_thread][<ffffffc00008a488>] show_stack+0x14/0x1c
-			<4>[21329.846919] -(5)[239:charger_thread][<ffffffc0003379b0>] dump_stack+0x8c/0xb0
-			<4>[21329.846930] -(5)[239:charger_thread][<ffffffc00009e5f8>] warn_slowpath_fmt+0xc0/0xf4
-			<4>[21329.846940] -(5)[239:charger_thread][<ffffffc0000fd598>] enable_irq+0x88/0xcc
-			<4>[21329.846945] -(5)[239:charger_thread][<ffffffc0004d8310>] rt5081_enable_power_path+0x148/0x190
-			<4>[21329.846957] -(5)[239:charger_thread][<ffffffc000945750>] charger_dev_enable_powerpath+0x24/0x34
-			<4>[21329.846968] -(5)[239:charger_thread][<ffffffc000948ba0>] charger_routine_thread+0x378/0x6a8
-			<4>[21329.846976] -(5)[239:charger_thread][<ffffffc0000be268>] kthread+0xdc/0xf0
-			<4>[21329.846987] -(5)[239:charger_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
-			<4>[21329.846994] -(5)[239:charger_thread]---[ end trace a4903c9f998f3193 ]---	
-			
-			
-		
-		}	
-	}
 
 
 	

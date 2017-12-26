@@ -53,6 +53,11 @@
 	
 	老化测试
 	05-01 09:44:57.365345  3321  3321 I oldtest.TAG: AgingTestMainActivity=>onActivityResult:requestCode=1;resultCode=0
+	I oldtest.TAG: ChargeActivity=>chargeCurrent
+	
+	aicl最后设定的最大电流
+	OK, aicr upper bound
+	
 	
 }
 
