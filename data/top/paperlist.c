@@ -143,21 +143,28 @@ USB：
 
 		android的USB MTP && USB CDC/USBnet(ECM, NCM, ACM) && USB gardget 
 		http://blog.csdn.net/zhandoushi1982/article/details/7563702
-	}
+		
+		
+		type-c:
 
+			USB&nbsp;Type-C
+			http://blog.csdn.net/fouweng/article/details/53435528
 
-	type-c:
-	{
-		USB&nbsp;Type-C
-		http://blog.csdn.net/fouweng/article/details/53435528
+			USB TYPE-C
+			http://blog.sina.com.cn/s/blog_63f7b4540102wch4.html
 
-		USB TYPE-C
-		http://blog.sina.com.cn/s/blog_63f7b4540102wch4.html
-
-		USB Type C的基本原理
-		http://blog.csdn.net/zoosenpin/article/details/49963031
-	}
+			USB Type C的基本原理
+			http://blog.csdn.net/zoosenpin/article/details/49963031
 	
+	
+	}
+
+
+
+
+
+
+
 
 
 other：

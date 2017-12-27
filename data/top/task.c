@@ -265,7 +265,9 @@ pmic:
 	decidegc
 	
 	NTC温度电压转换函数，看看过程什么样的
-	force_get_tbat_internal 温度转换函数
+	force_get_tbat_internal 温度转换函数 相关参数知道什么意思
+		12-07 16:47:12.320362 <3>[22144.642470]  (0)[70:pmic_thread][BattVoltToTemp] 498 24000 2773 -35
+		12-07 16:47:12.320370 <3>[22144.642478]  (0)[70:pmic_thread][force_get_tbat] 533,498,1,2049,100,43 r:75 100
 
 
 

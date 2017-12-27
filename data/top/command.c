@@ -367,7 +367,7 @@ qcom 烧写 当然要换路径
 		当然之前要先清掉本地的改动或提交
 		git checkout .;git clean -dxf
 		
-		然后才能git fetch ，git merge 
+		然后才lilubao能git fetch ，git merge 
 		
 		repo forall -vcp git branch  -avv
 	

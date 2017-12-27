@@ -30,41 +30,109 @@
 		
 			pass,GNSPR #139587	【低电量验证电流专项】进MMI硬件测试-充电测试（电量为8%），插入标配1A充电器显示充电电压为4957mv，
 			充电电流一直浮动在222mA~358mA（标准值应为1000mA）》插拔充电器未恢复，充电器测试另一台测机后再次测试恢复
-			GNSPR #141086	电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
+			pass,GNSPR #141086	电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
 		    玩游戏的时候充电电流为不足10MA
 		    
 		    
-		GNSPR #141086,电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
+		pass,GNSPR #141086,电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
 		玩游戏的时候充电电流为不足10MA
 		{
 		
-				这部分跟thermal有关，但是input设为0关闭了充电
-				//lilubao 
-				<3>[20189.850296]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-				<6>[20189.850308]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_aicr: aicr = 2300000 (0x2C)
-				<7>[20189.850319]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 13 data b0
-				<7>[20189.850327]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
-				<7>[20189.850624]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_write: reg 07 size 4
-				<6>[20189.850890]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 1
-				<7>[20189.850902]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_write: reg 07 data 00
-				<6>[20189.850973]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_hidden_mode: en = 0
-				<6>[20189.850982]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: __rt5081_set_ichg: ichg = 500000 (0x04)
-				<7>[20189.850992]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 17 data 10
-				<7>[20189.850999]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask fc
-				<7>[20189.851136]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 17
-
-				//lilubao 
-				<3>[20189.851216]  (0)[239:charger_thread][charger]charging current is set 0mA, turn off charging !
-				<6>[20189.851225]  (0)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_charging: en = 0
-				<7>[20189.851234]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 12 data 00
+			//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #141086 begin
 			
+				1.目前分析是thermal 的bcct，根据温升降电流，导致最后充电线上的电流很小，大部分都供给系统
+				首先要确定温度，充电电流的变化，thermal的策略是否合理
+				
+				
+				2.现在thermal 的策略是
+				/proc/driver/thermal/clabcct
+				43000 1000 200000 5 2000 300 0 3000 0 1 5000 2000
+				
+				
+				3.T_AP=46,T_btsmdpa=49
+				电池的温度是根据auxadc采集到的电压然后查表找到对应的温度，
+				这个标在一般的thermal代码里面有如，mtk_ts_btsmdpa.c BTSMDPA_TEMPERATURE BTSMDPA_Temperature_Table6[] 
+				至于找哪个表是从thermal config文件中配置的，倒数第二个 数组6
+				PUP_R 390000 PUP_VOLT 1800 OVER_CRITICAL_L 4251000 NTC_TABLE 6 0
+				
+				
+				4.这段时间内 AP，跟btsmdpa温度很高
+				12-07 16:48:18.501101 <7>[22198.050609]  (0)[12102:kworker/0:1][Thermal/TZ/BTSMDPA]T_btsmdpa=48000
+				12-07 16:48:18.501329 <7>[22198.050837]  (0)[12102:kworker/0:1][Thermal/TZ/BTS]T_AP=45000
+				
+		6 100000 0 mtktsAP-sysrst 90000 0 mtk-cl-shutdown00 53000 0 mtk-cl-cam00 49000 0 abcct_lcmoff 44000 0 mtk-cl-adp-fps 41000 0 abcct 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000
+
+
+				5. 16:47~16:49这段时间打游戏卡不卡，视频画质怎么样，有没有掉帧
+				
+
+
+				kernel_log:162074:<3>[22139.738872]  (0)[239:charger_thread]Vbat=4068,I=20496,VChr=5090,T=42,Soc=17:14,CT:4:4
+				12-07 16:47:08.666912 <7>[22140.989020]  (0)[1392:system_server][Thermal/TZ/BTS]T_AP=44000
+				12-07 16:47:08.667007 <7>[22140.989115]  (0)[1392:system_server][Thermal/TZ/BTSMDPA]T_btsmdpa=47000
+				
+				before thermal abcct
+				12-07 16:47:35.154654 <3>[22160.186551]  (1)[239:charger_thread]force:0 thermal:-1 -1 setting:2300000 2100000 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+				
+				12-07 16:48:08.690842 <3>[22188.240350]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 2100000 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+				
+				12-07 16:48:18.693888 <3>[22198.243396]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+				12-07 16:48:20.253308 <3>[22199.802816]  (2)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+				12-07 16:48:28.258041 <3>[22207.807548]  (3)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+				12-07 16:48:28.485482 <3>[22208.034989]  (1)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+				
+				
+				停止充电
+				12-07 16:48:18.693888 <3>[22198.243396]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
+				
+				12-07 16:48:18.695163 <7>[22198.244671]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 19 data 30
+				12-07 16:48:18.695176 <7>[22198.244684]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask f0
+				12-07 16:48:18.695343 <7>[22198.244851]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 19
+				12-07 16:48:18.695437 <3>[22198.244945]  (0)[239:charger_thread][charger]charging current is set 0mA, turn off charging !
+				
+				
+				
+				6.有两个电流区别和注意的地方，
+				charging_current_limit
+				input_current_limit
+				
+				rt5081会获取最低设备最低的充电电流 500mA，如果低于500mA就会设置为0
+				charging current	500mA
+				static int rt5081_get_min_ichg(struct charger_device *chg_dev, u32 *uA)
+				{
+					*uA = 500000;
+					return 0;
+				}
+				
+				input current  100mA
+				static int rt5081_get_min_aicr(struct charger_device *chg_dev, u32 *uA)
+				{
+					*uA = 100000;
+					return 0;
+				}
+				
+				
+				7.IEOC 截止电流为什么会变成250mA，设置的是150mA，为什么会变？
+				这个是内部一个算法调整，主要是针对输入电流变化大的情况下，截止电流不准，
+				可以调整截止电流 Workaround
+				/* Workaround to make IEOC accurate */
+				if (uA < 900000 && !chg_data->ieoc_wkard) { /* 900mA */
+					ret = __rt5081_set_ieoc(chg_data, chg_data->ieoc + 100000);
+					chg_data->ieoc_wkard = true;
+				} else if (uA >= 900000 && chg_data->ieoc_wkard) {
+					chg_data->ieoc_wkard = false;
+					ret = __rt5081_set_ieoc(chg_data, chg_data->ieoc - 100000);
+				}
+				
+				
+				
 			
 				0x27=0x60   0110 0000 
 				 SDP NSTD (by input pin of (sVBUSPG_syn & sCHGDETB & DCDT)=1)
 				 Charger port is not detected
 				 
 				 
-				 static void swchg_turn_on_charging(struct charger_manager *info)
+				static void swchg_turn_on_charging(struct charger_manager *info)
 				{
 					struct switch_charging_alg_data *swchgalg = info->algorithm_data;
 					bool charging_enable = true;
@@ -229,6 +297,16 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	GNSPR#139202，去除冗余log
 	{
 		//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log begin
@@ -336,10 +414,7 @@
 		
 		
 		
-		
-		
-		
-		
+
 		
 			定位开机的dod_init
 			12-09 17:31:09.029360     0     0 E [   40.798592][dod_init_result]: <5> 39834 39834 6210 1 0 1 1
@@ -353,9 +428,6 @@
 			12-09 16:58:54.382134     0     0 E [  341.016964][dod_init_result]: <1> 38052 38169 3258 0 0 1 0
 
 			1代表定位到第1路开机定位采用old_data的值，UI保持与关机前的一致。标红0 1 和上一条一致
-
-
-
 
 
 
@@ -945,7 +1017,21 @@ M2018
 			
 		PD3.0/PPS/or QC4.0	了解一下pps的一些内容，干什么的，有什么要求
 		{
-			
+			The CC line communication between Sink and Source will look like below :
+
+				1. The Sink will first request Source capabilities.
+
+				2. The Source will provide its source capabilities.
+
+				3. The Sink will then request a suitable power profile from the Source capability list.
+
+				4. The Source will accept the request and start to make changes to the BUS voltage. The Sink will minimize the bus loading during BUS voltage change. The Source will increase the VBUS voltage with a defined slew rate.
+
+				5. After the BUS voltage has reached its final value, the source will wait until the BUS has stabilized and then will send a Power Supply Ready signal. The Sink will now increase the BUS loading again. 
+				
+				
+				Bi-phase Mark Code (BMC) 这个是什么编码方式
+				The BMC data can be decoded by USB PD decoders like Ellisys EX350 Analyzer
 		
 		}
 	}
