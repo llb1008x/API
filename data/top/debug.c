@@ -18,6 +18,210 @@
 {
 	
 	
+	
+	GNSPR#144714,高温高湿回温后，LED灯一直亮
+	{
+		在高温设定RGB亮蓝灯后，再也没有操作电池指示灯。请查看逻辑是否有问题。
+		12-19 14:31:50.195590 1245 1245 D AmigoLedController: [forced:false]updateBatteryLight, status=2, level=77, old ledStatus=turn_off, new ledStatus=charge_blue
+		12-19 14:31:50.195693 1245 1245 D LightsService: SetLight #3: color=#ff0000ff
+		12-19 14:31:50.195852 1245 1245 D lights : set_led_state colorRGB=FF0000FF, onMS=0, offMS=0
+		12-19 14:31:50.195870 1245 1245 D lights : blink_blue, level=255, onMS=0, offMS=0
+		12-19 14:31:50.195883 1245 1245 D lights : write cc_mode to /sys/class/leds/rt5081_pmu_led2/trigger
+		12-19 14:31:50.196393 1245 1245 D lights : write 255 to /sys/class/leds/rt5081_pmu_led2/brightness
+		12-19 14:31:50.196536 1245 1245 D lights : write_int open fd=268
+
+		补充下现象说明：是高温后，一直亮蓝灯。
+
+
+		12-19 14:31:50.192424 1245 8568 I battery_status: [2,2,1,0,Li-ion]
+		12-19 14:31:50.195590 1245 1245 D AmigoLedController: [forced:false]updateBatteryLight, status=2, level=77, old ledStatus=turn_off, new ledStatus=charge_blue
+		呼吸道收到ACTION_BATTERY_CHANGED广播，接受到的
+		int batteryStatus = intent.getIntExtra(BatteryManager.EXTRA_STATUS,BatteryManager.BATTERY_STATUS_UNKNOWN);
+		是batteryStatus=2.为BATTERY_STATUS_CHARGING 。故实现显示蓝色充电呼吸灯状态
+		
+		
+		1.高温高湿？温度多少，插充电器了吗？
+		{
+			电池最高温度 58度，大部分55+，大部分是45度以上的高温
+			没有插充电器
+		
+		}
+		
+		2.led灯一直亮，应该搜什么关键字，时间点是多少
+		{
+			rgbled 灯的模式：Register Mode, PWM Mode and Breath Mode
+			ISINKx_DIM_MODE 这个可以设置工作模式，ISINKx_CUR_SEL控制每个channel的电流
+			单个led可以提供最大24mA的电流，
+			#define RT5081_PMU_REG_RGBEN		(0x85)
+			
+			breath mode 呼吸灯模式 控制这些寄存器，控制一定时间内电流的大小，持续时间，上升沿，下降沿
+			ISINKx_VREATH_TON_SEL, BISINKx_BREATH_TOFF_SEL, BISINKx_BREATH_Trx_SEL and ISINKx_BREATH_Tfx_SEL.
+			
+		
+			rgb灯应该跟电量的状态有关，低电红灯，充电蓝灯，充满绿灯
+			
+			
+			
+			
+			
+			
+			
+			时间点
+			12-19 14:31:50.192242  1245  8568 D BatteryService: mBatteryVoltage=4066, batteryLevel=50
+			power supply上报了状态的变化，为什么会出现状态变化，
+			
+			BATTERY_STATUS_CHARGING
+		
+			之前电池的温度大于55度，所以会停止充电，之后温度小于50度，回充
+			
+			
+			12-19 14:22:09.815070 <3>[ 6497.740337]  (0)[238:charger_thread][BATTERY] Battery over Temperature or NTC fail 57 55!!
+			
+			12-19 14:22:10.628123 <3>[ 6498.553390]  (0)[238:charger_thread][BATTERY] Battery Temperature raise from 55 to 49(50), allow charging!!
+			12-19 14:22:10.628123 <3>[ 6498.553390] 
+			12-19 14:22:10.629700 <6>[ 6498.554967]  (0)[238:charger_thread][mt6355_get_auxadc_value] ch = 1, reg_val = 0x2, adc_result = 0
+
+
+			12-19 14:22:10.629741 <3>[ 6498.555008]  (0)[238:charger_thread]charging->1,en->1
+			
+			//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #144714 begin
+			
+			
+			目前分析是因为在修改ovp 提示代码的时候判断电压高于提醒，低于使能充电，但是没有判断充电器在不在
+			导致会上报 charging的状态，然后这个地方还有一个问题是mivr_irq这个中断，在kernel log里面一直报
+			waring的
+			charger_dev_enable_powerpath(chg_dev, en);
+			
+			
+			//Gionee <GN_BSP_CHG> <lilubao> <20170712> add for fixed ovp begin
+			//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #144714 begin
+			if( mtk_is_charger_on(info)){
+
+				pr_err("in [%s] by lilubao for debug over temperature notify\n",__FUNCTION__);
+			//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #144714 end
+				vchr = pmic_get_vbus();
+				if(vchr*1000 > info->data.max_charger_voltage){
+
+					pr_err("vchr->%d,info->data.max_charger_voltage->%d\n",vchr*1000,info->data.max_charger_voltage);
+					charging = false;
+					en=false;
+					pr_info("charging->%d,en->%d\n",charging,en);
+				
+					goto stop_charging;
+				}else {
+					charging = true;
+					en=true;
+					pr_info("charging->%d,en->%d\n",charging,en);
+					goto stop_charging;
+				}
+			}
+			//Gionee <GN_BSP_CHG> <lilubao> <20170712> add for fixed ovp end
+		
+			
+			
+			power supply 的status
+			enum {
+				POWER_SUPPLY_STATUS_UNKNOWN = 0,
+				POWER_SUPPLY_STATUS_CHARGING,			// 1.charging
+				POWER_SUPPLY_STATUS_DISCHARGING,
+				POWER_SUPPLY_STATUS_NOT_CHARGING,
+				POWER_SUPPLY_STATUS_FULL,
+				POWER_SUPPLY_STATUS_CMD_DISCHARGING,
+			};
+			
+			
+			/* charger_manager notify charger_consumer */
+			enum {
+				CHARGER_NOTIFY_EOC,
+				CHARGER_NOTIFY_START_CHARGING,			// 1.charging
+				CHARGER_NOTIFY_STOP_CHARGING,
+				CHARGER_NOTIFY_ERROR,
+				CHARGER_NOTIFY_NORMAL,
+			};
+			
+		
+		}
+		
+		
+		修改高低温提示语
+		{
+			vendor/mediatek/proprietary/packages/apps/BatteryWarning/res/values-zh-rCN/strings.xml
+			./system/vendor/app/BatteryWarning
+			
+			
+			/sys/devices/platform/charger/BatteryNotify 
+				
+			echo 1 > BatteryNotify  电池电压过高
+			echo 2 > BatteryNotify 	电池温度过高
+			
+			static void mtk_battery_notify_UI_test(struct charger_manager *info)
+			{
+				switch (info->notify_test_mode) {
+				case 1:
+					info->notify_code = 0x0001;
+					pr_debug("[%s] CASE_0001_VCHARGER\n", __func__);
+					break;
+				case 2:
+					info->notify_code = 0x0002;
+					pr_debug("[%s] CASE_0002_VBATTEMP\n", __func__);
+					break;
+				case 3:
+					info->notify_code = 0x0004;
+					pr_debug("[%s] CASE_0003_ICHARGING\n", __func__);
+					break;
+				case 4:
+					info->notify_code = 0x0008;
+					pr_debug("[%s] CASE_0004_VBAT\n", __func__);
+					break;
+				case 5:
+					info->notify_code = 0x0010;
+					pr_debug("[%s] CASE_0005_TOTAL_CHARGINGTIME\n", __func__);
+					break;
+				default:
+					pr_debug("[%s] Unknown BN_TestMode Code: %x\n",
+						__func__, info->notify_test_mode);
+				}
+			}
+	
+			
+			
+			高温 您的电池温度过高，请移除电池！	->   为了保护电池，请暂停使用手机
+			
+			低温 您的电池温度过低，请移除电池！   ->	 为了保护电池，充电已经中断
+		
+		}
+
+		
+		
+		这是个问题为什么batterylevel=50
+		12-19 14:31:50.192242  1245  8568 D BatteryService: mBatteryVoltage=4066, batteryLevel=50
+		12-19 14:31:50.195590  1245  1245 D AmigoLedController: [forced:false]updateBatteryLight, status=2, level=77, old ledStatus=turn_off, new ledStatus=charge_blue
+		
+		
+		因为在batteryservices.java 里面 把batterylevel 读成了batterylevel_smb ，而这个smb是dual battery
+		if (mLastBatteryVoltage != mBatteryProps.batteryVoltage) {
+		 //Gionee <GN_BY_CHG> <lilubao> <20171227> modify  info  begin		
+		    Log.d(TAG, "mBatteryVoltage=" + mBatteryProps.batteryVoltage + ", batteryLevel=" + mBatteryProps.batteryLevel);
+		 //Gionee <GN_BY_CHG> <lilubao> <20171227> modify  info  end
+		}
+		
+		
+		KeyguardUpdateMonitor
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	充电相关的问题问题
 	{
 		老化测试电流不够
@@ -38,7 +242,7 @@
 		玩游戏的时候充电电流为不足10MA
 		{
 		
-			//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #141086 begin
+				//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #141086 begin
 			
 				1.目前分析是thermal 的bcct，根据温升降电流，导致最后充电线上的电流很小，大部分都供给系统
 				首先要确定温度，充电电流的变化，thermal的策略是否合理
@@ -356,6 +560,7 @@
 		
 	}
 	
+
 
 
 

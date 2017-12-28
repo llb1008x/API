@@ -3854,8 +3854,8 @@ out:
 					}
 				}
 	
-					vendor/mediatek/proprietary/packages/apps/BatteryWarning/res/values-zh-rCN/strings.xml
-					./system/vendor/app/BatteryWarning
+				vendor/mediatek/proprietary/packages/apps/BatteryWarning/res/values-zh-rCN/strings.xml
+				./system/vendor/app/BatteryWarning
 	
 				
 			}

@@ -155,6 +155,9 @@ USB：
 
 			USB Type C的基本原理
 			http://blog.csdn.net/zoosenpin/article/details/49963031
+			
+			Introduction to Richtek USB Type-C Power Delivery Solutions
+			http://www.richtek.com/en/Design%20Support/Technical%20Document/AN056
 	
 	
 	}
