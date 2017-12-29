@@ -1105,6 +1105,9 @@
 		  导致充电电流降到0
 	  }
 	  
+	  
+	  //Gionee <GN_BSP_CHG> <lilubao> <20171229> modify for platform change begin
+	  
  }
 
 

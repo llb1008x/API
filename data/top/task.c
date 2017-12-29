@@ -59,6 +59,10 @@
 	OK, aicr upper bound
 	
 	
+	高低温跟过压的充电使能情况
+	<3>[ 6498.557056]  (1)[238:charger_thread]tmp:49 (jeita:0 sm:0 cv:0 en:0) (sm:1) en:1
+	
+	
 }
 
 

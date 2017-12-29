@@ -19,6 +19,119 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	GNSPR#100830,充电时按开机键开机，测试值是6.83s，标准值是4.5s，超出标准值2.33s
+	{
+		现在的关机充电条件下按powerkey到亮logo时间太长
+		
+		相关代码
+		{
+			key_chontrol.cpp  key_control
+			
+			linux-event-codes.h描述event
+		}
+		
+		
+		现在主要分两部分分析：powerkey+usb handshake
+		{
+			//powerkey
+			
+			
+
+			[PMIC] pl pmic powerkey Release
+			[PMIC] pmic_IsUsbCableIn 1
+			[PLFM] USB/charger boot!
+			[PMIC] PMIC_POWER_HOLD ON
+
+
+
+			mtk detect key function pmic_detect_homekey MTK_PMIC_RST_KEY = 17
+			[PMIC] pl pmic FCHRKEY Release
+
+
+
+
+			[   11.483398] <4>.(4)[295:kpoc_charger]charger: draw_with_interval... key_trigger_suspend = 0
+			[   11.499852] <4>.(4)[70:pmic_thread][name:pmic_irq&][PMIC] [PMIC_INT] addr[0x854]=0x1
+			[   11.500840] <4>.(4)[70:pmic_thread][name:kpd&]kpd: Power Key generate, pressed=1
+			[   11.501783] <4>.(4)[70:pmic_thread][name:hal_kpd&]kpd: kpd: (pressed) HW keycode =116 using PMIC
+			[   11.502868] <4>.(4)[70:pmic_thread][name:aed&](pressed) HW keycode powerkey
+			[   11.503837] <4>.(4)[276:kpoc_charger]charger: key_control: event.type:1,116:1
+			[   11.504766] <4>.(4)[276:kpoc_charger]charger: key_control: event.type:0,0:0
+			[   11.505666] <4>.(4)[296:kpoc_charger]charger: pwr key long press check start
+
+
+
+
+			//usb handshake
+
+			[SEC] read '0x8800000'
+			0x4D,0x4D,0x4D,0x4D,0x4,0x0,0x0,0x0,
+			[LIB] seclib_img_auth_load_sig [LIB] CFG read size '0x2000' '0x3C'
+			0x4D4D4D4D
+			[LIB] SEC CFG 'v4' exists
+			[LIB] HW DEC
+			GCPU Enhance,V1.1
+			[LIB] SEC CFG is valid. Lock state is 1 
+			[BLDR] Starting tool handshake.
+			€€€€€€€€€€€[BLDR] Tool connection is unlocked
+			[platform_vusb_on] VUSB33 is on
+			[platform_vusb_on] VA10 is on
+			[platform_vusb_on] VA10 select to 0.9V
+			rt5081_enable_chgdet_flow: en = 0
+			rt5081_enable_chgdet_flow: en = 1
+			mtk_ext_chgdet: usb_stats = 0x00000020
+			mtk_ext_chgdet: chg type = 1
+
+			[PLFM] USB cable in
+			[TOOL] USB enum timeout (Yes), handshake timeout(Yes)
+			[TOOL] Enumeration(Start)
+			HS is detected
+			HS is detected
+			[TOOL] Enumeration(End): OK 524ms 
+			usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0][TOOL] : usb listen timeout
+			[TOOL] <USB> cannot detect tools!
+			[TOOL] <UART> listen  ended, receive size:0!
+
+			[TOOL] <UART> wait sync time 150ms->5ms
+			[TOOL] <UART> receieved data: ()
+		
+		}
+		
+		
+		preloader 
+			vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6757/src/core/main.c
+			bldr_pre_process,
+			bldr_handshake -> usb_handshake
+
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	GNSPR#144714,高温高湿回温后，LED灯一直亮
 	{
 		在高温设定RGB亮蓝灯后，再也没有操作电池指示灯。请查看逻辑是否有问题。
@@ -93,30 +206,116 @@
 			charger_dev_enable_powerpath(chg_dev, en);
 			
 			
-			//Gionee <GN_BSP_CHG> <lilubao> <20170712> add for fixed ovp begin
-			//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #144714 begin
-			if( mtk_is_charger_on(info)){
-
-				pr_err("in [%s] by lilubao for debug over temperature notify\n",__FUNCTION__);
-			//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #144714 end
-				vchr = pmic_get_vbus();
-				if(vchr*1000 > info->data.max_charger_voltage){
-
-					pr_err("vchr->%d,info->data.max_charger_voltage->%d\n",vchr*1000,info->data.max_charger_voltage);
-					charging = false;
-					en=false;
-					pr_info("charging->%d,en->%d\n",charging,en);
-				
-					goto stop_charging;
-				}else {
-					charging = true;
-					en=true;
-					pr_info("charging->%d,en->%d\n",charging,en);
-					goto stop_charging;
-				}
-			}
-			//Gionee <GN_BSP_CHG> <lilubao> <20170712> add for fixed ovp end
+			
+			
+			modify:
+			
+			mtk_charger.c 	charger_check_status
+			
+				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp begin
+				int vchr;
+				static int count=0,ovp_flag=false;
+				struct charger_device *chg_dev;
+	
+				struct battery_thermal_protection_data *thermal;
+	
+				chg_dev = info->chg1_dev;
+				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp end
+			
+			
+			
+			
+				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp begin
+				if( mtk_is_charger_on(info) ){
 		
+					pr_err("in [%s] by lilubao for debug ovp\n",__FUNCTION__);
+					vchr=pmic_get_vbus();
+					pr_err("vchr*1000 ->%d,info->data.max_charger_voltage->%d,info->data.max_charger_voltage_plus_x_degree->%d\n",
+											vchr*1000,info->data.max_charger_voltage,info->data.max_charger_voltage_plus_x_degree);
+			
+					pr_err("ovp_flag->%d,charging->%d,count->%d\n",ovp_flag,charging,count);
+					//过压之后电压仍然大于ovp
+					if( (vchr*1000 > info->data.max_charger_voltage) && ovp_flag ){
+			
+						pr_err("111111111\n");
+						pr_err("vchr*1000->%d ,info->data.max_charger_voltage->%d\n",vchr*1000,info->data.max_charger_voltage);
+				
+						goto stop_charging;
+					}else if( (vchr*1000 > info->data.max_charger_voltage) && !ovp_flag ){
+					//第一次过压，需要停止充电，断开power path，设置ovp状态
+						pr_err("222222222\n");
+				
+						pr_err("[BATTERY] Battery over voltage %d %d!!\n\r", vchr*1000,info->data.max_charger_voltage);
+				
+						ovp_flag=true;
+						charging=false;
+						count=1;
+						charger_dev_enable_powerpath(chg_dev,charging);
+						goto stop_charging;
+					}else if( (vchr*1000 < info->data.max_charger_voltage) && ovp_flag){
+					//低于过压门限,但是之前的状态是过压的	
+						pr_err("33333333\n");
+
+						if( vchr*1000>info->data.max_charger_voltage_plus_x_degree ){
+							//高于回充门限，仍然不充电
+							pr_err("444444444\n");
+							goto stop_charging;
+					
+						}else {
+							//低于回充门限，可以充电，
+							pr_err("5555555555\n");
+					
+							pr_err("[BATTERY] Battery vollatge decrease from %d to %d(%d), allow charging!!\n\r",
+								info->data.max_charger_voltage,
+								vchr*1000,
+								info->data.max_charger_voltage_plus_x_degree);
+					
+							ovp_flag=false;
+							charging=true;
+					
+							//但是不能一直enable power path
+							if( count == 1 ){
+								pr_err("6666666\n");
+								count=0;
+								charger_dev_enable_powerpath(chg_dev, charging);	
+							}
+						 }	
+			
+					}
+			
+			
+				}
+				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp end
+
+
+			mtk_charger_parse_dt
+			//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp begin
+			if (of_property_read_u32(np, "max_charger_voltage_plus_x_degree", &val) >= 0) {
+				info->data.max_charger_voltage_plus_x_degree = val;
+			} else {
+				pr_err(
+					"use default max_charger_voltage_plus_x_degree:%d\n",
+					V_CHARGER_MAX);
+				info->data.max_charger_voltage_plus_x_degree = V_CHARGER_MAX_PLUS_X_DEGRESS;
+			}
+			pr_err("info->data.max_charger_voltage ->%d,info->max_charger_voltage_plus_x_degree->%d\n",info->data.max_charger_voltage,info->data.max_charger_voltage_plus_x_degree);
+			//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp end
+
+		
+			mtk_charger_intf.h 	
+			struct charger_custom_data {
+				int battery_cv;	/* uv */
+				int max_charger_voltage;
+				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp begin
+				int max_charger_voltage_plus_x_degree ;
+				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp end
+		
+		
+			
+			pr_err("tmp:%d (jeita:%d sm:%d cv:%d en:%d) (sm:%d) en:%d\n", temperature,
+				info->enable_sw_jeita, info->sw_jeita.sm, info->sw_jeita.cv,
+				info->sw_jeita.charging,
+				thermal->sm, charging);
 			
 			
 			power supply 的status
@@ -774,88 +973,7 @@
 
 
 
-	GNSPR#100830,充电时按开机键开机，测试值是6.83s，标准值是4.5s，超出标准值2.33s
-	{
-		现在的关机充电条件下按powerkey到亮logo时间太长
-		
-		相关代码
-		{
-			key_chontrol.cpp  key_control
-			
-			linux-event-codes.h描述event
-		
-		}
-		
-		
-		现在主要分两部分分析：powerkey+usb handshake
-		{
-			//powerkey
-			
-			
 
-			[PMIC] pl pmic powerkey Release
-			[PMIC] pmic_IsUsbCableIn 1
-			[PLFM] USB/charger boot!
-			[PMIC] PMIC_POWER_HOLD ON
-
-
-
-			mtk detect key function pmic_detect_homekey MTK_PMIC_RST_KEY = 17
-			[PMIC] pl pmic FCHRKEY Release
-
-
-
-
-			[   11.483398] <4>.(4)[295:kpoc_charger]charger: draw_with_interval... key_trigger_suspend = 0
-			[   11.499852] <4>.(4)[70:pmic_thread][name:pmic_irq&][PMIC] [PMIC_INT] addr[0x854]=0x1
-			[   11.500840] <4>.(4)[70:pmic_thread][name:kpd&]kpd: Power Key generate, pressed=1
-			[   11.501783] <4>.(4)[70:pmic_thread][name:hal_kpd&]kpd: kpd: (pressed) HW keycode =116 using PMIC
-			[   11.502868] <4>.(4)[70:pmic_thread][name:aed&](pressed) HW keycode powerkey
-			[   11.503837] <4>.(4)[276:kpoc_charger]charger: key_control: event.type:1,116:1
-			[   11.504766] <4>.(4)[276:kpoc_charger]charger: key_control: event.type:0,0:0
-			[   11.505666] <4>.(4)[296:kpoc_charger]charger: pwr key long press check start
-
-
-
-
-			//usb handshake
-
-			[SEC] read '0x8800000'
-			0x4D,0x4D,0x4D,0x4D,0x4,0x0,0x0,0x0,
-			[LIB] seclib_img_auth_load_sig [LIB] CFG read size '0x2000' '0x3C'
-			0x4D4D4D4D
-			[LIB] SEC CFG 'v4' exists
-			[LIB] HW DEC
-			GCPU Enhance,V1.1
-			[LIB] SEC CFG is valid. Lock state is 1 
-			[BLDR] Starting tool handshake.
-			€€€€€€€€€€€[BLDR] Tool connection is unlocked
-			[platform_vusb_on] VUSB33 is on
-			[platform_vusb_on] VA10 is on
-			[platform_vusb_on] VA10 select to 0.9V
-			rt5081_enable_chgdet_flow: en = 0
-			rt5081_enable_chgdet_flow: en = 1
-			mtk_ext_chgdet: usb_stats = 0x00000020
-			mtk_ext_chgdet: chg type = 1
-
-			[PLFM] USB cable in
-			[TOOL] USB enum timeout (Yes), handshake timeout(Yes)
-			[TOOL] Enumeration(Start)
-			HS is detected
-			HS is detected
-			[TOOL] Enumeration(End): OK 524ms 
-			usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0][TOOL] : usb listen timeout
-			[TOOL] <USB> cannot detect tools!
-			[TOOL] <UART> listen  ended, receive size:0!
-
-			[TOOL] <UART> wait sync time 150ms->5ms
-			[TOOL] <UART> receieved data: ()
-		
-		}
-		
-		
-	
-	}
 	
 
 

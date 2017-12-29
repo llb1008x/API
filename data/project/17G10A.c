@@ -3667,7 +3667,7 @@ out:
 	    out/target/product/gnbj6757_66_n/system/vendor/lib/libshowlogo.so
 		
 		./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/charger/
-		 ./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/libshowlogo/	
+		./TmakeGionee    BJ17G10A01_A   -p  vendor/mediatek/proprietary/external/libshowlogo/	
 		
 		log关键字
 		charger_thread,kpoc_charger
@@ -3694,8 +3694,8 @@ out:
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/dev/logo/rules.mk:184:#GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:225:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:231:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
-	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:238://GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
-	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:257://GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
+	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:238:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
+	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:257:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/mt_logo.c:295:	//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/platform.c:782:			//GioneeDrv LiLuBao 20161113 modify for change gioneelogo begin
 	   vendor/mediatek/proprietary/bootable/bootloader/lk/platform/mt6735/platform.c:785:			//GioneeDrv LiLuBao 20161113 modify for change gioneelogo end	
