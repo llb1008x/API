@@ -41,7 +41,7 @@
 		而且编译要全编
 		
 		The I 2 C interface bus must be connect a resistor 2.2kΩ to power node and independent connection to processor. The
-		I 2 C interface also supports High-Speed (HS) mode for transfer up to 3.4Mbits. If don't use USB_PD function that allow to
+		I 2 C interface also supports High-Speed (HS) mode for transfer up to 3.4Mbits. If do not use USB_PD function that allow to
 		use 400kbits to write or read the bit.	
 	
 		
@@ -165,7 +165,7 @@
 		
 		usb握手
 		[LIB] seclib_img_auth_load_sig [LIB] CFG read size '0x2000' '0x3C'
-		[LIB] SEC CFG doesn't exist
+		[LIB] SEC CFG does not exist
 		[SEC] init fail '0x3000'
 		[BLDR] Starting tool handshake.
 		€€€€€€€€€€€[MT6356] get volt 2, 48, 800000

@@ -1,5 +1,135 @@
 
 
+17G10A log关键字
+{
+	fg_drv_update_hw_status  电量计上报一些硬件信息
+	[fg_drv_update_hw_status] current:18726 19824 state:1 1 car:164 217 bat:3888 3926 chr:4891 4901 hwocv:1234 1234 bat_plug_out:1 1 tmp:31 32 imix 16550 rac 448
+	car是库伦计变化 coulomb count 相当于实际电量除10
+	
+	[FGADC_intr_end][FG_INTR_COULOMB_C]soc:10000 fg_c_soc:10018 fg_v_soc:10000 ui_soc:10000 vc_diff:18 vc_mode 0 VBAT 44030 T:[29 V 29 C 34] D0_C -30 D0_V 3 CAR_V 28826 Q:[28835 28835] aging 10000 bat_cycle 0 Trk[0:0:0] UI[1:0] Chr[1:10000:0] pseudo1 0  DC_ratio 100!
+	Q:[28835 28835] 是最大电量 同样要除以10
+	
+	最好直接搜MTK_FG: [FGADC_intr_end]:
+	
+	GM3.0相关的log
+	[FGADC_intr_end]		
+	MTK_FG: [dod_init] swocv									初始化
+	FG_INTR_COULOMB_LT											
+	MTK_FG: [FGADC_intr_end]: 		
+	dod_init_result
+	
+	FG_INTR_FG_ZCV
+	
+	FG_DAEMON_CMD_GET
+
+	控制fuel_gauge的log级
+	FG_daemon_log_level 	
+
+	rtc记录的电量
+	BATTERY_METER_CMD_SET_RTC_UI_SOC	
+	获取上层电量
+	FG_status.ui_soc=battery_get_bat_uisoc
+
+	可以通过检索Call trace，察看内存堆栈函数的调用
+
+
+	ibus，ibat可以检索相关的电流电压信息，这写都在一块
+
+	[248:charger_thread][name:mtk_charger&]Vbat=4321,I=3597,VChr=492,T=33,Soc100,CT:0:1
+
+	healthd线程检测电池的状态
+	healthd]: healthd: battery l=5 v=3796 t=41.0 h=2 st=4 chg=	
+
+	获取lte rspr信号强弱	
+	GnGetLteLevel(), rsrpIconLevel =1, standard LTE, mLteRsrp =-116,isCampOnLte =true
+	
+	
+	插入充电器
+	mtk_charger_int_handler，dump_charger_name，mt_charger_set_property
+	rt5081_enable_chgdet_flow
+	
+	系统初始化的电压电量
+	dod_init_result
+	
+	
+	老化测试
+	05-01 09:44:57.365345  3321  3321 I oldtest.TAG: AgingTestMainActivity=>onActivityResult:requestCode=1;resultCode=0
+	I oldtest.TAG: ChargeActivity=>chargeCurrent
+	
+	aicl最后设定的最大电流
+	OK, aicr upper bound
+	
+	
+	高低温跟过压的充电使能情况
+	<3>[ 6498.557056]  (1)[238:charger_thread]tmp:49 (jeita:0 sm:0 cv:0 en:0) (sm:1) en:1
+	
+	
+}
+
+
+
+
+
+
+17G06A log关键字
+{
+	src_detect_handler	，handle_usb_insertion	充电检测
+	
+	Enable USB ID pin 
+	
+	FG: log_bat_status
+	
+	usbid_change_handler		插入otg检测，usbid引脚变化会产生这个中断
+	
+	MediaScannerReceiver		扫描u盘文件
+
+	MediaScannerReceiver		扫描多媒体文件
+	MediaProvider,FileManager_IntentBuilder
+	INTERNAL_VOLUME，EXTERNAL_VOLUME内置盘符，外置盘符
+
+	VIB_DRV						马达相关的log
+
+	acquireWakeLockInternal 获取wakelock
+}
+
+
+
+
+17G08A
+{
+	fg_charge_full_update
+	FG: 
+	PMI:
+	
+
+	缩写	
+	{
+		RPM:Resource Power Manager
+		PBL:Primary Boot Loader	
+		SBL:Secondary Boot Loader
+		RMR:Reset Management Register
+		SDI:系统调试镜像
+		MBA：modem boot authenticator
+		FLCB：perform fast low current boot
+		APSD：performs automatic power source detection
+		MPSS:modem processor subsystem
+		APSS:Applications processor subsystem
+	
+		VINTF Vendor Interface
+		HIDL HAL Interface Definition Language
+		VTS Vendor Test Suite
+		NDK Native Development Kit
+		VNDK Vendor NDK
+		LKM Loadable Kernel Modules
+		ABI Application Binary Interface
+		
+		电量计的配置在：UEFI，XBL,HLOS
+		UEFI：unified extensible firmware interface
+		全称“统一的可扩展固件接口”(Unified Extensible Firmware Interface)， 是一种详细描述类型接口的标准。
+		这种接口用于操作系统自动从预启动的操作环境，加载到一种操作系统上。
+	}
+	
+}
 
 
 
@@ -17,12 +147,7 @@
 17G10A
 {
 	
-	
-	
-	
-	
-	
-	
+
 	
 	
 	GNSPR#100830,充电时按开机键开机，测试值是6.83s，标准值是4.5s，超出标准值2.33s
@@ -36,6 +161,7 @@
 			linux-event-codes.h描述event
 		}
 		
+		有一个文档需要看看，mtk的boot阶段，追踪代码
 		
 		现在主要分两部分分析：powerkey+usb handshake
 		{
@@ -119,597 +245,7 @@
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	GNSPR#144714,高温高湿回温后，LED灯一直亮
-	{
-		在高温设定RGB亮蓝灯后，再也没有操作电池指示灯。请查看逻辑是否有问题。
-		12-19 14:31:50.195590 1245 1245 D AmigoLedController: [forced:false]updateBatteryLight, status=2, level=77, old ledStatus=turn_off, new ledStatus=charge_blue
-		12-19 14:31:50.195693 1245 1245 D LightsService: SetLight #3: color=#ff0000ff
-		12-19 14:31:50.195852 1245 1245 D lights : set_led_state colorRGB=FF0000FF, onMS=0, offMS=0
-		12-19 14:31:50.195870 1245 1245 D lights : blink_blue, level=255, onMS=0, offMS=0
-		12-19 14:31:50.195883 1245 1245 D lights : write cc_mode to /sys/class/leds/rt5081_pmu_led2/trigger
-		12-19 14:31:50.196393 1245 1245 D lights : write 255 to /sys/class/leds/rt5081_pmu_led2/brightness
-		12-19 14:31:50.196536 1245 1245 D lights : write_int open fd=268
 
-		补充下现象说明：是高温后，一直亮蓝灯。
-
-
-		12-19 14:31:50.192424 1245 8568 I battery_status: [2,2,1,0,Li-ion]
-		12-19 14:31:50.195590 1245 1245 D AmigoLedController: [forced:false]updateBatteryLight, status=2, level=77, old ledStatus=turn_off, new ledStatus=charge_blue
-		呼吸道收到ACTION_BATTERY_CHANGED广播，接受到的
-		int batteryStatus = intent.getIntExtra(BatteryManager.EXTRA_STATUS,BatteryManager.BATTERY_STATUS_UNKNOWN);
-		是batteryStatus=2.为BATTERY_STATUS_CHARGING 。故实现显示蓝色充电呼吸灯状态
-		
-		
-		1.高温高湿？温度多少，插充电器了吗？
-		{
-			电池最高温度 58度，大部分55+，大部分是45度以上的高温
-			没有插充电器
-		
-		}
-		
-		2.led灯一直亮，应该搜什么关键字，时间点是多少
-		{
-			rgbled 灯的模式：Register Mode, PWM Mode and Breath Mode
-			ISINKx_DIM_MODE 这个可以设置工作模式，ISINKx_CUR_SEL控制每个channel的电流
-			单个led可以提供最大24mA的电流，
-			#define RT5081_PMU_REG_RGBEN		(0x85)
-			
-			breath mode 呼吸灯模式 控制这些寄存器，控制一定时间内电流的大小，持续时间，上升沿，下降沿
-			ISINKx_VREATH_TON_SEL, BISINKx_BREATH_TOFF_SEL, BISINKx_BREATH_Trx_SEL and ISINKx_BREATH_Tfx_SEL.
-			
-		
-			rgb灯应该跟电量的状态有关，低电红灯，充电蓝灯，充满绿灯
-			
-			
-			
-			
-			
-			
-			
-			时间点
-			12-19 14:31:50.192242  1245  8568 D BatteryService: mBatteryVoltage=4066, batteryLevel=50
-			power supply上报了状态的变化，为什么会出现状态变化，
-			
-			BATTERY_STATUS_CHARGING
-		
-			之前电池的温度大于55度，所以会停止充电，之后温度小于50度，回充
-			
-			
-			12-19 14:22:09.815070 <3>[ 6497.740337]  (0)[238:charger_thread][BATTERY] Battery over Temperature or NTC fail 57 55!!
-			
-			12-19 14:22:10.628123 <3>[ 6498.553390]  (0)[238:charger_thread][BATTERY] Battery Temperature raise from 55 to 49(50), allow charging!!
-			12-19 14:22:10.628123 <3>[ 6498.553390] 
-			12-19 14:22:10.629700 <6>[ 6498.554967]  (0)[238:charger_thread][mt6355_get_auxadc_value] ch = 1, reg_val = 0x2, adc_result = 0
-
-
-			12-19 14:22:10.629741 <3>[ 6498.555008]  (0)[238:charger_thread]charging->1,en->1
-			
-			//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #144714 begin
-			
-			
-			目前分析是因为在修改ovp 提示代码的时候判断电压高于提醒，低于使能充电，但是没有判断充电器在不在
-			导致会上报 charging的状态，然后这个地方还有一个问题是mivr_irq这个中断，在kernel log里面一直报
-			waring的
-			charger_dev_enable_powerpath(chg_dev, en);
-			
-			
-			
-			
-			modify:
-			
-			mtk_charger.c 	charger_check_status
-			
-				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp begin
-				int vchr;
-				static int count=0,ovp_flag=false;
-				struct charger_device *chg_dev;
-	
-				struct battery_thermal_protection_data *thermal;
-	
-				chg_dev = info->chg1_dev;
-				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp end
-			
-			
-			
-			
-				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp begin
-				if( mtk_is_charger_on(info) ){
-		
-					pr_err("in [%s] by lilubao for debug ovp\n",__FUNCTION__);
-					vchr=pmic_get_vbus();
-					pr_err("vchr*1000 ->%d,info->data.max_charger_voltage->%d,info->data.max_charger_voltage_plus_x_degree->%d\n",
-											vchr*1000,info->data.max_charger_voltage,info->data.max_charger_voltage_plus_x_degree);
-			
-					pr_err("ovp_flag->%d,charging->%d,count->%d\n",ovp_flag,charging,count);
-					//过压之后电压仍然大于ovp
-					if( (vchr*1000 > info->data.max_charger_voltage) && ovp_flag ){
-			
-						pr_err("111111111\n");
-						pr_err("vchr*1000->%d ,info->data.max_charger_voltage->%d\n",vchr*1000,info->data.max_charger_voltage);
-				
-						goto stop_charging;
-					}else if( (vchr*1000 > info->data.max_charger_voltage) && !ovp_flag ){
-					//第一次过压，需要停止充电，断开power path，设置ovp状态
-						pr_err("222222222\n");
-				
-						pr_err("[BATTERY] Battery over voltage %d %d!!\n\r", vchr*1000,info->data.max_charger_voltage);
-				
-						ovp_flag=true;
-						charging=false;
-						count=1;
-						charger_dev_enable_powerpath(chg_dev,charging);
-						goto stop_charging;
-					}else if( (vchr*1000 < info->data.max_charger_voltage) && ovp_flag){
-					//低于过压门限,但是之前的状态是过压的	
-						pr_err("33333333\n");
-
-						if( vchr*1000>info->data.max_charger_voltage_plus_x_degree ){
-							//高于回充门限，仍然不充电
-							pr_err("444444444\n");
-							goto stop_charging;
-					
-						}else {
-							//低于回充门限，可以充电，
-							pr_err("5555555555\n");
-					
-							pr_err("[BATTERY] Battery vollatge decrease from %d to %d(%d), allow charging!!\n\r",
-								info->data.max_charger_voltage,
-								vchr*1000,
-								info->data.max_charger_voltage_plus_x_degree);
-					
-							ovp_flag=false;
-							charging=true;
-					
-							//但是不能一直enable power path
-							if( count == 1 ){
-								pr_err("6666666\n");
-								count=0;
-								charger_dev_enable_powerpath(chg_dev, charging);	
-							}
-						 }	
-			
-					}
-			
-			
-				}
-				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp end
-
-
-			mtk_charger_parse_dt
-			//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp begin
-			if (of_property_read_u32(np, "max_charger_voltage_plus_x_degree", &val) >= 0) {
-				info->data.max_charger_voltage_plus_x_degree = val;
-			} else {
-				pr_err(
-					"use default max_charger_voltage_plus_x_degree:%d\n",
-					V_CHARGER_MAX);
-				info->data.max_charger_voltage_plus_x_degree = V_CHARGER_MAX_PLUS_X_DEGRESS;
-			}
-			pr_err("info->data.max_charger_voltage ->%d,info->max_charger_voltage_plus_x_degree->%d\n",info->data.max_charger_voltage,info->data.max_charger_voltage_plus_x_degree);
-			//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp end
-
-		
-			mtk_charger_intf.h 	
-			struct charger_custom_data {
-				int battery_cv;	/* uv */
-				int max_charger_voltage;
-				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp begin
-				int max_charger_voltage_plus_x_degree ;
-				//Gionee <GN_BSP_CHG> <lilubao> <20171228> add for fixed ovp end
-		
-		
-			
-			pr_err("tmp:%d (jeita:%d sm:%d cv:%d en:%d) (sm:%d) en:%d\n", temperature,
-				info->enable_sw_jeita, info->sw_jeita.sm, info->sw_jeita.cv,
-				info->sw_jeita.charging,
-				thermal->sm, charging);
-			
-			
-			power supply 的status
-			enum {
-				POWER_SUPPLY_STATUS_UNKNOWN = 0,
-				POWER_SUPPLY_STATUS_CHARGING,			// 1.charging
-				POWER_SUPPLY_STATUS_DISCHARGING,
-				POWER_SUPPLY_STATUS_NOT_CHARGING,
-				POWER_SUPPLY_STATUS_FULL,
-				POWER_SUPPLY_STATUS_CMD_DISCHARGING,
-			};
-			
-			
-			/* charger_manager notify charger_consumer */
-			enum {
-				CHARGER_NOTIFY_EOC,
-				CHARGER_NOTIFY_START_CHARGING,			// 1.charging
-				CHARGER_NOTIFY_STOP_CHARGING,
-				CHARGER_NOTIFY_ERROR,
-				CHARGER_NOTIFY_NORMAL,
-			};
-			
-		
-		}
-		
-		
-		修改高低温提示语
-		{
-			vendor/mediatek/proprietary/packages/apps/BatteryWarning/res/values-zh-rCN/strings.xml
-			./system/vendor/app/BatteryWarning
-			
-			
-			/sys/devices/platform/charger/BatteryNotify 
-				
-			echo 1 > BatteryNotify  电池电压过高
-			echo 2 > BatteryNotify 	电池温度过高
-			
-			static void mtk_battery_notify_UI_test(struct charger_manager *info)
-			{
-				switch (info->notify_test_mode) {
-				case 1:
-					info->notify_code = 0x0001;
-					pr_debug("[%s] CASE_0001_VCHARGER\n", __func__);
-					break;
-				case 2:
-					info->notify_code = 0x0002;
-					pr_debug("[%s] CASE_0002_VBATTEMP\n", __func__);
-					break;
-				case 3:
-					info->notify_code = 0x0004;
-					pr_debug("[%s] CASE_0003_ICHARGING\n", __func__);
-					break;
-				case 4:
-					info->notify_code = 0x0008;
-					pr_debug("[%s] CASE_0004_VBAT\n", __func__);
-					break;
-				case 5:
-					info->notify_code = 0x0010;
-					pr_debug("[%s] CASE_0005_TOTAL_CHARGINGTIME\n", __func__);
-					break;
-				default:
-					pr_debug("[%s] Unknown BN_TestMode Code: %x\n",
-						__func__, info->notify_test_mode);
-				}
-			}
-	
-			
-			
-			高温 您的电池温度过高，请移除电池！	->   为了保护电池，请暂停使用手机
-			
-			低温 您的电池温度过低，请移除电池！   ->	 为了保护电池，充电已经中断
-		
-		}
-
-		
-		
-		这是个问题为什么batterylevel=50
-		12-19 14:31:50.192242  1245  8568 D BatteryService: mBatteryVoltage=4066, batteryLevel=50
-		12-19 14:31:50.195590  1245  1245 D AmigoLedController: [forced:false]updateBatteryLight, status=2, level=77, old ledStatus=turn_off, new ledStatus=charge_blue
-		
-		
-		因为在batteryservices.java 里面 把batterylevel 读成了batterylevel_smb ，而这个smb是dual battery
-		if (mLastBatteryVoltage != mBatteryProps.batteryVoltage) {
-		 //Gionee <GN_BY_CHG> <lilubao> <20171227> modify  info  begin		
-		    Log.d(TAG, "mBatteryVoltage=" + mBatteryProps.batteryVoltage + ", batteryLevel=" + mBatteryProps.batteryLevel);
-		 //Gionee <GN_BY_CHG> <lilubao> <20171227> modify  info  end
-		}
-		
-		
-		KeyguardUpdateMonitor
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	充电相关的问题问题
-	{
-		老化测试电流不够
-			pass,GNSPR #147155	【老化测试】老化测试电流测试电流节点达到1000ma，难以通过电流测试进行老化测试
-			pass,GNSPR #141724 	【产线器件老化】老化测试过程中出现充电测试未通过
-			pass,GNSPR #135719	【老化测试】测试老化测试时 出现非异常重启在组合测试2中	
-			pass,GNSPR #146336	【产线器件老化】产线老化12个小时 出现充电测试未通过在电流测试中 出现5台
-			
-			
-		
-			pass,GNSPR #139587	【低电量验证电流专项】进MMI硬件测试-充电测试（电量为8%），插入标配1A充电器显示充电电压为4957mv，
-			充电电流一直浮动在222mA~358mA（标准值应为1000mA）》插拔充电器未恢复，充电器测试另一台测机后再次测试恢复
-			pass,GNSPR #141086	电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
-		    玩游戏的时候充电电流为不足10MA
-		    
-		    
-		pass,GNSPR #141086,电源管理：玩王者荣耀的时候插标配充电器充电玩游戏1H，电量只增加0%，查看充电记录，
-		玩游戏的时候充电电流为不足10MA
-		{
-		
-				//Gionee <GN_BY_CHG> <lilubao> <20171227> add for fixed #141086 begin
-			
-				1.目前分析是thermal 的bcct，根据温升降电流，导致最后充电线上的电流很小，大部分都供给系统
-				首先要确定温度，充电电流的变化，thermal的策略是否合理
-				
-				
-				2.现在thermal 的策略是
-				/proc/driver/thermal/clabcct
-				43000 1000 200000 5 2000 300 0 3000 0 1 5000 2000
-				
-				
-				3.T_AP=46,T_btsmdpa=49
-				电池的温度是根据auxadc采集到的电压然后查表找到对应的温度，
-				这个标在一般的thermal代码里面有如，mtk_ts_btsmdpa.c BTSMDPA_TEMPERATURE BTSMDPA_Temperature_Table6[] 
-				至于找哪个表是从thermal config文件中配置的，倒数第二个 数组6
-				PUP_R 390000 PUP_VOLT 1800 OVER_CRITICAL_L 4251000 NTC_TABLE 6 0
-				
-				
-				4.这段时间内 AP，跟btsmdpa温度很高
-				12-07 16:48:18.501101 <7>[22198.050609]  (0)[12102:kworker/0:1][Thermal/TZ/BTSMDPA]T_btsmdpa=48000
-				12-07 16:48:18.501329 <7>[22198.050837]  (0)[12102:kworker/0:1][Thermal/TZ/BTS]T_AP=45000
-				
-		6 100000 0 mtktsAP-sysrst 90000 0 mtk-cl-shutdown00 53000 0 mtk-cl-cam00 49000 0 abcct_lcmoff 44000 0 mtk-cl-adp-fps 41000 0 abcct 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 0 0 no-cooler 1000
-
-
-				5. 16:47~16:49这段时间打游戏卡不卡，视频画质怎么样，有没有掉帧
-				
-
-
-				kernel_log:162074:<3>[22139.738872]  (0)[239:charger_thread]Vbat=4068,I=20496,VChr=5090,T=42,Soc=17:14,CT:4:4
-				12-07 16:47:08.666912 <7>[22140.989020]  (0)[1392:system_server][Thermal/TZ/BTS]T_AP=44000
-				12-07 16:47:08.667007 <7>[22140.989115]  (0)[1392:system_server][Thermal/TZ/BTSMDPA]T_btsmdpa=47000
-				
-				before thermal abcct
-				12-07 16:47:35.154654 <3>[22160.186551]  (1)[239:charger_thread]force:0 thermal:-1 -1 setting:2300000 2100000 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-				
-				12-07 16:48:08.690842 <3>[22188.240350]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 2100000 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-				
-				12-07 16:48:18.693888 <3>[22198.243396]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-				12-07 16:48:20.253308 <3>[22199.802816]  (2)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-				12-07 16:48:28.258041 <3>[22207.807548]  (3)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-				12-07 16:48:28.485482 <3>[22208.034989]  (1)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-				
-				
-				停止充电
-				12-07 16:48:18.693888 <3>[22198.243396]  (0)[239:charger_thread]force:0 thermal:-1 300000 setting:2300000 0 type:4 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
-				
-				12-07 16:48:18.695163 <7>[22198.244671]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: reg 19 data 30
-				12-07 16:48:18.695176 <7>[22198.244684]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_update_bits: mask f0
-				12-07 16:48:18.695343 <7>[22198.244851]  (0)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 19
-				12-07 16:48:18.695437 <3>[22198.244945]  (0)[239:charger_thread][charger]charging current is set 0mA, turn off charging !
-				
-				
-				
-				6.有两个电流区别和注意的地方，
-				charging_current_limit
-				input_current_limit
-				
-				rt5081会获取最低设备最低的充电电流 500mA，如果低于500mA就会设置为0
-				charging current	500mA
-				static int rt5081_get_min_ichg(struct charger_device *chg_dev, u32 *uA)
-				{
-					*uA = 500000;
-					return 0;
-				}
-				
-				input current  100mA
-				static int rt5081_get_min_aicr(struct charger_device *chg_dev, u32 *uA)
-				{
-					*uA = 100000;
-					return 0;
-				}
-				
-				
-				7.IEOC 截止电流为什么会变成250mA，设置的是150mA，为什么会变？
-				这个是内部一个算法调整，主要是针对输入电流变化大的情况下，截止电流不准，
-				可以调整截止电流 Workaround
-				/* Workaround to make IEOC accurate */
-				if (uA < 900000 && !chg_data->ieoc_wkard) { /* 900mA */
-					ret = __rt5081_set_ieoc(chg_data, chg_data->ieoc + 100000);
-					chg_data->ieoc_wkard = true;
-				} else if (uA >= 900000 && chg_data->ieoc_wkard) {
-					chg_data->ieoc_wkard = false;
-					ret = __rt5081_set_ieoc(chg_data, chg_data->ieoc - 100000);
-				}
-				
-				
-				
-			
-				0x27=0x60   0110 0000 
-				 SDP NSTD (by input pin of (sVBUSPG_syn & sCHGDETB & DCDT)=1)
-				 Charger port is not detected
-				 
-				 
-				static void swchg_turn_on_charging(struct charger_manager *info)
-				{
-					struct switch_charging_alg_data *swchgalg = info->algorithm_data;
-					bool charging_enable = true;
-
-					if (swchgalg->state == CHR_ERROR) {
-						charging_enable = false;
-						pr_err("[charger]Charger Error, turn OFF charging !\n");
-					} else if ((get_boot_mode() == META_BOOT) || ((get_boot_mode() == ADVMETA_BOOT))) {
-						charging_enable = false;
-						pr_err("[charger]In meta or advanced meta mode, disable charging.\n");
-					} else {
-						mtk_pe20_start_algorithm(info);
-						mtk_pe_start_algorithm(info);
-
-						swchg_select_charging_current_limit(info);
-						if (info->chg1_data.input_current_limit == 0 || info->chg1_data.charging_current_limit == 0) {
-							charging_enable = false;
-							pr_err("[charger]charging current is set 0mA, turn off charging !\r\n");
-						} else {
-							swchg_select_cv(info);
-						}
-					}
-
-					charger_dev_enable(info->chg1_dev, charging_enable);
-				}
-				 
-
-
-			}	
-		}		   
-		   
-		   
-		   
-		   
-		   
-		   
-		   
-		pass,GNSPR #139587	【低电量验证电流专项】进MMI硬件测试-充电测试（电量为8%），插入标配1A充电器显示充电电压为4957mv，
-		充电电流一直浮动在222mA~358mA（标准值应为1000mA）》插拔充电器未恢复，充电器测试另一台测机后再次测试恢复
- 		{
- 			这个是当时充电器识别成非标充导致电流设置只有500mA，亮屏进电池只有200~300mA左右
-			识别成为非标充是概率性的，有时候没有插拔好充电器就会出现这种情况
-
-			时间点：2017-5-2 05:58
-			05-02 05:46:27.434155 0 0 E [ 172.031524] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 0, Charger Unknown
-			05-02 05:57:53.785801 0 0 E [ 333.714307] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 3, Non-standard Charger
-			05-02 06:00:56.656058 0 0 E [ 516.584564] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 0, Charger Unknown
-			05-02 06:01:02.302431 0 0 E [ 522.230937] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 3, Non-standard Charger
-			05-02 06:02:20.661125 0 0 E [ 600.589631] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 0, Charger Unknown
-			05-02 06:03:10.771173 0 0 E [ 650.699679] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 4, Standard Charger
-			05-02 06:03:42.047792 0 0 E [ 681.976298] (0)[185:irq/773-rt5081_]: dump_charger_name: charger type: 0, Charger Unknown
-
-			05-02 05:58:05.086952 238 238 E [ 345.015458] (0)[238:charger_thread]: force:0 thermal:-1 -1 setting:500000 500000 type:3 usb_unlimited:0 usbif:0 usbsm:0 aicl:-1
- 		
- 		}
-		    
-		   
-		   
-		   
-		   
-		   
-		pass,GNSPR #146336	【产线器件老化】产线老化12个小时 出现充电测试未通过在电流测试中 出现5台
-		{
-			产线的是电源5V/2A,而且充电线比较长，压差比较大，所以有时候电流可能很小
-			现在标准是1000mA，所以用电源有很多机器没有通过测试，统一标准是200mA，应该可以通过
-		} 
-		    
-		    
-		    
-		    
-
-		pass，GNSPR #141724 	【产线器件老化】老化测试过程中出现充电测试未通过
-		{
-			<7>[ 2661.566148]  (0)[241:wdtk-0][thread:241][RT:2661566148084] 2017-05-01 04:49:39.879272 UTC;android time 2017-05-01 12:49:39.879272
-			
-			
-			
-			
-			main.log
-			05-01 12:49:47.199482 4699 4699 I oldtest.TAG: ChargeBroadcastReceiver=>getChargingAllValues:mFirstChargeLevel=52;mChargePlug=1;mChargeVoltage=3818;mChargeCurrent=0;mChargeLevel=46;mTemperatureAp=25
-			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: ChargeBroadcastReceiver=>getChargingAllValues:充电状态：
-			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 老化测试开始电量:52
-			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 充电方式：AC
-			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 充电电压：3818mV
-			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 充电电流：0mA
-			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 电池电量：46
-			05-01 12:49:47.199968 4699 4699 I oldtest.TAG: 电池温度：25
-			05-01 12:49:47.200629 4699 4699 I oldtest.TAG: DbDatabaseManager=>oldDatabaseManager insertTP
-			05-01 12:49:47.200656 4699 4699 I oldtest.TAG: DbDatabaseHelper=>oldDatabaseHelper inserttp
-			05-01 12:49:47.200674 4699 4699 I oldtest.TAG: DbDatabaseHelper=>scene=电流测试
-			05-01 12:49:47.209559 4699 4699 I oldtest.TAG: DbDatabaseHelper=>row=1
-			
-			
-			同BUG#147155
-		
-		}    
-		    
-		    
-		    
-		    
-		    
-		    
-		pass,GNSPR #135719	【老化测试】测试老化测试时 出现非异常重启在组合测试2中	
-		{
-			11-20 08:56:09.759403 3444 3581 I oldtest.TAG: DbDatabaseHelper=>query oldtest db time_=2017-11-20_08-56-09 issue_非异常重启
-			11-20 08:56:09.759403 3444 3581 I oldtest.TAG: 低电关机,充电器断开时间:2017-11-17 19:51:42
-			11-20 08:56:09.759403 3444 3581 I oldtest.TAG: scene=组合测试2 testtime=11-17 19:52:08
-			11-20 08:56:09.759468 3444 3581 I oldtest.TAG: ReportActvity=>queryIssue:issue.getIssue()=非异常重启
-			11-20 08:56:09.759468 3444 3581 I oldtest.TAG: 低电关机,充电器断开时间:2017-11-17 19:51:42
-			11-20 08:56:09.802517 3444 3444 I oldtest.TAG: ReportActvity=>onPostExecute:duration=3664;isdone=true
-			11-20 08:56:09.831705 3444 3444 I oldtest.TAG: ReportActvity=>getView:2017-11-20_08-56-09: 非异常重启
-			11-20 08:56:09.831705 3444 3444 I oldtest.TAG: 低电关机,充电器断开时间:2017-11-17 19:51:42
-			
-			
-			测试在测试的时候插的是usb，不是标准充电器，所以耗的电多充的电少，最后低电关机了
-
-			150064:<3>[177297.658288] (7)[236:charger_thread]Vbat=3153,I=194,VChr=4938,T=32,Soc=-24:1,CT:1:1
-			152317:<3>[177307.658305] (6)[236:charger_thread]Vbat=3150,I=-434,VChr=4920,T=32,Soc=-24:1,CT:1:1
-			154591:<3>[177317.657975] (6)[236:charger_thread]Vbat=3153,I=30,VChr=4929,T=32,Soc=-24:1,CT:1:1
-		
-		
-		}    
-		    
-		    
-		    
-		    
-		    
-		pass,GNSPR #147155	【老化测试】老化测试电流测试电流节点达到1000ma，难以通过电流测试进行老化测试    
-		{
-			01-03 18:43:43.633744 <6>[17525.419381]  (0)[242:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: VSYS = 4420mV, VBAT = 4420mV, IBAT = 1150mA, IBUS = 1500mA, VBUS = 4625mV
-			01-03 18:43:43.935567 <6>[17525.721204]  (1)[242:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_dump_register: VSYS = 4450mV, VBAT = 4435mV, IBAT = 1200mA, IBUS = 1450mA, VBUS = 4625mV
-
-
-
-			01-03 18:43:43.365765 <3>[17525.151402]  (3)[242:charger_thread]Vbat=4251,I=-865,VChr=4976,T=30,Soc=86:87,CT:4:0
-			01-03 18:43:43.640270 <3>[17525.425907]  (0)[242:charger_thread]Vbat=4431,I=11970,VChr=4740,T=29,Soc=86:87,CT:4:4
-			01-03 18:43:51.144345 <3>[17532.929982]  (0)[242:charger_thread]Vbat=4238,I=1014,VChr=794,T=30,Soc=86:87,CT:0:4
-
-
-
-
-			01-03 18:43:45.937121 16094 16094 V PhoneWindow: DecorView setVisiblity: visibility = 0, Parent = ViewRoot{5ed0521 com.gionee.factorytests/com.gionee.os.autooldtest.ChargeActivity,ident = 4}, this = DecorView@c03272b[ChargeActivity]
-
-
-
-			01-03 18:43:45.937961 16094 16094 I oldtest.TAG: ChargeActivity=>mBroadcastReceiver action=android.intent.action.BATTERY_CHANGED
-			01-03 18:43:45.938362 16094 16094 I oldtest.TAG: ChargeActivity=>chargeCurrent=
-			01-03 18:43:45.938981 16094 16094 I oldtest.TAG: ChargeActivity=>chargeCurrent 2=49
-			01-03 18:43:45.939117 16094 16094 I oldtest.TAG: ChargeActivity=>chargeVoltage = 4248;current=49;mChargeTargetValue=1000;plugged=1
-
-			
-			实际电流有1200mA，但实际只有49mA，所以要确定老化测试读的数据对不对？
-			老化测试修改了，监听电流变化的sys node，原来需要10s才变化一次，所以数据可能没有即时更新
-			监听 	 BatteryAverageCurrent
-			读取电流 BatteryPresentCurrent
-			
-			集成到T210版本上
-		
-		}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	GNSPR#139202，去除冗余log
 	{
 		//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log begin
@@ -1062,8 +598,7 @@
 
 18Y07A
 {
-
-
+    还有一个otg功能好像还有问题，需要抽时间调试一下 
 }
 
 
@@ -1093,7 +628,7 @@
 {
 
 	
-	3.U盘识别时间过长 (32s)
+	3.U盘识别时间过长 (32s)        暂时先不跟
 	{
 		usb眼图通过，同平台其他无此问题，
 		本地验证了，大概4~6此出现一次不识别或识别慢的问题，不是必现的
@@ -1229,14 +764,6 @@
 
 }	
 	
-
-
-
-
-
-
-
-
 
 
 
@@ -1482,24 +1009,10 @@ M2018
 
 
 
+
 /*********************************************************************************************************************************/
 17G06A
 {
-
-
-
-
-
-	金刚3续航问题
-	{
-		1.GNSPR#133023,【视频续航】金刚3视频续航（外放）比华为畅享7平均电流高50mA左右
-	
-		2.对比M7续航时间差很多
-		
-		3.中批比T2机械手臂时间差一个小时
-
-	}
-
 
 
 

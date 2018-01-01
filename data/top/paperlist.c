@@ -1,10 +1,11 @@
 
-查找的资料：
-http://www.imooc.com/qadetail/198875?lastmedia=1
+
+这些都是自己之前看的博客文章的网址，最好是可以转换到成pdf或者有道云笔记
 
 
-linux内核：
-
+1.linux内核
+{
+    
 	list_for_each_entry 
 	http://blog.csdn.net/xubin341719/article/details/7098611
 
@@ -43,6 +44,7 @@ linux内核：
 	
 	http://blog.csdn.net/honour2sword/article/details/40213417
 	ARM中断向量表与响应流程 
+}
 
 
 
@@ -51,9 +53,10 @@ linux内核：
 
 
 
-battery：
 
-	android 4.4 电池电量管理底层分析(C\C++层) 
+2.电源相关
+{
+    android 4.4 电池电量管理底层分析(C\C++层) 
 	http://blog.csdn.net/daweibalang717/article/details/41446993
 
 
@@ -94,9 +97,28 @@ battery：
 	sdp cdp dcp及快速充电技术介绍 
 	http://blog.csdn.net/u012719256/article/details/72627022
 	
+	典型AC／DC电源模块
+	http://www.docin.com/p-50062023.html
 
-USB：
-	相关的协议：
+    无线充电IC
+	http://www.elecfans.com/dianyuan/404455.html
+	
+	
+	高通batterydata电池曲线数据学习
+	https://www.2cto.com/kf/201601/488126.html
+
+
+	千万别乱用单位：详解电池的mAh和Wh的区别
+	http://libattery.ofweek.com/2015-06/ART-36001-11002-28964256.html
+
+}
+
+
+	
+
+3.USB
+{
+    相关的协议：
 	{
 		BC1.1标准 
 		http://blog.csdn.net/zhaoguowei2010/article/details/8970319
@@ -158,9 +180,16 @@ USB：
 			
 			Introduction to Richtek USB Type-C Power Delivery Solutions
 			http://www.richtek.com/en/Design%20Support/Technical%20Document/AN056
+			
+		Linux USB 驱动开发实例（一） —— USB摄像头驱动实现源码分析 
+	    http://blog.csdn.net/zqixiao_09/article/details/50984412
+
 	
+	    Linux USB 驱动开发（一）—— USB设备基础概念 
+	    http://blog.csdn.net/zqixiao_09/article/details/50984074	
 	
 	}
+}
 
 
 
@@ -170,9 +199,9 @@ USB：
 
 
 
-other：
-
-	手机主叫的信道流程与Modem Log简单分析
+4.other
+{
+    手机主叫的信道流程与Modem Log简单分析
 	http://blog.csdn.net/zx249388847/article/details/52637563
 
 
@@ -227,10 +256,6 @@ other：
 	
 	git rebase命令
 	http://gitbook.liuhui998.com/4_2.html
-	
-	
-	无线充电IC
-	http://www.elecfans.com/dianyuan/404455.html
 	
 	
 	cin、cin.get()、getline()（讲解的很详细）
@@ -354,10 +379,6 @@ other：
 	http://blog.csdn.net/tdstds/article/details/25179541
 
 
-	典型AC／DC电源模块
-	http://www.docin.com/p-50062023.html
-
-
 	Android Bootloader分析
 	http://www.tuicool.com/articles/M7v6nuN
 
@@ -394,14 +415,6 @@ other：
 	http://blog.csdn.net/finewind/article/details/46469645
 
 
-	高通batterydata电池曲线数据学习
-	https://www.2cto.com/kf/201601/488126.html
-
-
-	千万别乱用单位：详解电池的mAh和Wh的区别
-	http://libattery.ofweek.com/2015-06/ART-36001-11002-28964256.html
-
-
 	android socket编程 
 	http://blog.csdn.net/xl19862005/article/details/8517921
 
@@ -420,13 +433,6 @@ other：
 	http://blog.csdn.net/zqixiao_09/article/details/51039378
 
 
-	Linux USB 驱动开发实例（一） —— USB摄像头驱动实现源码分析 
-	http://blog.csdn.net/zqixiao_09/article/details/50984412
-
-	
-	Linux USB 驱动开发（一）—— USB设备基础概念 
-	http://blog.csdn.net/zqixiao_09/article/details/50984074
-
 
 	Android O 前期预研之一：Android Treble 计划
 	http://blog.csdn.net/ljp1205/article/details/77684550	
@@ -434,6 +440,11 @@ other：
 
 	android CTS 介绍
 	https://www.cnblogs.com/verawang/p/5421961.html
+
+
+}
+
+
 
 
 
