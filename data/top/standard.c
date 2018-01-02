@@ -482,6 +482,60 @@ gm1.0 算法：
 
 	    return 0;
     }
+    
+    
+    5.充电器类型的检测
+    int hw_charger_type_detection(void)
+	{
+		CHARGER_TYPE charger_tye = CHARGER_UNKNOWN;
+
+		/********* Step initial  ***************/
+		hw_bc11_init();
+
+		/********* Step DCD ***************/
+		if(1 == hw_bc11_DCD())
+		{
+		     /********* Step A1 ***************/
+		     if(1 == hw_bc11_stepA1())
+		     {
+		         charger_tye = APPLE_2_1A_CHARGER;
+		         print("step A1 : Apple 2.1A CHARGER!\r\n");
+		     }
+		     else
+		     {
+		         charger_tye = NONSTANDARD_CHARGER;
+		         print("step A1 : Non STANDARD CHARGER!\r\n");
+		     }
+		}
+		else
+		{
+		     /********* Step A2 ***************/
+		     if(1 == hw_bc11_stepA2())
+		     {
+		         /********* Step B2 ***************/
+		         if(1 == hw_bc11_stepB2())
+		         {
+		             charger_tye = STANDARD_CHARGER;
+		             print("step B2 : STANDARD CHARGER!\r\n");
+		         }
+		         else
+		         {
+		             charger_tye = CHARGING_HOST;
+		             print("step B2 :  Charging Host!\r\n");
+		         }
+		     }
+		     else
+		     {
+		         charger_tye = STANDARD_HOST;
+		         print("step A2 : Standard USB Host!\r\n");
+		     }
+		}
+
+		/********* Finally setting *******************************/
+		hw_bc11_done();
+
+		return charger_tye;
+	}
 	    
 
 }

@@ -96,11 +96,11 @@ MTK提供的解决方法
 		    BOOTING_TIME_PROFILING_LOG("USB handshake");
 	    }
 	   /*GioneeDrv LiLuBao 20161121 modify for fixed GNSPR#53131 end
-        #endif
+        #endif*/
 
 
 	2.方案二：修改检测延迟的时间timeout，不见效
-	修改usb tool hanshake timour的时间为1s，这个修改可能是影响tool的连接使用，所以建议修改不能比1s少
+	修改usb tool hanshake timeout的时间为1s，这个修改可能是影响tool的连接使用，所以建议修改不能比1s少
 	这里设置为1s
 	#if !defined(CFG_USB_HANDSHAKE_TIMEOUT)
 	-#define CFG_USB_HANDSHAKE_TIMEOUT (2500) /* 2.5s */

@@ -152,49 +152,74 @@
 	
 	GNSPR#100830,充电时按开机键开机，测试值是6.83s，标准值是4.5s，超出标准值2.33s
 	{
-		现在的关机充电条件下按powerkey到亮logo时间太长
+		未插usb： 4~4.5s出logo
+		枚举那段log基本上没停顿
+		插usb： 7.5~8s出logo
+		长按重启 枚举那段log停顿2.5~3s
+		第一次开机停顿2.5~3s
+		插充电器： 6~7s出logo
+		枚举那段停顿0.3~0.5s左右	
 		
-		相关代码
+		//Gionee <GN_BY_CHG> <lilubao> <20180101> add  for fixed #100830 begin
+		加点代码，计算这段用了多少时间
+		
+		unsigned int time_bat_init;
+		get_timer(time_bat_init)
+		
+		
+		preloader:			
 		{
-			key_chontrol.cpp  key_control
+			vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6757/src/core/main.c
 			
-			linux-event-codes.h描述event
+			CFG_USB_TOOL_HANDSHAKE
+			
+			bldr_pre_process()  -> bldr_handshake(&handler) 
+			
+			usb_cable_in() -> mt_charger_type_detection() ->  hw_charger_type_detection bc1.1协议，全都是一些操作寄存器的 
+			
+			-> usb_connect 
+			
+			platform.h
+			这里有两个一个是usb握手时间，一个是枚举的时间
+			/* if not defined in cust_usb.h, use default setting */
+			#if !defined(CFG_USB_ENUM_TIMEOUT)
+			//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 begin         
+			#define CFG_USB_ENUM_TIMEOUT            (4000)           
+			//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 end
+			#endif
+
+			/* if not defined in cust_usb.h, use default setting */
+			#if !defined(CFG_USB_HANDSHAKE_TIMEOUT)
+			//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 begin
+			#define CFG_USB_HANDSHAKE_TIMEOUT       (1500)       
+			//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 end
+			#endif
 		}
 		
-		有一个文档需要看看，mtk的boot阶段，追踪代码
 		
-		现在主要分两部分分析：powerkey+usb handshake
-		{
-			//powerkey
-			
-			
-
-			[PMIC] pl pmic powerkey Release
-			[PMIC] pmic_IsUsbCableIn 1
-			[PLFM] USB/charger boot!
-			[PMIC] PMIC_POWER_HOLD ON
-
-
-
-			mtk detect key function pmic_detect_homekey MTK_PMIC_RST_KEY = 17
-			[PMIC] pl pmic FCHRKEY Release
-
-
-
-
-			[   11.483398] <4>.(4)[295:kpoc_charger]charger: draw_with_interval... key_trigger_suspend = 0
-			[   11.499852] <4>.(4)[70:pmic_thread][name:pmic_irq&][PMIC] [PMIC_INT] addr[0x854]=0x1
-			[   11.500840] <4>.(4)[70:pmic_thread][name:kpd&]kpd: Power Key generate, pressed=1
-			[   11.501783] <4>.(4)[70:pmic_thread][name:hal_kpd&]kpd: kpd: (pressed) HW keycode =116 using PMIC
-			[   11.502868] <4>.(4)[70:pmic_thread][name:aed&](pressed) HW keycode powerkey
-			[   11.503837] <4>.(4)[276:kpoc_charger]charger: key_control: event.type:1,116:1
-			[   11.504766] <4>.(4)[276:kpoc_charger]charger: key_control: event.type:0,0:0
-			[   11.505666] <4>.(4)[296:kpoc_charger]charger: pwr key long press check start
-
-
-
-
-			//usb handshake
+		
+		
+		
+		
+		
+		
+		 	[   10.830067] <4>.(4)[69:pmic_thread][name:pmic_irq&][PMIC] [PMIC_INT] addr[0x854]=0x1
+			[   10.831035] <4>.(4)[69:pmic_thread][name:kpd&]kpd: Power Key generate, pressed=1
+			[   10.831971] <4>.(4)[69:pmic_thread][name:hal_kpd&]kpd: kpd: (pressed) HW keycode =116 using PMIC
+			[   10.833102] <4>.(4)[69:pmic_thread][name:aed&](pressed) HW keycode powerkey
+			[   10.834083] <4>.(4)[277:kpoc_charger]charger: key_control: event.type:1,116:1
+			[   10.835000] <4>.(4)[277:kpoc_charger]charger: key_control: event.type:0,0:0
+			[   10.835911] <4>.(4)[297:kpoc_charger]charger: pwr key long press check start
+		 
+		 
+			[LIB] Loading SEC config
+			[LIB] Name = 
+			[LIB] Config = 0x22, 0x22
+			[LIB] SECRO (ac, ac_offset, ac_length) = (0x1, 0x40, 0x40)
+			0x31,0x41,0x35,0x35
+			[SEC] DBGPORT 00000051 0000FFFF 00000101 00000101 0022EF45 00236705 00000051 0000FFFF 00000101 0000FFFF 00000101 00000042 00000000
+			[SEC] DBGPORT (0 1)
+			[SEC] DBGPORT 00000051 0000FFFF 00000101 00000101 0022EF45 00236705 00000051 0000FFFF 00000101 0000FFFF 00000101 00000042 00000000
 
 			[SEC] read '0x8800000'
 			0x4D,0x4D,0x4D,0x4D,0x4,0x0,0x0,0x0,
@@ -204,6 +229,9 @@
 			[LIB] HW DEC
 			GCPU Enhance,V1.1
 			[LIB] SEC CFG is valid. Lock state is 1 
+
+			
+			//tool handshake	这段时间比较长
 			[BLDR] Starting tool handshake.
 			€€€€€€€€€€€[BLDR] Tool connection is unlocked
 			[platform_vusb_on] VUSB33 is on
@@ -214,29 +242,29 @@
 			mtk_ext_chgdet: usb_stats = 0x00000020
 			mtk_ext_chgdet: chg type = 1
 
+
 			[PLFM] USB cable in
 			[TOOL] USB enum timeout (Yes), handshake timeout(Yes)
 			[TOOL] Enumeration(Start)
 			HS is detected
 			HS is detected
-			[TOOL] Enumeration(End): OK 524ms 
+			[TOOL] Enumeration(End): OK 521ms 
+			
 			usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0][TOOL] : usb listen timeout
+			
+			
 			[TOOL] <USB> cannot detect tools!
 			[TOOL] <UART> listen  ended, receive size:0!
 
 			[TOOL] <UART> wait sync time 150ms->5ms
 			[TOOL] <UART> receieved data: ()
 		
-		}
-		
-		
-		preloader 
-			vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6757/src/core/main.c
-			bldr_pre_process,
-			bldr_handshake -> usb_handshake
-
 	
 	}
+	
+	
+	
+	
 	
 	
 	
@@ -814,57 +842,159 @@ M2018
 {
 	1.调试PD协议是否通
 	{
-		相关的宏：
-		CONFIG_USB_PD_POLICY=y
-		CONFIG_QPNP_USB_PDPHY=y
+		1.相关的代码
+		{
+			相关的宏：
+			CONFIG_USB_PD_POLICY=y
+			CONFIG_QPNP_USB_PDPHY=y
 	
-		相关的代码：
-		drivers/usb/pd/
-			policy_engine.c
-			qpnp-pdphy.c
+			相关的代码：
+			drivers/usb/pd/
+				policy_engine.c
+				qpnp-pdphy.c
 			
-		/sys/kernel/debug/ipc_logging/usb_pd
+			/sys/kernel/debug/ipc_logging/usb_pd
 		
-		cat /d/ipc_logging/usb_pd/log
-		cat /sys/class/usbpd/usbpd0
+			cat /d/ipc_logging/usb_pd/log
+			cat /sys/class/usbpd/usbpd0
 			
-		//Gionee <GN_BY_CHG> <lilubao> <20171206> add for debug usb pd begin	
-		#define GN_USB_PD_DEBUG
-		
-		usbpd_err(&pd->dev, "in [%s] by lilubao \n",__FUNCTION__);
-		
-		
-		1.msm-pm660.c
+			
+			
+			
+			1.msm-pm660.dsti
 			pm660_charger: qcom,qpnp-smb2
 				qcom,micro-usb;
 				类型应该是type-c
 				
 			pm660_pdphy: qcom,usb-pdphy@1700 {
-				compatible = "qcom,qpnp-pdphy";
-				reg = <0x1700 0x100>;
-				vdd-pdphy-supply = <&pm660l_l7>;
-				vbus-supply = <&smb2_vbus>;
-				vconn-supply = <&smb2_vconn>;
+					compatible = "qcom,qpnp-pdphy";
+					reg = <0x1700 0x100>;
+					vdd-pdphy-supply = <&pm660l_l7>;
+					vbus-supply = <&smb2_vbus>;
+					vconn-supply = <&smb2_vconn>;
 
-				status = "ok";	
-		2.policy_engine.c
-			module_param(disable_usb_pd, bool, S_IRUGO|S_IWUSR);
-			模块传参 应该不是disable的	
-			
-		voter
-		{
-			pd_allowed_votable
-				PD_DISALLOWED_INDIRECT_VOTER
-				PD_VOTER
-				CC_DETACHED_VOTER
+					status = "ok";
+					
+			2.policy_engine.c
+				module_param(disable_usb_pd, bool, S_IRUGO|S_IWUSR);
+				模块传参 应该不是disable的	
 				
-			pd_disallowed_votable_indirect
-				HVDCP_TIMEOUT_VOTER
-				LEGACY_CABLE_VOTER
-				VBUS_CC_SHORT_VOTER	
-		
-		}	
+				
+			pd的投票
+	
+				pd_allowed_votable:
+						PD_DISALLOWED_INDIRECT_VOTER
+						PD_VOTER
+						CC_DETACHED_VOTER
+						
+				pd_disallowed_votable_indirect:
+						HVDCP_TIMEOUT_VOTER
+						LEGACY_CABLE_VOTER
+						VBUS_CC_SHORT_VOTER
+	
+			/* reset power delivery voters */
+			vote(chg->pd_allowed_votable, PD_VOTER, false, 0);
+			vote(chg->pd_disallowed_votable_indirect, CC_DETACHED_VOTER, true, 0);
+			vote(chg->pd_disallowed_votable_indirect, HVDCP_TIMEOUT_VOTER, true, 0);
+
+
+			1.Enable PD negotiation when the Type-C cable is inserted and HVDCP
+			detection timeout
 			
+			smblib_handle_hvdcp_check_timeout(chg,(bool)(stat & HVDCP_CHECK_TIMEOUT_BIT),(bool)(stat & QC_CHARGER_BIT));
+			SCHG_USB_APSD_STATUS -> 6 HVDCP_CHECK_TIMEOUT
+
+		
+			2.PD negotiation works now
+			
+			smb-lib.c
+			int smblib_get_pe_start(struct smb_charger *chg,
+		       union power_supply_propval *val)
+			{
+				/*
+				 * hvdcp timeout voter is the last one to allow pd. Use its vote
+				 * to indicate start of pe engine
+				 */
+				val->intval
+					= !get_client_vote_locked(chg->pd_disallowed_votable_indirect,
+						HVDCP_TIMEOUT_VOTER);
+				return 0;
+			}
+			
+			policy_engine.c
+			
+			
+			这个函数应该是比较重要的,设置pd的状态，有很多投票
+			smblib_set_prop_pd_active
+			
+			
+			相关的寄存器
+			TYPE_C_STATUS_4_REG							0x0000130E
+			TYPE_C_INTRPT_ENB_SOFTWARE_CTRL_REG			0x00001368
+			
+			pd 的状态
+			enum usbpd_state {
+				PE_UNKNOWN,
+				PE_ERROR_RECOVERY,
+				PE_SRC_DISABLED,
+				PE_SRC_STARTUP,
+				PE_SRC_SEND_CAPABILITIES,
+				PE_SRC_SEND_CAPABILITIES_WAIT, /* substate to wait for Request */
+				PE_SRC_NEGOTIATE_CAPABILITY,
+				PE_SRC_TRANSITION_SUPPLY,
+				PE_SRC_READY,
+				PE_SRC_HARD_RESET,
+				PE_SRC_SOFT_RESET,
+				PE_SRC_SEND_SOFT_RESET,
+				PE_SRC_DISCOVERY,
+				PE_SRC_TRANSITION_TO_DEFAULT,
+				PE_SNK_STARTUP,
+				PE_SNK_DISCOVERY,
+				PE_SNK_WAIT_FOR_CAPABILITIES,
+				PE_SNK_EVALUATE_CAPABILITY,
+				PE_SNK_SELECT_CAPABILITY,
+				PE_SNK_TRANSITION_SINK,
+				PE_SNK_READY,
+				PE_SNK_HARD_RESET,
+				PE_SNK_SOFT_RESET,
+				PE_SNK_SEND_SOFT_RESET,
+				PE_SNK_TRANSITION_TO_DEFAULT,
+				PE_DRS_SEND_DR_SWAP,
+				PE_PRS_SNK_SRC_SEND_SWAP,
+				PE_PRS_SNK_SRC_TRANSITION_TO_OFF,
+				PE_PRS_SNK_SRC_SOURCE_ON,
+				PE_PRS_SRC_SNK_SEND_SWAP,
+				PE_PRS_SRC_SNK_TRANSITION_TO_OFF,
+				PE_PRS_SRC_SNK_WAIT_SOURCE_ON,
+				PE_VCS_WAIT_FOR_VCONN,
+			};
+			
+			
+			type-c的状态
+			/* Indicates USB Type-C CC connection status */
+			enum power_supply_typec_mode {
+				POWER_SUPPLY_TYPEC_NONE,
+
+				/* Acting as source */
+				POWER_SUPPLY_TYPEC_SINK,			/* Rd only */
+				POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE,		/* Rd/Ra */
+				POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY,	/* Rd/Rd */
+				POWER_SUPPLY_TYPEC_SINK_AUDIO_ADAPTER,		/* Ra/Ra */
+				POWER_SUPPLY_TYPEC_POWERED_CABLE_ONLY,		/* Ra only */
+
+				/* Acting as sink */
+				POWER_SUPPLY_TYPEC_SOURCE_DEFAULT,		/* Rp default */
+				POWER_SUPPLY_TYPEC_SOURCE_MEDIUM,		/* Rp 1.5A */
+				POWER_SUPPLY_TYPEC_SOURCE_HIGH,			/* Rp 3A */
+				POWER_SUPPLY_TYPEC_NON_COMPLIANT,
+			};
+			
+			//Gionee <GN_BY_CHG> <lilubao> <20180101> add for debug usb pd begin	
+
+		}
+	
+	
+		
 		PD3.0/PPS/or QC4.0	了解一下pps的一些内容，干什么的，有什么要求
 		{
 			The CC line communication between Sink and Source will look like below :
@@ -884,6 +1014,7 @@ M2018
 				The BMC data can be decoded by USB PD decoders like Ellisys EX350 Analyzer
 		
 		}
+		
 	}
 
 
