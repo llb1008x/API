@@ -146,7 +146,7 @@
 
 17G10A
 {
-	
+	rt5081 probe时间太长 200ms+
 
 	
 	
@@ -863,7 +863,7 @@ M2018
 			
 			1.msm-pm660.dsti
 			pm660_charger: qcom,qpnp-smb2
-				qcom,micro-usb;
+				/*qcom,micro-usb;*/
 				类型应该是type-c
 				
 			pm660_pdphy: qcom,usb-pdphy@1700 {
