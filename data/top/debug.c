@@ -146,119 +146,105 @@
 
 17G10A
 {
-	rt5081 probe时间太长 200ms+
-
-	
-	
-	GNSPR#100830,充电时按开机键开机，测试值是6.83s，标准值是4.5s，超出标准值2.33s
+	充电电流过大
 	{
-		未插usb： 4~4.5s出logo
-		枚举那段log基本上没停顿
-		插usb： 7.5~8s出logo
-		长按重启 枚举那段log停顿2.5~3s
-		第一次开机停顿2.5~3s
-		插充电器： 6~7s出logo
-		枚举那段停顿0.3~0.5s左右	
-		
-		//Gionee <GN_BY_CHG> <lilubao> <20180101> add  for fixed #100830 begin
-		加点代码，计算这段用了多少时间
-		
-		unsigned int time_bat_init;
-		get_timer(time_bat_init)
-		
-		
-		preloader:			
+		1、17G10A的充电头是5V/2A的，但下面测试充电线上的电流超过了2A，最大达到了3.2A，超出了额定功率，而且持续了20分钟左右，这种是否会存在烧毁充电头的风险？
+		---如果有一个持续3.2A的输出电流，是有可能烧坏充电器的。
+		2、17G10A的充电头实际输出能力是多少？
+		---输出最大过流点范围是2-2.4A
+		3、之前项目5V/2A的充电头输出电流能力是否和17G10都是一样的？有没有出现问题？
+		---目前我们的5V2A充电器输出过流点都是在2-2.4A，没有出现过最大电流达到3A的情况
+		4、如果确实是充电头实际输出电流很大，能不能改小点？
+		---如果确定是充电器输出电流很大，只能说是这个充电器坏掉了，所以出现异常大输出电流。
+	
+	}
+
+
+
+
+
+
+
+
+	
+	GNSPR#109803,关机状态，连接充电器，显示电量灭屏后，短按两次电源键1s，出现开机画面，再次操作恢复
+	{
+		启动之后的boot_reason 是4,wdt_by_pass_pwk,然后这个现象是在系统跑到kernel之后的
+		按键的检测问题应该是在kernel出现问题的		
 		{
-			vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6757/src/core/main.c
-			
-			CFG_USB_TOOL_HANDSHAKE
-			
-			bldr_pre_process()  -> bldr_handshake(&handler) 
-			
-			usb_cable_in() -> mt_charger_type_detection() ->  hw_charger_type_detection bc1.1协议，全都是一些操作寄存器的 
-			
-			-> usb_connect 
-			
-			platform.h
-			这里有两个一个是usb握手时间，一个是枚举的时间
-			/* if not defined in cust_usb.h, use default setting */
-			#if !defined(CFG_USB_ENUM_TIMEOUT)
-			//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 begin         
-			#define CFG_USB_ENUM_TIMEOUT            (4000)           
-			//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 end
+			首先这个boot_reason 有哪些原因？
+			SW,HW,kernel panic 按键检测到短按所以会重启，这个应该是系统硬件初始化的时候读取寄存器传递的值g_boot_arg
+		
+			kernel 部分按键的处理在kpd.c 中断回调函数 kpd_pwrkey_pmic_handler
+			void kpd_pwrkey_pmic_handler(unsigned long pressed)
+			{
+			//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 begin
+				if(1==s_gn_clam)
+				{
+					return ;
+				}
+				else
+				{
+					kpd_print("Power Key generate, pressed=%ld\n", pressed);
+					if (!kpd_input_dev) {
+						kpd_print("KPD input device not ready\n");
+						return;
+				}
+				kpd_pmic_pwrkey_hal(pressed);
+			#if (defined(CONFIG_ARCH_MT8173) || defined(CONFIG_ARCH_MT8163))
+				if (pressed) /* keep the lock while the button in held pushed */
+					wake_lock(&pwrkey_lock);
+				else /* keep the lock for extra 500ms after the button is released */
+					wake_lock_timeout(&pwrkey_lock, HZ/2);
+					//这一部分的处理就是说在释放powerkey之后还有500ms持锁
 			#endif
+				}
+			}
+			//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 end
+		}		
+	
+		6355的 MT6355_TOPSTATUS这个寄存器有homekey跟powerkey的检测
+		preloader的keypad.c mtk_detect_key 检测按键
+	
+		按键相关的input子系统内定的编号
+		linux-event-codes.h
+	
+	
+		{
+			相关的宏	
+			BR_WDT_BY_PASS_PWK,MTK_KERNEL_POWER_OFF_CHARGING,kpoc_flag
+		
 
-			/* if not defined in cust_usb.h, use default setting */
-			#if !defined(CFG_USB_HANDSHAKE_TIMEOUT)
-			//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 begin
-			#define CFG_USB_HANDSHAKE_TIMEOUT       (1500)       
-			//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 end
-			#endif
+			<3>[   10.779316]  (7)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->10
+			<3>[   20.786597]  (5)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->20
+			<3>[   30.792217]  (0)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->30
 		}
+	
+		按键检测的流程大概是这样的：
+		底层6355接收到按键触发的中断然后通过handler回调到(kpd.c)kpd_pwrkey_pmic_handler，这里有wake_lock持锁，按下的时候持锁，
+		释放的时候还会持锁500ms，然后时（hal_kpd.c）kpd_pmic_pwrkey_hal 将按键的时间上报给input子系统的，(key_control.cpp) 之后应该是通过input
+		子系统下面的fd节点，这里面是一个线程通过轮询的方式，如果有变化就会判断下一步亮屏关机充电的动画还是灭屏或者是重启之类的
 		
 		
+		现在这个问题是灭屏的时候连续短按powerkey 短按时间是1s左右，然后会重启亮屏，所以现在需要先看log确定原因
 		
-		
-		
-		
-		
-		
-		 	[   10.830067] <4>.(4)[69:pmic_thread][name:pmic_irq&][PMIC] [PMIC_INT] addr[0x854]=0x1
-			[   10.831035] <4>.(4)[69:pmic_thread][name:kpd&]kpd: Power Key generate, pressed=1
-			[   10.831971] <4>.(4)[69:pmic_thread][name:hal_kpd&]kpd: kpd: (pressed) HW keycode =116 using PMIC
-			[   10.833102] <4>.(4)[69:pmic_thread][name:aed&](pressed) HW keycode powerkey
-			[   10.834083] <4>.(4)[277:kpoc_charger]charger: key_control: event.type:1,116:1
-			[   10.835000] <4>.(4)[277:kpoc_charger]charger: key_control: event.type:0,0:0
-			[   10.835911] <4>.(4)[297:kpoc_charger]charger: pwr key long press check start
-		 
-		 
-			[LIB] Loading SEC config
-			[LIB] Name = 
-			[LIB] Config = 0x22, 0x22
-			[LIB] SECRO (ac, ac_offset, ac_length) = (0x1, 0x40, 0x40)
-			0x31,0x41,0x35,0x35
-			[SEC] DBGPORT 00000051 0000FFFF 00000101 00000101 0022EF45 00236705 00000051 0000FFFF 00000101 0000FFFF 00000101 00000042 00000000
-			[SEC] DBGPORT (0 1)
-			[SEC] DBGPORT 00000051 0000FFFF 00000101 00000101 0022EF45 00236705 00000051 0000FFFF 00000101 0000FFFF 00000101 00000042 00000000
 
-			[SEC] read '0x8800000'
-			0x4D,0x4D,0x4D,0x4D,0x4,0x0,0x0,0x0,
-			[LIB] seclib_img_auth_load_sig [LIB] CFG read size '0x2000' '0x3C'
-			0x4D4D4D4D
-			[LIB] SEC CFG 'v4' exists
-			[LIB] HW DEC
-			GCPU Enhance,V1.1
-			[LIB] SEC CFG is valid. Lock state is 1 
+		//Gionee <GN_BY_CHG> <lilubao> <20180104> modify for kpoc charging begin
+		bp侧的编译脚本 pm_config.scons 这样的 *.scons
+		scons: done reading SConscript files.
 
-			
-			//tool handshake	这段时间比较长
-			[BLDR] Starting tool handshake.
-			€€€€€€€€€€€[BLDR] Tool connection is unlocked
-			[platform_vusb_on] VUSB33 is on
-			[platform_vusb_on] VA10 is on
-			[platform_vusb_on] VA10 select to 0.9V
-			rt5081_enable_chgdet_flow: en = 0
-			rt5081_enable_chgdet_flow: en = 1
-			mtk_ext_chgdet: usb_stats = 0x00000020
-			mtk_ext_chgdet: chg type = 1
-
-
-			[PLFM] USB cable in
-			[TOOL] USB enum timeout (Yes), handshake timeout(Yes)
-			[TOOL] Enumeration(Start)
-			HS is detected
-			HS is detected
-			[TOOL] Enumeration(End): OK 521ms 
-			
-			usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0][TOOL] : usb listen timeout
-			
-			
-			[TOOL] <USB> cannot detect tools!
-			[TOOL] <UART> listen  ended, receive size:0!
-
-			[TOOL] <UART> wait sync time 150ms->5ms
-			[TOOL] <UART> receieved data: ()
+	}
+	
+	
+	
+	
+	
+	
+	
+	GNSPR #129934,【系统】手机后台下载游戏，手机连接充电器，手机出现严重卡顿
+	{
 		
+	
 	
 	}
 	
@@ -272,7 +258,20 @@
 	
 	
 	
+
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	80-P2485-1
+
 
 	GNSPR#139202，去除冗余log
 	{
@@ -300,7 +299,7 @@
 		
 		
 		
-		3.还有这个问题，irq不匹配的问题
+		3.还有这个问题，irq不匹配的问题  这个问题是修改充电ovp的时候多次enable power_path 导致的这个warning
 		<6>[21329.846831]  (5)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_irq: (chg_mivr) en = 1
 		<7>[21329.846844]  (5)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_read: reg e0 size 16
 		<4>[21329.846857] -(5)[239:charger_thread]------------[ cut here ]------------
@@ -320,6 +319,12 @@
 		<4>[21329.846976] -(5)[239:charger_thread][<ffffffc0000be268>] kthread+0xdc/0xf0
 		<4>[21329.846987] -(5)[239:charger_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
 		<4>[21329.846994] -(5)[239:charger_thread]---[ end trace a4903c9f998f3193 ]---	
+		
+		
+		4.rt5081 probe时间太长 200ms+
+		
+		
+		5.rt5081的 pd和type-c 的配置因为占用了gpio 8
 		
 	}
 	
@@ -1144,6 +1149,78 @@ M2018
 /*********************************************************************************************************************************/
 17G06A
 {
+	关机充电充电电流跳变，同时电流比较大导致充电器烧毁的
+	{
+		SMBCHGL_USB_ICL_STS_1			0x00001307
+		
+	
+		SMBCHGL_USB_ICL_STS_2			0x00001309		
+		3	USBIN_SUSPEND_STS			[5:4]	ICL_MODE
+		
+		SMBCHGL_USB_CMD_IL				0x00001340
+		4	USBIN_SUSPEND
+		
+		SMBCHGL_USB_USBIN_IL_CFG		0x000013F2		限制usbin的电流
+		
+		SMBCHGL_USB_USB_AICL_CFG		0x000013F3
+		#define USB_AICL_CFG				0xF3
+		#define AICL_EN_BIT				BIT(2)
+		static void smbchg_rerun_aicl(struct smbchg_chip *chip)
+		
+		SMBCHGL_USB_INT_POLARITY_LOW	0x00001313
+		
+		然后去掉并行充电部分的宏，并行充电是否会有问题
+		
+		
+		//Gionee <GN_BSP_CHG> <lilubao> <20180105> add for debug begin
+		dump打开
+		
+		smbchg_prepare_for_pulsing
+		
+		
+		//modify by lilubao for debug 20180106
+		pr_err("in [%s] by lilubao reg->%02X\n",__FUNCTION__,reg);
+		
+		
+		
+		1.aicl不是旨在插入充电器的时候检测充电器的能力吗？为什么还要每隔180S检测一次
+
+		---充电器插入的时候会启动AICL 检测，充电过程中硬件也会定时去做AICL rerun ,原因qpnp-smbcharger.txt 已经解释了，硬件AICL 默认是enable，默认rerun时间是180S。
+
+		- qcom,force-aicl-rerun: A boolean property which upon set will enable the AICL rerun by default along with the deglitch time
+		configured to long interval (20 ms). Also, specifying
+		this property will not adjust the AICL deglitch time
+		dynamically for handling the battery over-voltage
+		oscillations when the charger is headroom limited.
+		- qcom,aicl-rerun-period-s If force-aicl-rerun is on, this property dictates how often aicl is reran in seconds. Possible values
+		are
+		SCHG - 45, 90, 180, and 360.
+		SCHG_LITE - 3 (2.8), 6 (5.6), 11 (11.3), 23 (22.5), 45, 90, 180 and 360 
+		
+		
+		并行充电部分可能会影响到充电电流跳变
+		msm-pmi8937.dtsi
+				qcom,parallel-usb-min-current-ma = <1400>;
+				qcom,parallel-usb-9v-min-current-ma = <900>;
+				qcom,parallel-allowed-lowering-ma = <500>;
+				
+		这三个参数会在qpnp-smbcharger.c中判断，然后会影响到aicl的中断
+		if (chip->parallel.min_current_thr_ma != -EINVAL
+			&& chip->parallel.min_9v_current_thr_ma != -EINVAL)
+						chip->parallel.avail = true;	
+						
+		if (chip->parallel.avail && chip->usb_present) {
+				rc = enable_irq_wake(chip->aicl_done_irq);
+				chip->enable_aicl_wake = true;
+			}					
+	}
+
+
+
+
+
+
+
 
 
 

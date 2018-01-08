@@ -4777,6 +4777,121 @@ out:
 
 
 
+/*********************************************************************************************************************************************/
+30.裁决，GNSPR#100830,充电时按开机键开机，测试值是6.83s，标准值是4.5s，超出标准值2.33s
+{
+	未插usb： 4~4.5s出logo
+	枚举那段log基本上没停顿
+	插usb： 7.5~8s出logo
+	长按重启 枚举那段log停顿2.5~3s
+	第一次开机停顿2.5~3s
+	插充电器： 6~7s出logo
+	枚举那段停顿0.3~0.5s左右	
+	
+	//Gionee <GN_BY_CHG> <lilubao> <20180101> add  for fixed #100830 begin
+	加点代码，计算这段用了多少时间
+	
+	unsigned int time_bat_init;
+	get_timer(time_bat_init)
+	
+	
+	preloader:			
+	{
+		vendor/mediatek/proprietary/bootable/bootloader/preloader/platform/mt6757/src/core/main.c
+		
+		CFG_USB_TOOL_HANDSHAKE
+		
+		bldr_pre_process()  -> bldr_handshake(&handler) 
+		
+		usb_cable_in() -> mt_charger_type_detection() ->  hw_charger_type_detection bc1.1协议，全都是一些操作寄存器的 
+		
+		-> usb_connect 
+		
+		platform.h
+		这里有两个一个是usb握手时间，一个是枚举的时间
+		/* if not defined in cust_usb.h, use default setting */
+		#if !defined(CFG_USB_ENUM_TIMEOUT)
+		//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 begin         
+		#define CFG_USB_ENUM_TIMEOUT            (4000)           
+		//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 end
+		#endif
+
+		/* if not defined in cust_usb.h, use default setting */
+		#if !defined(CFG_USB_HANDSHAKE_TIMEOUT)
+		//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 begin
+		#define CFG_USB_HANDSHAKE_TIMEOUT       (1500)       
+		//GioneeDrv LiLuBao 20161121 modify for fixed GNSPR53131 end
+		#endif
+	}
+	
+	
+
+	 	[   10.830067] <4>.(4)[69:pmic_thread][name:pmic_irq&][PMIC] [PMIC_INT] addr[0x854]=0x1
+		[   10.831035] <4>.(4)[69:pmic_thread][name:kpd&]kpd: Power Key generate, pressed=1
+		[   10.831971] <4>.(4)[69:pmic_thread][name:hal_kpd&]kpd: kpd: (pressed) HW keycode =116 using PMIC
+		[   10.833102] <4>.(4)[69:pmic_thread][name:aed&](pressed) HW keycode powerkey
+		[   10.834083] <4>.(4)[277:kpoc_charger]charger: key_control: event.type:1,116:1
+		[   10.835000] <4>.(4)[277:kpoc_charger]charger: key_control: event.type:0,0:0
+		[   10.835911] <4>.(4)[297:kpoc_charger]charger: pwr key long press check start
+	 
+	 
+		[LIB] Loading SEC config
+		[LIB] Name = 
+		[LIB] Config = 0x22, 0x22
+		[LIB] SECRO (ac, ac_offset, ac_length) = (0x1, 0x40, 0x40)
+		0x31,0x41,0x35,0x35
+		[SEC] DBGPORT 00000051 0000FFFF 00000101 00000101 0022EF45 00236705 00000051 0000FFFF 00000101 0000FFFF 00000101 00000042 00000000
+		[SEC] DBGPORT (0 1)
+		[SEC] DBGPORT 00000051 0000FFFF 00000101 00000101 0022EF45 00236705 00000051 0000FFFF 00000101 0000FFFF 00000101 00000042 00000000
+
+		[SEC] read '0x8800000'
+		0x4D,0x4D,0x4D,0x4D,0x4,0x0,0x0,0x0,
+		[LIB] seclib_img_auth_load_sig [LIB] CFG read size '0x2000' '0x3C'
+		0x4D4D4D4D
+		[LIB] SEC CFG 'v4' exists
+		[LIB] HW DEC
+		GCPU Enhance,V1.1
+		[LIB] SEC CFG is valid. Lock state is 1 
+
+		
+		//tool handshake	这段时间比较长
+		[BLDR] Starting tool handshake.
+		€€€€€€€€€€€[BLDR] Tool connection is unlocked
+		[platform_vusb_on] VUSB33 is on
+		[platform_vusb_on] VA10 is on
+		[platform_vusb_on] VA10 select to 0.9V
+		rt5081_enable_chgdet_flow: en = 0
+		rt5081_enable_chgdet_flow: en = 1
+		mtk_ext_chgdet: usb_stats = 0x00000020
+		mtk_ext_chgdet: chg type = 1
+
+
+		[PLFM] USB cable in
+		[TOOL] USB enum timeout (Yes), handshake timeout(Yes)
+		[TOOL] Enumeration(Start)
+		HS is detected
+		HS is detected
+		[TOOL] Enumeration(End): OK 521ms 
+		
+		usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0]usbdl_flush timeoutintrep :0, IntrTx[0] IntrRx [0][TOOL] : usb listen timeout
+		
+		
+		[TOOL] <USB> cannot detect tools!
+		[TOOL] <UART> listen  ended, receive size:0!
+
+		[TOOL] <UART> wait sync time 150ms->5ms
+		[TOOL] <UART> receieved data: ()
+		
+		
+		测试标准有问题 这个测试标准应该针对不同平台制定，高通跟mtk平台本身会有差异。
+
+		MTK平台本身时间比较长，按键检测，usb握手，枚举和tools的检测导致时间比较长
+		时间可以减少一点，但是会影响到usb跟充电检测的准确性，而且也无法达到标准时间
+
+
+}
+
+
 
 
 

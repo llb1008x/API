@@ -1106,8 +1106,29 @@
 	  }
 	  
 	  
-	  //Gionee <GN_BSP_CHG> <lilubao> <20171229> modify for platform change begin
-	  
+	  modify :
+	  	msm8917-pmi8937-qrd-sku5.dtsi
+	  		//Gionee <GN_BSP_CHG> <lilubao> <20170928> modify for charging current begin
+			qcom,fastchg-current-ma = <1000>;  // default 1000
+			//Gionee <GN_BSP_CHG> <lilubao> <20170928> modify for charging current end
+		msm-pmi8937.dtsi
+			//Gionee <GN_BSP_CHG> <lilubao> <20171229> add for platform change begin
+			qcom,thermal-mitigation = <1000 800 600 0>;
+			//Gionee <GN_BSP_CHG> <lilubao> <20171229> add for platform change end	
+			
+		qpnp-smbcharger.c
+			//Gionee <GN_BSP_CHG> <lilubao> <20171229> add for platform change begin
+			static int smbchg_default_dcp_icl_ma = 1000;
+			//Gionee <GN_BSP_CHG> <lilubao> <20171229> add for platform change end
+			
+			
+			
+			
+	 	 //Gionee <GN_BSP_CHG> <lilubao> <20171229> modify for platform change begin
+	 
+	 	启动阶段到esr计算断开充电之前限制充电电流，或者关闭power path
+	 	限制充电电流方案好一点
+	 	 
  }
 
 
