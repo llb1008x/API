@@ -136,7 +136,44 @@
 
 
 
+G1605A
+{
+	GNSPR #149596,自动化monkey72h测试执行过程中adb异常
+	{
+		monkey是干什么的，有什么机制，然后针对的找问题
+		搜 Exception
+		
+		确定问题发生的时间，
+	
+		<7>[22616.294464] -(0)[3642:commands.monkey][name:devapc&][DEVAPC] Device Access Permission Read Violation - Process:commands.monkey PID:3642 Vio Addr:0x11006000 , Bus ID:0x1a , Dom ID:0x0
+		<7>[22616.294475] -(0)[3642:commands.monkey][name:devapc&][DEVAPC] VIO_STA 0:0x0, 1:0x40000, 2:0x0, 3:0x2400000, 4:0x0
+		
+		
+		:Sending Flip keyboardOpen=true
+		Got IOException performing flipjava.io.IOException: write failed: EINVAL (Invalid argument)
+		// Injection Failed
+		
+		
+		这个好象是上层虚拟机重启了，然后adbd service被kill了
+		adb功能之前一直是正常的
+		main.log
+		01-04 04:47:55.531473 3833 3833 D AndroidRuntime: Shutting down VM
 
+		kernel.log
+		<13>[42205.234289] (2)[1:init]init: Service 'adbd' is being killed...
+		<5>[42205.234666] (2)[1:init][g_android][USB]enable_store: device_attr->attr.name: enable
+		<5>[42205.234686] (2)[1:init][g_android][USB]enable_store: enable 1->0 case, device_desc.idVendor = 0x271d, device_desc.idProduct = 0xc02
+		<4>[42205.234696] (2)[1:init][MUSB]musb_gadget_pullup 2545: is_on=0, softconnect=1 ++
+		<4>[42205.234705] (2)[1:init][MUSB]usb_cable_connected 594: type(1)
+		<4>[42205.234713] (2)[1:init][MUSB]musb_pullup 2488: MUSB: gadget pull up 0 start
+		<4>[42205.234722] (2)[1:init][MUSB]musb_pullup 2508: MUSB: gadget pull up 0 end
+		<6>[42205.234734] -(2)[1:init]android_usb gadget: disable function 'mtp'/ffffffc0b4bf7800
+		<4>[42205.234741] -(2)[1:init]mtp_function_disable
+	
+	}
+
+
+}
 
 
 
@@ -146,6 +183,44 @@
 
 17G10A
 {
+
+
+	充电至满电的状态可能有问题
+	{
+		1.整个power supply 上报的都很慢
+		power_supply_changed(bat_psy); 
+		
+		fg_update_flag电量计要上报
+		
+		
+		//Gionee <GN_BY_CHG> <lilubao> <20180110> modify for platform change begin
+		
+		
+		
+
+		2.
+		<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22
+		
+		mtk_chg_type_det.c 这个里面注册了charger到power supply但是没有charger_type这个节点所以一直报错 
+		charge_type
+		
+		mt_charger_set_property
+		
+			struct mt_charger *mtk_chg = power_supply_get_drvdata(psy);
+		
+			mt_chg->chg_online = false;
+			mt_chg->charger.name = "charger";
+			mt_chg->charger.type = POWER_SUPPLY_TYPE_UNKNOWN;
+	
+	}
+
+
+
+
+
+
+
+
 	充电电流过大
 	{
 		1、17G10A的充电头是5V/2A的，但下面测试充电线上的电流超过了2A，最大达到了3.2A，超出了额定功率，而且持续了20分钟左右，这种是否会存在烧毁充电头的风险？
@@ -156,6 +231,18 @@
 		---目前我们的5V2A充电器输出过流点都是在2-2.4A，没有出现过最大电流达到3A的情况
 		4、如果确实是充电头实际输出电流很大，能不能改小点？
 		---如果确定是充电器输出电流很大，只能说是这个充电器坏掉了，所以出现异常大输出电流。
+		
+		
+		设置电流的地方有哪些？
+		
+		
+		rt5081跟pd相关的宏，代码
+		#CONFIG_TCPC_CLASS=y
+		#CONFIG_USB_POWER_DELIVERY=y
+		#CONFIG_TCPC_RT5081=y
+		
+		
+		现在不确定是否可能存在问题
 	
 	}
 
@@ -239,17 +326,7 @@
 	
 	
 	
-	
-	
-	GNSPR #129934,【系统】手机后台下载游戏，手机连接充电器，手机出现严重卡顿
-	{
-		
-	
-	
-	}
-	
-	
-	
+
 	
 	
 	
@@ -325,6 +402,10 @@
 		
 		
 		5.rt5081的 pd和type-c 的配置因为占用了gpio 8
+		
+		
+		6.power_supply 上报有问题
+		<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22
 		
 	}
 	
