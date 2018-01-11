@@ -68,9 +68,6 @@
 
 
 
-
-
-
 17G06A log关键字
 {
 	src_detect_handler	，handle_usb_insertion	充电检测
@@ -178,7 +175,7 @@ G1605A
 
 
 
-
+rt5081_enable_cable_drop_comp
 
 
 17G10A
@@ -187,13 +184,58 @@ G1605A
 
 	充电至满电的状态可能有问题
 	{
-		1.整个power supply 上报的都很慢
-		power_supply_changed(bat_psy); 
+		reviewer code 感觉代码逻辑跟规范有问题
 		
-		fg_update_flag电量计要上报
+		mtk_battery.c
+			1.
+			整个power supply 上报的都很慢
+			power_supply_changed(bat_psy); 
 		
+			fg_update_flag电量计要上报
 		
-		//Gionee <GN_BY_CHG> <lilubao> <20180110> modify for platform change begin
+			battery_update_routine
+		
+						battery_update_psd(&battery_main);
+						if ( (chr_type != CHARGER_UNKNOWN)||(gn_screenon_time>0) ){
+							bm_err("in [%s] by lilubao for debug \n",__FUNCTION__);
+							ktime = ktime_set(10, 0);
+						}	
+		
+			但是这个函数里面并没有调用power supply change 不知道会不会上报
+			power_supply_changed(bat_psy);
+		
+			估计需要在battery_update_psd里面上报
+			struct power_supply *bat_psy = bat_data->psy;
+			power_supply_changed(bat_psy);
+		
+			2.boot ，screen的时间这部分代码不是很好看
+			void fg_update_info(void )
+			{
+				int gn_boot_reason,gn_boot_mode;
+
+				gn_boot_reason=get_boot_reason();
+				gn_boot_mode=get_boot_mode();
+
+				if(mt_get_bl_brightness() != 0)
+					gn_screenon_time = gn_screenon_time + 10;
+				else
+					gn_screenon_time = 0;
+
+	
+				bm_info("gn_boot_reason->%d,gn_boot_mode->%d,gn_call_state->%d,gn_screenon_time->%d\n",
+						gn_boot_reason,gn_boot_mode,gn_call_state,gn_screenon_time);
+			}
+			
+			包括后面的电量信息上报也根据screen判断
+			
+			
+		mtk_charger.c
+				之前已经修改了一部分关于ovp的代码
+				
+		mtk_switch_charging.c
+				
+		rt5081_pmu_charger.c
+			取出冗余log				
 		
 		
 		
