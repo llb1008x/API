@@ -59,8 +59,45 @@
               
               
             编译源码：
+                source build/envsetup.sh 
+                lunch msm8916_64-userdebug 
+
+                make -j10 | tee log.txt
                 
-        
+                1.                
+                ninja: error: 'out/target/product/msm8916_64/obj_arm/SHARED_LIBRARIES/libqct_resampler_intermediates/export_includes', needed by 'out/target/product/msm8916_64/obj_arm/SHARED_LIBRARIES/libaudioresampler_intermediates/import_includes', missing and no known rule to make it
+                build/core/ninja.mk:148: recipe for target 'ninja_wrapper' failed
+                make: *** [ninja_wrapper] Error 1
+
+                解决：配置好java环境和jack_vm_args。
+
+                # set java 8
+                export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+                export JRE_HOME=$JAVA_HOME/jre
+                export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH
+                export CLASSPATH=$CLASSPATH:.:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
+
+
+                # set for android N build
+                export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
+                echo "ANDROID_JACK_VM_ARGS=$ANDROID_JACK_VM_ARGS"
+
+
+
+                ninja: error: 'out/target/product/msm8916_64/obj/SHARED_LIBRARIES/libsrsprocessing_intermediates/export_includes', needed by 'out/target/product/msm8916_64/obj/SHARED_LIBRARIES/libaudioflinger_intermediates/import_includes', missing and no known rule to make it
+
+
+
+                No private recovery resources for TARGET_DEVICE msm8916_64
+
+
+                prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/ld.gold: error: version script assignment of LIBC to symbol __propClientDispatch failed: symbol not defined
+                prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/aarch64-linux-android/bin/ld.gold: error: version script assignment of LIBC to symbol __propClientDispatchWrite failed: symbol not defined
+                clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+
+
+                编译过了，但是屏幕一直无法正常使用
+                
         }    
        
 
@@ -71,6 +108,212 @@
 
 
 
+/*4412开发板*/
+{
+    下面是设置 PC 机和开发板以太网的例子:
+        1)设置 PC 主机 IPV4 地址为 192.168.1.2(IP 地址可以根据实际情况选择)
+        2)连接开发板和主机的串口,网口,启动开发板,系统启动后,设置 Android 的 IP 地址和主机在同一
+        个网段,例如,在串口中输入:
+        ifconfig eth0 192.168.1.130 (IP 地址可以根据实际情况自行确定)
+        测试以太网连接,在串口中输入:
+        ping 192.168.1.2(开发板 ping PC)
+        或者在 PC 的 cmd 窗口中输入:
+        ping 192.168.1.130(PC ping 开发板)
+        然后可以看到 ping 命令执行的结果。
+        开发板连接路由器例子:
+        ifconfig eth0 192.168.1.130 netmask 255.255.255.0 up
+        route add default gw 192.168.1.1 dev eth0
+        setprop net.dns1 192.168.1.1
+
+
+    烧写镜像文件不能用fastboot，需要通过串口进入uboot模式
+    需要注意的是,fastboot 命令只能用来和开发板的 Uboot 模式进行交互,前面烧写镜像时提到的那些
+命令也都是运行在开发板的 UBOOT 模式。
+
+
+    更换make编译器
+    但是报错了，
+
+    1.Makefile:1039: recipe for target 'check-regression' failed
+    make[2]: *** [check-regression] Error 1
+    make[2]: Leaving directory '/home/llb/project/WORK/linux_tar/make-3.81'
+    Makefile:880: recipe for target 'check-am' failed
+    make[1]: *** [check-am] Error 2
+    make[1]: Leaving directory '/home/llb/project/WORK/linux_tar/make-3.81'
+    Makefile:603: recipe for target 'check-recursive' failed
+    make: *** [check-recursive] Error 1
+
+    ./configure
+
+    make
+
+    make install
+
+
+    2.Error:
+    frameworks/base/include/utils/KeyedVector.h:193:31: note: declarations in dependent base ‘android::KeyedVector<android::String8, android::sp<AaptDir> >’ are not found by unqualified lookup
+    frameworks/base/include/utils/KeyedVector.h:193:31: note: use ‘this->indexOfKey’ instead
+    make: *** [out/host/linux-x86/obj/EXECUTABLES/aapt_intermediates/AaptAssets.o] Error 1
+
+    Fix:
+    vi frameworks/base/tools/aapt/Android.mk
+
+    Add '-fpermissive' to line 31:
+    LOCAL_CFLAGS += -Wno-format-y2k -fpermissive
+
+
+    3.external/srec/tools/thirdparty/OpenFst/fst/lib/determinize.h:297:12: error: ‘SetArcs’ was not declared in this scope, and no declarations were found by argument-dependent lookup at the point of instantiation [-fpermissive]
+    解决办法：
+    cd external/srec
+    wget "https://github.com/CyanogenMod/android_external_srec/commit/4d7ae7b79eda47e489669fbbe1f91ec501d42fb2.diff"
+    patch -p1 < 4d7ae7b79eda47e489669fbbe1f91ec501d42fb2.diff
+    rm -f 4d7ae7b79eda47e489669fbbe1f91ec501d42fb2.diff
+    cd ../..
+
+
+    4.<command-line>:0:0: error: "_FORTIFY_SOURCE" redefined [-Werror
+
+    解决方法：
+
+    修改源码目录下/build/core/combo/HOST_linux-x86.mk文件：
+
+    将以下语句
+
+    HOST_GLOBAL_CFLAGS += -D_FORTIFY_SOURCE=0
+
+    修改为
+
+    HOST_GLOBAL_CFLAGS += -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0
+
+
+
+
+    5.external/oprofile/libpp/format_output.h:94:22: error: reference ‘counts’ cannot be declared ‘mutable’ [-fpermissive]
+   mutable counts_t & counts;
+
+   解决办法：
+    external/oprofile/libpp/format_output.h
+
+    把：
+    mutable counts_t & counts;
+    改为：
+    counts_t & counts;
+
+
+    6.external/gtest/src/../include/gtest/internal/gtest-param-util.h:122:11: error: ‘ptrdiff_t’ does not name a type
+In file included from external/gtest/src/gtest-all.cc:38:0:
+
+    解决方法：
+    $vi external/gtest/src/../include/gtest/internal/gtest-param-util.h
+    #include <cstddef>
+
+
+    7.host SharedLib: libext2_profile_host (out/host/linux-x86/obj/lib/libext2_profile.so)
+host Executable: ext2simg (out/host/linux-x86/obj/EXECUTABLES/ext2simg_intermediates/ext2simg)
+host Executable: ext4fixup (out/host/linux-x86/obj/EXECUTABLES/ext4fixup_intermediates/ext4fixup)
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_mark_block_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:307：对‘ext2fs_mark_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_unmark_block_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:307：对‘ext2fs_unmark_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_test_block_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:307：对‘ext2fs_test_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_mark_inode_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:333：对‘ext2fs_mark_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_unmark_inode_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:340：对‘ext2fs_unmark_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_test_inode_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:342：对‘ext2fs_test_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_mark_block_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:342：对‘ext2fs_mark_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_unmark_block_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:342：对‘ext2fs_unmark_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_test_block_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:342：对‘ext2fs_test_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_mark_inode_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:373：对‘ext2fs_mark_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_unmark_inode_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:379：对‘ext2fs_unmark_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_test_inode_bitmap’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:385：对‘ext2fs_test_generic_bitmap’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_get_block_bitmap_start’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:387：对‘ext2fs_get_generic_bitmap_start’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_get_inode_bitmap_start’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:396：对‘ext2fs_get_generic_bitmap_start’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_get_block_bitmap_end’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:397：对‘ext2fs_get_generic_bitmap_end’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_get_inode_bitmap_end’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:406：对‘ext2fs_get_generic_bitmap_end’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_test_block_bitmap_range’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:412：对‘ext2fs_test_block_bitmap_range’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_mark_block_bitmap_range’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:418：对‘ext2fs_mark_block_bitmap_range’未定义的引用
+out/host/linux-x86/obj/SHARED_LIBRARIES/libext2_e2p_host_intermediates/feature.o：在函数‘ext2fs_fast_unmark_block_bitmap_range’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/e2fsprogs/lib/ext2fs/bitops.h:424：对‘ext2fs_unmark_block_bitmap_range’未定义的引用
+
+    diff --git a/include/ext2fs/ext2fs.h b/include/ext2fs/ext2fs.h
+    index 17481a0..78f517a 100644
+    --- a/include/ext2fs/ext2fs.h
+    +++ b/include/ext2fs/ext2fs.h
+    @@ -221,12 +221,6 @@ struct struct_ext2_filsys {
+        struct ext2_inode_cache		*icache;
+    };
+    
+    -#if EXT2_FLAT_INCLUDES
+    -#include "e2_bitops.h"
+    -#else
+    -#include "ext2fs/bitops.h"
+    -#endif
+    -
+
+
+    8.host Executable: test-librsloader (out/host/linux-x86/obj/EXECUTABLES/test-librsloader_intermediates/test-librsloader)
+out/host/linux-x86/obj/STATIC_LIBRARIES/libLLVMSupport_intermediates/libLLVMSupport.a(Signals.o)：在函数‘PrintStackTrace(void*)’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Unix/Signals.inc:219：对‘dladdr’未定义的引用
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Unix/Signals.inc:231：对‘dladdr’未定义的引用
+out/host/linux-x86/obj/STATIC_LIBRARIES/libLLVMSupport_intermediates/libLLVMSupport.a(Threading.o)：在函数‘llvm::llvm_execute_on_thread(void (*)(void*), void*, unsigned int)’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Threading.cpp:96：对‘pthread_create’未定义的引用
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Threading.cpp:100：对‘pthread_join’未定义的引用
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Threading.cpp:91：对‘pthread_attr_setstacksize’未定义的引用
+out/host/linux-x86/obj/STATIC_LIBRARIES/libLLVMSupport_intermediates/libLLVMSupport.a(Mutex.o)：在函数‘llvm::sys::MutexImpl::MutexImpl(bool)’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Mutex.cpp:69：对‘pthread_mutexattr_init’未定义的引用
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Mutex.cpp:75：对‘pthread_mutexattr_settype’未定义的引用
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Mutex.cpp:80：对‘pthread_mutexattr_setpshared’未定义的引用
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Mutex.cpp:89：对‘pthread_mutexattr_destroy’未定义的引用
+out/host/linux-x86/obj/STATIC_LIBRARIES/libLLVMSupport_intermediates/libLLVMSupport.a(Mutex.o)：在函数‘llvm::sys::MutexImpl::tryacquire()’中：
+/home/llb/project/PRO/exynos4412/android_4.0/iTop4412_ICS_git/external/llvm/lib/Support/Mutex.cpp:143：对‘pthread_mutex_trylock’未定义的引用
+
+    $vi external/llvm/llvm-host-build.mk +
+    LOCAL_LDLIBS := -lpthread -ldl
+
+
+    9.external/llvm/include/llvm/ADT/PointerUnion.h:56:10: error: enumeral mismatch in conditional expression: ‘llvm::PointerLikeTypeTraits<llvm::PointerUnion<clang::Stmt*, const clang::Type*> >::<anonymous enum>’ vs ‘llvm::PointerLikeTypeTraits<clang::ObjCInterfaceDecl*>::<anonymous enum>’ [-Werror]
+cc1plus: all warnings being treated as errors
+make: *** [out/host/linux-x86/obj/EXECUTABLES/llvm-rs-cc_intermediates/slang_rs.o] Error 1
+
+    Fix:
+    vi frameworks/compile/slang/Android.mk
+
+    Remove '-Werror' from line 22:
+    local_cflags_for_slang := -Wno-sign-promo -Wall -Wno-unused-parameter 
+
+
+    安装make 3.81
+    如果之前没有安装过make, 可以先在configure之后运行 sh build.sh(README文件中有说明),再运行make install.
+    解压之后，进入make-3.81目录， 
+    1)
+    ./configure  --prefix=$HOME/jdeng/local
+    2)
+    make 
+    3) optional (也可不选)
+    make check
+    4)
+    make install
+    make clean是去掉安装.
+    其中configure加安装目录是因为要装一个本地的make, 避免跟系统make冲突了，而且在服务器上也没有管理员的权限。不然默认是安装在/usr/local下。
+    --program-prefix=PREFIX
+    --program-suffix=SUFFIX 可以给程序加前缀或后缀
+    configure --help 可看帮助 
+}
 
 
 
