@@ -1297,4 +1297,346 @@ gm1.0 算法：
 
 
 
+/**************************************************************************************/
+10.pmic的一个线程，这里主要是锁跟进程调度方面的用法
+static void irq_thread_init(void)
+{
+	/* create pmic irq thread handler*/
+	pmic_thread_handle = kthread_create(pmic_thread_kthread, (void *)NULL, "pmic_thread");
+	if (IS_ERR(pmic_thread_handle)) {
+		pmic_thread_handle = NULL;
+		pr_err(PMICTAG "[pmic_thread_kthread] creation fails\n");
+	} else {
+		PMICLOG("[pmic_thread_kthread] kthread_create Done\n");
+	}
+}
+
+int pmic_thread_kthread(void *x)
+{
+	unsigned int i;
+	unsigned int int_status_val = 0;
+#ifdef IPIMB
+#else
+	unsigned int pwrap_eint_status = 0;
+#endif
+	struct sched_param param = {.sched_priority = 98 };
+
+	sched_setscheduler(current, SCHED_FIFO, &param);
+	set_current_state(TASK_INTERRUPTIBLE);
+
+	PMICLOG("[PMIC_INT] enter\n");
+
+	pmic_enable_charger_detection_int(0);
+
+	/* Run on a process content */
+	while (1) {
+		mutex_lock(&pmic_mutex);
+#ifdef IPIMB
+#else
+		pwrap_eint_status = pmic_wrap_eint_status();
+		PMICLOG("[PMIC_INT] pwrap_eint_status=0x%x\n", pwrap_eint_status);
+#endif
+
+		pmic_int_handler();
+
+#ifdef IPIMB
+#else
+		pmic_wrap_eint_clr(0x0);
+#endif
+
+		for (i = 0; i < interrupts_size; i++) {
+			int_status_val = upmu_get_reg_value(interrupts[i].address);
+			PMICLOG("[PMIC_INT] after ,int_status_val[0x%x]=0x%x\n",
+				interrupts[i].address, int_status_val);
+		}
+
+		/*mdelay(1); TBD*/
+
+		mutex_unlock(&pmic_mutex);
+		pmic_wake_unlock(&pmicThread_lock);
+
+		set_current_state(TASK_INTERRUPTIBLE);
+		enable_irq(g_pmic_irq);
+		schedule();
+	}
+
+	return 0;
+}
+
+
+
+/********************************************************************************************/
+11.sdm660获取申请注册中断
+
+dtsi文件
+	qcom,chgr@1000 {
+		reg = <0x1000 0x100>;
+		interrupts =
+			<0x0 0x10 0x0 IRQ_TYPE_EDGE_RISING>,
+			<0x0 0x10 0x1 IRQ_TYPE_EDGE_RISING>,
+			<0x0 0x10 0x2 IRQ_TYPE_EDGE_RISING>,
+			<0x0 0x10 0x3 IRQ_TYPE_EDGE_RISING>,
+			<0x0 0x10 0x4 IRQ_TYPE_EDGE_RISING>;
+
+		interrupt-names = "chg-error",
+				  "chg-state-change",
+				  "step-chg-state-change",
+				  "step-chg-soc-update-fail",
+				  "step-chg-soc-update-request";
+	}
+
+static struct smb_irq_info smb2_irqs[] = {
+/* CHARGER IRQs */
+	[CHG_ERROR_IRQ] = {
+		.name		= "chg-error",
+		.handler	= smblib_handle_debug,
+	},
+	[CHG_STATE_CHANGE_IRQ] = {
+		.name		= "chg-state-change",
+		.handler	= smblib_handle_chg_state_change,
+		.wake		= true,
+	},
+	[STEP_CHG_STATE_CHANGE_IRQ] = {
+		.name		= "step-chg-state-change",
+		.handler	= NULL,
+	},
+	[STEP_CHG_SOC_UPDATE_FAIL_IRQ] = {
+		.name		= "step-chg-soc-update-fail",
+		.handler	= NULL,
+	},
+	[STEP_CHG_SOC_UPDATE_REQ_IRQ] = {
+		.name		= "step-chg-soc-update-request",
+		.handler	= NULL,
+	},
+/* OTG IRQs */
+	[OTG_FAIL_IRQ] = {
+		.name		= "otg-fail",
+		.handler	= smblib_handle_debug,
+	},
+	[OTG_OVERCURRENT_IRQ] = {
+		.name		= "otg-overcurrent",
+		.handler	= smblib_handle_otg_overcurrent,
+	},
+	[OTG_OC_DIS_SW_STS_IRQ] = {
+		.name		= "otg-oc-dis-sw-sts",
+		.handler	= smblib_handle_debug,
+	},
+	[TESTMODE_CHANGE_DET_IRQ] = {
+		.name		= "testmode-change-detect",
+		.handler	= smblib_handle_debug,
+	},
+/* BATTERY IRQs */
+	[BATT_TEMP_IRQ] = {
+		.name		= "bat-temp",
+		.handler	= smblib_handle_batt_temp_changed,
+		.wake		= true,
+	},
+	[BATT_OCP_IRQ] = {
+		.name		= "bat-ocp",
+		.handler	= smblib_handle_batt_psy_changed,
+	},
+	[BATT_OV_IRQ] = {
+		.name		= "bat-ov",
+		.handler	= smblib_handle_batt_psy_changed,
+	},
+	[BATT_LOW_IRQ] = {
+		.name		= "bat-low",
+		.handler	= smblib_handle_batt_psy_changed,
+	},
+	[BATT_THERM_ID_MISS_IRQ] = {
+		.name		= "bat-therm-or-id-missing",
+		.handler	= smblib_handle_batt_psy_changed,
+	},
+	[BATT_TERM_MISS_IRQ] = {
+		.name		= "bat-terminal-missing",
+		.handler	= smblib_handle_batt_psy_changed,
+	},
+/* USB INPUT IRQs */
+	[USBIN_COLLAPSE_IRQ] = {
+		.name		= "usbin-collapse",
+		.handler	= smblib_handle_debug,
+	},
+	[USBIN_LT_3P6V_IRQ] = {
+		.name		= "usbin-lt-3p6v",
+		.handler	= smblib_handle_debug,
+	},
+	[USBIN_UV_IRQ] = {
+		.name		= "usbin-uv",
+		.handler	= smblib_handle_usbin_uv,
+	},
+	[USBIN_OV_IRQ] = {
+		.name		= "usbin-ov",
+		.handler	= smblib_handle_debug,
+	},
+	[USBIN_PLUGIN_IRQ] = {
+		.name		= "usbin-plugin",
+		.handler	= smblib_handle_usb_plugin,
+		.wake		= true,
+	},
+	[USBIN_SRC_CHANGE_IRQ] = {
+		.name		= "usbin-src-change",
+		.handler	= smblib_handle_usb_source_change,
+		.wake		= true,
+	},
+	[USBIN_ICL_CHANGE_IRQ] = {
+		.name		= "usbin-icl-change",
+		.handler	= smblib_handle_icl_change,
+		.wake		= true,
+	},
+	[TYPE_C_CHANGE_IRQ] = {
+		.name		= "type-c-change",
+		.handler	= smblib_handle_usb_typec_change,
+		.wake		= true,
+	},
+/* DC INPUT IRQs */
+	[DCIN_COLLAPSE_IRQ] = {
+		.name		= "dcin-collapse",
+		.handler	= smblib_handle_debug,
+	},
+	[DCIN_LT_3P6V_IRQ] = {
+		.name		= "dcin-lt-3p6v",
+		.handler	= smblib_handle_debug,
+	},
+	[DCIN_UV_IRQ] = {
+		.name		= "dcin-uv",
+		.handler	= smblib_handle_debug,
+	},
+	[DCIN_OV_IRQ] = {
+		.name		= "dcin-ov",
+		.handler	= smblib_handle_debug,
+	},
+	[DCIN_PLUGIN_IRQ] = {
+		.name		= "dcin-plugin",
+		.handler	= smblib_handle_dc_plugin,
+		.wake		= true,
+	},
+	[DIV2_EN_DG_IRQ] = {
+		.name		= "div2-en-dg",
+		.handler	= smblib_handle_debug,
+	},
+	[DCIN_ICL_CHANGE_IRQ] = {
+		.name		= "dcin-icl-change",
+		.handler	= smblib_handle_debug,
+	},
+/* MISCELLANEOUS IRQs */
+	[WDOG_SNARL_IRQ] = {
+		.name		= "wdog-snarl",
+		.handler	= NULL,
+	},
+	[WDOG_BARK_IRQ] = {
+		.name		= "wdog-bark",
+		.handler	= smblib_handle_wdog_bark,
+		.wake		= true,
+	},
+	[AICL_FAIL_IRQ] = {
+		.name		= "aicl-fail",
+		.handler	= smblib_handle_debug,
+	},
+	[AICL_DONE_IRQ] = {
+		.name		= "aicl-done",
+		.handler	= smblib_handle_debug,
+	},
+	[HIGH_DUTY_CYCLE_IRQ] = {
+		.name		= "high-duty-cycle",
+		.handler	= smblib_handle_high_duty_cycle,
+		.wake		= true,
+	},
+	[INPUT_CURRENT_LIMIT_IRQ] = {
+		.name		= "input-current-limiting",
+		.handler	= smblib_handle_debug,
+	},
+	[TEMPERATURE_CHANGE_IRQ] = {
+		.name		= "temperature-change",
+		.handler	= smblib_handle_debug,
+	},
+	[SWITCH_POWER_OK_IRQ] = {
+		.name		= "switcher-power-ok",
+		.handler	= smblib_handle_switcher_power_ok,
+		.storm_data	= {true, 1000, 8},
+	},
+};
+
+static int smb2_get_irq_index_byname(const char *irq_name)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(smb2_irqs); i++) {
+		if (strcmp(smb2_irqs[i].name, irq_name) == 0)
+			return i;
+	}
+
+	return -ENOENT;
+}
+
+static int smb2_request_interrupt(struct smb2 *chip,
+				struct device_node *node, const char *irq_name)
+{
+	struct smb_charger *chg = &chip->chg;
+	int rc, irq, irq_index;
+	struct smb_irq_data *irq_data;
+
+	irq = of_irq_get_byname(node, irq_name);
+	if (irq < 0) {
+		pr_err("Couldn't get irq %s byname\n", irq_name);
+		return irq;
+	}
+
+	irq_index = smb2_get_irq_index_byname(irq_name);
+	if (irq_index < 0) {
+		pr_err("%s is not a defined irq\n", irq_name);
+		return irq_index;
+	}
+
+	if (!smb2_irqs[irq_index].handler)
+		return 0;
+
+	irq_data = devm_kzalloc(chg->dev, sizeof(*irq_data), GFP_KERNEL);
+	if (!irq_data)
+		return -ENOMEM;
+
+	irq_data->parent_data = chip;
+	irq_data->name = irq_name;
+	irq_data->storm_data = smb2_irqs[irq_index].storm_data;
+	mutex_init(&irq_data->storm_data.storm_lock);
+
+	rc = devm_request_threaded_irq(chg->dev, irq, NULL,
+					smb2_irqs[irq_index].handler,
+					IRQF_ONESHOT, irq_name, irq_data);
+	if (rc < 0) {
+		pr_err("Couldn't request irq %d\n", irq);
+		return rc;
+	}
+
+	smb2_irqs[irq_index].irq = irq;
+	smb2_irqs[irq_index].irq_data = irq_data;
+	if (smb2_irqs[irq_index].wake)
+		enable_irq_wake(irq);
+
+	return rc;
+}
+
+static int smb2_request_interrupts(struct smb2 *chip)
+{
+	struct smb_charger *chg = &chip->chg;
+	struct device_node *node = chg->dev->of_node;
+	struct device_node *child;
+	int rc = 0;
+	const char *name;
+	struct property *prop;
+
+	for_each_available_child_of_node(node, child) {
+		of_property_for_each_string(child, "interrupt-names",
+					    prop, name) {
+			rc = smb2_request_interrupt(chip, child, name);
+			if (rc < 0)
+				return rc;
+		}
+	}
+	if (chg->irq_info[USBIN_ICL_CHANGE_IRQ].irq)
+		chg->usb_icl_change_irq_enabled = true;
+
+	return rc;
+}
+
+
 

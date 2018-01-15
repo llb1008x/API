@@ -98,7 +98,8 @@
 	FG: 
 	PMI:
 	
-
+	smblib_handle_usbin_uv  插入充电器
+	
 	缩写	
 	{
 		RPM:Resource Power Manager
@@ -126,7 +127,251 @@
 		这种接口用于操作系统自动从预启动的操作环境，加载到一种操作系统上。
 	}
 	
+	
+		bp侧的编译脚本 pm_config.scons 这样的 *.scons
+		scons: done reading SConscript files.
+		
 }
+
+
+
+
+
+
+M2018
+{
+	1.调试PD协议是否通
+	{
+		1.相关的代码
+		{
+			相关的宏：
+			CONFIG_USB_PD_POLICY=y
+			CONFIG_QPNP_USB_PDPHY=y
+	
+			相关的代码：
+			drivers/usb/pd/
+				policy_engine.c
+				qpnp-pdphy.c
+			
+			/sys/kernel/debug/ipc_logging/usb_pd
+		
+			cat /d/ipc_logging/usb_pd/log
+			cat /sys/class/usbpd/usbpd0
+						
+			
+			1.msm-pm660.dsti
+			pm660_charger: qcom,qpnp-smb2
+				/*qcom,micro-usb;*/
+				类型应该是type-c
+				
+			pm660_pdphy: qcom,usb-pdphy@1700 {
+					compatible = "qcom,qpnp-pdphy";
+					reg = <0x1700 0x100>;
+					vdd-pdphy-supply = <&pm660l_l7>;
+					vbus-supply = <&smb2_vbus>;
+					vconn-supply = <&smb2_vconn>;
+
+					status = "ok";
+					
+			2.policy_engine.c
+				module_param(disable_usb_pd, bool, S_IRUGO|S_IWUSR);
+				模块传参 应该不是disable的	
+				
+				
+			pd的投票
+	
+				pd_allowed_votable:
+						PD_DISALLOWED_INDIRECT_VOTER
+						PD_VOTER
+						CC_DETACHED_VOTER
+						
+				pd_disallowed_votable_indirect:
+						HVDCP_TIMEOUT_VOTER
+						LEGACY_CABLE_VOTER
+						VBUS_CC_SHORT_VOTER
+	
+			/* reset power delivery voters */
+			vote(chg->pd_allowed_votable, PD_VOTER, false, 0);
+			vote(chg->pd_disallowed_votable_indirect, CC_DETACHED_VOTER, true, 0);
+			vote(chg->pd_disallowed_votable_indirect, HVDCP_TIMEOUT_VOTER, true, 0);
+
+
+			1.Enable PD negotiation when the Type-C cable is inserted and HVDCP
+			detection timeout
+			
+			smblib_handle_hvdcp_check_timeout(chg,(bool)(stat & HVDCP_CHECK_TIMEOUT_BIT),(bool)(stat & QC_CHARGER_BIT));
+			SCHG_USB_APSD_STATUS -> 6 HVDCP_CHECK_TIMEOUT
+
+		
+			2.PD negotiation works now
+			
+			smb-lib.c
+			int smblib_get_pe_start(struct smb_charger *chg,
+		       union power_supply_propval *val)
+			{
+				/*
+				 * hvdcp timeout voter is the last one to allow pd. Use its vote
+				 * to indicate start of pe engine
+				 */
+				val->intval
+					= !get_client_vote_locked(chg->pd_disallowed_votable_indirect,
+						HVDCP_TIMEOUT_VOTER);
+				return 0;
+			}
+			
+			policy_engine.c
+			
+			
+			这个函数应该是比较重要的,设置pd的状态，有很多投票
+			smblib_set_prop_pd_active
+			
+
+			
+			pd 的状态
+			enum usbpd_state {
+				PE_UNKNOWN,
+				PE_ERROR_RECOVERY,
+				PE_SRC_DISABLED,
+				PE_SRC_STARTUP,
+				PE_SRC_SEND_CAPABILITIES,
+				PE_SRC_SEND_CAPABILITIES_WAIT, /* substate to wait for Request */
+				PE_SRC_NEGOTIATE_CAPABILITY,
+				PE_SRC_TRANSITION_SUPPLY,
+				PE_SRC_READY,
+				PE_SRC_HARD_RESET,
+				PE_SRC_SOFT_RESET,
+				PE_SRC_SEND_SOFT_RESET,
+				PE_SRC_DISCOVERY,
+				PE_SRC_TRANSITION_TO_DEFAULT,
+				PE_SNK_STARTUP,
+				PE_SNK_DISCOVERY,
+				PE_SNK_WAIT_FOR_CAPABILITIES,
+				PE_SNK_EVALUATE_CAPABILITY,
+				PE_SNK_SELECT_CAPABILITY,
+				PE_SNK_TRANSITION_SINK,
+				PE_SNK_READY,
+				PE_SNK_HARD_RESET,
+				PE_SNK_SOFT_RESET,
+				PE_SNK_SEND_SOFT_RESET,
+				PE_SNK_TRANSITION_TO_DEFAULT,
+				PE_DRS_SEND_DR_SWAP,
+				PE_PRS_SNK_SRC_SEND_SWAP,
+				PE_PRS_SNK_SRC_TRANSITION_TO_OFF,
+				PE_PRS_SNK_SRC_SOURCE_ON,
+				PE_PRS_SRC_SNK_SEND_SWAP,
+				PE_PRS_SRC_SNK_TRANSITION_TO_OFF,
+				PE_PRS_SRC_SNK_WAIT_SOURCE_ON,
+				PE_VCS_WAIT_FOR_VCONN,
+			};
+			
+			
+			type-c的状态
+			/* Indicates USB Type-C CC connection status */
+			enum power_supply_typec_mode {
+				POWER_SUPPLY_TYPEC_NONE,
+
+				/* Acting as source */
+				POWER_SUPPLY_TYPEC_SINK,			/* Rd only */
+				POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE,		/* Rd/Ra */
+				POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY,	/* Rd/Rd */
+				POWER_SUPPLY_TYPEC_SINK_AUDIO_ADAPTER,		/* Ra/Ra */
+				POWER_SUPPLY_TYPEC_POWERED_CABLE_ONLY,		/* Ra only */
+
+				/* Acting as sink */
+				POWER_SUPPLY_TYPEC_SOURCE_DEFAULT,		/* Rp default */
+				POWER_SUPPLY_TYPEC_SOURCE_MEDIUM,		/* Rp 1.5A */
+				POWER_SUPPLY_TYPEC_SOURCE_HIGH,			/* Rp 3A */
+				POWER_SUPPLY_TYPEC_NON_COMPLIANT,
+			};
+			
+			
+						
+			相关的寄存器
+			TYPE_C_STATUS_4_REG							0x0000130E
+			TYPE_C_INTRPT_ENB_SOFTWARE_CTRL_REG			0x00001368
+			SCHG_USB_TYPE_C_STATUS_1					0x0000130B	
+			
+			pd相关的
+			USB_PD_PHY									0x00001704		
+			//Gionee <GN_BY_CHG> <lilubao> <20180101> add for debug usb pd begin
+			
+			usb相关的
+			SCHG_USB									0x00001306	
+			
+			SCHG_MISC_POWER_PATH_STATUS					0x0000160B
+			
+			
+			SCHG_CHGR_BATTERY_CHARGER_STATUS_1			0x00001006
+			
+			storm_count 中断发生的次数
+			/**
+			 * Data used to track an event storm.
+			 *
+			 * @storm_period_ms: The maximum time interval between two events. If this limit
+			 *                   is exceeded then the event chain will be broken and removed
+			 *                   from consideration for a storm.
+			 * @max_storm_count: The number of chained events required to trigger a storm.
+			 * @storm_count:     The current number of chained events.
+			 * @last_kt:         Kernel time of the last event seen.
+			 * @storm_lock:      Mutex lock to protect storm_watch data.
+			 */
+			struct storm_watch {
+				bool		enabled;
+				int		storm_period_ms;
+				int		max_storm_count;
+				int		storm_count;
+				ktime_t		last_kt;
+				struct mutex	storm_lock;
+			};
+		}
+		
+		
+		高通充电器检测流程
+		{
+			1.[ 3409.800866] PMI: smblib_handle_debug: IRQ: usbin-lt-3p6v
+				充电器插入，usbin 的vbus电压大于3.6v会有中断
+			
+			2.[ 3409.801575] PMI: smblib_handle_usb_typec_change: Scheduling OTG work
+				smblib_handle_usb_typec_change 因为是micro usb所以有些type-c的没走，
+				检测相关寄存器 type-c的是否使能，cc,vconn是否连接,状态，调用work，然后上报给power supply
+				smblib_handle_typec_cc_state_change 
+				
+				
+			3.<6>[ 1384.829967] PMI: smblib_handle_usbin_uv: IRQ: usbin-uv
+				
+			4.<6>[ 1384.830987] PMI: smblib_usb_plugin_locked: enabling DPDM regulator	
+			  <6>[ 1384.854058] PMI: smblib_usb_plugin_locked: IRQ: usbin-plugin attached
+				smblib_handle_usb_plugin 有usb插入的中断 vbus高电平插入，低电平拔出
+				使能 usb的dp/dm引脚，设置switch的频率，vbus电平拉高，然后调用pl 充电，
+				如果是micro usb的话调用 ，smblib_micro_usb_plugin 
+				apsd_result = smblib_get_apsd_result(chg);会检测充电器的类型
+			
+			5.<6>[ 1385.468371] PMI: smblib_handle_chg_state_change: IRQ: chg-state-change
+			  <3>[ 1385.567325] PMI: smblib_handle_usb_source_change: APSD_STATUS = 0x01
+			  smblib_handle_chg_state_change 检测battery charger 的状态最后的BATTERY_CHARGER_STAT
+			  比较重要，之前的满电状态有问题就是硬件寄存器的状态已经变成了INHIBIT
+			  smblib_handle_usb_source_change 这个函数里面很多跟apsd的检测相关
+			  	
+				
+				
+			PD跟APSD检测是否有冲突，还是PD在APSD之后检测	
+		}
+		
+		
+		
+		
+		
+	}
+}
+	
+
+
+
+
+
+
+
+
 
 
 
@@ -137,6 +382,8 @@ G1605A
 {
 	GNSPR #149596,自动化monkey72h测试执行过程中adb异常
 	{
+		//Gionee <GN_BY_CHG> <lilubao> <20180115> modify for debug begin
+	
 		monkey是干什么的，有什么机制，然后针对的找问题
 		搜 Exception
 		
@@ -166,6 +413,13 @@ G1605A
 		<4>[42205.234722] (2)[1:init][MUSB]musb_pullup 2508: MUSB: gadget pull up 0 end
 		<6>[42205.234734] -(2)[1:init]android_usb gadget: disable function 'mtp'/ffffffc0b4bf7800
 		<4>[42205.234741] -(2)[1:init]mtp_function_disable
+		
+		system/core/adb/adb_trace.h
+		中的
+		# define ADB_TRACING ((adb_trace_mask & (1 << TRACE_TAG)) != 0)
+		修改为
+		# define ADB_TRACING 1
+		确保log可以抓取到
 	
 	}
 
@@ -175,7 +429,8 @@ G1605A
 
 
 
-rt5081_enable_cable_drop_comp
+
+
 
 
 17G10A
@@ -185,6 +440,7 @@ rt5081_enable_cable_drop_comp
 	充电至满电的状态可能有问题
 	{
 		reviewer code 感觉代码逻辑跟规范有问题
+		//Gionee <GN_BY_CHG> <lilubao> <20180112> modify for platform change begin
 		
 		mtk_battery.c
 			1.
@@ -235,7 +491,7 @@ rt5081_enable_cable_drop_comp
 		mtk_switch_charging.c
 				
 		rt5081_pmu_charger.c
-			取出冗余log				
+			去除冗余log				
 		
 		
 		
@@ -253,6 +509,8 @@ rt5081_enable_cable_drop_comp
 			mt_chg->chg_online = false;
 			mt_chg->charger.name = "charger";
 			mt_chg->charger.type = POWER_SUPPLY_TYPE_UNKNOWN;
+			
+		
 	
 	}
 
@@ -291,107 +549,6 @@ rt5081_enable_cable_drop_comp
 
 
 
-
-
-
-
-	
-	GNSPR#109803,关机状态，连接充电器，显示电量灭屏后，短按两次电源键1s，出现开机画面，再次操作恢复
-	{
-		启动之后的boot_reason 是4,wdt_by_pass_pwk,然后这个现象是在系统跑到kernel之后的
-		按键的检测问题应该是在kernel出现问题的		
-		{
-			首先这个boot_reason 有哪些原因？
-			SW,HW,kernel panic 按键检测到短按所以会重启，这个应该是系统硬件初始化的时候读取寄存器传递的值g_boot_arg
-		
-			kernel 部分按键的处理在kpd.c 中断回调函数 kpd_pwrkey_pmic_handler
-			void kpd_pwrkey_pmic_handler(unsigned long pressed)
-			{
-			//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 begin
-				if(1==s_gn_clam)
-				{
-					return ;
-				}
-				else
-				{
-					kpd_print("Power Key generate, pressed=%ld\n", pressed);
-					if (!kpd_input_dev) {
-						kpd_print("KPD input device not ready\n");
-						return;
-				}
-				kpd_pmic_pwrkey_hal(pressed);
-			#if (defined(CONFIG_ARCH_MT8173) || defined(CONFIG_ARCH_MT8163))
-				if (pressed) /* keep the lock while the button in held pushed */
-					wake_lock(&pwrkey_lock);
-				else /* keep the lock for extra 500ms after the button is released */
-					wake_lock_timeout(&pwrkey_lock, HZ/2);
-					//这一部分的处理就是说在释放powerkey之后还有500ms持锁
-			#endif
-				}
-			}
-			//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 end
-		}		
-	
-		6355的 MT6355_TOPSTATUS这个寄存器有homekey跟powerkey的检测
-		preloader的keypad.c mtk_detect_key 检测按键
-	
-		按键相关的input子系统内定的编号
-		linux-event-codes.h
-	
-	
-		{
-			相关的宏	
-			BR_WDT_BY_PASS_PWK,MTK_KERNEL_POWER_OFF_CHARGING,kpoc_flag
-		
-
-			<3>[   10.779316]  (7)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->10
-			<3>[   20.786597]  (5)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->20
-			<3>[   30.792217]  (0)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->30
-		}
-	
-		按键检测的流程大概是这样的：
-		底层6355接收到按键触发的中断然后通过handler回调到(kpd.c)kpd_pwrkey_pmic_handler，这里有wake_lock持锁，按下的时候持锁，
-		释放的时候还会持锁500ms，然后时（hal_kpd.c）kpd_pmic_pwrkey_hal 将按键的时间上报给input子系统的，(key_control.cpp) 之后应该是通过input
-		子系统下面的fd节点，这里面是一个线程通过轮询的方式，如果有变化就会判断下一步亮屏关机充电的动画还是灭屏或者是重启之类的
-		
-		
-		现在这个问题是灭屏的时候连续短按powerkey 短按时间是1s左右，然后会重启亮屏，所以现在需要先看log确定原因
-		
-
-		//Gionee <GN_BY_CHG> <lilubao> <20180104> modify for kpoc charging begin
-		bp侧的编译脚本 pm_config.scons 这样的 *.scons
-		scons: done reading SConscript files.
-
-	}
-	
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	80-P2485-1
-
-
 	GNSPR#139202，去除冗余log
 	{
 		//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log begin
@@ -416,30 +573,7 @@ rt5081_enable_cable_drop_comp
 			};
 		};
 		
-		
-		
-		3.还有这个问题，irq不匹配的问题  这个问题是修改充电ovp的时候多次enable power_path 导致的这个warning
-		<6>[21329.846831]  (5)[239:charger_thread]rt5081_pmu_charger rt5081_pmu_charger: rt5081_enable_irq: (chg_mivr) en = 1
-		<7>[21329.846844]  (5)[239:charger_thread]rt5081_pmu 5-0034: rt5081_pmu_reg_block_read: reg e0 size 16
-		<4>[21329.846857] -(5)[239:charger_thread]------------[ cut here ]------------
-		<4>[21329.846862] -(5)[239:charger_thread]WARNING: CPU: 5 PID: 239 at /data/MAIN_GIT_REPO_CODE/BJ17G10A_MAIN_REPO/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/L31_6757_66_N_17G10A_NO.MP5_V1.53_170512_ALPS/android_mtk_mp/kernel-4.4/kernel/irq/manage.c:513 enable_irq+0x88/0xcc()
-		<4>[21329.846880] -(5)[239:charger_thread]Unbalanced enable for IRQ 166
-		<4>[21329.846887] -(5)[239:charger_thread]CPU: 5 PID: 239 Comm: charger_thread Tainted: G        W       4.4.15 #1
-		<4>[21329.846894] -(5)[239:charger_thread]Hardware name: MT6757CD (DT)
-		<0>[21329.846899] -(5)[239:charger_thread]Call trace:
-		<4>[21329.846903] -(5)[239:charger_thread][<ffffffc00008a328>] dump_backtrace+0x0/0x14c
-		<4>[21329.846913] -(5)[239:charger_thread][<ffffffc00008a488>] show_stack+0x14/0x1c
-		<4>[21329.846919] -(5)[239:charger_thread][<ffffffc0003379b0>] dump_stack+0x8c/0xb0
-		<4>[21329.846930] -(5)[239:charger_thread][<ffffffc00009e5f8>] warn_slowpath_fmt+0xc0/0xf4
-		<4>[21329.846940] -(5)[239:charger_thread][<ffffffc0000fd598>] enable_irq+0x88/0xcc
-		<4>[21329.846945] -(5)[239:charger_thread][<ffffffc0004d8310>] rt5081_enable_power_path+0x148/0x190
-		<4>[21329.846957] -(5)[239:charger_thread][<ffffffc000945750>] charger_dev_enable_powerpath+0x24/0x34
-		<4>[21329.846968] -(5)[239:charger_thread][<ffffffc000948ba0>] charger_routine_thread+0x378/0x6a8
-		<4>[21329.846976] -(5)[239:charger_thread][<ffffffc0000be268>] kthread+0xdc/0xf0
-		<4>[21329.846987] -(5)[239:charger_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
-		<4>[21329.846994] -(5)[239:charger_thread]---[ end trace a4903c9f998f3193 ]---	
-		
-		
+
 		4.rt5081 probe时间太长 200ms+
 		
 		
@@ -448,6 +582,11 @@ rt5081_enable_cable_drop_comp
 		
 		6.power_supply 上报有问题
 		<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22
+		
+	
+		这两个宏跟很多模块的调试log有关，所以导致rt5081,mt6355的一些寄存器log很多
+		CONFIG_DYNAMIC_DEBUG=y
+		CONFIG_DEBUG_INFO=y
 		
 	}
 	
@@ -952,205 +1091,6 @@ msm8917 替换IC
 	
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-M2018
-{
-	1.调试PD协议是否通
-	{
-		1.相关的代码
-		{
-			相关的宏：
-			CONFIG_USB_PD_POLICY=y
-			CONFIG_QPNP_USB_PDPHY=y
-	
-			相关的代码：
-			drivers/usb/pd/
-				policy_engine.c
-				qpnp-pdphy.c
-			
-			/sys/kernel/debug/ipc_logging/usb_pd
-		
-			cat /d/ipc_logging/usb_pd/log
-			cat /sys/class/usbpd/usbpd0
-			
-			
-			
-			
-			1.msm-pm660.dsti
-			pm660_charger: qcom,qpnp-smb2
-				/*qcom,micro-usb;*/
-				类型应该是type-c
-				
-			pm660_pdphy: qcom,usb-pdphy@1700 {
-					compatible = "qcom,qpnp-pdphy";
-					reg = <0x1700 0x100>;
-					vdd-pdphy-supply = <&pm660l_l7>;
-					vbus-supply = <&smb2_vbus>;
-					vconn-supply = <&smb2_vconn>;
-
-					status = "ok";
-					
-			2.policy_engine.c
-				module_param(disable_usb_pd, bool, S_IRUGO|S_IWUSR);
-				模块传参 应该不是disable的	
-				
-				
-			pd的投票
-	
-				pd_allowed_votable:
-						PD_DISALLOWED_INDIRECT_VOTER
-						PD_VOTER
-						CC_DETACHED_VOTER
-						
-				pd_disallowed_votable_indirect:
-						HVDCP_TIMEOUT_VOTER
-						LEGACY_CABLE_VOTER
-						VBUS_CC_SHORT_VOTER
-	
-			/* reset power delivery voters */
-			vote(chg->pd_allowed_votable, PD_VOTER, false, 0);
-			vote(chg->pd_disallowed_votable_indirect, CC_DETACHED_VOTER, true, 0);
-			vote(chg->pd_disallowed_votable_indirect, HVDCP_TIMEOUT_VOTER, true, 0);
-
-
-			1.Enable PD negotiation when the Type-C cable is inserted and HVDCP
-			detection timeout
-			
-			smblib_handle_hvdcp_check_timeout(chg,(bool)(stat & HVDCP_CHECK_TIMEOUT_BIT),(bool)(stat & QC_CHARGER_BIT));
-			SCHG_USB_APSD_STATUS -> 6 HVDCP_CHECK_TIMEOUT
-
-		
-			2.PD negotiation works now
-			
-			smb-lib.c
-			int smblib_get_pe_start(struct smb_charger *chg,
-		       union power_supply_propval *val)
-			{
-				/*
-				 * hvdcp timeout voter is the last one to allow pd. Use its vote
-				 * to indicate start of pe engine
-				 */
-				val->intval
-					= !get_client_vote_locked(chg->pd_disallowed_votable_indirect,
-						HVDCP_TIMEOUT_VOTER);
-				return 0;
-			}
-			
-			policy_engine.c
-			
-			
-			这个函数应该是比较重要的,设置pd的状态，有很多投票
-			smblib_set_prop_pd_active
-			
-			
-			相关的寄存器
-			TYPE_C_STATUS_4_REG							0x0000130E
-			TYPE_C_INTRPT_ENB_SOFTWARE_CTRL_REG			0x00001368
-			
-			pd 的状态
-			enum usbpd_state {
-				PE_UNKNOWN,
-				PE_ERROR_RECOVERY,
-				PE_SRC_DISABLED,
-				PE_SRC_STARTUP,
-				PE_SRC_SEND_CAPABILITIES,
-				PE_SRC_SEND_CAPABILITIES_WAIT, /* substate to wait for Request */
-				PE_SRC_NEGOTIATE_CAPABILITY,
-				PE_SRC_TRANSITION_SUPPLY,
-				PE_SRC_READY,
-				PE_SRC_HARD_RESET,
-				PE_SRC_SOFT_RESET,
-				PE_SRC_SEND_SOFT_RESET,
-				PE_SRC_DISCOVERY,
-				PE_SRC_TRANSITION_TO_DEFAULT,
-				PE_SNK_STARTUP,
-				PE_SNK_DISCOVERY,
-				PE_SNK_WAIT_FOR_CAPABILITIES,
-				PE_SNK_EVALUATE_CAPABILITY,
-				PE_SNK_SELECT_CAPABILITY,
-				PE_SNK_TRANSITION_SINK,
-				PE_SNK_READY,
-				PE_SNK_HARD_RESET,
-				PE_SNK_SOFT_RESET,
-				PE_SNK_SEND_SOFT_RESET,
-				PE_SNK_TRANSITION_TO_DEFAULT,
-				PE_DRS_SEND_DR_SWAP,
-				PE_PRS_SNK_SRC_SEND_SWAP,
-				PE_PRS_SNK_SRC_TRANSITION_TO_OFF,
-				PE_PRS_SNK_SRC_SOURCE_ON,
-				PE_PRS_SRC_SNK_SEND_SWAP,
-				PE_PRS_SRC_SNK_TRANSITION_TO_OFF,
-				PE_PRS_SRC_SNK_WAIT_SOURCE_ON,
-				PE_VCS_WAIT_FOR_VCONN,
-			};
-			
-			
-			type-c的状态
-			/* Indicates USB Type-C CC connection status */
-			enum power_supply_typec_mode {
-				POWER_SUPPLY_TYPEC_NONE,
-
-				/* Acting as source */
-				POWER_SUPPLY_TYPEC_SINK,			/* Rd only */
-				POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE,		/* Rd/Ra */
-				POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY,	/* Rd/Rd */
-				POWER_SUPPLY_TYPEC_SINK_AUDIO_ADAPTER,		/* Ra/Ra */
-				POWER_SUPPLY_TYPEC_POWERED_CABLE_ONLY,		/* Ra only */
-
-				/* Acting as sink */
-				POWER_SUPPLY_TYPEC_SOURCE_DEFAULT,		/* Rp default */
-				POWER_SUPPLY_TYPEC_SOURCE_MEDIUM,		/* Rp 1.5A */
-				POWER_SUPPLY_TYPEC_SOURCE_HIGH,			/* Rp 3A */
-				POWER_SUPPLY_TYPEC_NON_COMPLIANT,
-			};
-			
-			//Gionee <GN_BY_CHG> <lilubao> <20180101> add for debug usb pd begin	
-
-		}
-	
-	
-		
-		PD3.0/PPS/or QC4.0	了解一下pps的一些内容，干什么的，有什么要求
-		{
-			The CC line communication between Sink and Source will look like below :
-
-				1. The Sink will first request Source capabilities.
-
-				2. The Source will provide its source capabilities.
-
-				3. The Sink will then request a suitable power profile from the Source capability list.
-
-				4. The Source will accept the request and start to make changes to the BUS voltage. The Sink will minimize the bus loading during BUS voltage change. The Source will increase the VBUS voltage with a defined slew rate.
-
-				5. After the BUS voltage has reached its final value, the source will wait until the BUS has stabilized and then will send a Power Supply Ready signal. The Sink will now increase the BUS loading again. 
-				
-				
-				Bi-phase Mark Code (BMC) 这个是什么编码方式
-				The BMC data can be decoded by USB PD decoders like Ellisys EX350 Analyzer
-		
-		}
-		
-	}
-
-
-}
-	
-	
-
-
 
 
 

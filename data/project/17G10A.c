@@ -4157,14 +4157,14 @@ out:
 
 
 /**************************************************************************************************************************/
-27.	GNSPR#109803,关机状态，连接充电器，显示电量灭屏后，短按两次电源键1s，出现开机画面，再次操作恢复
+27.GNSPR#109803,关机状态，连接充电器，显示电量灭屏后，短按两次电源键1s，出现开机画面，再次操作恢复
 {
 	启动之后的boot_reason 是4,wdt_by_pass_pwk,然后这个现象是在系统跑到kernel之后的
 	按键的检测问题应该是在kernel出现问题的		
 	{
 		首先这个boot_reason 有哪些原因？
 		SW,HW,kernel panic 按键检测到短按所以会重启，这个应该是系统硬件初始化的时候读取寄存器传递的值g_boot_arg
-		
+	
 		kernel 部分按键的处理在kpd.c 中断回调函数 kpd_pwrkey_pmic_handler
 		void kpd_pwrkey_pmic_handler(unsigned long pressed)
 		{
@@ -4192,30 +4192,88 @@ out:
 		}
 		//Gionee <GN_BY_DRV> <wangguojun> <2017-10-17> modify for 124138 end
 	}		
-	
+
 	6355的 MT6355_TOPSTATUS这个寄存器有homekey跟powerkey的检测
 	preloader的keypad.c mtk_detect_key 检测按键
-	
+
 	按键相关的input子系统内定的编号
 	linux-event-codes.h
-	
-	
 	{
 		相关的宏	
 		BR_WDT_BY_PASS_PWK,MTK_KERNEL_POWER_OFF_CHARGING,kpoc_flag
-		
 
 		<3>[   10.779316]  (7)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->10
 		<3>[   20.786597]  (5)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->20
 		<3>[   30.792217]  (0)[185:battery_thread]in [fg_drv_update_hw_status] gn_boot_reason->4,gn_boot_mode->0,gn_call_state->0,gn_screenon_time->30
 	}
-	
-	按键检测的流程大概是这样的：
-	底层6355接收到按键触发的中断然后通过handler回调到(kpd.c)kpd_pwrkey_pmic_handler，这里有wake_lock持锁，按下的时候持锁，
-	释放的时候还会持锁500ms，然后时（hal_kpd.c）kpd_pmic_pwrkey_hal 将按键的时间上报给input子系统的，(key_control.cpp) 之后应该是通过input
-	子系统下面的fd节点，这里面是一个线程通过轮询的方式，如果有变化就会判断下一步亮屏关机充电的动画还是灭屏或者是重启之类的
 
+	
+	现在这个问题是灭屏的时候连续短按powerkey 短按时间是1s左右，然后会重启亮屏，所以现在需要先看log确定原因
+	
+	这个问题可能是pmic的中断配置的有问题 0x854 RG_INT_STATUS_PWRKEY_R
+	
+	[   17.621815] <4>.(4)[70:pmic_thread][name:pmic_irq&][PMIC] [PMIC_INT] addr[0x854]=0x4
+	[   17.622778] <4>.(4)[70:pmic_thread][name:wd_api&]arch_reset: cmd = NULL
+	[   17.623614] <4>-(4)[70:pmic_thread]CPU: 4 PID: 70 Comm: pmic_thread Tainted: G        W       4.4.15 #18
+	[   17.624785] <4>-(4)[70:pmic_thread]Hardware name: MT6757CD (DT)
+	[   17.625524] <4>-(4)[70:pmic_thread][name:traps&]Call trace:
+	[   17.626217] <4>-(4)[70:pmic_thread][<ffffffc00008a6c8>] dump_backtrace+0x0/0x180
+	[   17.627139] <4>-(4)[70:pmic_thread][<ffffffc00008a958>] show_stack+0x14/0x1c
+	[   17.628017] <4>-(4)[70:pmic_thread][<ffffffc000396b94>] dump_stack+0xa8/0xe0
+	[   17.628896] <4>-(4)[70:pmic_thread][<ffffffc000b261a8>] arch_reset+0xf0/0x1a8
+	[   17.629785] <4>-(4)[70:pmic_thread][<ffffffc000538278>] pwrkey_int_handler_r+0x17c/0x1f4
+	[   17.630794] <4>-(4)[70:pmic_thread][<ffffffc000538648>] pmic_thread_kthread+0x258/0x480
+	[   17.631792] <4>-(4)[70:pmic_thread][<ffffffc0000c81d4>] kthread+0xec/0x100
+	[   17.632649] <4>-(4)[70:pmic_thread][<ffffffc000085cd0>] ret_from_fork+0x10/0x40
+	[   17.633639] <4>.(4)[70:pmic_thread][name:mtk_wdt&]wdt_arch_reset: mode=0x1
+	[   17.634716] <4>.(4)[70:pmic_thread][name:mtk_wdt&]wdt_arch_reset: wdt_mode=0xdd
+	[   17.635629] <4>.(4)[70:pmic_thread][name:mtk_wdt&]mtk_rgu_dram_reserved:MTK_WDT_MODE(0x14)
+	[   17.636647] <4>.(4)[70:pmic_thread][name:mtk_wdt&]wdt_arch_reset called end MTK_WDT_MODE =22000094
+	[   17.637764] <4>-(4)[70:pmic_thread][name:upmu_debugfs&][PMIC] [pmic_pre_wdt_reset][pmic_boot_status]
+
+
+	[   17.638907] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_TOP_RST_STATUS Reg[0x614]=0x0
+	[   17.640153] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_PONSTS Reg[0xe74]=0x0
+	[   17.641314] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_POFFSTS Reg[0xe76]=0x0
+	[   17.642485] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_THERMALSTATUS Reg[0x214]=0x0
+	[   17.643722] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_PGSTATUS0 Reg[0x20e]=0xffff
+	[   17.644947] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_PGSTATUS1 Reg[0x210]=0xff80
+	[   17.646173] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_PSOCSTATUS Reg[0x212]=0x0
+	[   17.647377] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_BUCK_OC_CON0 Reg[0x100c]=0x0
+	[   17.648621] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_BUCK_OC_CON1 Reg[0x100e]=0x1ff
+	[   17.649871] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_STRUP_CON4 Reg[0xe08]=0x8010
+	[   17.651108] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_TOP_RST_MISC Reg[0x60e]=0x221
+	[   17.652364] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][pmic_boot_status] MT6355_TOP_CLK_TRIM Reg[0x458]=0x70f8
+	[   17.654452] <4>-(4)[70:pmic_thread][name:pmic_debugfs&][PMIC] [pmic_boot_status] JUST_PWRKEY_RST=0x0
+	[   18.155990] <4>-(4)[70:pmic_thread][name:mtk_wdt&]wdt_arch_reset: sw reset happen!
+
+
+	(pmic_irq.c) pmic_thread_kthread pimc相关的线程，有一些进程调度方面的内容 -> pwrkey_int_handler 按下按键的回调函数，按下按键会计时
+	-> kpd_pwrkey_pmic_handler 按键处理函数 (cust_kpd_8167.dtsi)这个文件里面定义了一些按键的lable，按键按下要持锁，同时要避免hang，启动hang检测
+	释放的时候也需要持锁500ms，去抖可能是避免按键是否的时候有抖动 -> （hal_kpd.c）kpd_pmic_pwrkey_hal 将按键的时间上报给input子系统的，
+	(key_control.cpp) 之后应该是通过input子系统下面的fd节点，这里面是一个线程通过轮询的方式，如果有变化就会判断下一步亮屏关机充电的动画还是灭屏或者是重启之类的
+	key_control线程， 正常的按键处理轮询fd，判断input上报的事件，然后处理， key_thread_routine长按处理，重启 开机动画还是继续检测。
+	
+	
+	-> pwrkey_int_handler_r 按键释放，这个地方可能存在问题，这个地方的长按时间检测有问题，long_press 最大时间只有500ms，然后释放会持锁500ms，所以
+	长按1s左右可能会重启
+	pwrkey_int_handler
+			timer_pre = sched_clock();
+	
+	pwrkey_int_handler_r	
+			timer_pos = sched_clock();
+			if (timer_pos - timer_pre >= LONG_PWRKEY_PRESS_TIME_UNIT * LONG_PWRKEY_PRESS_TIME_US)
+				long_pwrkey_press = true;
+
+
+
+	long最大长度 2147483648～2147483647 
+	timer_pos - timer_pre >= LONG_PWRKEY_PRESS_TIME_UNIT * LONG_PWRKEY_PRESS_TIME_US
+	所以LONG_PWRKEY_PRESS_TIME_UNIT * LONG_PWRKEY_PRESS_TIME_US 最大是2.1s
+	
 }
+	
+	
 
 
 /***************************************************************************************************************/
