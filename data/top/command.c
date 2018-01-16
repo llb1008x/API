@@ -738,6 +738,9 @@ qcom 烧写 当然要换路径
 		mount –o umask=000, iocharset=cp936   /dev/hda5  /mnt/hda5 (解决挂在之后没有权限)
 
 
+        主机文件夹共享到虚拟机
+                                                   主机  虚拟机挂载目录
+        sudo mount -t vboxsf -o uid=1000,gid=1000  llb  /home/llb/workstation/
 
 		**有待验证
 		{
