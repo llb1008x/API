@@ -134,6 +134,10 @@
 }
 
 
+device/qcom/sepolicy/gionee/bluetooth.te:3:ERROR 'unknown type gnres_file' at token ';' on line 39978:
+#Gionee <GN_BlueTooth> <zhaolong> <20171228> add for 147852 begin
+allow bluetooth gnres_file:dir search;
+checkpolicy:  error(s) encountered while parsing configuration
 
 
 
