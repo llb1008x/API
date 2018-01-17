@@ -444,7 +444,7 @@ G1605A
 	充电至满电的状态可能有问题
 	{
 		reviewer code 感觉代码逻辑跟规范有问题
-		//Gionee <GN_BY_CHG> <lilubao> <20180112> modify for platform change begin
+		//Gionee <GN_BY_CHG> <lilubao> <20180117> modify for platform change begin
 		
 		mtk_battery.c
 			1.
@@ -514,8 +514,9 @@ G1605A
 			mt_chg->charger.name = "charger";
 			mt_chg->charger.type = POWER_SUPPLY_TYPE_UNKNOWN;
 			
-		
-	
+			
+		修改这两个至，首先这两个值跟什么有关，有什么作用？	
+		所以保守的把 ircmp_resistor / ircmp_vclamp 各調大一階到 50mΩ / 64mV，	
 	}
 
 
