@@ -151,6 +151,86 @@
     
     可能是ubuntu版本不一样，有差异，所以ubuntu16编译的时候有那么多的问题，但是一套源码怎么有那么多的问题
     编译是个问题
+
+
+    
+    ./build_android.sh: line 71: mkimage: command not found
+
+    ==============================================================================================================
+
+    解决方案是：
+
+    
+
+    1. 将 iTop4412_uboot_scp_20141224.tar 
+
+        iTop4412_Kernel_3.0_20150403.tar
+
+    iTop4412_ICS_20150413.tar
+
+    解压出来的三个文件夹，放在同一个目录下
+
+
+    2. 将 uboot/tools/目录里面的 mkimage.c 和 mkimage.h 复制到 /usr/bin/ 目录下
+
+    3. 执行apt-get install uboot-mkimage 命令
+
+
+    最后，使用讯为iTOP4412开发板，终于顺利生成如下四个文件：
+
+    1. system.img                       210040 KB
+
+    2. ramdisk-uboot.img                901    KB
+
+    3. u-boot-iTOP-4412.bin             515    KB
+
+    4. zImage                           3907   KB
+
+    并且通过fastboot模式，将四个文件成功烧写下载到开发板，现在开发板的Android系统，正常运行。
+
+
+    烧写步骤：
+    1.四个镜像文件
+    system.img ，ramdisk-uboot.img，u-boot-iTOP-4412.bin，u-boot-iTOP-4412.bin
+
+    2.打开超级终端,然后上电启动开发板,按“回车”,进入 Uboot 模式,不明白 Uboot 模式可以
+    参考前面“Uboot 模式和文件系统模式”。如下图所示,进入 Uboot 模式
+
+    3.创建 eMMC 分区并格式化。如果原来已经做过此步骤,则可以跳过,不必每次烧写前都分区和格
+    式化。在超级终端中,输入下面分区和格式化命令。
+    —fdisk -c 0
+    —fatformat mmc 0:1
+    —ext3format mmc 0:2
+    —ext3format mmc 0:3
+    —ext3format mmc 0:4
+
+    (5)在 Windows 命令行中,输入下面的命令:
+    fastboot flash bootloader u-boot-iTOP-4412.bin
+    特别提醒,不建议用户烧写“u-boot-iTOP-4412.bin”这个文件,可跳过此步骤,因为出厂前已经烧
+    写过这个镜像文件了。
+    fastboot flash boot boot.img
+    fastboot flash kernel zImage
+    fastboot flash ramdisk ramdisk-uboot.img
+    fastboot flash system system.img
+    fastboot -w
+
+    #modify by lilubao for compile 20180113
+    export PATH=$PATH:/usr/local/arm/arm-2009q3/bin
+
+
+    内存管理：
+        内核所管理的另外一个重要资源是内存。为了提高效率,如果由硬件管理虚拟内存,内存是按照所谓的
+        内存页方式进行管理的(对于大部分体系结构来说都是 4KB)。Linux 包括了管理可用内存的方式,以及物
+        理和虚拟映射所使用的硬件机制。
+        不过内存管理要管理的可不止 4KB 缓冲区。Linux 提供了对 4KB 缓冲区的抽象,例如 slab 分配器。
+        这种内存管理模式使用 4KB 缓冲区为基数,然后从中分配结构,并跟踪内存页使用情况,比如哪些内存页是
+        满的,哪些页面没有完全使用,哪些页面为空。这样就允许该模式根据系统需要来动态调整内存使用。
+        为了支持多个用户使用内存,有时会出现可用内存被消耗光的情况。由于这个原因,页面可以移出内存
+        并放入磁盘中。这个过程称为交换,因为页面会被从内存交换到硬盘上。内存管理的源代码可以
+        在 ./linux/mm 中找到。
+
+    添加一个驱动模块
+            
 }
 
 
