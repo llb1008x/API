@@ -63,6 +63,9 @@
 	高低温跟过压的充电使能情况
 	<3>[ 6498.557056]  (1)[238:charger_thread]tmp:49 (jeita:0 sm:0 cv:0 en:0) (sm:1) en:1
 	
+	BC1.2 
+		DCD:Data contact detection 
+	
 	
 }
 
@@ -375,60 +378,227 @@ M2018
 
 
 
-
-
-
-
-
-
-
 G1605A
 {
-	GNSPR #149596,自动化monkey72h测试执行过程中adb异常
+	GNSPR #149586,自动化monkey72h测试执行过程中adb异常
 	{
-		//Gionee <GN_BY_CHG> <lilubao> <20180115> modify for debug begin
+		现象：
+			现在这几个版本有很多在跑monkey的过程中出现问题的
+			adb失败，定屏，黑屏
 	
+		这个问题的时间点：Wed Jan  3 17:06:30 CST 2018   ->  Thu Jan 4 04:47:14 CST 2018 跑了11h左右
+		
+		什么原因导致adb断开的  ？
+		{
+			main.log
+				01-04 04:47:55.078813  3833  3833 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+				01-04 04:47:55.099458  3833  3833 D AndroidRuntime: CheckJNI is OFF
+
+				01-04 04:47:55.531473  3833  3833 D AndroidRuntime: Shutting down VM	
+			
+			
+			kernel.log	后面有很多的sensor abnormal的 log
+			<7>[27687.738585]  (3)[2014:Binder_A][name:mag&]<MAGNETIC>  mag_store_active done
+			<7>[27687.738911]  (3)[2014:Binder_A][name:mag&]<MAGNETIC>  mag_delay ++
+			<7>[27687.738925]  (3)[2014:Binder_A][name:mag&]<MAGNETIC>  mag_delay 30000000 ns done
+			<7>[27687.740314]  (2)[8189:kworker/2:2][name:akm09911&][AKM09911] Soft reset is done.
+			
+			这个目前还是不确定	
+		}
+		
+		
+		mtk  case	ALPS03722488 
+		{
+			//Gionee <GN_BY_CHG> <lilubao> <20180115> modify for debug begin
+		
+			system/core/adb/adb_trace.h
+			中的
+			# define ADB_TRACING ((adb_trace_mask & (1 << TRACE_TAG)) != 0)
+			修改为
+			# define ADB_TRACING 1
+			确保log可以抓取到
+		
+		
+			修改之后，插入USB，连接时，您会在main log中看到： adb: online
+			offline的时候为：
+			adb: offline
+			然后按照上面的方式修改的话
+			刚开始创建的时候，还会show出如下的log
+			starting transport output thread on fd
+			以及
+			data pump started
+			等等，总之以D打印的log都会show出来
+			
+			
+			上面的log中表明，贵司在这个过程中有做mode的切换
+			将mtp切换为rndis只要UI界面上有mode的切换，adbd就一定会退出
+			thanks！ 
+			
+			切function一定会这样flow就是这样设定的,原生flow就是这样的
+			所以在adbd monkey测试过程中，不可以切mode
+			thanks！ 
+			
+			
+		}
+	
+		
+		定屏的问题
+		{
+			这个里面有很多的hang_detect
+			
+			hang_detect_counter  这个数值有哪些意思
+			hd_detect_enabled	 应该是使能hang_detect
+			
+			即在hang detect 中有两个关键的变数， hd_detect_enabled 指示当前hang detect 是否开启， hang_detect_counter 为计时器计数. hang_detect thread 每隔30s 
+			(HD_INTER) 将其减一。
+
+			其设计思想非常简单，即上层通过ioctl 此device, 设置hang_detect_counter, 即告知hang detect, 本人预计会在hang_detect_counter * 30s 之内再次来tick 您,
+			假如我没有在这个时间内tick 您，那么就意味着我已经牺牲了, 您就发动暴动, 重启手机.
+			
+			AEEIOCTL_RT_MON_Kick
+			
+			正常情况下，tick 300s, 对应count=10.
+			在dump backtrace 时，tick 360s, 对应count=12.
+			在SWT 发生的情况下，tick 420s, 对应count=14.
+			
+			这里出现的是
+			<3>[55732.738098]  (0)[161:hang_detect][name:aed&][Hang_Detect] init found pid:1.
+			<3>[55732.738375]  (0)[161:hang_detect][name:aed&][Hang_Detect] mmcqd/0 found pid:168.
+			<3>[55732.738523]  (0)[161:hang_detect][name:aed&][Hang_Detect] surfaceflinger found pid:286.
+			<3>[55732.738600]  (0)[161:hang_detect][name:aed&][Hang_Detect] debuggerd found pid:1015.
+			<3>[55732.738635]  (0)[161:hang_detect][name:aed&][Hang_Detect] debuggerd64 found pid:1016.
+			<3>[55732.738732]  (0)[161:hang_detect][name:aed&][Hang_Detect] system_server found pid:1729.
+			<3>[55732.738779]  (0)[161:hang_detect][name:aed&][Hang_Detect] ndroid.systemui found pid:2536.
+			<3>[55732.738967]  (0)[161:hang_detect][name:aed&][Hang_Detect] debuggerd64 found pid:32664.
+			<3>[55732.739018]  (0)[161:hang_detect][name:aed&][Hang_Detect] hang_detect thread counts down 1:14.
+
+	
+			monitoe_hang.c  showstatus
+			
+			第一个出现的是	dump mmcqd/1 all thread bt
+			/* show all kbt in mmcqd/1 */
+			LOGE("[Hang_Detect] dump mmcqd/1 all thread bt\n");
+			if (mmcqd1)
+				show_bt_by_pid(mmcqd1);
+				
+				
+			<4>[56420.224940]  (0)[161:hang_detect][<ffffffc0000876ac>] __switch_to+0x74/0x8c
+			<4>[56420.224986]  (0)[161:hang_detect][<ffffffc000c208fc>] __schedule+0x434/0x8b0
+			<4>[56420.225031]  (0)[161:hang_detect][<ffffffc000c20d9c>] schedule+0x24/0x74
+			<4>[56420.225076]  (0)[161:hang_detect][<ffffffc000942ff0>] mmc_queue_thread+0x114/0x16c
+			<4>[56420.225117]  (0)[161:hang_detect][<ffffffc0000c07cc>] kthread+0xe4/0xfc
+			<3>[56420.225153]  (0)[161:hang_detect][name:aed&][Hang_Detect] dump mmcqd/1 all thread bt
+			<3>[56420.225187]  (0)[161:hang_detect][name:aed&][Hang_Detect] dump debug_show_all_locks
+			<4>[56420.225220]  (0)[161:hang_detect]INFO: lockdep is turned off.
+			<3>[56420.225253]  (0)[161:hang_detect][name:aed&][Hang_Detect] show_free_areas	
+			
+			这个关于hang detect的介绍还是比较不错的
+			https://onlinesso.mediatek.com/_layouts/15/mol/topic/ext/Topic.aspx?id=269
+		
+			<3>[54952.478167]  (1)[161:hang_detect][name:aed&][Hang_Detect] hang_detect thread counts down 10:10.
+
+		}
+		
+		
+		ccflags-$(CONFIG_USB_MTK_HDRC) += -I$(srctree)/drivers/misc/mediatek/usb20
+		ccflags 这个是什么意思
+		{
+			其实CFLAGS 你可以看成是gcc（或gcc同类编译器）编译命令的一部分。
+			通常情况下我们编译源代码的时候因为需求不同等原因会加上各种各样选项和参数，而通过修改CFLAGS这一变量来达到在它作用域范围内修改编译命令的目的。
+			针对你所描述的问题，
+			CFLAGS="-DDEBUG ${INCDIR} ${LIBDIR}" LIBPATH=$(TUXLIBDIR)
+			其实${INCDIR} ${LIBDIR} 等等是一个变量，按照这个变量名提示的意思，${INCDIR}可能是存放着部分源代码要用到的头文件，而 ${LIBDIR}是你将可能用到的库文件的路径。
+			这些变量代表着具体的值，在运行的时候会被展开成具体的值。另外还要注意在这些语句里面，等号左边的变量名不带$，而等号右边的变量名则要带$。
+		
+		
+			这是配置编译器设置，就是说让编译器知道怎么样去编译你的源代码，CFLAGS不是makefile的关键字,他是一个变量，这个名称可以随便起，你可以起CFLAGSABCDEFG,只要你在编译时，
+			用$引用这个变量就可以了，CFLAGS 没有什么具体含义. 
+			
+			
+			这里的意思应该是 宏CONFIG_USB_MTK_HDRC 在drivers/misc/mediatek/usb20 这个里面起作用
+			  
+		}
+		
+		
+		{ 
+			4966		
+				Tue Jan 23 			23:02:14 CST 2018
+			
+				结束：Wed Jan 24 	03:55:58 CST 2018
+				
+				
+				
+				<4>[17955.169385]  (2)[214:wdtk-2][thread:214][RT:17955169375162] 2018-01-23 19:55:54.605386 UTC;android time 2018-01-24 03:55:54.605386
+				
+				<13>[17925.355645]  (0)[1:init]init: Service 'adbd' is being killed...
+				<4>[17925.356204] -(1)[389:adbd][name:mtk_qmu&]QMU_WARN,<mtk_qmu_stop 473>, Stop RQ 2
+				<4>[17925.356222] -(1)[389:adbd][name:mtk_qmu&]QMU_WARN,<mtk_qmu_enable 334>, enable RQ(2)
+				<13>[17925.357142]  (0)[1:init]init: Service 'adbd' is being killed...
+				<5>[17925.360406]  (0)[1:init][name:g_android&][g_android][USB]android_enable_function: name = rndis, f->name=adb 
+				<5>[17925.360482]  (0)[1:init][name:g_android&][g_android][USB]functions_store: name = adb 
+
+
+				<11>[17925.364173]  (0)[1:init]init: service 'adbd' still running, return directly
+				
+				
+				
+				shell
+				/sys/class/android_usb/android0/enable
+				
+				system/core/init/init.cpp
+				<13>[17925.355645]  (0)[1:init]init: Service 'adbd' is being killed...
+				
+				
+			#8.mtp,adb
+			on property:sys.usb.config=mtp,adb
+				write /sys/class/android_usb/android0/enable 0
+				write /sys/class/android_usb/android0/idVendor ${sys.usb.vid}
+				write /sys/class/android_usb/android0/idProduct 0C02
+				write /sys/class/android_usb/android0/functions mtp,adb
+				write /sys/class/android_usb/android0/enable 1
+				start adbd
+				setprop sys.usb.state ${sys.usb.config}
+			
+				
+			#20.rndis,adb
+			on property:sys.usb.config=rndis,adb
+				write /sys/class/android_usb/android0/enable 0
+				write /sys/class/android_usb/android0/idVendor ${sys.usb.vid}
+				write /sys/class/android_usb/android0/idProduct 0004
+				write /sys/class/android_usb/android0/functions ${sys.usb.config}
+				write /sys/class/android_usb/android0/enable 1
+				start adbd
+				setprop sys.usb.state ${sys.usb.config}	
+
+		}
+
+
 		monkey是干什么的，有什么机制，然后针对的找问题
 		搜 Exception
 		
-		确定问题发生的时间，
-	
-		<7>[22616.294464] -(0)[3642:commands.monkey][name:devapc&][DEVAPC] Device Access Permission Read Violation - Process:commands.monkey PID:3642 Vio Addr:0x11006000 , Bus ID:0x1a , Dom ID:0x0
-		<7>[22616.294475] -(0)[3642:commands.monkey][name:devapc&][DEVAPC] VIO_STA 0:0x0, 1:0x40000, 2:0x0, 3:0x2400000, 4:0x0
+		量产分支
+		origin/g1605a_mp_main_dev
 		
 		
-		:Sending Flip keyboardOpen=true
-		Got IOException performing flipjava.io.IOException: write failed: EINVAL (Invalid argument)
-		// Injection Failed
+		adb的体系框架
+		{
+			
+		
+		}
 		
 		
-		这个好象是上层虚拟机重启了，然后adbd service被kill了
-		adb功能之前一直是正常的
-		main.log
-		01-04 04:47:55.531473 3833 3833 D AndroidRuntime: Shutting down VM
-
-		kernel.log
-		<13>[42205.234289] (2)[1:init]init: Service 'adbd' is being killed...
-		<5>[42205.234666] (2)[1:init][g_android][USB]enable_store: device_attr->attr.name: enable
-		<5>[42205.234686] (2)[1:init][g_android][USB]enable_store: enable 1->0 case, device_desc.idVendor = 0x271d, device_desc.idProduct = 0xc02
-		<4>[42205.234696] (2)[1:init][MUSB]musb_gadget_pullup 2545: is_on=0, softconnect=1 ++
-		<4>[42205.234705] (2)[1:init][MUSB]usb_cable_connected 594: type(1)
-		<4>[42205.234713] (2)[1:init][MUSB]musb_pullup 2488: MUSB: gadget pull up 0 start
-		<4>[42205.234722] (2)[1:init][MUSB]musb_pullup 2508: MUSB: gadget pull up 0 end
-		<6>[42205.234734] -(2)[1:init]android_usb gadget: disable function 'mtp'/ffffffc0b4bf7800
-		<4>[42205.234741] -(2)[1:init]mtp_function_disable
 		
-		system/core/adb/adb_trace.h
-		中的
-		# define ADB_TRACING ((adb_trace_mask & (1 << TRACE_TAG)) != 0)
-		修改为
-		# define ADB_TRACING 1
-		确保log可以抓取到
-	
+		
+		
+		
 	}
-
+	
 
 }
+
+
+
+
 
 
 
@@ -500,8 +670,7 @@ G1605A
 		
 		
 
-		2.
-		<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22
+		2.<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22
 		
 		mtk_chg_type_det.c 这个里面注册了charger到power supply但是没有charger_type这个节点所以一直报错 
 		charge_type
@@ -515,8 +684,30 @@ G1605A
 			mt_chg->charger.type = POWER_SUPPLY_TYPE_UNKNOWN;
 			
 			
-		修改这两个至，首先这两个值跟什么有关，有什么作用？	
-		所以保守的把 ircmp_resistor / ircmp_vclamp 各調大一階到 50mΩ / 64mV，	
+		rt5081 probe 时间太长， 主要是因为dump register 这个时间太长导致的
+		rt5081 ，mt6355的一些寄存器log比较多，想办法动态开关
+		[    2.335297] <4>.(7)[1:swapper/0]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 17	
+			
+			
+		3.供应商回复	
+			修改这两个至，首先这两个值跟什么有关，有什么作用？	
+			所以保守的把 ircmp_resistor / ircmp_vclamp 各調大一階到 50mΩ / 64mV，	
+		
+			這種現像通常跟 IR 補償不夠有關。
+			這會增加線路上的阻抗，所以 ircmp_resistor = 50mΩ 或許太小，可先提高到 75mΩ (如附件) 但有風險，請注意。
+
+			因為每支手機PCB、每顆電池的阻值不一，若剛好總阻值低的話，過補會損壞電池、手機，甚至有生命危險。
+
+			修改 ircmp_resistor 也要注意 ircmp_vclamp < ICHG (2A) x ircmp_resistor
+		
+		
+			这个电量应该是充满了，因为库伦计的值已经接近满的，但是pcb上的阻抗不匹配或者大小问题，导致最后出来的电池电压比较小
+			
+			电流是否正常，
+			
+			
+			
+			
 	}
 
 

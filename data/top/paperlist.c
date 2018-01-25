@@ -187,6 +187,12 @@
 	
 	    Linux USB 驱动开发（一）—— USB设备基础概念 
 	    http://blog.csdn.net/zqixiao_09/article/details/50984074	
+	    
+	    android adb 源码框架分析（1 系统）
+	    http://blog.csdn.net/luansxx/article/details/25203269
+	    
+	    android adb源码分析(1) 
+	    http://blog.csdn.net/xgbing/article/details/52058390
 	
 	}
 }
