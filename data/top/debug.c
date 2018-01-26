@@ -145,6 +145,35 @@ checkpolicy:  error(s) encountered while parsing configuration
 
 
 
+
+18Y07A
+{
+   android o版本上bring up
+   
+   hardware : 
+   	cpu:mt6763
+   	pmic:mt6356,mt6370
+   	
+   	
+   	//Gionee <GN_BY_CHG> <lilubao> <20180126> add for debug begin
+   
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 M2018
 {
 	1.调试PD协议是否通
@@ -582,18 +611,21 @@ G1605A
 		
 		adb的体系框架
 		{
+			主要是system/core/adb 目录下的代码和这两个博客
+			android adb 源码框架分析（1 系统）
+			http://blog.csdn.net/luansxx/article/details/25203269
 			
+			android adb源码分析(1) 
+			http://blog.csdn.net/xgbing/article/details/52058390
+			
+			
+			adb的框架主要是基于 client server的模式，adb，adbd(adb daemon)
+			服务器，客户端，客户端发送请求，服务器应答，然后处理请求
+			中间有很多内容需要学习，c/s，socket，线程处理
 		
 		}
-		
-		
-		
-		
-		
-		
+			
 	}
-	
-
 }
 
 
@@ -1087,10 +1119,6 @@ G1605A
 
 
 
-18Y07A
-{
-    还有一个otg功能好像还有问题，需要抽时间调试一下 
-}
 
 
 
