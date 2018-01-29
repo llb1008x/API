@@ -4950,7 +4950,143 @@ out:
 }
 
 
+/***************************************************************************************************/
+31.	充电至满电的状态可能有问题
+{
+	reviewer code 感觉代码逻辑跟规范有问题
+	//Gionee <GN_BY_CHG> <lilubao> <20180117> modify for platform change begin
+	
+	mtk_battery.c
+		1.
+		整个power supply 上报的都很慢
+		power_supply_changed(bat_psy); 
+	
+		fg_update_flag电量计要上报
+	
+		battery_update_routine
+	
+					battery_update_psd(&battery_main);
+					if ( (chr_type != CHARGER_UNKNOWN)||(gn_screenon_time>0) ){
+						bm_err("in [%s] by lilubao for debug \n",__FUNCTION__);
+						ktime = ktime_set(10, 0);
+					}	
+	
+		但是这个函数里面并没有调用power supply change 不知道会不会上报
+		power_supply_changed(bat_psy);
+	
+		估计需要在battery_update_psd里面上报
+		struct power_supply *bat_psy = bat_data->psy;
+		power_supply_changed(bat_psy);
+	
+		2.boot ，screen的时间这部分代码不是很好看
+		void fg_update_info(void )
+		{
+			int gn_boot_reason,gn_boot_mode;
+
+			gn_boot_reason=get_boot_reason();
+			gn_boot_mode=get_boot_mode();
+
+			if(mt_get_bl_brightness() != 0)
+				gn_screenon_time = gn_screenon_time + 10;
+			else
+				gn_screenon_time = 0;
 
 
+			bm_info("gn_boot_reason->%d,gn_boot_mode->%d,gn_call_state->%d,gn_screenon_time->%d\n",
+					gn_boot_reason,gn_boot_mode,gn_call_state,gn_screenon_time);
+		}
+		
+		包括后面的电量信息上报也根据screen判断
+		
+		
+	mtk_charger.c
+			之前已经修改了一部分关于ovp的代码
+			
+	mtk_switch_charging.c
+			
+	rt5081_pmu_charger.c
+		去除冗余log				
+	
+	
+	
+
+	2.<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22
+	
+	mtk_chg_type_det.c 这个里面注册了charger到power supply但是没有charger_type这个节点所以一直报错 
+	charge_type
+	
+	mt_charger_set_property
+	
+		struct mt_charger *mtk_chg = power_supply_get_drvdata(psy);
+	
+		mt_chg->chg_online = false;
+		mt_chg->charger.name = "charger";
+		mt_chg->charger.type = POWER_SUPPLY_TYPE_UNKNOWN;
+		
+		
+	rt5081 probe 时间太长， 主要是因为dump register 这个时间太长导致的
+	rt5081 ，mt6355的一些寄存器log比较多，想办法动态开关
+	[    2.335297] <4>.(7)[1:swapper/0]rt5081_pmu 5-0034: rt5081_pmu_reg_read: reg 17	
+		
+		
+	3.供应商回复	
+		修改这两个至，首先这两个值跟什么有关，有什么作用？	
+		所以保守的把 ircmp_resistor / ircmp_vclamp 各調大一階到 50mΩ / 64mV，	
+	
+		這種現像通常跟 IR 補償不夠有關。
+		這會增加線路上的阻抗，所以 ircmp_resistor = 50mΩ 或許太小，可先提高到 75mΩ (如附件) 但有風險，請注意。
+
+		因為每支手機PCB、每顆電池的阻值不一，若剛好總阻值低的話，過補會損壞電池、手機，甚至有生命危險。
+
+		修改 ircmp_resistor 也要注意 ircmp_vclamp < ICHG (2A) x ircmp_resistor
+	
+	
+		这个电量应该是充满了，因为库伦计的值已经接近满的，但是pcb上的阻抗不匹配或者大小问题，导致最后出来的电池电压比较小
+		
+		电流是否正常，	
+}
+
+
+/************************************************************************************************************************/
+32.GNSPR#139202，去除冗余log
+{
+	//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log begin
+	1.修改log等级 5 可以减少一部分
+	FG_daemon_log_level 
+	Enable_BATDRV_LOG	
+	
+	2.mt6757.dtsi
+	pwrap@1000d000 {
+		compatible = "mediatek,pwrap";
+		reg = <0 0x1000d000 0 0x1000>;
+		//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log begin
+		interrupts = <GIC_SPI 152 IRQ_TYPE_LEVEL_HIGH>;
+		//Gionee <GN_BY_CHG> <lilubao> <20171130> remove redundant log end
+		mt6351_pmic: mt6351 {
+			compatible = "mediatek,mt6351-pmic";
+			interrupt-controller;
+		};
+		mt6355_pmic: mt6355 {
+			compatible = "mediatek,mt6355-pmic";
+			interrupt-controller;
+		};
+	};
+	
+
+	4.rt5081 probe时间太长 200ms+
+	
+	
+	5.rt5081的 pd和type-c 的配置因为占用了gpio 8
+	
+	
+	6.power_supply 上报有问题
+	<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22
+	
+
+	这两个宏跟很多模块的调试log有关，所以导致rt5081,mt6355的一些寄存器log很多
+	CONFIG_DYNAMIC_DEBUG=y
+	CONFIG_DEBUG_INFO=y
+	
+}
 
 
