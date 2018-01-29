@@ -18,7 +18,7 @@ int main(int argc,char **argv)
 		err_sys("fork error");
 	}else if(pid==0){
 	
-		if(execl("/home/llb/project/API/study/C/daily_code/day_91/testinter.sh","testinterp","myargl","MY ARG2",(char *)0)<0)
+		if(execl("/home/llb/project/API/study/C/daily_code/day_91/testinterp","testinterp","myargl","MY ARG2",NULL)<0)
 			
 			err_sys("execl error");
 	}

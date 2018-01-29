@@ -447,7 +447,8 @@
 	android CTS 介绍
 	https://www.cnblogs.com/verawang/p/5421961.html
 
-
+    Linux三剑客之awk命令
+    https://www.cnblogs.com/ginvip/p/6352157.html
 }
 
 
