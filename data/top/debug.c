@@ -186,8 +186,8 @@ M2018
 			cat /d/ipc_logging/usb_pd/log
 			cat /sys/class/usbpd/usbpd0
 						
-			
-			1.msm-pm660.dsti
+		
+			1.msm-pm660.dtsi
 			pm660_charger: qcom,qpnp-smb2
 				/*qcom,micro-usb;*/
 				类型应该是type-c
