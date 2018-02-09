@@ -147,7 +147,7 @@
    	pmic:mt6356,mt6370
    	
    	
-   	//Gionee <GN_BY_CHG> <lilubao> <20180126> add for debug begin
+   	//Gionee <GN_BY_CHG> <lilubao> <20180208> modify for platform change begin
    
     
 }
@@ -381,6 +381,51 @@ M2018
 			  smblib_handle_usb_source_change 这个函数里面很多跟apsd的检测相关
 			  			
 			PD跟APSD检测是否有冲突，还是PD在APSD之后检测	
+			
+			
+			type-c 口的检测，类型，正常的apsd跑到哪一个部分？
+			{
+				/*modify by lilubao for debug 20180202*/
+				dev_err(chg->dev,"in [%s] by lilubao for debug\n", __FUNCTION__);
+			
+				smb2_configure_typec
+				
+				
+				中断 smblib_handle_usb_typec_change -> smblib_usb_typec_change  -> smblib_handle_typec_cc_state_change
+				
+				type-c 要读取rp电阻的的电压判断source 的等级，如果是sink insert徐压迫disable hvdcp这个投票
+				
+				
+				
+				type-c mode
+				static const char * const smblib_typec_mode_name[] = {
+					[POWER_SUPPLY_TYPEC_NONE]		  = "NONE",
+					[POWER_SUPPLY_TYPEC_SOURCE_DEFAULT]	  = "SOURCE_DEFAULT",
+					[POWER_SUPPLY_TYPEC_SOURCE_MEDIUM]	  = "SOURCE_MEDIUM",
+					[POWER_SUPPLY_TYPEC_SOURCE_HIGH]	  = "SOURCE_HIGH",
+					[POWER_SUPPLY_TYPEC_NON_COMPLIANT]	  = "NON_COMPLIANT",
+					[POWER_SUPPLY_TYPEC_SINK]		  = "SINK",
+					[POWER_SUPPLY_TYPEC_SINK_POWERED_CABLE]   = "SINK_POWERED_CABLE",
+					[POWER_SUPPLY_TYPEC_SINK_DEBUG_ACCESSORY] = "SINK_DEBUG_ACCESSORY",
+					[POWER_SUPPLY_TYPEC_SINK_AUDIO_ADAPTER]   = "SINK_AUDIO_ADAPTER",
+					[POWER_SUPPLY_TYPEC_POWERED_CABLE_ONLY]   = "POWERED_CABLE_ONLY",
+				};
+				
+				
+				static void typec_sink_insertion(struct smb_charger *chg)
+				{
+					/* when a sink is inserted we should not wait on hvdcp timeout to
+					 * enable pd
+					 */
+					vote(chg->pd_disallowed_votable_indirect, HVDCP_TIMEOUT_VOTER,
+							false, 0);
+				}
+			}
+			
+
+
+
+			
 		}
 		
 		
@@ -391,7 +436,7 @@ M2018
 }
 	
 
-
+http://www.richtek.com/en/Design%20Support/Technical%20Document/AN056#__Bookmark__0
 
 
 17G10A

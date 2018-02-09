@@ -10,7 +10,7 @@
 	
 	gpio:
 	 drv_vbus
-	 usb_id		AA27			
+	 usb_id		AA27	AG28没接		
 	 gpio_chg_en
 	 eint_chg_stat
 	还差一个霍尔元件搜kpd.c  flip
@@ -90,6 +90,12 @@
 		
 		不接bat_id 的话 ，那个脚有电压，默认是1.14V，接上不同的分压电阻有不同的电压
 		(68K，0.84v),(15k,0.43v)
+		
+		如果修改dts，需要
+		./TmakeGionee BJ18Y07A01_A -i odmdtboimage
+		
+		
+		/home/llb/project/PRO/source/18Y07A/L34_MTK_MT6763_18Y07A_180103_ALPS/android_mtk_mp/out/target/product/k63v2_64_bsp/obj/KERNEL_OBJ/include/generated/autoconf.h
 		
 	
 	}
