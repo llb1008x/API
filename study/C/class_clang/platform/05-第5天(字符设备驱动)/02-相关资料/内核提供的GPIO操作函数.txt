@@ -1,0 +1,28 @@
+
+1、 bit的读、写
+	gpio_set_value(S5PV210_GPH0(i), 0);     //代替  以前的  s3c2410_setpin()
+	gpio_get_value(S5PV210_GPH0(i));
+
+2、配置输入、输出、其他功能
+	s3c_gpio_cfgpin(S5PV210_GPH0(0),S3C_GPIO_OUTPUT); 		//S3C_GPIO_INPUT
+
+3、上拉
+	s3c_gpio_setpull(S5PV210_GPH2(3),S3C_GPIO_PULL_UP);
+
+4、驱动能力
+	s5p_gpio_set_drvstr(S5PV210_GPH3(0), 2);				//驱动能力 0-3
+
+5、中断
+	ret = set_irq_type(IRQ_EINT(19),IRQ_TYPE_EDGE_FALLING);
+	ret = request_irq(IRQ_EINT(23),buttons_interrupt, 0,"KEY6", (void *)6);
+	
+	
+	
+6、任意中断 (前提这个管脚有中断功能) （gpio_to_irq）
+   .start = S5PV210_GPJ2(7),//IRQ_EINT_GROUP(20, 7), //J2_7
+    s3c_gpio_cfgpin(wiegand.r0->start, S3C_GPIO_SFN(15));
+
+	status = request_irq(gpio_to_irq(wiegand.r0->start), eint_irq, wiegand.r0->flags & IRQF_TRIGGER_MASK, "wiegand0", (void*)0);
+	DPRINT("request %d %d\n", wiegand.r0->start, status);
+	if(status < 0)
+		return -EIO;

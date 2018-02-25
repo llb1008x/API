@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<web_rfid>
+	<man>
+		<name>xixi</name>
+		<time>123</time>
+	</man>
+	<man>
+		<name>ddd</name>
+		<time>14:5</time>
+	</man>
+	<man>
+		<name>我</name>
+		<time>9:90</time>
+	</man>
+</web_rfid>

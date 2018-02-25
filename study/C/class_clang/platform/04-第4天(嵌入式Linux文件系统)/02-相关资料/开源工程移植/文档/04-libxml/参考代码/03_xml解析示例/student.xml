@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="GB2312"?>
+<studentInfo>
+	<student student_id="1">
+		<studentName>张三</studentName>
+		<studentSex>男</studentSex>
+		<studentAge>20</studentAge>
+	</student>
+	<student student_id="2">
+		<studentName>李四</studentName>
+		<studentSex>男</studentSex>
+		<studentAge>21</studentAge>
+	</student>
+	<student student_id="3">
+		<studentName>王五</studentName>
+		<studentSex>女</studentSex>
+		<studentAge>23</studentAge>
+	</student>
+</studentInfo>

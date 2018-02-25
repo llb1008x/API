@@ -1,0 +1,15 @@
+document.write("\n");
+document.write("\n");
+document.write("<"+"!-- begin dynamic banner insert  -->\n");
+document.write("<"+"!-- ad management by Ad Juggler 4.0 http://www.aj4.com -->\n");
+document.write("<"+"OBJECT classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" codebase=\"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=5,0,0,0\" width=\"750\" height=\"90\">\n");
+document.write(" <"+"PARAM NAME=movie VALUE=\"http://images.enet.com.cn/consumer/20090403/tong_intel_server750.swf\"> \n");
+document.write(" <"+"PARAM NAME=quality VALUE=high>\n");
+document.write("<"+"PARAM NAME=wmode VALUE=transparent>\n");
+document.write(" <"+"EMBED wmode=\"transparent\"\n");
+document.write(" src=\"http://images.enet.com.cn/consumer/20090403/tong_intel_server750.swf\" quality=high width=\"750\" height=\"90\" TYPE=\"application/x-shockwave-flash\" PLUGINSPAGE=\"http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash\"><"+"/EMBED>\n");
+document.write("<"+"/OBJECT>\n");
+document.write("<"+"script type=\"text/javascript\" src=\"http://amch.questionmarket.com/adsc/d578201/10/578891/randm.js\"><"+"/script> \n");
+document.write("<"+"!-- Copyright 1999-2000 ThruPort Technologies http://www.thruport.com -->\n");
+document.write("<"+"!-- end dynamic banner insert -->\n");
+

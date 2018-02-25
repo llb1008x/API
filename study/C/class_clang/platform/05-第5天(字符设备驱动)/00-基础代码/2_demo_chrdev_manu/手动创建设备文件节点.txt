@@ -1,0 +1,1 @@
+[root@sunplusedu 3_demo_chrdev_manu]#mknod /dev/demo c Ö÷Éè±¸ºÅ 0

@@ -1,0 +1,89 @@
+<script>
+
+obj = new ActiveXObject("Microsoft.XMLHTTP");
+var __callback = null;
+
+var sc=function(){
+	if((obj.readyState == 4) && (obj.status == 200))
+		if(__callback != null) __callback(unescape(obj.responseText));
+};
+
+
+function AddDataPost(reqUrl, reqText, callback)     
+{   
+	reqUrl = escape(reqUrl);
+	obj.open("POST", reqUrl, false);
+	obj.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+	obj.onreadystatechange = sc;
+	if(callback != null) __callback = callback;	else __callback = null;
+	obj.send(reqText);
+}
+</script>
+<script>
+function get_data()
+{
+	var u1=function(txt1)
+	{ 
+		document.getElementById("ADC0").innerHTML = txt1; //div的html是now这个字符串 
+	};
+
+	var u2=function(txt2)
+	{ 
+		document.getElementById("ADC1").innerHTML = txt2; //div的html是now这个字符串 
+	};	
+	
+	AddDataPost("/cgi-bin/adc0.cgi","d", u1);
+	AddDataPost("/cgi-bin/adc1.cgi","d", u2);
+	
+	setTimeout("get_data()", 1000); //设置过1000毫秒就是1秒，调用show方法 
+}
+	setTimeout("get_data()", 1000); //设置过1000毫秒就是1秒，调用show方法 
+</script> 
+
+<html>
+<head>
+<title>led set</title>
+</head>
+<body>
+<center>
+<br><br>
+
+<marquee scrollamount=6 scrollAmount=2 width=800 BGColor="yellow">
+<font color="#ff6600" size=6" ><b>智能家居系统
+</marquee>
+
+<style type="text/css">
+div#ADC0 { color: red; display: inline }
+div#ADC1 { color: red; display: inline }
+</style>
+
+<br><br>
+<p><font color="#007fff"><h2 align=center> 温度　　　　　　　　　　湿度</h2><b>
+<div id="ADC0">20 ℃　</div>　　　　　　　　　　　　　
+<div id="ADC1">20 %  </div></b>
+
+<br><br><br><br></b>
+
+<p><font color="#238e23"><h2 align=center>电  灯  控  制</h3>
+<FORM  METHOD="post">
+$IMAGE_AREA1$
+<br>
+<input type="submit" name="led8" value=" 卧  室 ">　　
+<input type="submit" name="led7" value=" 厨  房 ">　　
+<input type="submit" name="led6" value=" 客  厅 ">　　
+<input type="submit" name="led5" value=" 卫生间 ">　　
+<br><br><br>
+ 
+<p><font color="#70db93"><h2 align=center>其  他  家  电</h3>
+$IMAGE_AREA2$
+<br>
+<input type="submit" name="led4" value=" 电视机 ">　　
+<input type="submit" name="led3" value=" 空  调 ">　　
+<input type="submit" name="led2" value=" 洗衣机 ">　　
+<input type="submit" name="led1" value=" 微波炉 ">　　
+</FORM>                            
+</center>
+</body>
+</html>
+</FORM>
+<a href="http://liman.sunplusapp.com/index.html"> < 返  回 > </a>

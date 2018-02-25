@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN" dir="ltr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>linux系统脚本的启动顺序 - Menjoy's 技术文摘 - ITeye技术网站</title>
+    <meta name="description" content="在Redhat Redflag centos fc linux系统里面脚本的启动 先后： 第一步：通过/boot/vm进行启动 vmlinuz 第二步：init /etc/inittab 第三步：启动相应的脚本，并且打开终端 rc.sysinit rc.d(里面的脚本） rc.local 第四步：启动login登录界面 login 第五步:在用户登录的时候执行sh脚本的顺序：每次登录的时候都会完全执 ..." />
+    <meta name="keywords" content="linux 启动 脚本执行顺序  linux系统脚本的启动顺序" />
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="search" type="application/opensearchdescription+xml" href="/open_search.xml" title="ITeye" />
+    <link href="/rss" rel="alternate" title="Menjoy's 技术文摘" type="application/rss+xml" />
+    <link href="http://www.iteye.com/stylesheets/blog.css?1302768771" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://www.iteye.com/stylesheets/themes/blog/blue.css?1299226978" media="screen" rel="stylesheet" type="text/css" />
+    <script src="http://js.iteye.com/javascripts/application.js?1302577958" type="text/javascript"></script>
+      
+  <link href="http://www.iteye.com/javascripts/syntaxhighlighter/SyntaxHighlighter.css?1299226978" media="screen" rel="stylesheet" type="text/css" />
+  <script src="http://www.iteye.com/javascripts/syntaxhighlighter/shCoreCommon.js?1299226978" type="text/javascript"></script>
+<script src="http://www.iteye.com/javascripts/hotkey.js?1299226978" type="text/javascript"></script>
+  <script src="http://www.iteye.com/javascripts/code_favorites.js?1300153098" type="text/javascript"></script>
+  <style>
+    div#main {background-color: transparent; border: 0; padding: 0px; width: 740px;}
+  </style>
+  <link href="http://www.iteye.com/javascripts/editor/css/ui.css?1299226978" media="screen" rel="stylesheet" type="text/css" />
+  <script src="http://www.iteye.com/javascripts/editor/compress.js?1302577958" type="text/javascript"></script>
+  </head>
+  <body>
+    <div id="header">
+      <div id="blog_site_nav">
+  <a href="http://www.iteye.com/" class="homepage">首页</a>
+  <a href="http://www.iteye.com/news">新闻</a>
+  <a href="http://www.iteye.com/forums">论坛</a>
+  <a href="http://www.iteye.com/ask">问答</a>
+  <a href="http://www.iteye.com/blogs">博客</a>
+  <a href="http://www.iteye.com/job">招聘</a>
+  <a href="#" onclick="return false;" id="msna"><u>更多</u> <small>▼</small></a>
+  <div class="quick_menu" style="display:none;">
+    <a href="http://www.iteye.com/wiki">专栏</a>
+    <!--<a href="http://www.iteye.com/articles">文摘</a>//-->
+    <a href="http://www.iteye.com/groups">群组</a>
+    <a href="http://www.iteye.com/search">搜索</a>
+  </div>
+</div>
+      <div id="user_nav">
+      <a href="/login" class="welcome" title="登录">您还未登录 !</a>
+    <a href="http://www.iteye.com/all" style="color:red">我的应用</a>
+    <a href="/login">登录</a>
+    <a href="/signup" class="nobg">注册</a>
+  </div>
+    </div>
+
+    <div id="page">
+      <div id="branding" class="clearfix">
+        <div id="blog_name"><h1><a href="/">Menjoy's 技术文摘</a></h1></div>
+        <div id="blog_preview">
+          
+        </div>
+        <div id="blog_domain">永久域名 <a href="/">http://menjoy.iteye.com</a></div>
+      </div>
+      
+      <div id="content" class="clearfix">
+        <div id="main">
+          
+
+
+          
+
+
+<div class="blog_main"> 
+  <div class="blog_nav">
+    
+    <div class="pre_next">
+      <a href="/blog/285161" class="next" title="Server refused to allocate pty">Server refused to allocate pty</a>
+      |
+      <a href="/blog/252976" class="pre" title="FFMPEG Install for CentOS 5">FFMPEG Install for CentOS 5</a>
+    </div>
+  </div>
+  <div class="blog_title">
+    <div class="date"><span class='year'>2008</span><span class='sep_year'>-</span><span class='month'>10</span><span class='sep_month'>-</span><span class='day'>27</span></div>
+    <h3><a href="/blog/258398">linux系统脚本的启动顺序</a></h3>
+                    关键字: linux 启动 脚本执行顺序
+  </div>
+
+  <div class="blog_content">
+    <p>在Redhat Redflag centos fc linux系统里面脚本的启动<br/>
+<br/>
+先后：<br/>
+第一步：通过/boot/vm进行启动 vmlinuz<br/>
+第二步：init /etc/inittab<br/>
+第三步：启动相应的脚本，并且打开终端<br/>
+rc.sysinit<br/>
+rc.d(里面的脚本）<br/>
+rc.local<br/>
+第四步：启动login登录界面 login<br/>
+第五步:在用户登录的时候执行sh脚本的顺序：每次登录的时候都会完全执行的<br/>
+/etc/profile.d/file<br/>
+/etc/profile<br/>
+/etc/bashrc<br/>
+/root/.bashrc<br/>
+/root/.bash_profile<br/>
+<br/>
+在Suse Linux （sles server or Desktop 10）<br/>
+<br/>
+第一步：通过/boot/vm进行启动 vmlinuz<br/>
+第二步：init /etc/inittab<br/>
+第三步：启动相应的脚本，并且打开终端 /etc/init.d/boot 里面包括：<br/>
+. /etc/rc.status<br/>
+./etc/sysconfig/boot<br/>
+./etc/init.d/boot.d下面的脚本<br/>
+./etc/init.d/boot.local<br/>
+rc X.d(里面的脚本）<br/>
+第四步：启动login登录界面 login<br/>
+第五步:在用户登录的时候执行sh脚本的顺序：每次登录的时候都会完全执行的<br/>
+/etc/profile.d/file<br/>
+/etc/profile<br/>
+/root/.bashrc<br/>
+/root/.profile<br/>
+先后：<br/>
+第一步：通过/boot/vm进行启动 vmlinuz<br/>
+第二步：init /etc/inittab<br/>
+第三步：启动相应的脚本，并且打开终端<br/>
+rc.sysinit<br/>
+rc.d(里面的脚本）<br/>
+rc.local<br/>
+第四步：启动login登录界面 login<br/>
+第五步:在用户登录的时候执行sh脚本的顺序：每次登录的时候都会完全执行的<br/>
+/etc/profile.d/file<br/>
+/etc/profile<br/>
+/etc/bashrc<br/>
+/root/.bashrc<br/>
+/root/.bash_profile<br/>
+<br/>
+<br/>
+<img src='http://www.jz123.cn/uploads/userup/0808/0F034293126.jpg' height='434' alt='' style='vertical-align: middle;' width='357'/>
+</p>
+<p> </p>
+  </div>
+
+  
+
+  <div>
+      <script type="text/javascript"><!--
+      google_ad_client = "pub-4547838183514670";
+      google_ad_slot = "4036665165";
+      google_ad_width = 728;
+      google_ad_height = 90;
+      //--></script>
+      <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>  
+    </div>
+  
+  
+
+  <div class="blog_nav">
+    <div class="pre_next">
+      <a href="/blog/285161" class="next" title="Server refused to allocate pty">Server refused to allocate pty</a>
+      |
+      <a href="/blog/252976" class="pre" title="FFMPEG Install for CentOS 5">FFMPEG Install for CentOS 5</a>
+    </div>
+  </div>
+
+  <div class="blog_bottom">
+    <ul>
+      <li>09:51</li>
+      <li>浏览 (1100)</li>
+            <li><a href="#comments">评论</a> (0)</li>
+      <li>分类: <a href="/category/8572">Linux</a></li>
+      
+      
+      
+      <li class='last'><a href="http://www.iteye.com/wiki/topic/258398" target="_blank" class="more">相关推荐</a></li>
+    </ul>
+  </div>
+
+  <div class="blog_comment">
+    <h5>评论</h5>
+    <a id="comments" name="comments"></a>
+    
+    
+    
+  </div>
+
+  <div class="blog_comment">
+    <h5>发表评论</h5>
+          
+      
+        <form action="/blog/258398" id="comment_form" method="post" onsubmit="return false;">          
+
+
+  <input type="hidden" id="editor_bbcode_flag"/>
+
+
+
+<div id="editor_main"><textarea class="validate-richeditor bad-words min-length-5" cols="40" id="editor_body" name="comment[body]" rows="20" style="width: 500px; height: 350px;"></textarea></div>
+
+
+<script type="text/javascript">
+  var editor = new Control.TextArea.Editor("editor_body", "bbcode", false);
+</script>
+          <p style="text-align:right;padding-right:30px;">您还没有登录，请<a href='/login'>登录</a>后发表评论(快捷键 Alt+S / Ctrl+Enter) <input class="submit" id="quick_reply_button" name="commit" type="submit" value="提交" /></p>
+        </form>
+        <script type="text/javascript">
+          new HotKey("s",function() {$('quick_reply_button').click();},{altKey: true, ctrlKey: false});
+          new HotKey(new Number(13),function() {$('quick_reply_button').click();},{altKey: false, ctrlKey: true});
+
+          new Validation("comment_form", {immediate: false, onFormValidate: function(result, form){
+    
+            if(confirm('您需要登录以后才能执行这个操作，现在要登录吗？')) window.location.href = '/login';
+    
+        }});
+        </script>
+      
+      </div>
+</div>
+
+
+<script type="text/javascript">
+  dp.SyntaxHighlighter.HighlightAll('code', true, true);
+  
+  $$('#main .blog_content pre[name=code]').each(function(pre, index){ // blog content
+    var post_id = 711672;
+    var location = window.location;
+    source_url = location.protocol + "//" + location.host + location.pathname + location.search;
+    pre.writeAttribute('codeable_id', post_id);
+    pre.writeAttribute('codeable_type', "Post");
+    pre.writeAttribute('source_url', source_url);
+    pre.writeAttribute('pre_index', index);
+    pre.writeAttribute('title', 'linux系统脚本的启动顺序');
+  });
+  $$('#main .blog_comment > div').each(function(comment){// comment
+    var post_id = comment.id.substr(2);
+    $$("#"+comment.id+" pre[name=code]").each(function(pre, index){
+      var location = window.location;
+      source_url = location.protocol + "//" + location.host + location.pathname + location.search;
+      source_url += "#" + comment.id;
+      pre.writeAttribute('codeable_id', post_id);
+      pre.writeAttribute('codeable_type', "Post");
+      pre.writeAttribute('source_url', source_url);
+      pre.writeAttribute('pre_index', index);
+      pre.writeAttribute('title', 'linux系统脚本的启动顺序');
+    });
+  });
+  code_favorites_init();
+
+  fix_image_size($$('div.blog_content img'), 700);
+  function quote_comment(id) {
+    new Ajax.Request('/editor/quote', {
+      parameters: {'id':id, 'type':'Post'},
+      onSuccess:function(response){editor.bbcode_editor.textarea.insertAfterSelection(response.responseText);}
+    });
+  }
+</script>
+
+
+
+        </div>
+
+        <div id="local">
+          <div class="local_top"></div>
+          <div id="blog_owner">
+            <div id="blog_owner_logo"><a href='http://menjoy.iteye.com'><img alt="menjoy的博客" class="logo" src="http://www.iteye.com/upload/logo/user/46291/83f8adf9-7a4f-4167-8cb2-8d863e705418.jpg?1236834604" title="menjoy的博客: Menjoy's 技术文摘" /></a></div>
+            <div id="blog_owner_name">menjoy</div>
+          </div>
+          <div id="blog_actions">
+            <ul>
+              <li>浏览: 162771 次</li>
+              <li>性别: <img alt="Icon_minigender_1" src="http://www.iteye.com/images/icon_minigender_1.gif?1299226978" title="男" /></li>
+              
+              <li><img src='/images/status/offline.gif'/></li>
+              <li>
+                <a href="/blog/profile" class="profile">详细资料</a>
+                <a href="/blog/guest_book" class="guest_book">留言簿</a>
+              </li>
+              
+            </ul>
+            <h5>搜索本博客</h5>
+            <form action="/blog/search" method="get">              <input class="text" id="query" name="query" style="margin-left: 10px;width: 110px;" type="text" />
+              <input class="submit" type="submit" value="搜索" />
+            </form>          </div>
+          
+            <div id="user_visits" class="clearfix">
+              <h5>最近访客 <span style='font-weight:normal;font-size:12px;padding-left:30px;'><a href="/blog/user_visits">&gt;&gt;更多访客</a></span></h5>
+              
+                <div class="user_visit">
+                  <div class="logo"><a href='http://yingzhuo.iteye.com' target='_blank'><img alt="yingzhor的博客" class="logo" src="http://www.iteye.com/upload/logo/user/442831/925aea48-ddbd-3c7f-957f-210fc61c382f-thumb.jpg?1300784780" title="yingzhor的博客: 马勒・格・彼得" /></a></div>
+                  <div class="left"><a href='http://yingzhuo.iteye.com' target='_blank'>yingzhor</a></div>
+                </div>
+              
+                <div class="user_visit">
+                  <div class="logo"><a href='http://sinpinle.iteye.com' target='_blank'><img alt="sinpinle的博客" class="logo" src="http://www.iteye.com/images/user-logo-thumb.gif?1301623867" title="sinpinle的博客: " /></a></div>
+                  <div class="left"><a href='http://sinpinle.iteye.com' target='_blank'>sinpinle</a></div>
+                </div>
+              
+                <div class="user_visit">
+                  <div class="logo"><a href='http://kanvons.iteye.com' target='_blank'><img alt="kanvons的博客" class="logo" src="http://www.iteye.com/images/user-logo-thumb.gif?1301623867" title="kanvons的博客: " /></a></div>
+                  <div class="left"><a href='http://kanvons.iteye.com' target='_blank'>kanvons</a></div>
+                </div>
+              
+                <div class="user_visit">
+                  <div class="logo"><a href='http://jijiajia19.iteye.com' target='_blank'><img alt="jijiajia19的博客" class="logo" src="http://www.iteye.com/images/user-logo-thumb.gif?1301623867" title="jijiajia19的博客: " /></a></div>
+                  <div class="left"><a href='http://jijiajia19.iteye.com' target='_blank'>jijiajia19</a></div>
+                </div>
+              
+            </div>
+          
+                      <div id="blog_menu">
+              <h5>博客分类</h5>
+              <ul>
+                <li><a href="/">全部博客 (113)</a></li>
+                
+                  <li><a href="/category/8567">Hibernate (5)</a></li>
+                
+                  <li><a href="/category/8568">Struts (0)</a></li>
+                
+                  <li><a href="/category/8569">Spring (3)</a></li>
+                
+                  <li><a href="/category/8570">Ajax (8)</a></li>
+                
+                  <li><a href="/category/8571">XML (0)</a></li>
+                
+                  <li class='selected'><a href="/category/8572">Linux (19)</a></li>
+                
+                  <li><a href="/category/8573">Java (26)</a></li>
+                
+                  <li><a href="/category/17465">Ibatis (3)</a></li>
+                
+                  <li><a href="/category/8574">Database (8)</a></li>
+                
+                  <li><a href="/category/8575">JavaScript&amp;Html (28)</a></li>
+                
+                  <li><a href="/category/8639">开源&amp;整合 (7)</a></li>
+                
+                  <li><a href="/category/9996">ASP (4)</a></li>
+                
+                  <li><a href="/category/26155">EXT (1)</a></li>
+                
+              </ul>
+            </div>
+            
+            
+              <div id="guest_books">
+                <h5>我的留言簿 <span style='font-weight:normal;font-size:12px;padding-left:20px;'><a href="/blog/guest_book">&gt;&gt;更多留言</a></span></h5>
+                <ul>
+                  
+                    <li>
+                      你好，想请教你点openmeetings的问题，谢谢。我qq：164560293 ...<br/>
+                      -- by <a href="/blog/guest_book#8649">blink5150</a>
+                    </li>
+                  
+                </ul>
+              </div>
+            
+            <div id="blog_others">
+              <h5>其他分类</h5>
+              <ul>
+                <li><a href="/blog/favorite">我的收藏</a> (15)</li>
+                <li><a href="/blog/code_favorite">我的代码</a> (0)</li>
+                                                <li><a href="/blog/topic">我的论坛主题帖</a> (2)</li>
+                <li><a href="/blog/post">我的所有论坛帖</a> (3)</li>
+                <li><a href="/blog/article">我的精华良好帖</a> (0)</li>
+                              </ul>
+            </div>
+            
+            <div id="recent_groups">
+              <h5>最近加入群组</h5>
+              <ul>
+                
+              </ul>
+            </div>
+            
+                          <div id="month_blogs">
+                <h5>存档</h5>
+                <ul>
+                  
+                    <li><a href="/blog/monthblog/2010-12">2010-12</a> (2)</li>
+                  
+                    <li><a href="/blog/monthblog/2010-09">2010-09</a> (1)</li>
+                  
+                    <li><a href="/blog/monthblog/2010-06">2010-06</a> (1)</li>
+                  
+                  <li><a href="/blog/monthblog_more">更多存档...</a></li>
+                </ul>
+              </div>
+                        <div id="comments_top">
+              <h5>评论排行榜</h5>
+              <ul>
+                
+                  <li><a href="/blog/690783" title="CentOS5.4 升级到 5.5 ">CentOS5.4 升级到 5.5 </a></li>
+                
+                  <li><a href="/blog/843414" title="获取本机外网IP地址（External IP Address）">获取本机外网IP地址（External IP Address ...</a></li>
+                
+                  <li><a href="/blog/851885" title="linux下的所见及所得的html编辑器--KompoZer">linux下的所见及所得的html编辑器--KompoZ ...</a></li>
+                
+                  <li><a href="/blog/767182" title="xp sp3的iis127错误修正">xp sp3的iis127错误修正</a></li>
+                
+              </ul>
+            </div>
+            <div id="rss">
+              <ul>
+                <li><a href="/rss" target="_blank"><img alt="Rss" src="http://www.iteye.com/images/rss.png?1299226978" /></a></li>
+                <li><a href="http://fusion.google.com/add?feedurl=http://menjoy.iteye.com/rss" target="_blank"><img alt="Rss_google" src="http://www.iteye.com/images/rss_google.gif?1299226978" /></a></li>
+              </ul>
+            </div>
+            <div class="local_bottom"></div>
+          
+        </div>
+      </div>
+
+      <div id="footer" class="clearfix">
+        <div id="copyright">
+          <hr/>
+          声明：ITeye文章版权属于作者，受法律保护。没有作者书面许可不得转载。若作者同意转载，必须以超链接形式标明文章原始出处和作者。<br />
+          &copy; 2003-2011 ITeye.com.   All rights reserved.  [ 京ICP证110151号 ]
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+  document.write("<img src='http://stat.iteye.com/?url="+ encodeURIComponent(document.location.href) + "&referrer=" + encodeURIComponent(document.referrer) + "&user_id=-1' width='0' height='0' />");
+</script>
+    
+  </body>
+</html>

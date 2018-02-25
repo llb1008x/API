@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<glade-interface>
+  <!-- interface-requires gtk+ 2.16 -->
+  <!-- interface-naming-policy project-wide -->
+  <widget class="GtkWindow" id="main_window">
+    <property name="width_request">800</property>
+    <property name="height_request">480</property>
+    <property name="resizable">False</property>
+    <property name="window_position">center</property>
+    <property name="default_width">800</property>
+    <property name="default_height">480</property>
+    <child>
+      <widget class="GtkFixed" id="fixed1">
+        <property name="visible">True</property>
+        <child>
+          <widget class="GtkButton" id="button">
+            <property name="width_request">252</property>
+            <property name="height_request">165</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="relief">none</property>
+            <child>
+              <widget class="GtkImage" id="image">
+                <property name="visible">True</property>
+                <property name="stock">gtk-missing-image</property>
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="x">178</property>
+            <property name="y">99</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+</glade-interface>

@@ -1,0 +1,13 @@
+apache服务器的配置:
+1. 安装httpd-2.2.21-win32-x86-no_ssl.msi文件,一路NEXT,有一个地方要填写三项,随意写就可以.
+2. 安装成功之后,在浏览器中输入本机的IP地址,显示“It Works”就表示成功了.
+3. apache的配置文件在: "Apache Software Foundation\Apache2.2\conf\httpd.conf" 当中
+4. httpd.conf当中配置根目录.
+    （1）DocumentRoot "C:/Program Files/Apache Software Foundation/Apache2.2/htdocs"
+    （2）<Directory "C:/Program Files/Apache Software Foundation/Apache2.2/htdocs">
+    注意：
+		配置根目录的路径中严格按照给出的demo进行填写,例如 html网页的路径为 G:\html
+		那么在配置文件中填写的方式为：
+		DocumentRoot "G:/html"
+		<Directory "G:/html">
+5. apache的配置文件当中不支持中文，还有路径是必须存在的.

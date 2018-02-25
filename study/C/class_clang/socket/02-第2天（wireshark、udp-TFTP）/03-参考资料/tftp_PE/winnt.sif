@@ -1,0 +1,5 @@
+[SetupData]
+BootDevice = "ramdisk(0)"
+BootPath = "\WXPE\SYSTEM32\"
+;OsLoadOptions = "/minint /fastdetect /rdpath=WinPE.img"
+OsLoadOptions = "/minint /fastdetect /rdexportascd /rdpath=WINPE.ISO"

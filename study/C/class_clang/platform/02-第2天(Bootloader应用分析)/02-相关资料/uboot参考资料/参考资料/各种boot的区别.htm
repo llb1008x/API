@@ -1,0 +1,933 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0063)http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx -->
+<HTML xmlns="http://www.w3.org/1999/xhtml"><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8"><TITLE>
+	
+        各种boot的区别
+        -
+        TT的小窝
+        - CSDN博客
+</TITLE>
+
+    <SCRIPT type="text/javascript">
+        try { document.domain = "csdn.net"; } catch (ex) { }
+    </SCRIPT>
+
+    <SCRIPT src="./各种boot的区别_files/jquery.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT src="./各种boot的区别_files/jquery.highlighter.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT src="./各种boot的区别_files/highlighter.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT src="./各种boot的区别_files/common.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT src="./各种boot的区别_files/AreaCounter.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT type="text/javascript" src="./各种boot的区别_files/feedback.js"></SCRIPT>
+
+    <SCRIPT type="text/javascript" src="./各种boot的区别_files/relatedarticle.js"></SCRIPT>
+
+<SCRIPT type="text/javascript" src="./各种boot的区别_files/google_service.js"></SCRIPT>
+<SCRIPT type="text/javascript">
+    GS_googleAddAdSenseService("ca-pub-1076724771190722");
+    GS_googleEnableAllServices();
+</SCRIPT><SCRIPT src="./各种boot的区别_files/google_ads.js"></SCRIPT>
+<SCRIPT type="text/javascript">
+    GA_googleAddSlot("ca-pub-1076724771190722", "blog_postpage_72890");
+</SCRIPT>
+<SCRIPT type="text/javascript">
+    GA_googleFetchAds();
+</SCRIPT>
+
+
+    <LINK href="./各种boot的区别_files/girl_1.css" type="text/css" rel="stylesheet" media="all"><LINK href="./各种boot的区别_files/csdn_favbykimi.css" type="text/css" rel="stylesheet" media="all"><LINK rel="Shortcut Icon" href="http://profile.csdn.net/tt89381585/picture/1.ico"><LINK href="http://feeds.feedsky.com/csdn.net/tt89381585" title="RSS" type="application/rss+xml" rel="alternate"></HEAD><BODY id="defaultuser">
+    <DIV id="csdnblog_allwrap">
+        <DIV id="csdnblog_midwrap">
+            
+<SCRIPT src="./各种boot的区别_files/pub_topnav.js" type="text/javascript"></SCRIPT><LINK rel="stylesheet" type="text/css" href="./各种boot的区别_files/pub_topnav.css"><DIV class="public_channeltopnav"><TABLE border="0" cellspacing="0" cellpadding="0"><TBODY><TR><TD><A href="http://www.csdn.net/" target="_blank" class="black_font">首页</A></TD><TD><A href="http://news.csdn.net/" target="_blank" class="black_font">资讯</A></TD><TD><A href="http://mobile.csdn.net/" target="_blank" class="black_font">移动</A></TD><TD><A href="http://cloud.csdn.net/" target="_blank" class="black_font">云计算</A></TD><TD><A href="http://hi.csdn.net/" target="_blank" class="black_font">空间</A></TD><TD><A href="http://student.csdn.net/" target="_blank" class="red_font">学生</A></TD><TD><A href="http://bbs.csdn.net/" target="_blank" class="black_font">论坛</A></TD><TD><A href="http://blog.csdn.net/" target="_blank" class="black_font">博客</A></TD><TD><A href="http://download.csdn.net/" target="_blank" class="black_font">下载</A></TD><TD><A href="http://wz.csdn.net/" target="_blank" class="black_font">网摘</A></TD><TD><A href="http://www.programmer.com.cn/" target="_blank" class="black_font">程序员</A></TD><TD><A href="http://prj.csdn.net/" target="_blank" class="black_font">外包</A></TD><TD><A href="http://www.dearbook.com.cn/" target="_blank" class="black_font">书店</A></TD><TD><A href="http://cto.csdn.net/" target="_blank" class="red_font ">CTO俱乐部</A></TD><TD><A href="http://tup.csdn.net/" target="_blank" class="black_font">TUP</A></TD><TD><A href="http://edu.csdn.net/" target="_blank" class="black_font">培训充电</A></TD><TD class="nolines"><A href="http://club.csdn.net/" target="_blank" class="black_font">D9区</A></TD></TR></TBODY></TABLE></DIV>
+<SCRIPT type="text/javascript" src="./各种boot的区别_files/AreaCounter(1).js"></SCRIPT>
+<SCRIPT type="text/javascript">
+    // 页面加载完毕，脚本开始执行
+    $(document).ready(function() {
+        ChangeUserState();
+        $("#notice").find("a").click(HideNoticeInfo);
+    });
+    
+    var userName = getCookie("activeUserName");
+    var isGuest = !userName || userName == "Guest";
+    var delay = 20 * 60 * 1000;
+    var timer = 0;
+
+    function ChangeUserState() {        
+        clearInterval(timer);
+        if (isGuest) {
+            HideNoticeInfo();
+        }
+        else {
+            RefreshNoticeInfo();
+            timer = setInterval( RefreshNoticeInfo, delay);
+        }
+    }
+    
+    var apiUrl = "/!handler/NoticeHandler.ashx?jsoncallback=?";
+    function RefreshNoticeInfo() {
+        $.getJSON(apiUrl + "&_t=" + Math.random(), function(result) {
+            if (result.noticeNum) {
+                newNoticeCount = result.noticeNum;
+                if (newNoticeCount <= 0) {
+                    $("#notice").hide();
+                }
+                else {
+                    $("#noticeCount").text(newNoticeCount);
+                    $("#notice").show();
+                }
+            }
+        });
+    }
+    
+    function HideNoticeInfo() {
+        $("#notice").hide();
+    }
+</SCRIPT>
+
+<DIV id="csdnblog_header">
+    <H1>
+        <A href="http://blog.csdn.net/tt89381585">
+            TT的小窝</A></H1>
+    <H2>
+        学习笔记</H2>
+    <UL id="personalnav">
+        <LI style="display: none; " id="notice"><SPAN class="newnotice"><A class="red" href="http://hi.csdn.net/space-notice.html" target="_blank" onclick="LogClickCount(this,216);"><SPAN id="noticeCount"></SPAN>条新通知</A></SPAN></LI>
+        <LI style=""><A id="a_login" href="http://passport.csdn.net/UserLogin.aspx?from=http%3A%2F%2Fblog.csdn.net%2Ftt89381585%2Farchive%2F2009%2F11%2F19%2F4829267.aspx">
+            登录</A></LI>
+        <LI style=""><A id="a_register" href="http://passport.csdn.net/CSDNUserRegister.aspx" target="_blank">注册</A></LI>
+        <LI style="display: none; "><A id="a_welcome" href="http://hi.csdn.net/" target="_blank">
+            欢迎</A></LI>
+        <LI style="display: none; "><A id="a_exit" href="http://writeblog.csdn.net/Signout.aspx">
+            退出</A></LI>
+        <LI style="display: none; "><A id="a_myblog" href="http://blog.csdn.net/">我的博客</A></LI>
+        <LI style="display: none; "><A id="a_configure" href="http://writeblog.csdn.net/configure.aspx" target="_blank">配置</A></LI>
+        <LI style="display: none; "><A id="a_postedit" href="http://writeblog.csdn.net/PostEdit.aspx" target="_blank">写文章</A></LI>
+        <LI style="display: none; "><A id="a_postlist" href="http://writeblog.csdn.net/PostList.aspx" target="_blank">文章管理</A></LI>
+        <LI><A id="a_bloghome" href="http://blog.csdn.net/" target="_blank">博客首页</A></LI>
+    </UL>
+    <UL id="blogsearchsty">
+        <LI>
+            <INPUT id="inputSearch" type="text" class="bolgsearch"></LI>
+        <LI class="selectsty">
+            <SELECT name="Search:ddlSearchScope" id="Search_ddlSearchScope">
+                <OPTION value="all">全站</OPTION>
+                <OPTION value="tt89381585">当前博客</OPTION>
+            </SELECT>
+        </LI>
+        <LI>
+            <INPUT type="button" id="buttonSearch" value="搜索" class="bolggobtn"></LI>
+    </UL>
+    <UL id="menu">
+        <LI><A href="http://hi.csdn.net/tt89381585" target="_blank">空间</A></LI>
+        <LI><A class="on" href="http://blog.csdn.net/tt89381585">博客</A></LI>
+        <LI><A href="http://hi.csdn.net/!s/friend/list/tt89381585" target="_blank">好友</A></LI>
+        <LI><A href="http://hi.csdn.net/!s/album/list/tt89381585" target="_blank">相册</A></LI>
+        <LI><A class="last" href="http://hi.csdn.net/!s/wall/to/tt89381585" target="_blank">
+            留言</A></LI>
+    </UL>
+</DIV>
+
+<SCRIPT type="text/javascript">
+    var CurrentUserName = 'tt89381585';
+</SCRIPT>
+
+
+            
+<DIV id="csdnblog_sidebar">
+	<DIV class="gutter">
+		<DIV class="aboutauthor">
+			<DL>
+				<DT style="text-align: left; ">用户操作</DT>
+				<DD class="middle">
+					<A href="http://hi.csdn.net/!s/wall/to/tt89381585" target="_blank">[留言]</A>&nbsp;
+					<A href="http://hi.csdn.net/!s/msg/to/tt89381585" target="_blank">[发消息]</A>&nbsp;
+					<A href="http://hi.csdn.net/!s/friend/add/tt89381585" target="_blank">[加为好友]</A>&nbsp;
+				</DD>
+				<DT style="text-align: left; ">雪婷<SPAN>ID：<A href="http://hi.csdn.net/tt89381585" target="_blank">tt89381585</A></SPAN></DT><DD class="middle"><A href="http://hi.csdn.net/tt89381585" target="_blank"><IMG class="avatar" src="./各种boot的区别_files/1_tt89381585.jpg" alt="雪婷"></A></DD><DD style="text-align: left; ">共<EM>2802</EM>次访问，排名<EM>2万外</EM>，<A href="http://hi.csdn.net/!s/friend/list/tt89381585" target="_blank">好友</A><EM>4</EM>人，<A href="http://hi.csdn.net/!s/follow/list/tt89381585" target="_blank">关注者</A><EM>11</EM>人。</DD><DD style="text-align: left; "><DT style="text-align: left; ">雪婷的文章</DT><DD style="text-align: left; ">原创 23 篇</DD><DD style="text-align: left; ">翻译 0 篇</DD><DD style="text-align: left; ">转载 14 篇</DD><DD style="text-align: left; ">评论 2 篇</DD>
+				<SPAN id="SubscriptionList">
+					<DT style="text-align: left; ">订阅我的博客</DT>
+					<DD style="text-align: left; ">
+						<A href="http://feeds.feedsky.com/csdn.net/tt89381585">
+							<IMG border="0" alt="XML聚合" src="./各种boot的区别_files/gif">
+						</A>&nbsp;&nbsp;
+						<A href="http://feeds.feedsky.com/csdn.net/tt89381585" target="_blank">
+							<IMG border="0" alt="FeedSky" src="./各种boot的区别_files/feedsky.gif">
+						</A>
+					</DD>
+					<DD style="text-align: left; ">
+						<A href="http://www.xianguo.com/subscribe.php?url=http://feeds.feedsky.com/csdn.net/tt89381585" target="_blank">
+							<IMG border="0" alt="订阅到鲜果" src="./各种boot的区别_files/rss_xianguo.jpg">
+						</A>
+					</DD>
+					<DD style="text-align: left; ">
+						<A href="http://fusion.google.com/add?feedurl=http://feeds.feedsky.com/csdn.net/tt89381585" target="_blank">
+							<IMG border="0" alt="订阅到Google" src="./各种boot的区别_files/rss_google.gif">
+						</A>
+					</DD>
+					<DD style="text-align: left; ">
+						<A href="http://www.zhuaxia.com/add_channel.php?url=http://feeds.feedsky.com/csdn.net/tt89381585" target="_blank">
+							<IMG border="0" alt="订阅到抓虾" src="./各种boot的区别_files/rss_zhuaxia.gif">
+						</A>
+					</DD>
+				</SPAN>
+				<DT style="text-align: left; ">
+					<SPAN class="floatright" style="display:none;"><A class="a_edit" href="http://writeblog.csdn.net/configure.aspx" target="_blank">[编辑]</A></SPAN>tt89381585的公告
+				</DT>
+				<DD style="text-align: left; ">
+				<DT style="text-align: left; "><SPAN class="floatright" style="display:none;"><A class="a_edit" href="http://writeblog.csdn.net/EditCategories.aspx?catID=1" target="_blank">[编辑]</A></SPAN>文章分类</DT>
+				<DD style="text-align: left; ">
+					<DIV class="publiclist_sidebar">
+						<UL><LI><A href="http://blog.csdn.net/tt89381585/category/665309.aspx/rss"><IMG src="./各种boot的区别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/tt89381585/category/665309.aspx" title="wince bsp包开发学习笔记">BSP学习笔记</A></LI><LI><A href="http://blog.csdn.net/tt89381585/category/648664.aspx/rss"><IMG src="./各种boot的区别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/tt89381585/category/648664.aspx">evc编程问题集</A></LI><LI><A href="http://blog.csdn.net/tt89381585/category/620323.aspx/rss"><IMG src="./各种boot的区别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/tt89381585/category/620323.aspx" title="好好学习，天天向上~~">tt的学习笔记</A></LI><LI><A href="http://blog.csdn.net/tt89381585/category/643046.aspx/rss"><IMG src="./各种boot的区别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/tt89381585/category/643046.aspx" title="网摘，借我看看~">偷来的~~</A></LI><LI><A href="http://blog.csdn.net/tt89381585/category/620326.aspx/rss"><IMG src="./各种boot的区别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/tt89381585/category/620326.aspx" title="我是严重的工科女生，多了不会写，O(&cap;_&cap;)O~">一句话日记</A></LI></UL>
+					</DIV>
+				</DD>
+				
+				
+				<DT style="text-align: left; ">存档</DT>
+				<DD style="text-align: left; ">
+					<DIV class="publiclist_sidebar">
+						<UL><LI><A href="http://blog.csdn.net/tt89381585/archive/2010/05.aspx">2010年05月(1)</A></LI><LI><A href="http://blog.csdn.net/tt89381585/archive/2010/03.aspx">2010年03月(2)</A></LI><LI><A href="http://blog.csdn.net/tt89381585/archive/2010/02.aspx">2010年02月(2)</A></LI><LI><A href="http://blog.csdn.net/tt89381585/archive/2010/01.aspx">2010年01月(22)</A></LI><LI><A href="http://blog.csdn.net/tt89381585/archive/2009/12.aspx">2009年12月(9)</A></LI><LI><A href="http://blog.csdn.net/tt89381585/archive/2009/11.aspx">2009年11月(1)</A></LI></UL>
+					</DIV>
+				</DD>
+			</DL>
+		</DIV>
+	</DIV>
+</DIV>
+
+            
+	<STYLE type="text/css">
+/*channel style*/
+.chal {font-family:Verdana,Helvetica,Arial,sans-serif;font-size:12px;font-weight:normal;}
+.chal .conts span.adv{font-weight:bold; width:300px; height:auto; float:right; text-align:righ; padding:5px 10px 1px 0; line-height:18px; text-align:right; font-weight:bold}
+.chal .conts span.adv img{width:300px; height:60px; padding:3px 0 0 0;}
+.chal .conts {clear: both; overflow: hidden; width: auto;  border:1px solid #ccc; padding:0; text-align:left;}
+.chal .conts #ann #annbody{clear:both;overflow:hidden;width: auto;border-top:1px dashed #AACBEE;margin-bottom:5px;height:18px;padding:0;text-align:left;}
+.chal .conts #ann #annbodylis{width:auto; margin:0 10px 0 10px; padding:0; list-style:none;}
+.chal .conts #ann #annbodylis li{width:100%; float:left; line-height:150%; text-align:left; padding:0; margin:0; color:#004797;}
+.chal .conts #ann #annbodylis li a{color:#f00;}
+.chal .conts #ann #annbodylis li.cen{text-align:center;}
+.chal .conts #ann #annbodylis li.rig{text-align:right;}
+
+.default_contents h4.notice {background:url("http://c.csdn.net/bbs/f/i/l/pic04.gif") no-repeat scroll 4px 10px #FFFFDD;}
+/*end */
+
+/*20100712 jinweiwei update*/
+.commentnew dl dd.recruit{width:200px;float: left; text-align: left; margin-left: 15px; display:inline; border:1px solid #C1AE9E; padding:1px;}
+.commentnew dl dd.recruit h5{background:#E0DBD3; color:#47381C; font-size:12px; height:24px; line-height:24px; padding-left:10px;}
+
+.commentnew dl dd.recruit ul{padding:0; margin:10px 5px; height:252px; overflow:hidden; width:auto; float:none;}
+.commentnew dl dd.recruit ul li{list-style:none; background:url(http://c.csdn.net/www/images/blog/dot_2.gif) left 7px no-repeat; margin-left:5px; padding-left:12px; margin-bottom:6px; height:36px; overflow:hidden;}
+
+.commentnew dl dd ul{width:474px; float:left; margin:0; padding:0 0 10px 0;}
+.commentnew dl dd ul li.left{width:70px; margin:0 0 0 12px; display:inline; padding:0; float:left;text-align:left;  line-height:18px; }
+*+html .commentnew dl dd ul li.left{line-height:20px;}
+*html .commentnew dl dd ul li.left{line-height:20px;}
+.commentnew dl dd ul li.lefttop{width:70px; margin:0 0 0 12px; display:inline; float:left;padding:5px 0; }
+.commentnew dl dd ul li.right{width:380px; margin:0; padding:0 12px 0 0; display:inline; float:left; text-align:left; line-height:18px;}
+.commentnew dl dd ul li.right img.brow{float:left; padding:0px 4px;}
+.commentnew dl dd ul li.right .textarea{width:378px; float:left; height:150px; border:1px solid #c3c3c3; padding:3px; margin:0; vertical-align:top;}
+.commentnew dl dd ul li.right .input{width:120px; float:left; height:18px;line-height:18px;  border:1px solid #c3c3c3; padding:0 2px; margin:0; vertical-align:middle;}
+.commentnew dl dd ul li.right span.left{width:auto;float:left; text-align:left;}
+.commentnew dl dd ul li.right span.right{width:100px;float:right; text-align:right;}
+.commentnew dl dd ul li.right span a{color:#f00}
+.commentnew dl dd ul li.right span a.red:link, a.red:visited, a.red:hover, a.red:active{color:#f00}
+.commentnew dl dd ul li.right em{color:#466bbb;font-style:noraml;}
+.commentnew dl dd ul li.right a img.btn{padding:0 0 3px 0; width:68px; height:21px;}
+.commentnew dl dd ul li.right .checkbox{padding:0; margin:0;vertical-align:middle; border:0;}
+	</STYLE>
+<DIV id="csdnblog_content">
+	<DIV class="gutter">
+		<DIV class="chal default_contents" id="chal" style="">
+			<H4 class="conts notice" style="height:20px;">
+				<SPAN style="float:left;font-weight:bold;margin:2px 0 0 0;">公告：</SPAN>
+				<DIV id="ann" style="width:500px;float:left;">
+					<DIV id="annbody" style="border-top: 0px none;">
+						<UL id="annbodylis">
+							<SCRIPT src="./各种boot的区别_files/rsscache.aspx" type="text/javascript"></SCRIPT><LI><A onclick="LogClickCount(this,224);" href="http://topic.csdn.net/u/20100811/15/8d13b103-1a98-45bf-8f9a-363cd38adfc7.html" target="_blank">CSDN招聘.NET开发工程师</A></LI>
+						</UL>
+					</DIV>
+				</DIV>
+				<SPAN><A href="http://forum.csdn.net/SList/blogSupport" target="_blank">[意见反馈]</A><A href="http://blog.csdn.net/blogdevteam" target="_blank">[官方博客]</A></SPAN>
+			</H4>
+		</DIV>
+
+		<DIV class="default_contents">
+			<DIV class="user_article">
+
+				<SCRIPT type="text/javascript" src="./各种boot的区别_files/feedbackcount.js"></SCRIPT>
+
+				<H1 class="title_txt">
+					<IMG src="./各种boot的区别_files/authorship.gif" border="0" width="15" height="15" alt="原创">&nbsp;
+					各种boot的区别
+					<CITE class="fav_csdnstylebykimi"><A href="JavaScript:d=document;t=d.selection?(d.selection.type!='None'?d.selection.createRange().text:''):(d.getSelection?d.getSelection():'');void(saveit=window.open('http://wz.csdn.net/storeit.aspx?t='+escape(d.title)+'&u='+escape(d.location.href)+'&c='+escape(t),'saveit','scrollbars=no,width=590,height=300,left=75,top=20,status=no,resizable=yes'));saveit.focus();" class="fav_csdnstylebykimi" title="收藏到我的网摘中，并分享给我的朋友">收藏</A> </CITE>
+					
+				</H1>
+				<DIV class="blogstory">
+
+					<SCRIPT type="text/javascript">
+						document.body.oncopy = function () {
+							if (window.clipboardData) {
+								setTimeout(function () {
+									var text = clipboardData.getData("text");
+									if (text && text.length > 300) {
+										text = text + "\r\n\n本文来自CSDN博客，转载请标明出处：" + location.href;
+										clipboardData.setData("text", text);
+									}
+								}, 100);
+							}
+						}
+					</SCRIPT>
+
+					<SCRIPT type="text/javascript">						function StorePage() { d = document; t = d.selection ? (d.selection.type != 'None' ? d.selection.createRange().text : '') : (d.getSelection ? d.getSelection() : ''); void (keyit = window.open('http://www.365key.com/storeit.aspx?t=' + escape(d.title) + '&u=' + escape(d.location.href) + '&c=' + escape(t), 'keyit', 'scrollbars=no,width=475,height=575,left=75,top=20,status=no,resizable=yes')); keyit.focus(); }</SCRIPT>
+
+					<P><SPAN style="font-size: medium;"><SPAN style="font-family: courier new,courier;"><SPAN style="background-color: #ffffff;"><STRONG><SPAN style="color: #0000ff;">vivi、uboot、eboot的区别</SPAN></STRONG>&nbsp;&nbsp;</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: medium;"><SPAN style="font-family: courier new,courier;"><SPAN style="background-color: #ffffff;">&nbsp; </SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: medium;"><SPAN style="font-family: courier new,courier;"><SPAN style="background-color: #ffffff;">&nbsp;&nbsp;&nbsp; 简单的说它们都是bootloader，所完成的任务也大同小异。</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: medium;"><SPAN style="font-family: courier new,courier;"><SPAN style="background-color: #ffffff;">&nbsp;&nbsp;&nbsp; vivi是mizi开发的用于s3c241x/s3c244x 的linux bootloader， 友善之臂移植了USB 下载功能后就成了现在看到的supervivi<BR>&nbsp;&nbsp;&nbsp; u-boot是一个广泛用于ARM平台的bootloader, 目前也支持s3c241x/s3c244x，可以用来启动Linux<BR>&nbsp;&nbsp;&nbsp; Eboot是WinCE平台下的bootloader。</SPAN></SPAN></SPAN></P>
+
+<P><SPAN style="font-size: medium;"><SPAN style="font-family: courier new,courier;"><SPAN style="background-color: #ffffff;"><A href="http://www.arm9home.com/bbs/read.php?tid-193.html"><SPAN style="background-color: #ffffff;"><SPAN style="color: #ff0000;">http://www.arm9home.com/bbs/read.php?tid-193.html</SPAN></SPAN></A></SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: medium;"><SPAN style="font-family: courier new,courier;"><SPAN style="background-color: #ffffff;"><SPAN style="color: #ff0000;">摘自论坛上好心人的回答</SPAN></SPAN></SPAN></SPAN></P>
+<HR>
+
+<P><BR><SPAN style="color: #0000ff;">eboot,nboot,uboot </SPAN></P>
+
+<P><SPAN style="color: #ff00ff;">网友A：</SPAN></P>
+<P>nboot是samsung系列cpu为了能将前4KB程序复制到SRAM中运行，而在wince写的。 <BR>eboot其实应该是Ethernet Boot，因为起始时，都是通过网口更新的。当然现在大部分反而通过USB了。 <BR>uboot是linux下主要使用的，不过现在已经剥离开来，ce下已经可以移植了，只是用来debug的多，实际合入工程的少，毕竟与wince系统的契合度不高。 </P>
+<P><SPAN style="color: #ff00ff;">网友B:</SPAN><BR>基本就是这个样子，补充一下： <BR>nboot很小（4k左右），一般用在从nandflash启动的情况，nandflash不支持xip，所以必须有一个可以执行的程序将烧写在其中的eboot搬到内存中，nboot就是干这个的。nboot烧写在片内的4ksram中。所以nboot一般配合eboot一起使用。 </P>
+<P>eboot就是ethernet boot，开始都是用网络下载的，现在大都加入了usb下载功能。eboot可以单独使用，就是把eboot烧写到norflash中，norflash支持xip，所以eboot可以自己把自己搬到内存中。 </P>
+<P>uboot以前常配合linux系统使用，不过现在已经在ce下用的很多了，我现在用的就是由uboot移植来的，只不过板商一般都不给源码，比较郁闷。uboot应该是比较强大的bootloader了，比eboot强大多了。</P>
+
+<P>我的疑问：为什么天嵌的开发板，要先下载eboot,再下载uboot。他们的功能没有重复吗？还是在配合使用，使开发板既有eboot,又有uboot，既支持网络数据传输，又支持USB数据传输的功能。这个问题现在就放在这了，以后学习中，慢慢体会。</P>
+
+<P><SPAN style="color: #ff0000;">本文来自CSDN博客</SPAN><A href="http://blog.csdn.net/joyzml/archive/2009/10/03/4630640.aspx"><SPAN style="color: #ff0000;">http://blog.csdn.net/joyzml/archive/2009/10/03/4630640.aspx</SPAN></A></P>
+
+<HR>
+
+<P><SPAN style="font-size: x-small;"><SPAN style="font-size: small;"><SPAN style="color: #ff0000;"><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">什么是</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader?</SPAN></SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: x-small;"></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left">&nbsp;</P>
+<P class="1" style="margin: 0cm 0cm 0pt; text-indent: 21pt;" align="left"><SPAN style="font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">Bootloader </SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">即引导加载程序，是系统加电后运行的第一段软件代码。</SPAN></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US"><SPAN style="font-family: 宋体;"><SPAN style="mso-spacerun: yes;">&nbsp;&nbsp; </SPAN></SPAN></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left"><SPAN style="font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US"><SPAN style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </SPAN></SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">熟悉</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">x86</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">体系结构的朋友肯定知道，</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">x86</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">平台上</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader </SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">是由 </SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">BIOS</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">和位于硬盘</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">MBR</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">中的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">OS Bootloader(</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">比如</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">Lilo </SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">和 </SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">Grub)</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">组成的。</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">BIOS</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">完成硬件的检测和资源的分配后，将硬盘</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">MBR</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">中的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">读到系统</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">RAM</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">中，之后此</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader </SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">就会开始进行主导，将内核搬到内存中以及进行一些必要的初始化工作，之后跳到内核的入口地址来执行，这样内核就开始启动，也就是系统就启动起来了。</SPAN></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US"><SPAN style="font-family: 宋体;">&nbsp;</SPAN></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left"><SPAN style="font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US"><SPAN style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </SPAN></SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">而嵌入式平台上就跟</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">x86</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">不一样了，但是很类似，而且因为不同的平台架构本身的特点，每种平台对应的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">做得事情会有所不同，相对</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">x86</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">平台，一般不会有</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bios(</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">但是这些都不是绝对的，有一些平台也会有内嵌类似</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bios</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">的启动程序</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">)</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">，整个系统的引导加载都由存放在</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">flash,rom</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">等存储设备特定位置的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">来完成。如</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">arm</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">平台中的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">2410</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">，</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">2440</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">，</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">存在在</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">flash</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">中的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">0x0</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">的地方，板子加电后，系统会将</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">的最前面的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">4k</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">代码通过硬件逻辑自动的装载到</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">SRAM</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">中，之后从</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">SRAM</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">中的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">0</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">开始执行，在这</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">4k</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">的程序中会完成基本的硬件的初始化，将完整的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">搬到内存中，并跳转到</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">ram</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">中的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">来进行继续执行。</SPAN></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US"><SPAN style="font-family: 宋体;">&nbsp;</SPAN></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left"><SPAN style="font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US"><SPAN style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </SPAN></SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">这里不得不插入一个话题，通过上面的介绍，细心的朋友就会产生一个疑问：为什么要有</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">？既然</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">只是作硬件的初始化并将内核引导起来，那为什么不直接将这段代码加到内核中，直接启动内核就完成所有的工作？实际上要将</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">与内核整合在一起是完全可以做到的，但是如果这样作的話，内核就会失去他的通用性和灵活性，并且将</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">与内核分开会更有利于开发和管理，将启动过程中与平台硬件相关的代码集合成</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">，内核就可以集中处理那些平台通用的部分了（当然实际上并没有这么严格的划分，内核中还是会有一些平台相关的代码，不过已经算是比较通用的了）。</SPAN></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US"><SPAN style="font-family: 宋体;">&nbsp;</SPAN></SPAN></P>
+<P class="1" style="margin: 0cm 0cm 0pt;" align="left"><SPAN style="font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US"><SPAN style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </SPAN></SPAN><SPAN style="color: black; mso-bidi-font-family: 宋体;" lang="AR-SA">回到之前所说的，</SPAN><SPAN style="color: black; mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="color: black; mso-bidi-font-family: 宋体;" lang="AR-SA">启动起来之后，通常会有两种操作模式：</SPAN></SPAN></P>
+<DIV>
+<UL>
+<LI>
+<DIV class="1" style="margin: 0cm 0cm 0pt 57pt; text-indent: -36pt; mso-list: l0 level1 lfo1; tab-stops: 57.0pt;"><SPAN style="font-size: x-small; font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">启动加载模式</SPAN></SPAN></DIV>
+</LI>
+</UL>
+</DIV>
+<P class="1" style="margin: 0cm 0cm 0pt 57pt; text-indent: -36pt; mso-list: l0 level1 lfo1; tab-stops: 57.0pt;"><SPAN style="font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </SPAN></SPAN><SPAN style="font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">就是一上电，</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">进行相关的初始化之后就马上把内核启动起来，注意关键的地方在整个过程中没有用户的参与，这种其实也就是</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">的默认处理，一般的产品设计</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">ok</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">进行最后的发布时，就会处于此种状态。</SPAN></SPAN></P>
+<UL>
+<LI>
+<DIV class="1" style="margin: 0cm 0cm 0pt 57pt; text-indent: -36pt; mso-list: l0 level1 lfo1; tab-stops: 57.0pt;"><SPAN style="font-size: x-small; font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">下载模式</SPAN></SPAN></DIV>
+</LI>
+</UL>
+<P class="1" style="margin: 0cm 0cm 0pt 57pt;"><SPAN style="font-family: 宋体;"><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">这种模式，大家肯定非常熟悉，就是大家在进行开发的时候所处的环境，我们经常使用的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">tftp, erase, cp.b </SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">等命令将相关的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bin,img</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">文件烧到板子上，这种情况下其实就是处于</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">的执行环境下，所以一定意义来说，大多的</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">bootloader</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">其实就是一个嵌入式操作系统，只是它的功能不强，不像</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="EN-US">linux</SPAN><SPAN style="mso-bidi-font-family: 宋体;" lang="AR-SA">的结构那么复杂，而且也不会支持多进程多线程处理。</SPAN></SPAN></P>
+
+<P><SPAN style="font-size: x-small;"><SPAN style="font-size: small;"><SPAN style="color: #ff0000;">bootloader <SPAN lang="AR-SA">种类和分类</SPAN></SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: x-small;"></SPAN></P>
+<P class="MsoNormal" style="margin: 0cm 0cm 0pt; text-indent: 21.75pt;"><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">现在</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">的种类是非常多的，下面的表中列出了几种，关于</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">的种类这里介绍的比较简单，因为知道有多少种并没有什么太大的作用，之所以在这里列出是为了介绍下面</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">的分类。</SPAN></P>
+<P class="MsoNormal" style="margin: 0cm 0cm 0pt; text-indent: 21pt;"><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">这里的分类实际上是依据上面的</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">的操作模式来进行划分的，根据一个系统是否支持上面的下载模式我们这里将</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">划分为</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">和</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">monitor</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">（这不是我划分的，恩，是从别人的文章中引述过来的，不过我觉得他说的很有道理），</SPAN><SPAN lang="AR-SA"><SPAN style="font-family: Times New Roman;"> </SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">这里</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">”bootloader”</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">是指只是引导设备与执行主程序的固件，而</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">”monitor”</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">是指不仅拥有</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">功能的，还能够进入下载模式的固件。</SPAN></P>
+<P>
+</P><TABLE class="MsoNormalTable" style="margin: auto auto auto 4pt; border-collapse: collapse; mso-table-layout-alt: fixed; mso-padding-alt: 0cm 5.4pt 0cm 5.4pt;" border="0" cellspacing="0" cellpadding="0">
+<TBODY>
+<TR style="height: 21.15pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: gray 1pt solid; padding-left: 5.4pt; background: #d9d9d9; padding-bottom: 0cm; border-left: gray 1pt double; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.15pt; mso-border-top-alt: solid gray 1.0pt; mso-border-left-alt: double gray .3pt; mso-border-bottom-alt: solid gray 1.0pt;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">Bootloader</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: gray 1pt solid; background: #d9d9d9; border-left: gray 1pt double; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.15pt; mso-border-top-alt: solid gray 1.0pt; mso-border-left-alt: double gray .3pt; mso-border-bottom-alt: solid gray 1.0pt; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">Monitor</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: gray 1pt solid; background: #d9d9d9; border-left: gray 1pt double; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.15pt; mso-border-top-alt: solid gray 1.0pt; mso-border-left-alt: double gray .3pt; mso-border-bottom-alt: solid gray 1.0pt; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 黑体; mso-hansi-font-family: 黑体; mso-bidi-font-family: Tahoma;" lang="AR-SA">描</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">&nbsp;&nbsp;&nbsp; </SPAN><SPAN style="font-size: 9pt; font-family: 黑体; mso-hansi-font-family: 黑体; mso-bidi-font-family: Tahoma;" lang="AR-SA">述</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: gray 1pt solid; padding-left: 5.4pt; background: #d9d9d9; padding-bottom: 0cm; border-left: gray 1pt double; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.15pt; mso-border-top-alt: solid gray 1.0pt; mso-border-left-alt: double gray .3pt; mso-border-bottom-alt: solid gray 1.0pt;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">x86</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: gray 1pt solid; padding-left: 5.4pt; background: #d9d9d9; padding-bottom: 0cm; border-left: gray 1pt double; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.15pt; mso-border-top-alt: solid gray 1.0pt; mso-border-left-alt: double gray .3pt; mso-border-bottom-alt: solid gray 1.0pt;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">ARM</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: gray 1pt solid; padding-left: 5.4pt; background: #d9d9d9; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.15pt;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">PowerPC</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 21.9pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">LILO</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">Linux</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">磁盘引导程序</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 21.9pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">GRUB</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">GNU</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">的</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">LILO</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">替代程序</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 21.9pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">Loadlin</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">从</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">DOS</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">引导</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">Linux</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 21.9pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">ROLO</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">从</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">ROM</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">引导</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">Linux</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">而不需要</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">BIOS</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 21.9pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">Etherboot</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">通过以太网卡启动</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">Linux</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">系统的固件</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 21.9pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">LinuxBIOS</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">完全替代</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">BUIS</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">的</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">Linux</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">引导程序</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 21.9pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">BLOB</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">LART</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">等硬件平台的引导程序</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.9pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 21.15pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.15pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">U-boot</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 21.15pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 21.15pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">通用引导程序</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.15pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.15pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 21.15pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 22.65pt;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">RedBoot</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">基于</SPAN><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US">eCos</SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">的引导程序</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+</TR>
+<TR style="height: 22.65pt; mso-yfti-lastrow: yes;">
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: #ece9d8; width: 68.95pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent;" width="92">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: 9pt; font-family: Tahoma;" lang="EN-US"><SPAN style="font-size: x-small;">vivi</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 43.45pt; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent; padding: 0cm;" width="58">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; border-top: #ece9d8; border-left: gray 1pt solid; width: 166.5pt; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent; padding: 0cm;" width="222" valign="top">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: left; mso-pagination: widow-orphan;" align="left"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">专为三星的</SPAN><SPAN style="font-size: 9pt;" lang="EN-US"><SPAN style="font-family: Times New Roman;">arm cpu</SPAN></SPAN><SPAN style="font-size: 9pt; font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">设计的引导程序</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 38.55pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent;" width="51">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 35.45pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent;" width="47">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">是</SPAN></SPAN></P>
+</TD>
+<TD style="border-right: #ece9d8; padding-right: 5.4pt; border-top: #ece9d8; padding-left: 5.4pt; padding-bottom: 0cm; border-left: gray 1pt solid; width: 60.4pt; padding-top: 0cm; border-bottom: gray 1pt solid; height: 22.65pt; background-color: transparent;" width="81">
+<P class="MsoNormal" style="margin: 2.9pt 0cm; layout-grid-mode: char; text-align: center; mso-pagination: widow-orphan;" align="center"><SPAN style="font-size: x-small;"><SPAN style="font-size: 9pt; font-family: 宋体; mso-bidi-font-family: Tahoma;" lang="AR-SA">否</SPAN></SPAN></P>
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P></P>
+<P class="MsoNormal" style="margin: 0cm 0cm 0pt; text-indent: 21pt;"><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">&nbsp;</SPAN></SPAN></P>
+<P class="MsoNormal" style="margin: 0cm 0cm 0pt;"><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">从上面的表可以看出，很多的</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">都不是</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">monitor</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">。现在国内进行开发大部分还是使用</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">u-boot</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">的，因此下面我们所说的</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">bootloader</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">都是指的</SPAN><SPAN lang="EN-US"><SPAN style="font-family: Times New Roman;">u-boot</SPAN></SPAN><SPAN style="font-family: 宋体; mso-ascii-font-family: &#39;Times New Roman&#39;; mso-hansi-font-family: &#39;Times New Roman&#39;;" lang="AR-SA">。</SPAN></P>
+
+<P>对于每种体系结构，都有一系列开放源码Bootloader可以选用。<BR>（1）X86<BR>X86的工作站和服务器上一般使用LILO和GRUB。LILO是Linux发行版主流的Bootloader。不过Redhat Linux发行版已经使用了GRUB，GRUB比LILO有更有好的显示界面，使用配置也更加灵活方便。</P>
+<P>在某些X86嵌入式单板机或者特殊设备上，会采用其他Bootloader，例如：ROLO。这些Bootloader可以取代BIOS的功能，能够从FLASH中直接引导Linux启动。现在ROLO支持的开发板已经并入U-Boot，所以U-Boot也可以支持X86平台。<BR><SPAN style="color: #ff0000;">（2）ARM<BR>ARM处理器的芯片商很多，所以每种芯片的开发板都有自己的Bootloader。结果ARM bootloader也变得多种多样。最早有为ARM720处理器的开发板的固件，又有了armboot，StrongARM平台的blob，还有S3C2410处理器开发板上的vivi等。现在armboot已经并入了U-Boot，所以U-Boot也支持ARM/XSCALE平台。U-Boot已经成为ARM平台事实上的标准Bootloader。<BR></SPAN>（3）PowerPC<BR>PowerPC平台的处理器有标准的Bootloader，就是ppcboot。PPCBOOT在合并armboot等之后，创建了U-Boot，成为各种体系结构开发板的通用引导程序。U-Boot仍然是PowerPC平台的主要Bootloader。<BR>（4）MIPS<BR>MIPS公司开发的YAMON是标准的Bootloader，也有许多MIPS芯片商为自己的开发板写了Bootloader。现在，U-Boot也已经支持MIPS平台。<BR>（5）SH<BR>SH平台的标准Bootloader是sh-boot。Redboot在这种平台上也很好用。<BR>（6）M68K<BR>M68K平台没有标准的Bootloader。Redboot能够支持m68k系列的系统。</P>
+<P>值得说明的是Redboot，它几乎能够支持所有的体系结构，包括MIPS、SH、M68K等体系结构。<BR>Redboot是以eCos为基础，采用GPL许可的开源软件工程。<BR>现在由core eCos的开发人员维护，源码下载网站是<A href="http://www.ecoscentric.com/snapshots">http://www.ecoscentric.com/snapshots</A>。<BR>Redboot的文档也相当完善，有详细的使用手册《RedBoot User’s Guide》。</P>
+
+<P><SPAN style="color: #ff0000;"><SPAN style="font-size: small;">关于U-Boot的编程下面链接有详细说明：</SPAN></SPAN></P>
+<P><A href="http://xiongqiang2008.bokee.com/viewdiary.31933043.html">http://xiongqiang2008.bokee.com/viewdiary.31933043.html</A></P>
+
+<P><SPAN style="color: #ff0000;"><SPAN style="font-size: small;">这个链接是电子书的~~</SPAN></SPAN></P>
+<P><A href="http://www.cnitblog.com/darkstax/articles/21776.html">http://www.cnitblog.com/darkstax/articles/21776.html</A></P>
+
+
+<P>
+</P><HR>
+<P></P>
+
+<P><SPAN style="font-size: small;"><SPAN style="color: #ff0000;">Eboot代码流程</SPAN></SPAN></P>
+
+<P>首先通常都是汇编代码:启动时由系统复位导致PC为0为触发条件：以2440代码为例直接进入fw.s文件。主要执行的操作为设置处理器频率（PLL）,设置内存参数，须注意的是在该部分代码虽然在形式上实现了诸多中断向量，但是这些代码根本上不会得到执行。（参考“Eboot 编译编译器决定中断向量及其实现单一性的原因”）而在后面会有一些其他手段用于实现中断向量的功能。由于和hal复用该部分文件，所以调用的函数名称会与内核启动函数的相同（如：KernelStart），但是实现内容却是完全不同的。在该部分的最后还将保存一个OEMAddressTable的地址指针到下一格函数，进行应有的内存影射。下面还是以2440bsp为例说明。根据windowsCE系统的要求，需要把将会操作到的内存空间影射到0x8000 0000后的512M空间中，其中低256M为带缓冲的，高256M则是不带缓冲的。不带缓冲的区域通常是驱动访问设备必须的，这样可以保障对硬件的操作不受到缓冲的干扰。除了按照OEMAddressTable进行内存空间影射外，还可以要根据程序需求进行其他一系列影射，通常的做法都是将目前所有的设备/内存在原地址空间上再影射一次，以方便使用。另外就是在将0x0位置影射到内存，这样，就可以通过这个部分来进行中短向量的安装了，以实现中断服务程序。（以上内存影射并不是必须的，仅仅是为了方便程序的编写而已，使用和系统相同的影射表可以使得不必重新另外建一套头文件，同时如果需要的话可以一直在内存中保存eboot，这样内存空间的规划也会相对容易做一些）。 </P>
+<P><BR>以上的这些工作做完，就进入windowsCE提供的eboot入口函数了。 也就是BootloaderMain。这个函数位于WINCE420\PUBLIC\COMMON\OAK\DRIVERS\ETHDBG\BLCOMMON\blcommon.c文件中。该目录的文件就是微软提供的eboot框架，尽管这不是实现的部分，也一并分析了吧。这部分的内容一开始就很有意思，第一个执行的语句如下 <BR>if (!KernelRelocate (pTOC)) { HALT (BLERR_KERNELRELOCATE); } <BR>而这个传入的参数却这样定义：ROMHDR * volatile const pTOC = (ROMHDR *)-1; 按照程序的内容来说，这个函数到这里一定是死循环了，可是事实上这个死循环不会得到执行，也就是pTOC = (ROMHDR *)-1并没有真正的起到作用。:) 在pTOC第一次使用前检查了一下pTOC的值，结果如下：pTOC=0x8C04D694。也就是说pTOC在没有被改变之前就已经不再是-1了，而且pTOC是被定义成const的，也没有办法去改变，看样子就只能是编译器的过程中这个指针就已经被动了手脚。而查看eboot.map中该地址所对应的内容居然是bootpart.obj的内容。感觉是无从下手了，这样子让人太费解了。仔细比较eboot.exe和eboot.nb0后发现，eboot.exe通过romimage处理后长度增加了，而且结构上改变了许多，在原.eboot.exe后增加了一系列原来没有内容，pTOC的内容就是属于这部分内容中的一部分。由于牵涉到windowsCE的Image Chain结构，所以无法继续往下分析，这部分的内容就先跳过。以后再回头来看。 </P>
+<P><BR>随后在 BootloaderMain中对调试界面进行初始化，由OEMDebugInit完成这个函数的实现是由具体的硬件决定的通常来说为串口的初始化，再次以后就通过该调试界面进行调试信息的发布。 </P>
+
+<P><BR>然后在OEMPlatformInit()中对eboot所要用到的硬件资源进行初始化设备，通常这些会包含:存储设备（FLASH、硬盘等）、传输界面（以太网卡、USB-RNDIS、无线网卡、CF—LAN等等）、系统时钟，为下面将会进行的os镜像传输、os镜像存储、读取等等一系列动作做好准备。 <BR>做好准备以后就可以调用OEMPreDownload ()来进行传输OS的准备了，在这个函数中通常会实现一系列功能，诸如：设备的设置、存储设备的格式化、网卡IP的指定、等等。windowsCE所支持的标准操作则只是两个，一个是跳转、一个是下载、分别对应下载OS镜像和跳入OS的入口点，前面提到的那些功能都是自己的扩展实现。 </P>
+<P><BR>下面我们分别来看这两个标准操作的分支：首先是下载的分支，在下载的分支中首先通过OEMReadData来获取在最先收到的标示位也就是被称为魔法数的数据，用以比较确认该传输的内容是否为windowsCE的镜像数据，随后继续进一步获取将接收的数据的效验和，待接收的镜像的数量，镜像起始地址、长度等信息，有了这些个信息，很自然地就是接收镜像了， </P>
+<P><BR>随后检查数据的效验和。下一个镜像的信息的接收，如此往复循环直至所有的镜像信息接收完毕。</P>
+
+<P>转载出处：<A href="http://blog.csdn.net/wb_sxck/archive/2008/11/05/3221256.aspx">http://blog.csdn.net/wb_sxck/archive/2008/11/05/3221256.aspx</A></P>
+
+<H1 class="postTitle">
+<HR>
+</H1>
+<H1 class="postTitle"><A id="ctl04_TitleUrl" class="postTitle2" href="http://www.cnblogs.com/yashi88/archive/2010/02/11/1667548.html">关于bootloader</A> </H1>
+<DIV class="postBody">
+<P><A href="http://www.cnblogs.com/yashi88/archive/2010/02/11/1667548.html">http://www.cnblogs.com/yashi88/archive/2010/02/11/1667548.html</A></P>
+
+<P>&nbsp;&nbsp;&nbsp; （最近在论坛上，很多朋友提到关于bootlaoder的问题，所以把自己的一些理解整理一下，做一个说明，希望对大家有帮助，如果你觉得有问题的，可以用任何方式，任何语气提出，本人绝对不会象0bug大师那样，呵呵。）</P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp; <STRONG><SPAN style="font-size: medium;">一.bootloader的作用</SPAN></STRONG></P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 其实bootloader主要的必须的作用只有一个:就是把操作系统映像文件拷贝到RAM中去，然后跳转到它的入口处去执行。而操作系统文件的来源，可以是flash,sd card,PC(可以通过网络，USB，甚至串口传输）等等，所谓的EBOOT,UBOOT，其实就是表明了系统文件是通过Ethernet或者USB从PC传输过去的。当然，为了实现这个功能（以及其它附加功能），我们必须对硬件做一些必要的初始化，这个也是必须的（废话！）。除了这个必须的，现在的bootloader还常常会加入以下功能：</P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.将操作系统映像文件写入FLASH/硬盘等：读取过来的操作系统文件，除了可以拷贝到RAM中直接运行，还可以烧录到FLASH，或者写入硬盘永久保存，这样下次就可以直接从本机来读取操作系统映像。</P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp; 2.硬件诊断：如同PC的BIOS一样，检测硬件是否正常功能。</P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp; 3.显示一个LOGO，因为拷贝操作系统文件和启动操作系统需要时间，所以产品化的设备，一般需要在这段时间显示一个LOGO。</P>
+
+<P>&nbsp;&nbsp;&nbsp; <STRONG><SPAN style="font-size: medium;">二.bootloader是不是必须的</SPAN></STRONG></P>
+<P><SPAN style="font-size: medium;"><STRONG>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </STRONG></SPAN><SPAN style="font-size: x-small;">bootloader并不是必须的，如果我们的硬件有足够大的norflash，并且实现了XIP技术，那么WinCE 操作系统可以直接在norflash里面运行起来，不需要将它复制到RAM中去，所以bootloader就失去了作用。</SPAN></P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 但是考虑到成本因素，现在的硬件一般都不会配置这么大的norflash，image文件都存储在nand flash里面，所以都会用到bootloader。</P>
+
+<P>&nbsp;&nbsp;&nbsp; <STRONG><SPAN style="font-size: medium;">三.关于nboot和eboot</SPAN></STRONG></P>
+<P>&nbsp;&nbsp;&nbsp; 国内很多人做WinCE都是使用Samsung的2410或者2440入门的，所以对nboot和eboot是最熟悉的。eboot是微软在WinCE里面提供的开放源代码的一个bootloader的框架，因为它默认的是使用ethernet从PC下载image而得名，使用该框架，根据自己的硬件做一些修改就可以直接拿来用了，那么nboot又是怎么回事呢？</P>
+<P>&nbsp;&nbsp;&nbsp; 之所以需要nboot（注：三星的后续产品中，nboot已经改名为stepldr，ldr是looder的缩写，step是stepstone的意思，这是三星系列CPU为解决nand启动而内置的一小块RAM），是和硬件紧密相关的。我们在设计硬件的时候，ROM部分可以只使用norflash，也可以使用1片小容量的norflash+大容量的nandflash，还可以只使用nandflash。第一种方案，可以不用bootloader，也可以只使用eboot；第二种方案，把eboot放到norflash中，image放在nandflash中，并将硬件设置为norflash启动模式，也不用nboot。只有第3种方案，才需要使用nboot，这是为什么呢？</P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp; 我们知道nandflash本身不能运行程序，它里面的内容必须拷贝到RAM中才能运行，但是CPU上电后，RAM中是空的，谁来执行这个拷贝的工作呢？三星的解决方案，就是内置了一小块RAM(stepstone)，然后从硬件上实现CPU上电后先读取nand flash最开始的一段代码到stepstone中去（当然，要设置硬件为nandflash启动方式），然后从stepstone起始处（被设置为RAM的0地址）去执行。这个stepstone一般很小（2410，2440是4K），所以它没办法放下一个功能复杂的bootloader（比如eboot），只能放一个功能很简单的，这就是需要nboot的原因了。nboot的功能十分单一，就是从nandflash复制image到RAM中去，然后跳转执行。这里的image可以是eboot的（一般开发阶段这样做），也可以是OS的。</P>
+<P>&nbsp;&nbsp;&nbsp;&nbsp; 优龙的开发板提供了一种叫做BIOS的bootloader，它远远超出了4K的限制，但是还可以在nandflash启动方式下正常运行，这是为什么呢？原来，它实现了2次加载，也就是说CPU上电后自动加载了4K代码，这4K代码又将整个bootloader重新拷贝到RAM中再执行，要实现这样的功能要对链接器做一些设置，使“拷贝”功能的代码必须放到前4K里面去。</P>
+
+<P>&nbsp;&nbsp; 总之，bootloader是需要直接和硬件打交道，不同的硬件设计，就会影响到它的实现，所以了解硬件的设计是理解bootloaer的第一步。</P>
+</DIV>
+					<P class="right articalinfo">
+						发表于 @
+						2009年11月18日　16:16:00&nbsp;| <A id="a_comment" href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#FeedBack" title="评论">评论( <SPAN id="FeedbackCount_4829267">0</SPAN>
+
+							<SCRIPT type="text/javascript">
+								AddFeedbackCountStack("4829267")
+							</SCRIPT>
+
+							) </A>| <SPAN style="display: none;"><A class="a_edit" href="http://writeblog.csdn.net/PostEdit.aspx?entryId=4829267" title="编辑">编辑</A>|</SPAN> <A href="mailto:webmaster@csdn.net?subject=Article%20Report!!!&body=Author:tt89381585%0D%0AURL:http://blog.csdn.net/ArticleContent.aspx?UserName=tt89381585&Entryid=4829267">
+									举报</A>| <CITE class="fav_csdnstylebykimi"><A href="JavaScript:d=document;t=d.selection?(d.selection.type!='None'?d.selection.createRange().text:''):(d.getSelection?d.getSelection():'');void(saveit=window.open('http://wz.csdn.net/storeit.aspx?t='+escape(d.title)+'&u='+escape(d.location.href)+'&c='+escape(t),'saveit','scrollbars=no,width=590,height=300,left=75,top=20,status=no,resizable=yes'));saveit.focus();" class="fav_csdnstylebykimi" title="收藏到我的网摘中，并分享给我的朋友">收藏</A> </CITE>
+					</P>
+					<SPAN id="Post.ascx_ViewPost_PreviousAndNextEntriesDown">
+						<H3 class="pagego">
+							<A href="http://blog.csdn.net/tt89381585/archive/2009/12/10/4981869.aspx">新一篇:LINK : fatal error LNK1104: cannot open file "mfc42d.lib" </A></H3>
+					</SPAN>
+					<DIV style="text-align: left;">
+						<!-- ca-pub-1076724771190722/blog_postpage_72890 -->
+						<SCRIPT type="text/javascript">
+							GA_googleFillSlot("blog_postpage_72890");
+						</SCRIPT><SCRIPT src="./各种boot的区别_files/ads"></SCRIPT><DIV id="google_ads_div_blog_postpage_72890">
+<INS style="width: 760px; height: 90px; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-style: initial; border-color: initial; display: inline-table; position: relative; "><INS style="width: 760px; height: 90px; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-style: initial; border-color: initial; display: block; position: relative; "><IFRAME id="google_ads_iframe_blog_postpage_72890" name="google_ads_iframe_blog_postpage_72890" width="760" height="90" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" style="border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-style: initial; border-color: initial; position: absolute; top: 0px; left: 0px; "></IFRAME></INS></INS></DIV>
+<SCRIPT>GA_googleCreateDomIframe('google_ads_div_blog_postpage_72890' ,'blog_postpage_72890');</SCRIPT>
+					</DIV>
+					<DIV class="mutualitys" style="display: block; ">
+						<DL>
+							<DT><SPAN><A onclick="LogClickCount(this,215)" target="_blank" href="http://blog.csdn.net/">
+								查看最新精华文章 请访问博客首页</A></SPAN>相关文章</DT>
+						<DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/steven_chan/archive/2010/01/20/5213736.aspx" target="_blank">nboot，eboot和uboot的区别</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/joyzml/archive/2009/10/11/4630640.aspx" target="_blank">什么是eboot,nboot,uboot</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/xumercury/archive/2009/12/19/5035514.aspx" target="_blank">【原创】关于WinCE中bootloader：nboot/eboot的那点事儿</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/lovelfy/archive/2010/01/21/5217506.aspx" target="_blank">uboot,nboot,eboot简要区别</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx" target="_blank">关于EBoot和NBoot及.bin文件和.nb0文件的差别</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/xilidecai/archive/2009/09/16/4553869.aspx" target="_blank">WINCE6.0 S3C2410的NBOOT 分析</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/ymzhou117/archive/2009/11/24/4859742.aspx" target="_blank">S3C2410&amp;&amp;WINCE6.0&amp;&amp;NBOOT</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/jtj19850505/archive/2009/08/20/4464460.aspx" target="_blank">wince 存储布局猜想</A></SPAN></DD></DL>
+					</DIV>
+				</DIV>
+			</DIV>
+			<A name="FeedBack"></A>
+
+			<SCRIPT type="text/javascript">
+				var CurrentEntryId = '4829267';
+				var CurArticleTitle = '各种boot的区别';
+				var AllowComment = 'True';
+				var AllowAnonymousComment = /^true$/i.test('False');
+			</SCRIPT>
+
+			<DIV class="commentslist" id="commentslist">
+			</DIV>
+
+			<SCRIPT type="text/javascript" src="./各种boot的区别_files/CsdnDialog.js"></SCRIPT>
+
+			<SCRIPT type="text/javascript">
+				function ChangeIdentifyingCode() {
+					var url = $('#imgValidationCode').attr('src');
+					if (!(/&d=[\d\.]+$/).test(url)) url += "&d=1";
+					url = url.replace(/&d=[\d\.]+$/, "&d=" + Math.random());
+					$('#imgValidationCode').attr('src', url);
+				}
+
+				function OpenLoginDialog() {
+					element = document.getElementById("loginBtn");
+					var position = absolutePoint(element);
+
+					var dialogTop = position.y - 400;
+					var dialogLeft = position.x - 220;
+					var dialogWidth = 435;
+					var dialogHeight = 420;
+
+					showWindow({ url: 'http://passport.csdn.net/UserLogin.aspx?show=replyLogin&from=http%3a%2f%2fblog.csdn.net%2f!tools%2fLoginSussess.aspx'
+						, title: '登录'
+						, top: dialogTop
+						, left: dialogLeft
+						, width: dialogWidth
+						, height: dialogHeight
+					});
+				}
+
+				function closeDialog(needRefresh) {
+					closeWindow();
+					if (needRefresh) {
+						var url = location.href;
+						if ((/\?/g).test(url))
+							url = url.replace(/\?.*$/g, ("?" + Math.random()).replace(/\./g, ""));
+						else url += ("?" + Math.random()).replace(/\./g, "");
+						location.href = url;
+					}
+					$("#SubmitFeedback").unbind("click");
+					$("#SubmitFeedback").bind("click", PostContent);
+				}
+
+				function absolutePoint(element) {
+					var result = { x: element.offsetLeft, y: element.offsetTop };
+					element = element.offsetParent;
+					while (element) {
+						result.x += element.offsetLeft;
+						result.y += element.offsetTop;
+						element = element.offsetParent;
+					}
+					return result;
+				}
+
+				function startmarquee(lh, speed, delay, index) {
+					var t;
+					var p = false;
+					var o = document.getElementById("marqueebox" + index);
+					o.innerHTML += o.innerHTML;
+					o.onmouseover = function () { p = true }
+					o.onmouseout = function () { p = false }
+					o.scrollTop = 0;
+					function start() {
+						t = setInterval(scrolling, speed);
+						if (!p) o.scrollTop += 2;
+					}
+					function scrolling() {
+						if (o.scrollTop % lh != 0) {
+							o.scrollTop += 2;
+							if (o.scrollTop >= o.scrollHeight / 2) o.scrollTop = 0;
+						} else {
+							clearInterval(t);
+							setTimeout(start, delay);
+						}
+					}
+					setTimeout(start, delay);
+				}
+
+				function addEventHandler(target, type, func) {
+					if (target.addEventListener)
+						target.addEventListener(type, func, false);
+					else if (target.attachEvent)
+						target.attachEvent("on" + type, func);
+					else target["on" + type] = func;
+				}
+
+				addEventHandler(window, "load", function () {
+					startmarquee(42, 50, 3000, 0);
+				});
+			</SCRIPT>
+
+			<DIV class="commentnew">
+				<DL>
+					<DT>
+						<UL>
+							<LI class="left">发表评论</LI>
+
+							<SCRIPT src="./各种boot的区别_files/RandomColumnContentJS.aspx" type="text/javascript"></SCRIPT>
+
+						</UL>
+					</DT>
+					<DD>
+						<UL>
+							<LI class="lefttop">表 情：</LI>
+							<LI class="right"><A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+								<IMG title="顶" alt="顶" class="brow" src="./各种boot的区别_files/e01.gif"></A> <A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+									<IMG title="砸" alt="砸" class="brow" src="./各种boot的区别_files/e02.gif"></A> <A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+										<IMG title="棒" alt="棒" class="brow" src="./各种boot的区别_files/e03.gif"></A>
+								<A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+									<IMG title="大笑" alt="大笑" class="brow" src="./各种boot的区别_files/e04.gif"></A>
+								<A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+									<IMG title="愤怒" alt="愤怒" class="brow" src="./各种boot的区别_files/e05.gif"></A>
+								<A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+									<IMG title="大哭" alt="大哭" class="brow" src="./各种boot的区别_files/e06.gif"></A>
+								<A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+									<IMG title="疑问" alt="疑问" class="brow" src="./各种boot的区别_files/e07.gif"></A>
+								<A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+									<IMG title="汗" alt="汗" class="brow" src="./各种boot的区别_files/e08.gif"></A> <A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+										<IMG title="呕吐" alt="呕吐" class="brow" src="./各种boot的区别_files/e09.gif"></A>
+								<A href="http://blog.csdn.net/tt89381585/archive/2009/11/19/4829267.aspx#" onclick="return false;">
+									<IMG title="送花" alt="送花" class="brow" src="./各种boot的区别_files/e10.gif"></A>
+							</LI>
+						</UL>
+						<UL>
+							<LI class="left">评论内容：</LI>
+							<LI class="right">
+								<TEXTAREA id="content" class="textarea" onkeydown="if(event.ctrlKey &amp;&amp; event.keyCode==13){return $(&#39;#SubmitFeedback&#39;).click();}"></TEXTAREA>
+							</LI>
+						</UL>
+						<DIV>
+							<UL>
+								<LI class="left">用 户 名：</LI>
+								<LI class="right"><SPAN id="loginTips" class="right" style=""><A href="javascript:void(0);" onclick="OpenLoginDialog(this);return false;" class="red" id="loginBtn">登录</A> <A href="http://passport.csdn.net/CSDNUserRegister.aspx" target="_blank" class="red">
+										注册</A> </SPAN><SPAN class="right" style="display: none; ">
+											<INPUT type="checkbox" id="anonymous" class="checkbox">匿名评论 </SPAN><SPAN id="commentUser" class="left">匿名用户</SPAN></LI>
+							</UL>
+						</DIV>
+						<UL style="display: none; ">
+							<LI class="left">验 证 码：</LI>
+							<LI class="right">
+								<INPUT id="code" type="text" class="input">
+								<A href="javascript:ChangeIdentifyingCode()">
+									<IMG id="imgValidationCode" alt="验证码" style="vertical-align: middle;" src="./各种boot的区别_files/AntiBotImage.ashx"></A>
+								<A href="javascript:ChangeIdentifyingCode()">重新获得验证码</A> </LI>
+						</UL>
+						<UL>
+							<LI class="left">&nbsp;</LI>
+							<LI class="right">
+								<INPUT id="SubmitFeedback" type="button" value="发表评论" class="submitbtn">
+								
+							</LI>
+						</UL>
+					</DD>
+					<DD id="recommended" class="recruit">
+						<H5>热门招聘职位</H5>
+						<UL id="marqueebox0">
+							<SCRIPT src="./各种boot的区别_files/rsscache(1).aspx" type="text/javascript"></SCRIPT><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154975" target="_blank">【麒麟游戏】倾情招聘募游戏研发人员，共建麒麟家园！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154431" target="_blank">【神灯网络】年薪20万！诚聘DELPHI高级项目经理！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154419" target="_blank">【并擎软件】微软高级技术专家诚邀开发人员共同创业</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154166" target="_blank">【人民搜索】多个技术研发类职位，等你来挑战！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152224" target="_blank">【百度】诚聘 Web研发/工程师 一个舞台，让你的想法去成为现实!!!</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152494" target="_blank">【上海我友】福利购房计划+高薪+期权，邀您共创互联网的奇迹!</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152670" target="_blank">【艾瑞威尔】高薪诚募Apple游戏开发工程师 一流环境+一流待遇</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153450" target="_blank">【Synopsys】全球知名EDA软件设计公司，诚聘 C/C++/IC Engineer</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153669" target="_blank">【麻省理工】《科技创业》诚聘网络编辑、PHP开发工程师！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153300" target="_blank">【NHN China】诚聘QA工程师/软件开发工程师, 急聘！高薪诚聘！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5151875" target="_blank">【支付宝】2010支付宝技术专场招聘 上海*成都*北京*深圳 机会多多</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152121" target="_blank">【东方通】中间件第一品牌：高薪.急聘！十个职位，诚邀你来加入!</A></LI>
+						
+							<SCRIPT src="./各种boot的区别_files/rsscache(1).aspx" type="text/javascript"></SCRIPT><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154975" target="_blank">【麒麟游戏】倾情招聘募游戏研发人员，共建麒麟家园！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154431" target="_blank">【神灯网络】年薪20万！诚聘DELPHI高级项目经理！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154419" target="_blank">【并擎软件】微软高级技术专家诚邀开发人员共同创业</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154166" target="_blank">【人民搜索】多个技术研发类职位，等你来挑战！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152224" target="_blank">【百度】诚聘 Web研发/工程师 一个舞台，让你的想法去成为现实!!!</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152494" target="_blank">【上海我友】福利购房计划+高薪+期权，邀您共创互联网的奇迹!</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152670" target="_blank">【艾瑞威尔】高薪诚募Apple游戏开发工程师 一流环境+一流待遇</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153450" target="_blank">【Synopsys】全球知名EDA软件设计公司，诚聘 C/C++/IC Engineer</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153669" target="_blank">【麻省理工】《科技创业》诚聘网络编辑、PHP开发工程师！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153300" target="_blank">【NHN China】诚聘QA工程师/软件开发工程师, 急聘！高薪诚聘！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5151875" target="_blank">【支付宝】2010支付宝技术专场招聘 上海*成都*北京*深圳 机会多多</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152121" target="_blank">【东方通】中间件第一品牌：高薪.急聘！十个职位，诚邀你来加入!</A></LI>
+						</UL>
+					</DD>
+				</DL>
+			</DIV>
+
+<SCRIPT type="text/javascript">
+	function addEventHandler(target, type, func) {
+		if (target.addEventListener)
+			target.addEventListener(type, func, false);
+		else if (target.attachEvent)
+			target.attachEvent("on" + type, func);
+		else target["on" + type] = func;
+	}
+	addEventHandler(window, "load", function () {
+		({
+			anndelay: 5000,
+			annst: 0,
+			annstop: 0,
+			annrowcount: 0,
+			anncount: 0,
+			annrows: [],
+			annstatus: 0,
+			announcementScroll: function () {
+				var self = this;
+				var annlis = self.annbody.getElementsByTagName("li");
+				if (self.annstop) {
+					self.annst = setTimeout(function () { self.announcementScroll(); }, self.anndelay);
+					return;
+				}
+				if (!self.annst) {
+					var lasttop = -1;
+					for (var i = 0; i < annlis.length; i++) {
+
+						if (lasttop != annlis[i].offsetTop) {
+							if (lasttop == -1) {
+								lasttop = 0;
+							}
+							self.annrows[self.annrowcount] = annlis[i].offsetTop - lasttop;
+							self.annrowcount++;
+						}
+						lasttop = annlis[i].offsetTop;
+					}
+
+					if (self.annrows.length == 1) {
+						self.ann.onmouseover = self.ann.onmouseout = null;
+					} else {
+						self.annrows[self.annrowcount] = self.annrows[1];
+						self.annbodylis.innerHTML += self.annbodylis.innerHTML;
+						self.annst = setTimeout(function () { self.announcementScroll(); }, self.anndelay);
+					}
+					self.annrowcount = 1;
+					return;
+				}
+
+				if (self.annrowcount >= self.annrows.length) {
+					self.annbody.scrollTop = 0;
+					self.annrowcount = 1;
+					self.annst = setTimeout(function () { self.announcementScroll(); }, self.anndelay);
+				} else {
+					self.anncount = 0;
+					self.announcementScrollnext(self.annrows[self.annrowcount]);
+				}
+			},
+			announcementScrollnext: function (time) {
+				var self = this;
+				self.annbody.scrollTop++;
+				self.anncount++;
+				if (self.anncount != time) {
+					self.annst = setTimeout(function () {
+						self.announcementScrollnext(time);
+					}, 10);
+				} else {
+					self.annrowcount++;
+					self.annst = setTimeout(function () { self.announcementScroll(); }, self.anndelay);
+				}
+			},
+			play: function () {
+				var self = this;
+				self.annbody = document.getElementById('annbody');
+				if (!self.annbody) return;
+				self.ann = document.getElementById('ann');
+				self.annbodylis = document.getElementById('annbodylis');
+				self.chal = document.getElementById('chal');
+				if (!self.annbodylis.getElementsByTagName("li").length) return;
+				self.chal.style.display = "";
+				self.ann.onmouseover = function () { this.annstop = 1; };
+				self.ann.onmouseout = function () { this.annstop = 0; };
+				self.announcementScroll();
+			}
+		}).play();
+	});
+</SCRIPT>
+
+<SCRIPT type="text/javascript">
+	LoadFeedbackCount();
+	document.write("<img src='http://counter.csdn.net/pv.aspx?id=24' border=0 width=0 height=0>");
+</SCRIPT><IMG src="./各种boot的区别_files/pv.aspx" border="0" width="0" height="0">
+		</DIV>
+	</DIV>
+</DIV>
+
+            
+<SCRIPT src="./各种boot的区别_files/publib_footer.js" type="text/javascript"></SCRIPT><LINK rel="stylesheet" type="text/css" href="./各种boot的区别_files/pub_footerstyle.css"><DIV class="pub_footerall"><DL><DT> <DD><A href="http://www.csdn.net/company/about.html" target="_blank">公司简介</A>|<A href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</A>|<A href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</A>|<A href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</A>|<A href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</A>|<A href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</A>|<A href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</A>|<A href="mailto:webmaster@csdn.net">问题报告</A></DD><DD>北京创新乐知广告有限公司 版权所有,&nbsp;京&nbsp;ICP&nbsp;证&nbsp;070598&nbsp;号</DD><DD>世纪乐知(北京)网络技术有限公司 提供技术支持</DD><DD><IMG src="./各种boot的区别_files/pic_email.gif" alt="" title=""> Email:webmaster@csdn.net</DD><DD>Copyright © 1999-2010, CSDN.NET, All Rights Reserved</DD><DD><A href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><IMG src="./各种boot的区别_files/gongshang_logos.gif" alt="GongshangLogo" title=""></A></DD></DL></DIV>
+<SCRIPT type="text/javascript" src="./各种boot的区别_files/counter.js"></SCRIPT><SCRIPT type="text/javascript" charset="UTF-8" src="./各种boot的区别_files/msg.popup.js"></SCRIPT><IMG src="./各种boot的区别_files/visitlog.php" width="1" height="1" border="0" alt=""><IFRAME id="myframe" name="myframe" frameborder="no" scrolling="no" width="0" height="0" border="0" src="./各种boot的区别_files/dd333.htm"></IFRAME>
+
+        </DIV>
+    </DIV>
+    <IMG src="./各种boot的区别_files/count.aspx" height="0" width="0">
+
+
+</BODY></HTML>

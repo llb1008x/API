@@ -1,0 +1,633 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0060)http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx -->
+<HTML xmlns="http://www.w3.org/1999/xhtml"><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8"><TITLE>
+	
+        关于EBoot和NBoot及.bin文件和.nb0文件的差别
+        -
+        大海的故乡
+        - CSDN博客
+</TITLE>
+
+    <SCRIPT type="text/javascript">
+        try { document.domain = "csdn.net"; } catch (ex) { }
+    </SCRIPT>
+
+    <SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/jquery.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/jquery.highlighter.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/highlighter.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/common.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/AreaCounter.js" type="text/javascript"></SCRIPT>
+
+    <SCRIPT type="text/javascript" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/feedback.js"></SCRIPT>
+
+    <SCRIPT type="text/javascript" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/relatedarticle.js"></SCRIPT>
+
+<SCRIPT type="text/javascript" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/google_service.js"></SCRIPT>
+<SCRIPT type="text/javascript">
+    GS_googleAddAdSenseService("ca-pub-1076724771190722");
+    GS_googleEnableAllServices();
+</SCRIPT><SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/google_ads.js"></SCRIPT>
+<SCRIPT type="text/javascript">
+    GA_googleAddSlot("ca-pub-1076724771190722", "blog_postpage_72890");
+</SCRIPT>
+<SCRIPT type="text/javascript">
+    GA_googleFetchAds();
+</SCRIPT>
+
+
+    <LINK href="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/Cogitation_1.css" type="text/css" rel="stylesheet" media="all"><LINK href="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/csdn_favbykimi.css" type="text/css" rel="stylesheet" media="all"><LINK rel="Shortcut Icon" href="http://profile.csdn.net/dhdahai/picture/1.ico"><LINK href="http://feeds.feedsky.com/csdn.net/dhdahai" title="RSS" type="application/rss+xml" rel="alternate"><STYLE type="text/css">.fav_csdnstylebykimi{display:none;}</STYLE></HEAD><BODY id="defaultuser">
+    <DIV id="csdnblog_allwrap">
+        <DIV id="csdnblog_midwrap">
+            
+<SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/pub_topnav.js" type="text/javascript"></SCRIPT><LINK rel="stylesheet" type="text/css" href="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/pub_topnav.css"><DIV class="public_channeltopnav"><TABLE border="0" cellspacing="0" cellpadding="0"><TBODY><TR><TD><A href="http://www.csdn.net/" target="_blank" class="black_font">首页</A></TD><TD><A href="http://news.csdn.net/" target="_blank" class="black_font">资讯</A></TD><TD><A href="http://mobile.csdn.net/" target="_blank" class="black_font">移动</A></TD><TD><A href="http://cloud.csdn.net/" target="_blank" class="black_font">云计算</A></TD><TD><A href="http://hi.csdn.net/" target="_blank" class="black_font">空间</A></TD><TD><A href="http://student.csdn.net/" target="_blank" class="red_font">学生</A></TD><TD><A href="http://bbs.csdn.net/" target="_blank" class="black_font">论坛</A></TD><TD><A href="http://blog.csdn.net/" target="_blank" class="black_font">博客</A></TD><TD><A href="http://download.csdn.net/" target="_blank" class="black_font">下载</A></TD><TD><A href="http://wz.csdn.net/" target="_blank" class="black_font">网摘</A></TD><TD><A href="http://www.programmer.com.cn/" target="_blank" class="black_font">程序员</A></TD><TD><A href="http://prj.csdn.net/" target="_blank" class="black_font">外包</A></TD><TD><A href="http://www.dearbook.com.cn/" target="_blank" class="black_font">书店</A></TD><TD><A href="http://cto.csdn.net/" target="_blank" class="red_font ">CTO俱乐部</A></TD><TD><A href="http://tup.csdn.net/" target="_blank" class="black_font">TUP</A></TD><TD><A href="http://edu.csdn.net/" target="_blank" class="black_font">培训充电</A></TD><TD class="nolines"><A href="http://club.csdn.net/" target="_blank" class="black_font">D9区</A></TD></TR></TBODY></TABLE></DIV>
+<SCRIPT type="text/javascript" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/AreaCounter(1).js"></SCRIPT>
+<SCRIPT type="text/javascript">
+    // 页面加载完毕，脚本开始执行
+    $(document).ready(function() {
+        ChangeUserState();
+        $("#notice").find("a").click(HideNoticeInfo);
+    });
+    
+    var userName = getCookie("activeUserName");
+    var isGuest = !userName || userName == "Guest";
+    var delay = 20 * 60 * 1000;
+    var timer = 0;
+
+    function ChangeUserState() {        
+        clearInterval(timer);
+        if (isGuest) {
+            HideNoticeInfo();
+        }
+        else {
+            RefreshNoticeInfo();
+            timer = setInterval( RefreshNoticeInfo, delay);
+        }
+    }
+    
+    var apiUrl = "/!handler/NoticeHandler.ashx?jsoncallback=?";
+    function RefreshNoticeInfo() {
+        $.getJSON(apiUrl + "&_t=" + Math.random(), function(result) {
+            if (result.noticeNum) {
+                newNoticeCount = result.noticeNum;
+                if (newNoticeCount <= 0) {
+                    $("#notice").hide();
+                }
+                else {
+                    $("#noticeCount").text(newNoticeCount);
+                    $("#notice").show();
+                }
+            }
+        });
+    }
+    
+    function HideNoticeInfo() {
+        $("#notice").hide();
+    }
+</SCRIPT>
+
+<DIV id="csdnblog_header">
+    <H1>
+        <A href="http://blog.csdn.net/dhdahai">
+            大海的故乡</A></H1>
+    <H2>
+        学习的快乐，分享的幸福……</H2>
+    <UL id="personalnav">
+        <LI style="display: none; " id="notice"><SPAN class="newnotice"><A class="red" href="http://hi.csdn.net/space-notice.html" target="_blank" onclick="LogClickCount(this,216);"><SPAN id="noticeCount"></SPAN>条新通知</A></SPAN></LI>
+        <LI style=""><A id="a_login" href="http://passport.csdn.net/UserLogin.aspx?from=http%3A%2F%2Fblog.csdn.net%2Fdhdahai%2Farchive%2F2009%2F04%2F03%2F4012458.aspx">
+            登录</A></LI>
+        <LI style=""><A id="a_register" href="http://passport.csdn.net/CSDNUserRegister.aspx" target="_blank">注册</A></LI>
+        <LI style="display: none; "><A id="a_welcome" href="http://hi.csdn.net/" target="_blank">
+            欢迎</A></LI>
+        <LI style="display: none; "><A id="a_exit" href="http://writeblog.csdn.net/Signout.aspx">
+            退出</A></LI>
+        <LI style="display: none; "><A id="a_myblog" href="http://blog.csdn.net/">我的博客</A></LI>
+        <LI style="display: none; "><A id="a_configure" href="http://writeblog.csdn.net/configure.aspx" target="_blank">配置</A></LI>
+        <LI style="display: none; "><A id="a_postedit" href="http://writeblog.csdn.net/PostEdit.aspx" target="_blank">写文章</A></LI>
+        <LI style="display: none; "><A id="a_postlist" href="http://writeblog.csdn.net/PostList.aspx" target="_blank">文章管理</A></LI>
+        <LI><A id="a_bloghome" href="http://blog.csdn.net/" target="_blank">博客首页</A></LI>
+    </UL>
+    <UL id="blogsearchsty">
+        <LI>
+            <INPUT id="inputSearch" type="text" class="bolgsearch"></LI>
+        <LI class="selectsty">
+            <SELECT name="Search:ddlSearchScope" id="Search_ddlSearchScope">
+                <OPTION value="all">全站</OPTION>
+                <OPTION value="dhdahai">当前博客</OPTION>
+            </SELECT>
+        </LI>
+        <LI>
+            <INPUT type="button" id="buttonSearch" value="搜索" class="bolggobtn"></LI>
+    </UL>
+    <UL id="menu">
+        <LI><A href="http://hi.csdn.net/dhdahai" target="_blank">空间</A></LI>
+        <LI><A class="on" href="http://blog.csdn.net/dhdahai">博客</A></LI>
+        <LI><A href="http://hi.csdn.net/!s/friend/list/dhdahai" target="_blank">好友</A></LI>
+        <LI><A href="http://hi.csdn.net/!s/album/list/dhdahai" target="_blank">相册</A></LI>
+        <LI><A class="last" href="http://hi.csdn.net/!s/wall/to/dhdahai" target="_blank">
+            留言</A></LI>
+    </UL>
+</DIV>
+
+<SCRIPT type="text/javascript">
+    var CurrentUserName = 'dhdahai';
+</SCRIPT>
+
+
+            
+<DIV id="csdnblog_sidebar">
+	<DIV class="gutter">
+		<DIV class="aboutauthor">
+			<DL>
+				<DT style="text-align: left; ">用户操作</DT>
+				<DD class="middle">
+					<A href="http://hi.csdn.net/!s/wall/to/dhdahai" target="_blank">[留言]</A>&nbsp;
+					<A href="http://hi.csdn.net/!s/msg/to/dhdahai" target="_blank">[发消息]</A>&nbsp;
+					<A href="http://hi.csdn.net/!s/friend/add/dhdahai" target="_blank">[加为好友]</A>&nbsp;
+				</DD>
+				<DT style="text-align: left; "><SPAN>ID：<A href="http://hi.csdn.net/dhdahai" target="_blank">dhdahai</A></SPAN></DT><DD class="middle"><A href="http://hi.csdn.net/dhdahai" target="_blank"><IMG class="avatar" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/1_dhdahai.jpg" alt=""></A></DD><DD style="text-align: left; ">共<EM>10567</EM>次访问，排名<EM>15100</EM>，<A href="http://hi.csdn.net/!s/friend/list/dhdahai" target="_blank">好友</A><EM>6</EM>人，<A href="http://hi.csdn.net/!s/follow/list/dhdahai" target="_blank">关注者</A><EM>9</EM>人。</DD><DD style="text-align: left; "><DT style="text-align: left; ">的文章</DT><DD style="text-align: left; ">原创 12 篇</DD><DD style="text-align: left; ">翻译 6 篇</DD><DD style="text-align: left; ">转载 53 篇</DD><DD style="text-align: left; ">评论 6 篇</DD>
+				<SPAN id="SubscriptionList">
+					<DT style="text-align: left; ">订阅我的博客</DT>
+					<DD style="text-align: left; ">
+						<A href="http://feeds.feedsky.com/csdn.net/dhdahai">
+							<IMG border="0" alt="XML聚合" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/gif">
+						</A>&nbsp;&nbsp;
+						<A href="http://feeds.feedsky.com/csdn.net/dhdahai" target="_blank">
+							<IMG border="0" alt="FeedSky" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/feedsky.gif">
+						</A>
+					</DD>
+					<DD style="text-align: left; ">
+						<A href="http://www.xianguo.com/subscribe.php?url=http://feeds.feedsky.com/csdn.net/dhdahai" target="_blank">
+							<IMG border="0" alt="订阅到鲜果" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss_xianguo.jpg">
+						</A>
+					</DD>
+					<DD style="text-align: left; ">
+						<A href="http://fusion.google.com/add?feedurl=http://feeds.feedsky.com/csdn.net/dhdahai" target="_blank">
+							<IMG border="0" alt="订阅到Google" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss_google.gif">
+						</A>
+					</DD>
+					<DD style="text-align: left; ">
+						<A href="http://www.zhuaxia.com/add_channel.php?url=http://feeds.feedsky.com/csdn.net/dhdahai" target="_blank">
+							<IMG border="0" alt="订阅到抓虾" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss_zhuaxia.gif">
+						</A>
+					</DD>
+				</SPAN>
+				<DT style="text-align: left; ">
+					<SPAN class="floatright" style="display:none;"><A class="a_edit" href="http://writeblog.csdn.net/configure.aspx" target="_blank">[编辑]</A></SPAN>dhdahai的公告
+				</DT>
+				<DD style="text-align: left; ">
+				<DT style="text-align: left; "><SPAN class="floatright" style="display:none;"><A class="a_edit" href="http://writeblog.csdn.net/EditCategories.aspx?catID=1" target="_blank">[编辑]</A></SPAN>文章分类</DT>
+				<DD style="text-align: left; ">
+					<DIV class="publiclist_sidebar">
+						<UL><LI><A href="http://blog.csdn.net/dhdahai/category/501417.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/501417.aspx">ARM</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/501415.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/501415.aspx">BootLoader</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/518265.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/518265.aspx">C/C++</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/531329.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/531329.aspx">Flash</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/501416.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/501416.aspx">Hardware</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/501410.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/501410.aspx">Others</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/518139.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/518139.aspx">TFT</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/524826.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/524826.aspx">Touch</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/518140.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/518140.aspx">Video</A></LI><LI><A href="http://blog.csdn.net/dhdahai/category/501414.aspx/rss"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rss.gif" alt="(RSS)"></A><A href="http://blog.csdn.net/dhdahai/category/501414.aspx">WinCE</A></LI></UL>
+					</DIV>
+				</DD>
+				
+				<DT style="text-align: left; "><SPAN class="floatright" style="display:none;"><A class="a_edit" href="http://writeblog.csdn.net/EditLinks.aspx" target="_blank">[编辑]</A></SPAN>职场生存</DT><DD style="text-align: left; "><A href="http://blog.csdn.net/jobchanceleo" target="_blank">Leo——教你如何找到好工作！</A></DD><DT style="text-align: left; "><SPAN class="floatright" style="display:none;"><A class="a_edit" href="http://writeblog.csdn.net/EditLinks.aspx" target="_blank">[编辑]</A></SPAN>资源链接</DT><DD style="text-align: left; "><A href="http://blog.csdn.net/nanjianhui" target="_blank">ARM-WinCE的专栏</A></DD><DD style="text-align: left; "><A href="http://blog.csdn.net/BelindaBen" target="_blank">BelindaBen</A></DD><DD style="text-align: left; "><A href="http://geekswithblogs.net/BruceEitman/Default.aspx" target="_blank">BruceEitman——Windows CE Musings</A></DD><DD style="text-align: left; "><A href="http://blog.ednchina.com/" target="_blank">EDN博客</A></DD><DD style="text-align: left; "><A href="http://www.epanorama.net/" target="_blank">epanorama.net/</A></DD><DD style="text-align: left; "><A href="http://blog.csdn.net/gooogleman" target="_blank">gooogleman的博客</A></DD><DD style="text-align: left; "><A href="http://blogs.msdn.com/mikehall/" target="_blank">Mikehall's Blog</A></DD><DD style="text-align: left; "><A href="http://www.cnblogs.com/harber/" target="_blank">No Best,Just Better</A></DD><DD style="text-align: left; "><A href="http://www.cnblogs.com/we-hjb/" target="_blank">we-hjb的BLOG</A></DD><DD style="text-align: left; "><A href="http://www.olinechina.com/bbs/index.php" target="_blank">WinCE技术论坛</A></DD><DD style="text-align: left; "><A href="http://blogs.msdn.com/ce_base/default.aspx" target="_blank">Windows CE Base Team Blog</A></DD><DD style="text-align: left; "><A href="http://www.esdevelop.cn/" target="_blank">中国嵌入式系统开发</A></DD><DD style="text-align: left; "><A href="http://www.eetop.cn/bbs/index.php" target="_blank">中国电子顶级开发网</A></DD><DD style="text-align: left; "><A href="http://blog.csdn.net/pongba" target="_blank">刘未鹏的blog</A></DD><DD style="text-align: left; "><A href="http://space.itpub.net/16912323/spacelist-blog" target="_blank">唐勉的日志</A></DD><DD style="text-align: left; "><A href="http://www.eetop.cn/blog/html/52/51552-5279.html" target="_blank">山谷的个人空间</A></DD><DD style="text-align: left; "><A href="http://blog.csdn.net/shuiii/" target="_blank">慕水</A></DD><DD style="text-align: left; "><A href="http://blog.csdn.net/zhengyun_ustc" target="_blank">旁观者 - 郑昀</A></DD><DD style="text-align: left; "><A href="http://blog.csdn.net/litp" target="_blank">李天平的博客</A></DD><DD style="text-align: left; "><A href="http://hi.baidu.com/even_xf" target="_blank">白色影子的休闲部落</A></DD>
+				<DT style="text-align: left; ">存档</DT>
+				<DD style="text-align: left; ">
+					<DIV class="publiclist_sidebar">
+						<UL><LI><A href="http://blog.csdn.net/dhdahai/archive/2010/09.aspx">2010年09月(1)</A></LI><LI><A href="http://blog.csdn.net/dhdahai/archive/2010/04.aspx">2010年04月(1)</A></LI><LI><A href="http://blog.csdn.net/dhdahai/archive/2009/07.aspx">2009年07月(1)</A></LI><LI><A href="http://blog.csdn.net/dhdahai/archive/2009/06.aspx">2009年06月(3)</A></LI><LI><A href="http://blog.csdn.net/dhdahai/archive/2009/04.aspx">2009年04月(10)</A></LI><LI><A href="http://blog.csdn.net/dhdahai/archive/2009/03.aspx">2009年03月(14)</A></LI><LI><A href="http://blog.csdn.net/dhdahai/archive/2009/02.aspx">2009年02月(17)</A></LI><LI><A href="http://blog.csdn.net/dhdahai/archive/2009/01.aspx">2009年01月(15)</A></LI><LI><A href="http://blog.csdn.net/dhdahai/archive/2008/12.aspx">2008年12月(9)</A></LI></UL>
+					</DIV>
+				</DD>
+			</DL>
+		</DIV>
+	</DIV>
+</DIV>
+
+            
+	<STYLE type="text/css">
+/*channel style*/
+.chal {font-family:Verdana,Helvetica,Arial,sans-serif;font-size:12px;font-weight:normal;}
+.chal .conts span.adv{font-weight:bold; width:300px; height:auto; float:right; text-align:righ; padding:5px 10px 1px 0; line-height:18px; text-align:right; font-weight:bold}
+.chal .conts span.adv img{width:300px; height:60px; padding:3px 0 0 0;}
+.chal .conts {clear: both; overflow: hidden; width: auto;  border:1px solid #ccc; padding:0; text-align:left;}
+.chal .conts #ann #annbody{clear:both;overflow:hidden;width: auto;border-top:1px dashed #AACBEE;margin-bottom:5px;height:18px;padding:0;text-align:left;}
+.chal .conts #ann #annbodylis{width:auto; margin:0 10px 0 10px; padding:0; list-style:none;}
+.chal .conts #ann #annbodylis li{width:100%; float:left; line-height:150%; text-align:left; padding:0; margin:0; color:#004797;}
+.chal .conts #ann #annbodylis li a{color:#f00;}
+.chal .conts #ann #annbodylis li.cen{text-align:center;}
+.chal .conts #ann #annbodylis li.rig{text-align:right;}
+
+.default_contents h4.notice {background:url("http://c.csdn.net/bbs/f/i/l/pic04.gif") no-repeat scroll 4px 10px #FFFFDD;}
+/*end */
+
+/*20100712 jinweiwei update*/
+.commentnew dl dd.recruit{width:200px;float: left; text-align: left; margin-left: 15px; display:inline; border:1px solid #C1AE9E; padding:1px;}
+.commentnew dl dd.recruit h5{background:#E0DBD3; color:#47381C; font-size:12px; height:24px; line-height:24px; padding-left:10px;}
+
+.commentnew dl dd.recruit ul{padding:0; margin:10px 5px; height:252px; overflow:hidden; width:auto; float:none;}
+.commentnew dl dd.recruit ul li{list-style:none; background:url(http://c.csdn.net/www/images/blog/dot_2.gif) left 7px no-repeat; margin-left:5px; padding-left:12px; margin-bottom:6px; height:36px; overflow:hidden;}
+
+.commentnew dl dd ul{width:474px; float:left; margin:0; padding:0 0 10px 0;}
+.commentnew dl dd ul li.left{width:70px; margin:0 0 0 12px; display:inline; padding:0; float:left;text-align:left;  line-height:18px; }
+*+html .commentnew dl dd ul li.left{line-height:20px;}
+*html .commentnew dl dd ul li.left{line-height:20px;}
+.commentnew dl dd ul li.lefttop{width:70px; margin:0 0 0 12px; display:inline; float:left;padding:5px 0; }
+.commentnew dl dd ul li.right{width:380px; margin:0; padding:0 12px 0 0; display:inline; float:left; text-align:left; line-height:18px;}
+.commentnew dl dd ul li.right img.brow{float:left; padding:0px 4px;}
+.commentnew dl dd ul li.right .textarea{width:378px; float:left; height:150px; border:1px solid #c3c3c3; padding:3px; margin:0; vertical-align:top;}
+.commentnew dl dd ul li.right .input{width:120px; float:left; height:18px;line-height:18px;  border:1px solid #c3c3c3; padding:0 2px; margin:0; vertical-align:middle;}
+.commentnew dl dd ul li.right span.left{width:auto;float:left; text-align:left;}
+.commentnew dl dd ul li.right span.right{width:100px;float:right; text-align:right;}
+.commentnew dl dd ul li.right span a{color:#f00}
+.commentnew dl dd ul li.right span a.red:link, a.red:visited, a.red:hover, a.red:active{color:#f00}
+.commentnew dl dd ul li.right em{color:#466bbb;font-style:noraml;}
+.commentnew dl dd ul li.right a img.btn{padding:0 0 3px 0; width:68px; height:21px;}
+.commentnew dl dd ul li.right .checkbox{padding:0; margin:0;vertical-align:middle; border:0;}
+	</STYLE>
+<DIV id="csdnblog_content">
+	<DIV class="gutter">
+		<DIV class="chal default_contents" id="chal" style="">
+			<H4 class="conts notice" style="height:20px;">
+				<SPAN style="float:left;font-weight:bold;margin:2px 0 0 0;">公告：</SPAN>
+				<DIV id="ann" style="width:500px;float:left;">
+					<DIV id="annbody" style="border-top: 0px none;">
+						<UL id="annbodylis">
+							<SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rsscache.aspx" type="text/javascript"></SCRIPT><LI><A onclick="LogClickCount(this,224);" href="http://topic.csdn.net/u/20100811/15/8d13b103-1a98-45bf-8f9a-363cd38adfc7.html" target="_blank">CSDN招聘.NET开发工程师</A></LI>
+						</UL>
+					</DIV>
+				</DIV>
+				<SPAN><A href="http://forum.csdn.net/SList/blogSupport" target="_blank">[意见反馈]</A><A href="http://blog.csdn.net/blogdevteam" target="_blank">[官方博客]</A></SPAN>
+			</H4>
+		</DIV>
+
+		<DIV class="default_contents">
+			<DIV class="user_article">
+
+				<SCRIPT type="text/javascript" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/feedbackcount.js"></SCRIPT>
+
+				<H1 class="title_txt">
+					<IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/turnship.gif" border="0" width="15" height="15" alt="转载">&nbsp;
+					关于EBoot和NBoot及.bin文件和.nb0文件的差别
+					<CITE class="fav_csdnstylebykimi"><A href="JavaScript:d=document;t=d.selection?(d.selection.type!='None'?d.selection.createRange().text:''):(d.getSelection?d.getSelection():'');void(saveit=window.open('http://wz.csdn.net/storeit.aspx?t='+escape(d.title)+'&u='+escape(d.location.href)+'&c='+escape(t),'saveit','scrollbars=no,width=590,height=300,left=75,top=20,status=no,resizable=yes'));saveit.focus();" class="fav_csdnstylebykimi" title="收藏到我的网摘中，并分享给我的朋友">收藏</A> </CITE>
+					
+				</H1>
+				<DIV class="blogstory">
+
+					<SCRIPT type="text/javascript">
+						document.body.oncopy = function () {
+							if (window.clipboardData) {
+								setTimeout(function () {
+									var text = clipboardData.getData("text");
+									if (text && text.length > 300) {
+										text = text + "\r\n\n本文来自CSDN博客，转载请标明出处：" + location.href;
+										clipboardData.setData("text", text);
+									}
+								}, 100);
+							}
+						}
+					</SCRIPT>
+
+					<SCRIPT type="text/javascript">						function StorePage() { d = document; t = d.selection ? (d.selection.type != 'None' ? d.selection.createRange().text : '') : (d.getSelection ? d.getSelection() : ''); void (keyit = window.open('http://www.365key.com/storeit.aspx?t=' + escape(d.title) + '&u=' + escape(d.location.href) + '&c=' + escape(t), 'keyit', 'scrollbars=no,width=475,height=575,left=75,top=20,status=no,resizable=yes')); keyit.focus(); }</SCRIPT>
+
+					<P><SPAN style="font-family: 新宋体;"><SPAN style="font-size: small;">关于EBoot和NBoot的区别：</SPAN></SPAN></P>
+<P><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; S3C2410<SPAN style="font-family: 宋体;">处理器支持将启动代码存储在</SPAN>NAND Flash<SPAN style="font-family: 宋体;">中。为了实现这一功能，</SPAN>2410<SPAN style="font-family: 宋体;">配备了一个名为“</SPAN>Steppingstone<SPAN style="font-family: 宋体;">”的内部</SPAN>SRAM<SPAN style="font-family: 宋体;">。在启动时，</SPAN>NAND Flash<SPAN style="font-family: 宋体;">中第一个</SPAN>4K<SPAN style="font-family: 宋体;">字节的内容将被加载到</SPAN>Steppingstone<SPAN style="font-family: 宋体;">中并执行。这个工作由</SPAN>MCU<SPAN style="font-family: 宋体;">主动完成，而我们只需将</SPAN>NAND Flash<SPAN style="font-family: 宋体;">配置为</SPAN>Auto Boot<SPAN style="font-family: 宋体;">模式即可。</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN style="font-family: 宋体;">一般来说，启动代码会拷贝存储在</SPAN>NAND Flash<SPAN style="font-family: 宋体;">中的内容至</SPAN>SDRAM<SPAN style="font-family: 宋体;">中。在使用</SPAN>ECC<SPAN style="font-family: 宋体;">校验时，</SPAN>NAND Flash<SPAN style="font-family: 宋体;">中数据的有效性将被确认。在完成拷贝的工作后，启动代码将跳转到已加载到</SPAN>SDRAM<SPAN style="font-family: 宋体;">中的主程序中，这时启动代码的使命完成，</SPAN>MCU<SPAN style="font-family: 宋体;">由主程序来控制。</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; WinCE<SPAN style="font-family: 宋体;">操作系统从文件的组成来看一般分为两部分：</SPAN>BOOTLOADER<SPAN style="font-family: 宋体;">和</SPAN>NK.bin<SPAN style="font-family: 宋体;">。在</SPAN>WinCE<SPAN style="font-family: 宋体;">中，</SPAN>BOOTLOADER<SPAN style="font-family: 宋体;">一般为</SPAN>EBOOT<SPAN style="font-family: 宋体;">。它的主要功能是初始化硬件设备，主要包括</SPAN>CPU<SPAN style="font-family: 宋体;">内部的相关控制器、内存、网络、串口甚至</SPAN>USB<SPAN style="font-family: 宋体;">口和</SPAN>LCD<SPAN style="font-family: 宋体;">。在初始化完成后，它将通过网络或</SPAN>USB<SPAN style="font-family: 宋体;">从外部下载</SPAN>NK.bin<SPAN style="font-family: 宋体;">，或从本地</SPAN>Flash<SPAN style="font-family: 宋体;">中加载</SPAN>NK.bin<SPAN style="font-family: 宋体;">并执行，从而启动</SPAN>WinCE<SPAN style="font-family: 宋体;">操作系统。可以看到</SPAN>Eboot<SPAN style="font-family: 宋体;">虽然是启动代码，但它得完成相当多的工作，最终的映像文件也将超过</SPAN>4K<SPAN style="font-family: 宋体;">。所以，我们不能直接将</SPAN>Eboot<SPAN style="font-family: 宋体;">存放在</SPAN>NAND Flash<SPAN style="font-family: 宋体;">的第一个</SPAN>4K<SPAN style="font-family: 宋体;">字节中。我们需要一个更小的启动代码，这就是通常所说的</SPAN>NBOOT(NAND BOOT)<SPAN style="font-family: 宋体;">。</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN style="font-family: 宋体;">通过上面的介绍，我们知道了</SPAN>NBOOT<SPAN style="font-family: 宋体;">在整个系统中扮演的角色，它负责将</SPAN>EBOOT<SPAN style="font-family: 宋体;">加载到内存并运行。在</SPAN>EBOOT<SPAN style="font-family: 宋体;">开始执行后，</SPAN>NBOOT<SPAN style="font-family: 宋体;">就退出了历史的舞台，事实上也不再有上场的机会。</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <SPAN style="font-family: 宋体;">在</SPAN>NBOOT<SPAN style="font-family: 宋体;">的代码实现中，我们必须完成以下几个部分。</SPAN></SPAN></SPAN></P>
+<P style="margin-left: 39pt; text-indent: -18pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">1.<SPAN style="font-family: 宋体;">初始化</SPAN>CPU<SPAN style="font-family: 宋体;">内部相关控制器，如设置</SPAN>GPIO<SPAN style="font-family: 宋体;">，关闭</SPAN>Watch Dog<SPAN style="font-family: 宋体;">，关闭中断，设置系统时钟。</SPAN></SPAN></SPAN></P>
+<P style="margin-left: 39pt; text-indent: -18pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">2.<SPAN style="font-family: 宋体;">初始化内存。</SPAN></SPAN></SPAN></P>
+<P style="margin-left: 39pt; text-indent: -18pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">3.<SPAN style="font-family: 宋体;">初始化串口，主要用来输出调试信息。</SPAN></SPAN></SPAN></P>
+<P style="margin-left: 39pt; text-indent: -18pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">4.<SPAN style="font-family: 宋体;">初始化</SPAN>NAND Flash<SPAN style="font-family: 宋体;">，因为在</SPAN>MCU<SPAN style="font-family: 宋体;">启动时默认是</SPAN>Auto Boot<SPAN style="font-family: 宋体;">模式，为了从</SPAN>NAND Flash<SPAN style="font-family: 宋体;">中读取</SPAN>EBOOT<SPAN style="font-family: 宋体;">，需要将其配置成</SPAN> NAND Flash Mode<SPAN style="font-family: 宋体;">。</SPAN></SPAN></SPAN></P>
+<P style="margin-left: 39pt; text-indent: -18pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">5.<SPAN style="font-family: 宋体;">读取</SPAN>NAND Flash<SPAN style="font-family: 宋体;">中的</SPAN>EBOOT<SPAN style="font-family: 宋体;">映像文件，并放在内存指定的位置，这个地址是跟</SPAN>EBOOT<SPAN style="font-family: 宋体;">有关，介绍</SPAN>EBOOT<SPAN style="font-family: 宋体;">时再详细说明。</SPAN></SPAN></SPAN></P>
+<P style="margin-left: 39pt; text-indent: -18pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">6.<SPAN style="font-family: 宋体;">完成读取之后，跳转到</SPAN>EBOOT<SPAN style="font-family: 宋体;">的起始位置，执行</SPAN>EBOOT<SPAN style="font-family: 宋体;">代码。</SPAN></SPAN></SPAN></P>
+<P style="text-indent: 21pt;" align="left"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;"><SPAN style="font-family: 宋体;">一般来说，前面两个功能在</SPAN>startup.s<SPAN style="font-family: 宋体;">中实现，</SPAN>WinCE6.0<SPAN style="font-family: 宋体;">下可以参考文件</SPAN>C:"WINCE600"PLATFORM"DEVICEEMULATOR"SRC"BOOTLOADER"EBOOT"startup.s<SPAN style="font-family: 宋体;">的相关代码。后面四个功能可在</SPAN>main.c<SPAN style="font-family: 宋体;">中实现。总之，在实现必备功能的情况下，尽可能减少代码量，以将最后的</SPAN>NBOOT<SPAN style="font-family: 宋体;">映像文件控制在</SPAN>4K<SPAN style="font-family: 宋体;">以内。</SPAN></SPAN></SPAN></P>
+<P style="text-indent: 21pt;" align="left"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">NBOOT<SPAN style="font-family: 宋体;">的编译环境一般有两种，</SPAN>ADS1.2<SPAN style="font-family: 宋体;">（或</SPAN>RVDS<SPAN style="font-family: 宋体;">）、</SPAN>Platform Builder<SPAN style="font-family: 宋体;">。用</SPAN>ADS1.2<SPAN style="font-family: 宋体;">编译</SPAN>NBOOT<SPAN style="font-family: 宋体;">是比较方便的，需要注意的就是</SPAN>RO Base<SPAN style="font-family: 宋体;">和</SPAN>RW Base<SPAN style="font-family: 宋体;">的设置，</SPAN>RO Base<SPAN style="font-family: 宋体;">必须设置为</SPAN>0x0<SPAN style="font-family: 宋体;">。否则，系统启动时</SPAN>NBOOT<SPAN style="font-family: 宋体;">将不被运行。在</SPAN>Post-Linker<SPAN style="font-family: 宋体;">中选择</SPAN>ARM from ELF<SPAN style="font-family: 宋体;">，在</SPAN>Linker<SPAN style="font-family: 宋体;">——</SPAN>ARM fromELF<SPAN style="font-family: 宋体;">——</SPAN>Output Format<SPAN style="font-family: 宋体;">中选择</SPAN>Plain Binary<SPAN style="font-family: 宋体;">，这样，编译完成后最终生成</SPAN>NBoot.bin<SPAN style="font-family: 宋体;">。该文件就可以固化在</SPAN>NAND Flash<SPAN style="font-family: 宋体;">的第</SPAN>0<SPAN style="font-family: 宋体;">个</SPAN>BLOCK<SPAN style="font-family: 宋体;">中。</SPAN>Platform Builder 6.0<SPAN style="font-family: 宋体;">是作为</SPAN>VS2005<SPAN style="font-family: 宋体;">的插件来用的，所以，我们现在也可以用</SPAN>VS2005<SPAN style="font-family: 宋体;">来编译</SPAN>NBOOT<SPAN style="font-family: 宋体;">，这样就免得再安装</SPAN>ADS<SPAN style="font-family: 宋体;">或</SPAN>RVDS<SPAN style="font-family: 宋体;">等软件。用</SPAN>VS2005<SPAN style="font-family: 宋体;">来编译</SPAN>NBOOT<SPAN style="font-family: 宋体;">也有两种方法，第一种跟编译</SPAN>EBOOT<SPAN style="font-family: 宋体;">映像文件类似，第二种是自己写</SPAN>makefile<SPAN style="font-family: 宋体;">文件，然后用命令行的方式调用</SPAN>ARM<SPAN style="font-family: 宋体;">编译器来编译。两种方法各有优点，第一种方法在编译</SPAN>OS<SPAN style="font-family: 宋体;">时，会自动编译生成映像，而第二种方法可由</SPAN>ADS<SPAN style="font-family: 宋体;">下的程序直接移植过来，不过，要写好</SPAN>makefile<SPAN style="font-family: 宋体;">文件是相当困难的事情。一般还是少用为好。</SPAN></SPAN></SPAN></P>
+<P style="text-indent: 21pt;" align="left"><SPAN style="font-family: 宋体;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">----------------------------------------------------------</SPAN></SPAN></SPAN></P>
+<P style="text-indent: 21pt;" align="left"><SPAN style="font-family: 宋体;">
+</SPAN></P><SPAN class="style1" style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">.bin文件和.nb0文件的差别 </SPAN></SPAN></SPAN><TABLE style="table-layout: fixed; width: 90%; word-break: break-all;" border="0" cellspacing="0" cellpadding="0">
+<TBODY>
+<TR>
+
+</TR>
+<TR>
+<TD><SPAN class="oblog_text"><BR>
+<DIV><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">eboot.nb0<BR>eboot.bin</SPAN></SPAN></SPAN></DIV>
+<DIV><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">nk.nb0<BR>nk.bin</SPAN></SPAN></SPAN></DIV>
+<P><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">.bin文件和.nb0文件的差别：</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">.nb0是可以直接烧到FLASH/ROM中的，是代码镜像，可以直接跳转到其入口执行。 </SPAN></SPAN></SPAN><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><BR><SPAN style="font-size: small;">.bin是Microsoft binary image格式的文件，必须按其格式定义解开到其指定的地址空间的位置才能执行。</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">两个都是CE的镜像，通过串口直接下载用nb0，pb下载用bin,nb0文件要大一些。</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">nb0是非压缩的数据，里面的数据是实际的NK展开以后在内存里面的数<BR>bin是有压缩的数据，里面的数据是压缩以后类似于成块形的数据，被loader拷贝到内存以后没有区别。</SPAN></SPAN></SPAN></P>
+<P><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"></SPAN></SPAN></P>
+<P><SPAN style="font-size: 12pt;"><SPAN style="font-family: NSimSun;"><SPAN style="font-size: small;">from:<A href="http://blog.mcuol.com/User/iwillbeback008/Article/7816_1.htm">http://blog.mcuol.com/User/iwillbeback008/Article/7816_1.htm</A></SPAN></SPAN></SPAN></P>
+</SPAN></TD>
+</TR>
+</TBODY>
+</TABLE>
+<P></P>
+					<P class="right articalinfo">
+						发表于 @
+						2009年03月21日　17:37:00&nbsp;| <A id="a_comment" href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#FeedBack" title="评论">评论( <SPAN id="FeedbackCount_4012458">0</SPAN>
+
+							<SCRIPT type="text/javascript">
+								AddFeedbackCountStack("4012458")
+							</SCRIPT>
+
+							) </A>| <SPAN style="display: none;"><A class="a_edit" href="http://writeblog.csdn.net/PostEdit.aspx?entryId=4012458" title="编辑">编辑</A>|</SPAN> <A href="mailto:webmaster@csdn.net?subject=Article%20Report!!!&body=Author:dhdahai%0D%0AURL:http://blog.csdn.net/ArticleContent.aspx?UserName=dhdahai&Entryid=4012458">
+									举报</A>| <CITE class="fav_csdnstylebykimi"><A href="JavaScript:d=document;t=d.selection?(d.selection.type!='None'?d.selection.createRange().text:''):(d.getSelection?d.getSelection():'');void(saveit=window.open('http://wz.csdn.net/storeit.aspx?t='+escape(d.title)+'&u='+escape(d.location.href)+'&c='+escape(t),'saveit','scrollbars=no,width=590,height=300,left=75,top=20,status=no,resizable=yes'));saveit.focus();" class="fav_csdnstylebykimi" title="收藏到我的网摘中，并分享给我的朋友">收藏</A> </CITE>
+					</P>
+					<SPAN id="Post.ascx_ViewPost_PreviousAndNextEntriesDown">
+						<H3 class="pagego">
+							<A href="http://blog.csdn.net/dhdahai/archive/2009/03/21/4012171.aspx">旧一篇:BSP Bootloader基本概念</A>&nbsp;|&nbsp;<A href="http://blog.csdn.net/dhdahai/archive/2009/03/28/4032487.aspx">新一篇:2440+SDRAM（K4S561632H*2）总结</A></H3>
+					</SPAN>
+					<DIV style="text-align: left;">
+						<!-- ca-pub-1076724771190722/blog_postpage_72890 -->
+						<SCRIPT type="text/javascript">
+							GA_googleFillSlot("blog_postpage_72890");
+						</SCRIPT><SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/ads"></SCRIPT><DIV id="google_ads_div_blog_postpage_72890">
+<INS style="width: 728px; height: 90px; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-style: initial; border-color: initial; display: inline-table; position: relative; "><INS style="width: 728px; height: 90px; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-style: initial; border-color: initial; display: block; position: relative; "><IFRAME id="google_ads_iframe_blog_postpage_72890" name="google_ads_iframe_blog_postpage_72890" width="728" height="90" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" style="border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-style: initial; border-color: initial; position: absolute; top: 0px; left: 0px; "></IFRAME></INS></INS></DIV>
+<SCRIPT>GA_googleCreateDomIframe('google_ads_div_blog_postpage_72890' ,'blog_postpage_72890');</SCRIPT>
+					</DIV>
+					<DIV class="mutualitys" style="display: block; ">
+						<DL>
+							<DT><SPAN><A onclick="LogClickCount(this,215)" target="_blank" href="http://blog.csdn.net/">
+								查看最新精华文章 请访问博客首页</A></SPAN>相关文章</DT>
+						<DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/zengdebiao/archive/2009/04/07/4052487.aspx" target="_blank">深入理解.bin文件和.nb0文件的结构</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/zengdebiao/archive/2009/04/06/4050893.aspx" target="_blank">深入理解.bin文件和.nb0文件的结构</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/xuguod20042576/archive/2009/10/13/4656776.aspx" target="_blank">深入理解.bin文件和.nb0文件的结构</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/joyzml/archive/2009/11/15/4810229.aspx" target="_blank">生成.bin和.nb0文件</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/tanghuaan/archive/2008/12/01/3413222.aspx" target="_blank">关于EBoot和NBoot及.bin文件和.nb0文件的差别</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/lyx_wq/archive/2009/06/05/4241614.aspx" target="_blank">WinCE5.0 romimage.exe如何填充eboot.bin中的pTOC生成.nb0（转载）</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/alien75/archive/2009/12/05/4938978.aspx" target="_blank">CE5.0 - romimage.exe如何填充eboot.bin中的pTOC特殊指针生成.nb0</A></SPAN></DD><DD><SPAN><A onclick="LogClickCount(this,183)" href="http://blog.csdn.net/bestspace/archive/2006/12/05/1431400.aspx" target="_blank">通过JTAG在AXD中调试使用MMU的程序</A></SPAN></DD></DL>
+					</DIV>
+				</DIV>
+			</DIV>
+			<A name="FeedBack"></A>
+
+			<SCRIPT type="text/javascript">
+				var CurrentEntryId = '4012458';
+				var CurArticleTitle = '关于EBoot和NBoot及.bin文件和.nb0文件的差别';
+				var AllowComment = 'True';
+				var AllowAnonymousComment = /^true$/i.test('False');
+			</SCRIPT>
+
+			<DIV class="commentslist" id="commentslist">
+			</DIV>
+
+			<SCRIPT type="text/javascript" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/CsdnDialog.js"></SCRIPT>
+
+			<SCRIPT type="text/javascript">
+				function ChangeIdentifyingCode() {
+					var url = $('#imgValidationCode').attr('src');
+					if (!(/&d=[\d\.]+$/).test(url)) url += "&d=1";
+					url = url.replace(/&d=[\d\.]+$/, "&d=" + Math.random());
+					$('#imgValidationCode').attr('src', url);
+				}
+
+				function OpenLoginDialog() {
+					element = document.getElementById("loginBtn");
+					var position = absolutePoint(element);
+
+					var dialogTop = position.y - 400;
+					var dialogLeft = position.x - 220;
+					var dialogWidth = 435;
+					var dialogHeight = 420;
+
+					showWindow({ url: 'http://passport.csdn.net/UserLogin.aspx?show=replyLogin&from=http%3a%2f%2fblog.csdn.net%2f!tools%2fLoginSussess.aspx'
+						, title: '登录'
+						, top: dialogTop
+						, left: dialogLeft
+						, width: dialogWidth
+						, height: dialogHeight
+					});
+				}
+
+				function closeDialog(needRefresh) {
+					closeWindow();
+					if (needRefresh) {
+						var url = location.href;
+						if ((/\?/g).test(url))
+							url = url.replace(/\?.*$/g, ("?" + Math.random()).replace(/\./g, ""));
+						else url += ("?" + Math.random()).replace(/\./g, "");
+						location.href = url;
+					}
+					$("#SubmitFeedback").unbind("click");
+					$("#SubmitFeedback").bind("click", PostContent);
+				}
+
+				function absolutePoint(element) {
+					var result = { x: element.offsetLeft, y: element.offsetTop };
+					element = element.offsetParent;
+					while (element) {
+						result.x += element.offsetLeft;
+						result.y += element.offsetTop;
+						element = element.offsetParent;
+					}
+					return result;
+				}
+
+				function startmarquee(lh, speed, delay, index) {
+					var t;
+					var p = false;
+					var o = document.getElementById("marqueebox" + index);
+					o.innerHTML += o.innerHTML;
+					o.onmouseover = function () { p = true }
+					o.onmouseout = function () { p = false }
+					o.scrollTop = 0;
+					function start() {
+						t = setInterval(scrolling, speed);
+						if (!p) o.scrollTop += 2;
+					}
+					function scrolling() {
+						if (o.scrollTop % lh != 0) {
+							o.scrollTop += 2;
+							if (o.scrollTop >= o.scrollHeight / 2) o.scrollTop = 0;
+						} else {
+							clearInterval(t);
+							setTimeout(start, delay);
+						}
+					}
+					setTimeout(start, delay);
+				}
+
+				function addEventHandler(target, type, func) {
+					if (target.addEventListener)
+						target.addEventListener(type, func, false);
+					else if (target.attachEvent)
+						target.attachEvent("on" + type, func);
+					else target["on" + type] = func;
+				}
+
+				addEventHandler(window, "load", function () {
+					startmarquee(42, 50, 3000, 0);
+				});
+			</SCRIPT>
+
+			<DIV class="commentnew">
+				<DL>
+					<DT>
+						<UL>
+							<LI class="left">发表评论</LI>
+
+							<SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/RandomColumnContentJS.aspx" type="text/javascript"></SCRIPT>
+
+						</UL>
+					</DT>
+					<DD>
+						<UL>
+							<LI class="lefttop">表 情：</LI>
+							<LI class="right"><A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+								<IMG title="顶" alt="顶" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e01.gif"></A> <A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+									<IMG title="砸" alt="砸" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e02.gif"></A> <A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+										<IMG title="棒" alt="棒" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e03.gif"></A>
+								<A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+									<IMG title="大笑" alt="大笑" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e04.gif"></A>
+								<A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+									<IMG title="愤怒" alt="愤怒" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e05.gif"></A>
+								<A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+									<IMG title="大哭" alt="大哭" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e06.gif"></A>
+								<A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+									<IMG title="疑问" alt="疑问" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e07.gif"></A>
+								<A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+									<IMG title="汗" alt="汗" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e08.gif"></A> <A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+										<IMG title="呕吐" alt="呕吐" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e09.gif"></A>
+								<A href="http://blog.csdn.net/dhdahai/archive/2009/04/03/4012458.aspx#" onclick="return false;">
+									<IMG title="送花" alt="送花" class="brow" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/e10.gif"></A>
+							</LI>
+						</UL>
+						<UL>
+							<LI class="left">评论内容：</LI>
+							<LI class="right">
+								<TEXTAREA id="content" class="textarea" onkeydown="if(event.ctrlKey &amp;&amp; event.keyCode==13){return $(&#39;#SubmitFeedback&#39;).click();}"></TEXTAREA>
+							</LI>
+						</UL>
+						<DIV>
+							<UL>
+								<LI class="left">用 户 名：</LI>
+								<LI class="right"><SPAN id="loginTips" class="right" style=""><A href="javascript:void(0);" onclick="OpenLoginDialog(this);return false;" class="red" id="loginBtn">登录</A> <A href="http://passport.csdn.net/CSDNUserRegister.aspx" target="_blank" class="red">
+										注册</A> </SPAN><SPAN class="right" style="display: none; ">
+											<INPUT type="checkbox" id="anonymous" class="checkbox">匿名评论 </SPAN><SPAN id="commentUser" class="left">匿名用户</SPAN></LI>
+							</UL>
+						</DIV>
+						<UL style="display: none; ">
+							<LI class="left">验 证 码：</LI>
+							<LI class="right">
+								<INPUT id="code" type="text" class="input">
+								<A href="javascript:ChangeIdentifyingCode()">
+									<IMG id="imgValidationCode" alt="验证码" style="vertical-align: middle;" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/AntiBotImage.ashx"></A>
+								<A href="javascript:ChangeIdentifyingCode()">重新获得验证码</A> </LI>
+						</UL>
+						<UL>
+							<LI class="left">&nbsp;</LI>
+							<LI class="right">
+								<INPUT id="SubmitFeedback" type="button" value="发表评论" class="submitbtn">
+								
+							</LI>
+						</UL>
+					</DD>
+					<DD id="recommended" class="recruit">
+						<H5>热门招聘职位</H5>
+						<UL id="marqueebox0">
+							<SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rsscache(1).aspx" type="text/javascript"></SCRIPT><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154975" target="_blank">【麒麟游戏】倾情招聘募游戏研发人员，共建麒麟家园！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154431" target="_blank">【神灯网络】年薪20万！诚聘DELPHI高级项目经理！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154419" target="_blank">【并擎软件】微软高级技术专家诚邀开发人员共同创业</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154166" target="_blank">【人民搜索】多个技术研发类职位，等你来挑战！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152224" target="_blank">【百度】诚聘 Web研发/工程师 一个舞台，让你的想法去成为现实!!!</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152494" target="_blank">【上海我友】福利购房计划+高薪+期权，邀您共创互联网的奇迹!</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152670" target="_blank">【艾瑞威尔】高薪诚募Apple游戏开发工程师 一流环境+一流待遇</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153450" target="_blank">【Synopsys】全球知名EDA软件设计公司，诚聘 C/C++/IC Engineer</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153669" target="_blank">【麻省理工】《科技创业》诚聘网络编辑、PHP开发工程师！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153300" target="_blank">【NHN China】诚聘QA工程师/软件开发工程师, 急聘！高薪诚聘！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5151875" target="_blank">【支付宝】2010支付宝技术专场招聘 上海*成都*北京*深圳 机会多多</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152121" target="_blank">【东方通】中间件第一品牌：高薪.急聘！十个职位，诚邀你来加入!</A></LI>
+						
+							<SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/rsscache(1).aspx" type="text/javascript"></SCRIPT><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154975" target="_blank">【麒麟游戏】倾情招聘募游戏研发人员，共建麒麟家园！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154431" target="_blank">【神灯网络】年薪20万！诚聘DELPHI高级项目经理！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154419" target="_blank">【并擎软件】微软高级技术专家诚邀开发人员共同创业</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5154166" target="_blank">【人民搜索】多个技术研发类职位，等你来挑战！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152224" target="_blank">【百度】诚聘 Web研发/工程师 一个舞台，让你的想法去成为现实!!!</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152494" target="_blank">【上海我友】福利购房计划+高薪+期权，邀您共创互联网的奇迹!</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152670" target="_blank">【艾瑞威尔】高薪诚募Apple游戏开发工程师 一流环境+一流待遇</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153450" target="_blank">【Synopsys】全球知名EDA软件设计公司，诚聘 C/C++/IC Engineer</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153669" target="_blank">【麻省理工】《科技创业》诚聘网络编辑、PHP开发工程师！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5153300" target="_blank">【NHN China】诚聘QA工程师/软件开发工程师, 急聘！高薪诚聘！</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5151875" target="_blank">【支付宝】2010支付宝技术专场招聘 上海*成都*北京*深圳 机会多多</A></LI><LI><A onclick="LogClickCount(this,226);" href="http://g.csdn.net/5152121" target="_blank">【东方通】中间件第一品牌：高薪.急聘！十个职位，诚邀你来加入!</A></LI>
+						</UL>
+					</DD>
+				</DL>
+			</DIV>
+
+<SCRIPT type="text/javascript">
+	function addEventHandler(target, type, func) {
+		if (target.addEventListener)
+			target.addEventListener(type, func, false);
+		else if (target.attachEvent)
+			target.attachEvent("on" + type, func);
+		else target["on" + type] = func;
+	}
+	addEventHandler(window, "load", function () {
+		({
+			anndelay: 5000,
+			annst: 0,
+			annstop: 0,
+			annrowcount: 0,
+			anncount: 0,
+			annrows: [],
+			annstatus: 0,
+			announcementScroll: function () {
+				var self = this;
+				var annlis = self.annbody.getElementsByTagName("li");
+				if (self.annstop) {
+					self.annst = setTimeout(function () { self.announcementScroll(); }, self.anndelay);
+					return;
+				}
+				if (!self.annst) {
+					var lasttop = -1;
+					for (var i = 0; i < annlis.length; i++) {
+
+						if (lasttop != annlis[i].offsetTop) {
+							if (lasttop == -1) {
+								lasttop = 0;
+							}
+							self.annrows[self.annrowcount] = annlis[i].offsetTop - lasttop;
+							self.annrowcount++;
+						}
+						lasttop = annlis[i].offsetTop;
+					}
+
+					if (self.annrows.length == 1) {
+						self.ann.onmouseover = self.ann.onmouseout = null;
+					} else {
+						self.annrows[self.annrowcount] = self.annrows[1];
+						self.annbodylis.innerHTML += self.annbodylis.innerHTML;
+						self.annst = setTimeout(function () { self.announcementScroll(); }, self.anndelay);
+					}
+					self.annrowcount = 1;
+					return;
+				}
+
+				if (self.annrowcount >= self.annrows.length) {
+					self.annbody.scrollTop = 0;
+					self.annrowcount = 1;
+					self.annst = setTimeout(function () { self.announcementScroll(); }, self.anndelay);
+				} else {
+					self.anncount = 0;
+					self.announcementScrollnext(self.annrows[self.annrowcount]);
+				}
+			},
+			announcementScrollnext: function (time) {
+				var self = this;
+				self.annbody.scrollTop++;
+				self.anncount++;
+				if (self.anncount != time) {
+					self.annst = setTimeout(function () {
+						self.announcementScrollnext(time);
+					}, 10);
+				} else {
+					self.annrowcount++;
+					self.annst = setTimeout(function () { self.announcementScroll(); }, self.anndelay);
+				}
+			},
+			play: function () {
+				var self = this;
+				self.annbody = document.getElementById('annbody');
+				if (!self.annbody) return;
+				self.ann = document.getElementById('ann');
+				self.annbodylis = document.getElementById('annbodylis');
+				self.chal = document.getElementById('chal');
+				if (!self.annbodylis.getElementsByTagName("li").length) return;
+				self.chal.style.display = "";
+				self.ann.onmouseover = function () { this.annstop = 1; };
+				self.ann.onmouseout = function () { this.annstop = 0; };
+				self.announcementScroll();
+			}
+		}).play();
+	});
+</SCRIPT>
+
+<SCRIPT type="text/javascript">
+	LoadFeedbackCount();
+	document.write("<img src='http://counter.csdn.net/pv.aspx?id=24' border=0 width=0 height=0>");
+</SCRIPT><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/pv.aspx" border="0" width="0" height="0">
+		</DIV>
+	</DIV>
+</DIV>
+
+            
+<SCRIPT src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/publib_footer.js" type="text/javascript"></SCRIPT><LINK rel="stylesheet" type="text/css" href="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/pub_footerstyle.css"><DIV class="pub_footerall"><DL><DT> <DD><A href="http://www.csdn.net/company/about.html" target="_blank">公司简介</A>|<A href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</A>|<A href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</A>|<A href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</A>|<A href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</A>|<A href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</A>|<A href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</A>|<A href="mailto:webmaster@csdn.net">问题报告</A></DD><DD>北京创新乐知广告有限公司 版权所有,&nbsp;京&nbsp;ICP&nbsp;证&nbsp;070598&nbsp;号</DD><DD>世纪乐知(北京)网络技术有限公司 提供技术支持</DD><DD><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/pic_email.gif" alt="" title=""> Email:webmaster@csdn.net</DD><DD>Copyright © 1999-2010, CSDN.NET, All Rights Reserved</DD><DD><A href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/gongshang_logos.gif" alt="GongshangLogo" title=""></A></DD></DL></DIV>
+<SCRIPT type="text/javascript" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/counter.js"></SCRIPT><SCRIPT type="text/javascript" charset="UTF-8" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/msg.popup.js"></SCRIPT><IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/visitlog.php" width="1" height="1" border="0" alt=""><IFRAME id="myframe" name="myframe" frameborder="no" scrolling="no" width="0" height="0" border="0" src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/dd333.htm"></IFRAME>
+
+        </DIV>
+    </DIV>
+    <IMG src="./关于EBoot和NBoot及.bin文件和.nb0文件的差别_files/count.aspx" height="0" width="0">
+
+
+</BODY></HTML>

@@ -1,0 +1,102 @@
+.l {
+	FLOAT: left
+}
+.r {
+	FLOAT: right
+}
+.it {
+	
+}
+.bm10 {
+	MARGIN-BOTTOM: 10px
+}
+.boder4 {
+	BORDER-RIGHT: #bacbe5 1px solid; BORDER-TOP: #bacbe5 1px solid; BORDER-LEFT: #bacbe5 1px solid; BORDER-BOTTOM: #bacbe5 1px solid
+}
+.boder1bottom {
+	BORDER-BOTTOM: #bacbe5 1px dashed
+}
+.u {
+	
+}
+.paddintb {
+	PADDING-BOTTOM: 10px
+}
+.paddintt {
+	PADDING-TOP: 10px
+}
+.ML10 {
+	MARGIN-LEFT: 10px
+}
+.u A:link {
+	COLOR: #105cb6; TEXT-DECORATION: underline
+}
+.u A:visited {
+	COLOR: #105cb6; TEXT-DECORATION: underline
+}
+.u A:hover {
+	COLOR: #e45b00
+}
+.u A:active {
+	COLOR: #e45b00
+}
+.f {
+	COLOR: #fff
+}
+.f A:link {
+	COLOR: #fff; TEXT-DECORATION: none
+}
+.f A:visited {
+	COLOR: #fff; TEXT-DECORATION: none
+}
+.f A:hover {
+	COLOR: #fff; TEXT-DECORATION: underline
+}
+.f A:active {
+	COLOR: #fff
+}
+.bz {
+	COLOR: #444444; TEXT-DECORATION: line-through
+}
+.kz {
+	OVERFLOW: hidden; WHITE-SPACE: nowrap; TEXT-OVERFLOW: ellipsis
+}
+.bb {
+	COLOR: #365368
+}
+.bb1 {
+	BORDER-BOTTOM: #dbe1e5 1px solid
+}
+.bb {
+	BACKGROUND: url(/unspimg/img0059.jpg) repeat-x right bottom
+}
+IMG {
+	BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-RIGHT-WIDTH: 0px
+}
+.bm5 {
+	MARGIN-BOTTOM: 5px
+}
+.BT14 {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; FONT-SIZE: 16px; PADDING-BOTTOM: 2px; PADDING-TOP: 2px
+}
+.techinput {
+	BORDER-RIGHT: #cbb945 1px solid; BORDER-TOP: #cbb945 1px solid; BACKGROUND: url(/unspimg/img0095.gif) repeat-x left top; BORDER-LEFT: #cbb945 1px solid; COLOR: #776b1b; LINE-HEIGHT: 22px; BORDER-BOTTOM: #cbb945 1px solid; HEIGHT: 22px
+}
+#NewMall {
+	POSITION: relative
+}
+#NewMallDIV {
+	Z-INDEX: 100; RIGHT: 192px; LEFT: 506px; WIDTH: 45px; POSITION: absolute; TOP: 140px; HEIGHT: 10px
+}
+#NewMall1 {
+	POSITION: relative
+}
+#NewMallDIV1 {
+	Z-INDEX: 100; RIGHT: 192px; LEFT: 740px; WIDTH: 45px; POSITION: absolute; TOP: 340px; HEIGHT: 10px
+}
+#NewMall2 {
+	POSITION: relative
+}
+#NewMallDIV2 {
+	Z-INDEX: 100; RIGHT: 192px; LEFT: 490px; WIDTH: 45px; POSITION: absolute; TOP: -50px; HEIGHT: 10px
+}

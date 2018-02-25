@@ -1,0 +1,90 @@
+
+<!-- saved from url=(0103)http://blog.chinaunix.net/comment/comment.php?bg=F3F3F3&ctype=0&iscomment=1&artid=2276917&blogid=101649 -->
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=GBK">
+
+<LINK rel="stylesheet" href="./index(1).css">
+<LINK rel="stylesheet" href="./base.css">
+
+<TITLE></TITLE>
+
+</HEAD><BODY leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="background:F3F3F3;" align="center">
+<IFRAME name="iframecomm" src="" style="display:none" width="0" height="0"></IFRAME>
+
+
+	<FORM method="post" id="sortForm" action="http://blog.chinaunix.net/comment/comment.php?comm=update" target="iframecomm" onsubmit="return check();">
+	<INPUT type="hidden" name="ctype" value="0">
+	<INPUT type="hidden" name="iscomment" id="iscomment" value="0">
+	<INPUT type="hidden" name="artid" value="2276917">
+	<INPUT type="hidden" name="userid" value="101649">
+
+	<TABLE border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse" width="100%" align="center">
+
+	<TBODY><TR><TD height="25">
+	<SPAN id="user1">
+	用户名：<INPUT type="text" name="username" id="username" size="15" value="" class="input_title3"> 密码：<INPUT type="password" size="15" name="password" id="password" class="input_title3"> <A href="http://blog.chinaunix.net/register.php" target="_blank">免费注册</A><BR>
+	</SPAN>
+	<SPAN id="freeuser" style="display:none;">
+		昵称：<INPUT type="text" name="nickname" id="nickname" class="input_title3" value=""> 
+	</SPAN>
+	
+	
+	验证码：<INPUT type="text" name="num" id="num" class="input_title3" style="width:40" value="">
+	<IMG src="./num.php" width="40" height="20" border="0" alt="">
+		　<INPUT type="checkbox" onclick="checkfree();" id="noname"><LABEL for="noname">匿名</LABEL>
+		</TD></TR>
+	<TR><TD>
+	<TEXTAREA name="comment" id="comment" style="border:1px solid #999999;font-size:12px;font-family: Tahoma,Verdana,宋体,Fixedsys;line-height:150%;width:430;height:85;"></TEXTAREA></TD></TR>
+	<TR><TD align="cemter"><INPUT type="submit" value="提交" class="smb_btn" onmouseover="this.className=&#39;smb_btn3&#39;" onmouseout="this.className=&#39;smb_btn&#39;">
+	</TD></TR>
+	</TBODY></TABLE>
+	</FORM>
+
+	<SCRIPT language="javascript">
+	function $(s){return document.getElementById(s);}
+	function checkfree(){
+		if($("noname").checked){
+			$("user1").style.display="none";
+			$("freeuser").style.display="";
+			$("iscomment").value=1;
+			
+			if($('nickname').value=='')$('nickname').value='本站网友';
+		}else{
+			$("user1").style.display="";
+			$("freeuser").style.display="none";
+			$("iscomment").value=0;
+		}
+		//alert($("noname").checked);
+	}
+	function check(){
+
+		if($("iscomment").value==0){
+			if($("username").value==""){
+				alert('请输入您的用户名！');
+				$("username").select();
+				return false;
+			}
+			if($("password").value==""){
+				alert('请输入您的密码！');
+				$("password").select();
+				return false;
+			}
+		}else{
+			if($("nickname").value==""){
+				alert('请输入您的称呼！');
+
+				$("nickname").select();
+				return false;
+			}
+			$("username").value="";
+			$("password").value="";
+		}
+		if($("comment").value==""){
+			alert('你忘记输入内容了！');
+			$("comment").select();
+			return false;
+		}
+		return true;
+	}
+
+
+	</SCRIPT></BODY></HTML>

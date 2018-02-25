@@ -1,0 +1,9 @@
+POSIX.1规定终止状态用定义在 <sys/wait.h>中的各个宏来查看。
+
+有三个互斥的宏可用来取得进程终止的原因,它们的名字都以WIF开始。基于这三个宏中哪一个值是真,就可选用其他宏来取得终止状态、信号编号等。
+
+WIFEXITED(status) 若为正常终止子进程返回的状态,则为真。对于这种情况可执行WEXITSTATUS(status)取子进程传送给exit或_exit参数的低8位
+
+WIFSIGNALED(status) 若为异常终止子进程返回的状态,则为真(接到一个不捕捉的信号)。对于这种情况,可执行WTERMSIG(status)取使子进程终止的信号编号。
+
+WIFSTOPPED(status) 若为当前暂停子进程的返回的状态,则为真。对于这种情况,可执行WSTOPSIG(status)取使子进程暂停的信号编

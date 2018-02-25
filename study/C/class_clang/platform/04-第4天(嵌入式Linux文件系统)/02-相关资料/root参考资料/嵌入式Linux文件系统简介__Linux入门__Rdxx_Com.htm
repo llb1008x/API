@@ -1,0 +1,479 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<!-- saved from url=(0064)http://os.rdxx.com/Linux/LinuxRudiment/2008/9/518114014766.shtml -->
+<HTML xmlns="http://www.w3.org/1999/xhtml"><HEAD><TITLE>嵌入式Linux文件系统简介__Linux入门__Rdxx.Com</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=gb2312"><LINK 
+href="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/content.css" type=text/css 
+rel=stylesheet><!-- Created Page at 2008-9-6 0:09:27 -->
+<META content="MSHTML 6.00.2900.2769" name=GENERATOR></HEAD>
+<BODY>
+<DIV id=main><A name=top></A>
+<DIV id=header>
+<DIV id=maintop>
+<DIV id=Logo><A href="http://www.rdxx.com/"><IMG height=60 alt=热点信息网 
+src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/Logo.gif" width=180 
+border=0></A></DIV>
+<DIV id=TopAds><!-- ad --><IFRAME 
+src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/dell_468x60.htm" frameBorder=0 
+width=468 scrolling=no height=60></IFRAME><!-- ad end --></DIV>
+<DIV id=toprightmenu><A 
+href="javascript:window.external.addFavorite('http://www.rdxx.com/','热点信息网')"><IMG 
+id=Image21 height=17 alt=加入收藏夹 
+src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/v1.jpg" width=77 border=0 
+name=Image21></A> <A 
+href="http://wpa.qq.com/msgrd?V=1&amp;Uin=9962164&amp;Site=By%20Rdxx.Com&amp;Menu=yes" 
+target=_blank><IMG height=17 alt=与我们联系 
+src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/v2.jpg" width=77 border=0></A> <A 
+href="http://os.rdxx.com/help/about.htm"><IMG height=17 alt=帮助 
+src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/v3.jpg" width=77 border=0></A> 
+</DIV></DIV>
+<DIV class=navup>
+<DIV id=nav-up-left>
+<UL class=TabBarLevel1>
+  <LI><A class=white href="http://www.rdxx.com/">首页</A> </LI>
+  <LI class=Selected><A class=white href="http://os.rdxx.com/">操作系统</A> </LI>
+  <LI><A class=white href="http://net.rdxx.com/">网络技术</A> </LI>
+  <LI><A class=white href="http://soft.rdxx.com/">软件技术</A> </LI>
+  <LI><A class=white href="http://hw.rdxx.com/">硬件天地</A> </LI>
+  <LI><A class=white href="http://web.rdxx.com/">WEB开发</A> </LI>
+  <LI><A class=white href="http://dev.rdxx.com/">编程开发</A> </LI>
+  <LI><A class=white href="http://db.rdxx.com/">数据库</A> </LI>
+  <LI><A class=white href="http://mg.rdxx.com/">网站运营</A> </LI>
+  <LI><A class=white href="http://www.rdxx.com/GuestBook/"><FONT 
+  color=red>意见留言</FONT></A> </LI></UL><!--频道下属栏目列表-->
+<DIV class=submenu><A class=white href="http://os.rdxx.com/">操作系统首页</A> | <A 
+class=white href="http://os.rdxx.com/Vista/"><STRONG>Vista</STRONG></A> | <A 
+class=white href="http://os.rdxx.com/Windows7/">Windows 7</A> | <A class=white 
+href="http://os.rdxx.com/Windows2003/">Win2003</A> | <A class=white 
+href="http://os.rdxx.com/Windows9x/">win9.X</A>&nbsp;|&nbsp;<A class=white 
+href="http://os.rdxx.com/WindowsMe/">winME</A>&nbsp;| <A class=white 
+href="http://os.rdxx.com/Windows2000/">Win2000</A>| <A class=white 
+href="http://os.rdxx.com/WindowsXP/">WinXP</A> | <A class=white 
+href="http://os.rdxx.com/Linux/">Linux</A> | <A class=white 
+href="http://os.rdxx.com/Solaris/">Solaris</A> | <A class=white 
+href="http://os.rdxx.com/FreeBSD/">FreeBSD</A> | <A class=white 
+href="http://os.rdxx.com/MacOS/">MacOS</A> | <A class=white 
+href="http://os.rdxx.com/Reg/">注册表</A> | <A class=white 
+href="http://os.rdxx.com/DOS/">DOS系统</A></DIV></DIV></DIV></DIV>
+<DIV class=mainline></DIV><!-- 主栏目开始 -->
+<SCRIPT language=JavaScript type=text/javascript>
+<!--
+if(document.documentElement.offsetWidth+100<=screen.availWidth){
+	self.moveTo(0,0)
+	self.resizeTo(screen.availWidth,screen.availHeight)
+}
+//-->
+</SCRIPT>
+</DIV>
+<DIV id=wrap><!-- 通栏广告1 -->
+<DIV class=mainline></DIV>
+<DIV class=maincolumn>
+<DIV class=mainleft>
+<DIV class=sublist>
+<DIV class=sublisttitleico></DIV>
+<DIV class=sublisttitlebg>
+<DIV class=sublisttitlename>您的位置：<A href="http://www.rdxx.com/index.shtml" 
+target=_blank>首页</A> &gt;&gt; <A href="http://os.rdxx.com/" 
+target=_blank>操作系统</A> &gt;&gt; <A href="http://os.rdxx.com/Linux/" 
+target=_blank>Linux</A> &gt;&gt; <A 
+href="http://os.rdxx.com/Linux/LinuxRudiment/" target=_blank>Linux入门</A> 
+&gt;&gt; 正文</DIV>
+<DIV class=sublisttitlemore><A 
+href="http://os.rdxx.com/Linux/LinuxRudiment/RSS.xml" target=_blank><IMG 
+alt="Linux入门 RSS" src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/xml.gif" 
+border=0></A></DIV></DIV>
+<DIV class=clear>&nbsp;</DIV>
+<DIV id=newsview>
+<DIV class=title align=center>
+<H1>嵌入式<A href="http://os.rdxx.com/Linux/" target=_blank>Linux</A>文件系统简介</H1>
+<H2>http://www.rdxx.com 08年09月05日 18:11 <FONT color=#a20010>ChinaUnix</FONT> <A 
+href="http://www.rdxx.com/User/contr/contrEdit.asp?action=add" 
+target=_blank>我要投稿</A></H2></DIV>
+<DIV class=keyword align=left>关键词： <A 
+href="http://www.rdxx.com/Class/&Icirc;&Auml;&frac14;&thorn;&Iuml;&micro;&Iacute;&sup3;.shtml" target=_blank>文件系统</A> , <A 
+href="http://www.rdxx.com/Class/&Ccedil;&para;&Egrave;&euml;&Ecirc;&frac12;.shtml" target=_blank>嵌入式</A> , <A 
+href="http://os.rdxx.com/Linux/" target=_blank>Linux</A> , <A 
+href="http://www.rdxx.com/Class/&Icirc;&Auml;&frac14;&thorn;.shtml" target=_blank>文件</A> , <A 
+href="http://www.rdxx.com/Class/&Iuml;&micro;&Iacute;&sup3;.shtml" target=_blank>系统</A> , <A 
+href="http://www.rdxx.com/Class/&Ccedil;&para;&Egrave;&euml;.shtml" target=_blank>嵌入</A> 
+<DIV id=gglink></DIV></DIV>
+<DIV class=content onload="this.style.overflowX='auto';">
+<DIV id=contentAdv></DIV><FONT #02368d??><B>嵌入式Linux文件系统简介</B></FONT><BR>&nbsp; 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <BR>&nbsp; &nbsp;&nbsp; 
+&nbsp;Linux支持多种文件系统，包括ext2、ext3、vfat、ntfs、iso9660、jffs、romfs和nfs等，为了对各类文件系统进行统一管理，Linux引入了虚拟文件系统VFS(Virtual 
+File System)，为各类文件系统提供一个统一的操作界面和应用<A href="http://dev.rdxx.com/" 
+target=_blank>编程</A>接口。<BR>&nbsp; &nbsp; Linux下的文件系统结构如下：<BR><IMG 
+onmousewheel="return imgzoom(this);" 
+onmouseover="if(this.width>screen.width*0.7) {this.resized=true; this.width=screen.width*0.7; this.style.cursor='hand'; this.alt='Click here to open new window\nCTRL+Mouse wheel to zoom in/out';}" 
+onclick="if(!this.resized) {return true;} else {window.open('http://blogimg.chinaunix.net/blog/upfile/070917233328.png');}" 
+alt="" src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/9A5AKKJCD66IK42JC3.png" 
+onload="if(this.width>screen.width*0.7) {this.resized=true; this.width=screen.width*0.7; this.alt='Click here to open new window\nCTRL+Mouse wheel to zoom in/out';}" 
+border=0><BR><BR>&nbsp; &nbsp; 
+Linux启动时，第一个必须挂载的是根文件系统；若系统不能从指定设备上挂载根文件系统，则系统会出错而退出启动。之后可以自动或手动挂载其他的文件系统。因此，一个系统中可以同时存在不同的文件系统。<BR>&nbsp; 
+&nbsp; 不同的文件系统类型有不同的特点，因而根据存储设备的<A href="http://hw.rdxx.com/" 
+target=_blank>硬件</A>特性、系统需求等有不同的应用场合。在嵌入式Linux应用中，主要的存储设备为RAM(DRAM, 
+SDRAM)和ROM(常采用FLASH存储器)，常用的基于存储设备的文件系统类型包括：jffs2, yaffs, cramfs, romfs, ramdisk, 
+ramfs/tmpfs等。<BR>&nbsp; &nbsp; 1. 基于FLASH的文件系统<BR>&nbsp; &nbsp;&nbsp;&nbsp;<A 
+href="http://soft.rdxx.com/Design/HomePage/Flash/" 
+target=_blank>Flash</A>(闪存)作为嵌入式系统的主要存储媒介，有其自身的特性。Flash的写入操作只能把对应位置的1修改为0，而不能把0修改为1(擦除Flash就是把对应存储块的内容恢复为1)，因此，一般情况下，向Flash写入内容时，需要先擦除对应的存储区间，这种擦除是以块(block)为单位进行的。<BR>&nbsp; 
+&nbsp;&nbsp;&nbsp;闪存主要有NOR和NAND两种技术(简单比较见附录)。Flash存储器的擦写次数是有限的，NAND闪存还有特殊的硬件接口和读写时序。因此，必须针对Flash的硬件特性<A 
+href="http://soft.rdxx.com/Design/" 
+target=_blank>设计</A>符合应用要求的文件系统；传统的文件系统如ext2等，用作Flash的文件系统会有诸多弊端。<BR>&nbsp; 
+&nbsp;&nbsp;&nbsp;在嵌入式Linux下，MTD(Memory Technology 
+Device,存储技术设备)为底层硬件(闪存)和上层(文件系统)之间提供一个统一的抽象接口，即Flash的文件系统都是基于MTD驱动层的(参见上面的Linux下的文件系统结构图)。使用MTD驱动程序的主要优点在于，它是专门针对各种非易失性存储器(以闪存为主)而设计的，因而它对Flash有更好的支持、管理和基于扇区的擦除、读/写操作接口。<BR>&nbsp; 
+&nbsp;&nbsp;&nbsp;顺便一提，一块Flash芯片可以被划分为多个分区，各分区可以采用不同的文件系统；两块Flash芯片也可以合并为一个分区使用，采用一个文件系统。即文件系统是针对于存储器分区而言的，而非存储芯片。<BR>&nbsp; 
+&nbsp;&nbsp;&nbsp;(1) jffs2<BR>&nbsp; &nbsp;&nbsp;&nbsp;<FONT 
+#000000??>JFFS</FONT><FONT #000000??>文件系统最早是由瑞典Axis Communications</FONT><FONT 
+#000000??>公司基于Linux2.0</FONT><FONT #000000??>的内核为嵌入式系统开发的文件系统。JFFS2</FONT><FONT 
+#000000??>是RedHat</FONT><FONT #000000??>公司基于JFFS</FONT><FONT 
+#000000??>开发的闪存文件系统，最初是针对RedHat</FONT><FONT #000000??>公司的嵌入式产品eCos</FONT><FONT 
+#000000??>开发的嵌入式文件系统，所以JFFS2</FONT><FONT #000000??>也可以用在Linux, 
+uCLinux</FONT><FONT #000000??>中。</FONT> <BR>&nbsp; &nbsp;&nbsp;&nbsp;Jffs2: 
+日志闪存文件系统版本2 (Journalling Flash FileSystem v2)<BR>&nbsp; 
+&nbsp;&nbsp;&nbsp;主要用于NOR型闪存，基于MTD驱动层，特点是：可读写的、支持数据压缩的、基于哈希表的日
+<P style="CLEAR: both" align=center><FONT title=第一页 color=#999999><FONT 
+face=webdings>9</FONT></FONT> <FONT title=上十页 color=#999999><FONT 
+face=webdings>7</FONT></FONT> <FONT title=上一页 color=#999999><FONT 
+face=webdings>3</FONT></FONT> <B>1</B> <A 
+href="http://os.rdxx.com/Linux/LinuxRudiment/2008/9/518114014766_2.shtml">2</A> 
+<A 
+href="http://os.rdxx.com/Linux/LinuxRudiment/2008/9/518114014766_3.shtml">3</A> 
+<A 
+href="http://os.rdxx.com/Linux/LinuxRudiment/2008/9/518114014766_4.shtml">4</A> 
+<A title=下一页 
+href="http://os.rdxx.com/Linux/LinuxRudiment/2008/9/518114014766_2.shtml"><FONT 
+face=webdings>4</FONT></A> <FONT title=下十页 color=#999999><FONT 
+face=webdings>8</FONT></FONT> <A title=尾页 
+href="http://os.rdxx.com/Linux/LinuxRudiment/2008/9/518114014766_4.shtml"><FONT 
+face=webdings>:</FONT></A> </P></DIV><BR>
+<DIV class=next>下一篇：<A 
+href="http://os.rdxx.com/Linux/LinuxRudiment/2008/9/518114085211.shtml">gdb命令手册</A><BR>上一篇：<A 
+href="http://os.rdxx.com/Linux/LinuxRudiment/2008/9/518114038087.shtml">从debian基础系统到fvwm-crystal</A></DIV></DIV>
+<DIV class=clear>&nbsp;</DIV>
+<DIV><IMG height=0 src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/Click.htm" 
+width=0 border=0></DIV>
+<DIV class=clear>&nbsp;</DIV>
+<DIV class=tool><SPAN>标签： <A href="http://www.rdxx.com/Class/&Icirc;&Auml;&frac14;&thorn;&Iuml;&micro;&Iacute;&sup3;.shtml" 
+target=_blank>文件系统</A> , <A href="http://www.rdxx.com/Class/&Ccedil;&para;&Egrave;&euml;&Ecirc;&frac12;.shtml" 
+target=_blank>嵌入式</A> , <A href="http://os.rdxx.com/Linux/" 
+target=_blank>Linux</A> , <A href="http://www.rdxx.com/Class/&Icirc;&Auml;&frac14;&thorn;.shtml" 
+target=_blank>文件</A> , <A href="http://www.rdxx.com/Class/&Iuml;&micro;&Iacute;&sup3;.shtml" 
+target=_blank>系统</A> , <A href="http://www.rdxx.com/Class/&Ccedil;&para;&Egrave;&euml;.shtml" 
+target=_blank>嵌入</A> </SPAN>
+<SCRIPT type=text/javascript>
+<!-- 
+document.write("<a target=\"_blank\" href=\"http://www.rdxx.com/User/AddFavor.asp?Id=179855&Type=ns\" class=\"button_content\" style=\"CURSOR:hand\" onClick=\"window.external.AddFavorite(document.location.href,document.title)\" onMouseMove=\"status='收藏本页';\" onMouseOut=\"status='';\">添加到收藏夹</a>");
+-->
+</SCRIPT>
+
+<SCRIPT type=text/javascript>
+<!-- 
+document.write("<a href=\"http://www.rdxx.com/User/Sendmail.asp?Id=179855&Type=ns\" class=\"button_content\" target=\"_blank\" onMouseMove=\"status='发送给您的好友';\" onMouseOut=\"status='';\">发送给好友</a>");
+-->
+</SCRIPT>
+<A class=button_content title=打印本文 href="javascript:window.print();" 
+target=_self>打印本文</A> </DIV>
+<DIV class=clear>&nbsp;</DIV></DIV>
+<DIV class=sublist id=favorite></DIV>
+<DIV class=sublist><!--相关区块 -->
+<DIV class=sublisttitleico></DIV>
+<DIV class=sublisttitlebg>
+<DIV class=sublisttitlename>&nbsp;&nbsp;相关资讯</DIV>
+<DIV class=sublisttitlemore><A href="http://www.rdxx.com/RSS/" 
+target=_blank><IMG alt=RSS src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/xml.gif" 
+border=0></A></DIV></DIV>
+<DIV class=clear>&nbsp;</DIV>
+<DIV id=newsview>
+<DIV id=newsdaodu>
+<UL>
+  <LI><SPAN>2001-10-16</SPAN><A 
+  href="http://web.rdxx.com/PHP/PHP_Example/2001-10/16/121852059212185295821.shtml" 
+  target=_blank>PHP开发文件系统实例讲解&nbsp;</A> 
+  <LI><SPAN>2003-09-13</SPAN><A 
+  href="http://os.rdxx.com/Linux/2003-9/13/174620701.shtml" 
+  target=_blank>虚拟文件系统(VFS)简介：Disk的Layout</A> 
+  <LI><SPAN>2006-02-22</SPAN><A 
+  href="http://db.rdxx.com/MySQL/2007/6/281623610818.shtml" 
+  target=_blank>MySQL文件系统先睹为快(1)</A> 
+  <LI><SPAN>2004-11-29</SPAN><A 
+  href="http://os.rdxx.com/Windows2000/2006-5/17/093410349.shtml" 
+  target=_blank>Windows&nbsp;2000分布式文件系统</A> 
+  <LI><SPAN>2003-08-28</SPAN><A 
+  href="http://os.rdxx.com/Linux/2003-8/28/174254702.shtml" 
+  target=_blank>怎样添加ReiserFS文件系统</A> 
+  <LI><SPAN>2003-09-13</SPAN><A 
+  href="http://os.rdxx.com/Linux/2003-9/13/174620963.shtml" 
+  target=_blank>虚拟文件系统(VFS)简介：基本资料</A> 
+  <LI><SPAN>2004-11-24</SPAN><A 
+  href="http://os.rdxx.com/Linux/2004-11/24/175034698.shtml" 
+  target=_blank>Ext2和Ext3文件系统</A> 
+  <LI><SPAN>2003-09-14</SPAN><A 
+  href="http://os.rdxx.com/Linux/2003-9/14/174629155.shtml" 
+  target=_blank>深入理解Linux网络文件系统</A> 
+  <LI><SPAN>2002-06-15</SPAN><A 
+  href="http://os.rdxx.com/Windows2000/2006-5/17/093258543.shtml" 
+  target=_blank>用Win2k加密文件系统</A> 
+  <LI><SPAN>2002-09-08</SPAN><A 
+  href="http://dev.rdxx.com/NET/NETOther/2002-9/8/084905224.shtml" 
+  target=_blank>操作文件系统（3）显示目录内容</A> </LI></UL></DIV></DIV>
+<DIV class=clear>&nbsp;</DIV><!-- 相关区块结束 --></DIV></DIV>
+<DIV class=mainright><!-- 搜索 -->
+<DIV class=rightblock>
+<DIV class=righttitleico></DIV>
+<DIV class=righttitlename>&nbsp;&nbsp;热点搜索</DIV>
+<DIV class=clear>&nbsp;</DIV>
+<DIV id=search><!--
+<form action="http://www.rdxx.com/Search.asp" method="get" name="SearchForm" target="_blank" id="SearchForm">
+  <input name="Keyword" type="text" id="Keyword" size="15" /><br />
+<input type="submit" id="SearchSubmit" value="搜索" /></form>
+--><!-- SiteSearch Baidu -->
+<SCRIPT language=javascript>
+function g(formname)	{
+var url = "http://www.baidu.com/baidu";
+if (formname.s[1].checked) {
+	formname.ct.value = "2097152";
+}
+else {
+	formname.ct.value = "0";
+}
+formname.action = url;
+return true;
+}
+</SCRIPT>
+
+<FORM name=f1 onsubmit="return g(this)" target=_blank>
+<TABLE border=0>
+  <TBODY>
+  <TR>
+    <TD vAlign=top noWrap align=left height=32><BR><LABEL 
+      style="DISPLAY: none" for=sbi>输入您的搜索字词</LABEL> <INPUT id=sbi maxLength=255 
+      size=18 name=word></INPUT> </TD></TR>
+  <TR>
+    <TD noWrap>
+      <TABLE>
+        <TBODY>
+        <TR>
+          <TD><INPUT id=ss0 type=radio value="" name=s></INPUT> <LABEL 
+            title=搜索网络 for=ss0><FONT color=black size=-1>Web</FONT></LABEL></TD>
+          <TD><INPUT id=ss1 type=radio CHECKED value=rdxx.com name=s></INPUT> 
+            <LABEL title="搜索 rdxx.com" for=ss1><FONT color=black 
+            size=-1>rdxx.com</FONT></LABEL></TD></TR></TBODY></TABLE><LABEL 
+      style="DISPLAY: none" for=sbb>提交搜索表单</LABEL> <INPUT id=sbb type=submit value=搜索 name=sa></INPUT> <INPUT type=hidden 
+      value=bds name=tn> <INPUT type=hidden value=3 name=cl> <INPUT type=hidden 
+      name=ct> <INPUT type=hidden value=rdxx.com name=si> 
+</TD></TR></TBODY></TABLE></FORM><!-- SiteSearch Baidu --></DIV></DIV><!-- 搜索结束 --><!-- 图文 -->
+<DIV class=rightblock>
+<DIV class=righttitleico></DIV>
+<DIV class=righttitlename>&nbsp;&nbsp;热点导读</DIV>
+<DIV class=clear>&nbsp;</DIV>
+<DIV class=picrightlist>
+<UL id=ClassPicNews>
+  <LI><A class="" title=最低2998元&nbsp;十月第二季新品笔记本推荐 
+  href="http://hw.rdxx.com/hw-News/2008/10/2022535334909.shtml" 
+  target=_blank><IMG height=100 alt="最低2998元 十月第二季新品笔记本推荐" 
+  src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/183638.jpg" width=150 
+  border=0></A><BR><A class="" title=最低2998元&nbsp;十月第二季新品笔记本推荐 
+  href="http://hw.rdxx.com/hw-News/2008/10/2022535334909.shtml" 
+  target=_blank>最低2998元&nbsp;十月第二季新品</A>
+  <LI><A class="" title=微软下一代操作系统正式定名为Windows&nbsp;7 
+  href="http://os.rdxx.com/Windows7/2008/10/1412384761423.shtml" 
+  target=_blank><IMG height=100 alt="微软下一代操作系统正式定名为Windows 7" 
+  src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/182940.jpg" width=150 
+  border=0></A><BR><A class="" title=微软下一代操作系统正式定名为Windows&nbsp;7 
+  href="http://os.rdxx.com/Windows7/2008/10/1412384761423.shtml" 
+  target=_blank>微软下一代操作系统正式定</A>
+  <LI><A class="" title=微软保证提供Windows&nbsp;XP支持至2014年 
+  href="http://os.rdxx.com/WindowsXP/2008/6/2522231290234.shtml" 
+  target=_blank><IMG height=100 alt="微软保证提供Windows XP支持至2014年" 
+  src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/173156.jpg" width=150 
+  border=0></A><BR><A class="" title=微软保证提供Windows&nbsp;XP支持至2014年 
+  href="http://os.rdxx.com/WindowsXP/2008/6/2522231290234.shtml" 
+  target=_blank>微软保证提供Windows&nbsp;XP支</A>
+  <LI><A class="" title=传Windows&nbsp;7将于27日首次正式亮相 
+  href="http://os.rdxx.com/Windows7/2008/5/26243823399.shtml" target=_blank><IMG 
+  height=100 alt="传Windows 7将于27日首次正式亮相" 
+  src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/170410.jpg" width=150 
+  border=0></A><BR><A class="" title=传Windows&nbsp;7将于27日首次正式亮相 
+  href="http://os.rdxx.com/Windows7/2008/5/26243823399.shtml" 
+  target=_blank>传Windows&nbsp;7将于27日首次正</A>
+  <LI><A class="" title=五月选卡指南&nbsp;399-699元超值显卡推荐 
+  href="http://hw.rdxx.com/MartTrade/2008/5/817291373846.shtml" 
+  target=_blank><IMG height=100 alt="五月选卡指南 399-699元超值显卡推荐" 
+  src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/168707.jpg" width=150 
+  border=0></A><BR><A class="" title=五月选卡指南&nbsp;399-699元超值显卡推荐 
+  href="http://hw.rdxx.com/MartTrade/2008/5/817291373846.shtml" 
+  target=_blank>五月选卡指南&nbsp;399-699元超</A></LI></UL>
+<DIV id=firefox18060></DIV></DIV></DIV><!-- 图文结束 --><!-- 热点 -->
+<DIV class=rightblock>
+<DIV class=righttitleico></DIV>
+<DIV class=righttitlename>&nbsp;&nbsp;热点文章</DIV>
+<DIV class=clear>&nbsp;</DIV>
+<DIV class="subrightlist pagerightlist">
+<UL>
+  <LI><A title=mininova放出windows&nbsp;7&nbsp;7068种子（鉴定为假） 
+  href="http://os.rdxx.com/Windows7/2009/3/2616564249577.shtml" 
+  target=_blank>mininova放出windows&nbsp;7&nbsp;7068</A></LI>
+  <LI><A 
+  href="http://os.rdxx.com/Linux/LinuxRudiment/2009/3/2423451556520.shtml" 
+  target=_blank>Shell编程基础</A></LI>
+  <LI><A title=在VC++中实现设备无关位图类CDib 
+  href="http://dev.rdxx.com/VC/BMP/2009/3/251265354642.shtml" 
+  target=_blank>在VC++中实现设备无关位图类</A></LI>
+  <LI><A 
+  href="http://os.rdxx.com/Linux/LinuxRudiment/2009/3/2423462934585.shtml" 
+  target=_blank>Samba&nbsp;中文手册</A></LI>
+  <LI><A 
+  href="http://os.rdxx.com/Linux/LinuxRudiment/2009/3/2423451557215.shtml" 
+  target=_blank>LINUX网络编程基础流程</A></LI>
+  <LI><A title=汪延的愤怒？“新浪浏览器”猛然现身 
+  href="http://soft.rdxx.com/Soft-News/2009/3/271959499307.shtml" 
+  target=_blank>汪延的愤怒？“新浪浏览器”</A></LI>
+  <LI><A title=Windows&nbsp;7最新版本Build&nbsp;7068泄露 
+  href="http://os.rdxx.com/Windows7/2009/3/2819534834683.shtml" 
+  target=_blank>Windows&nbsp;7最新版本Build&nbsp;706</A></LI>
+  <LI><A 
+  href="http://os.rdxx.com/Linux/LinuxRudiment/2009/3/2423462927658.shtml" 
+  target=_blank>Linux编程基础1</A></LI>
+  <LI><A href="http://os.rdxx.com/News/2009/3/267173883055.shtml" 
+  target=_blank>Windows&nbsp;XP&nbsp;SP4得到间接确认</A></LI>
+  <LI><A title=Word教程：教你用函数实现数据计算 
+  href="http://soft.rdxx.com/Apply/Office/Word/2009/3/2710544663497.shtml" 
+  target=_blank>Word教程：教你用函数实现数</A></LI>
+  <LI><A title=Word&nbsp;2007中编辑剪贴画文字环绕顶点 
+  href="http://soft.rdxx.com/Apply/Office/Word/2009/3/2710544670372.shtml" 
+  target=_blank>Word&nbsp;2007中编辑剪贴画文字环</A></LI>
+  <LI><A 
+  href="http://web.rdxx.com/ASPNET/ASPNET_Skill/2009/3/2619564411863.shtml" 
+  target=_blank>ASP.NET&nbsp;Form验证随笔</A></LI>
+  <LI><A title=下载：Intel集成显卡加速器GMABooster&nbsp;1.3a版 
+  href="http://hw.rdxx.com/hw-News/2009/3/2519162684431.shtml" 
+  target=_blank>下载：Intel集成显卡加速器G</A></LI>
+  <LI><A title=Word视频教程：插入和播放Flash的技巧 
+  href="http://soft.rdxx.com/Apply/Office/Word/2009/3/2710544657721.shtml" 
+  target=_blank>Word视频教程：插入和播放Fl</A></LI>
+  <LI><A title=消息称微软确定推出Windows&nbsp;XP&nbsp;SP4，发布时间恐要五年后 
+  href="http://os.rdxx.com/WindowsXP/2009/3/2619544417115.shtml" 
+  target=_blank>消息称微软确定推出Windows&nbsp;</A></LI></UL></DIV></DIV><!-- 热点结束 -->
+<DIV class=mainline></DIV><!-- 最新 -->
+<DIV class=rightblock>
+<DIV class=righttitleico></DIV>
+<DIV class=righttitlename>&nbsp;&nbsp;最近更新</DIV>
+<DIV class=clear>&nbsp;</DIV>
+<DIV class="subrightlist pagerightlist">
+<UL>
+  <LI><A title=&nbsp;Windows&nbsp;7墙纸的存档不断更新 
+  href="http://os.rdxx.com/Windows7/2009/3/3018262261873.shtml" 
+  target=_blank>&nbsp;Windows&nbsp;7墙纸的存档不断更</A> </LI>
+  <LI><A title=Windows&nbsp;7&nbsp;Starter版无法更改壁纸 
+  href="http://os.rdxx.com/Windows7/2009/3/3018262284935.shtml" 
+  target=_blank>Windows&nbsp;7&nbsp;Starter版无法更改</A> </LI>
+  <LI><A title=[多图]Windows&nbsp;7&nbsp;到达&nbsp;Build&nbsp;7070&nbsp;截图出现 
+  href="http://os.rdxx.com/Windows7/2009/3/3018262249087.shtml" 
+  target=_blank>[多图]Windows&nbsp;7&nbsp;到达&nbsp;Build</A> </LI>
+  <LI><A title=UnlockMe&nbsp;1.0&nbsp;-&nbsp;删除使用中的文件 
+  href="http://soft.rdxx.com/Apply/Tool/System/2009/3/301636310291.shtml" 
+  target=_blank>UnlockMe&nbsp;1.0&nbsp;-&nbsp;删除使用中的</A> </LI>
+  <LI><A title=谷歌音乐搜索改版&nbsp;-&nbsp;用泡泡挑歌 
+  href="http://mg.rdxx.com/SearchGuide/Google/2009/3/301634449870.shtml" 
+  target=_blank>谷歌音乐搜索改版&nbsp;-&nbsp;用泡泡挑</A> </LI>
+  <LI><A title=谷歌签约四大唱片公司&nbsp;将发布音乐搜索正式版 
+  href="http://mg.rdxx.com/SearchGuide/Google/2009/3/301634490845.shtml" 
+  target=_blank>谷歌签约四大唱片公司&nbsp;将发布</A> </LI>
+  <LI><A title=英特尔或将收购医疗及可视媒体公司 
+  href="http://hw.rdxx.com/hw-News/2009/3/3081672599.shtml" 
+  target=_blank>英特尔或将收购医疗及可视媒</A> </LI>
+  <LI><A title=Gartner:09/10最值得关注的八大移动技术 
+  href="http://net.rdxx.com/Net-News/2009/3/2923244879612.shtml" 
+  target=_blank>Gartner:09/10最值得关注的八</A> </LI>
+  <LI><A title=宏碁笔记本1GB内存被诉无法正常运行Vista 
+  href="http://hw.rdxx.com/hw-News/2009/3/29195728184.shtml" 
+  target=_blank>宏碁笔记本1GB内存被诉无法正</A> </LI>
+  <LI><A title=下载：小螃蟹Realtek&nbsp;HD音频驱动2.20版 
+  href="http://hw.rdxx.com/hw-News/2009/3/2919572851454.shtml" 
+  target=_blank>下载：小螃蟹Realtek&nbsp;HD音频</A> </LI>
+  <LI><A title=下载：AMD显卡Linux催化剂驱动9.3版 
+  href="http://hw.rdxx.com/hw-News/2009/3/2919572899860.shtml" 
+  target=_blank>下载：AMD显卡Linux催化剂驱</A> </LI>
+  <LI><A title=Windows7媒体解码利器&nbsp;Win7codecs&nbsp;1.0.5最终版发布 
+  href="http://os.rdxx.com/Windows7/2009/3/2918163675834.shtml" 
+  target=_blank>Windows7媒体解码利器&nbsp;Win7c</A> </LI>
+  <LI><A title=Google拟购Facebook估值20亿美元&nbsp;Facebook不屑 
+  href="http://mg.rdxx.com/SearchGuide/Google/2009/3/2917223938100.shtml" 
+  target=_blank>Google拟购Facebook估值20亿</A> </LI>
+  <LI><A title=谷歌否认Google&nbsp;Docs存在漏洞 
+  href="http://mg.rdxx.com/SearchGuide/Google/2009/3/2917223957731.shtml" 
+  target=_blank>谷歌否认Google&nbsp;Docs存在漏洞</A> </LI>
+  <LI><A title=谷歌开发新技术&nbsp;整合电视和网络视频广告 
+  href="http://mg.rdxx.com/SearchGuide/Google/2009/3/2917223973216.shtml" 
+  target=_blank>谷歌开发新技术&nbsp;整合电视和网</A> </LI></UL></DIV></DIV></DIV><!-- google link ad --><SPAN id=gglinkad></SPAN>
+<SCRIPT type=text/javascript>
+    document.getElementById('gglink').innerHTML=document.getElementById('gglinkad').innerHTML;
+    document.getElementById('gglinkad').innerHTML="";
+</SCRIPT>
+<!-- end google link ad --><!-- google contentAdv --><SPAN 
+id=contentAdvs></SPAN>
+<SCRIPT type=text/javascript>
+//var dt = new Date();
+//var hr = dt.getSeconds();
+//if (hr>=30){
+ document.getElementById('contentAdv').innerHTML='<iframe scrolling="no" frameborder="0" width="350" height="250" src="http://js4.all4ad.net/dell/dell_350x250.asp?id=236"></iframe>';
+//}else{
+// document.getElementById('contentAdv').innerHTML='<iframe scrolling="no" frameborder="0" width="350" height="250" src="http://js4.all4ad.net/vostro/dell_350x250.asp?id=640"></iframe>';
+//}
+//	if(document.getElementById('contentAdv').innerHTML==""){
+//    document.getElementById('contentAdv').innerHTML=document.getElementById('contentAdvs').innerHTML;
+//	}
+//    document.getElementById('contentAdvs').innerHTML="";
+</SCRIPT>
+<!-- end google contentAdv --><!-- google firefox18060 --><SPAN 
+id=firefox18060s></SPAN>
+<SCRIPT type=text/javascript>
+    document.getElementById('firefox18060').innerHTML=document.getElementById('firefox18060s').innerHTML;
+    document.getElementById('firefox18060s').innerHTML="";
+</SCRIPT>
+<!-- end google firefox18060 --><!-- google favorite --><SPAN id=favorites>
+<DIV align=center></DIV>
+<SCRIPT language=JavaScript src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/fav.js" 
+type=text/javascript></SCRIPT>
+
+<SCRIPT src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/cang.js" 
+type=text/javascript></SCRIPT>
+</SPAN>
+<SCRIPT type=text/javascript>
+    document.getElementById('favorite').innerHTML=document.getElementById('favorites').innerHTML;
+    document.getElementById('favorites').innerHTML="";
+</SCRIPT>
+<!-- end google favorite --></DIV></DIV>
+<DIV></DIV>
+<DIV class=mainline></DIV>
+<DIV id=bottommenu><BR>
+<DIV align=center><IFRAME 
+src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/dell_350x250.htm" frameBorder=0 
+width=760 scrolling=no height=90></IFRAME></DIV>
+<DIV align=center>
+<HR width=760 SIZE=2>
+<BR><A href="http://validator.w3.org/check?uri=referer" target=_blank><IMG 
+height=31 alt="Valid XHTML 1.0 Transitional" 
+src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/valid-xhtml10-blue.png" width=88 
+border=0></A> <BR>Copyright &copy;2005 - 2008 <A href="http://www.rdxx.com/" 
+target=_blank><FONT face="Verdana, Arial, Helvetica, sans-serif" 
+size=1><B>Rdxx<FONT color=#cc0000>.Com</FONT></B></FONT></A>，All Rights Reserved 
+</DIV></DIV>
+<DIV id=AddFav 
+style="BORDER-RIGHT: #666 1px dashed; PADDING-RIGHT: 3px; BORDER-TOP: #666 1px dashed; PADDING-LEFT: 3px; Z-INDEX: 10; LEFT: 0px; PADDING-BOTTOM: 3px; BORDER-LEFT: #666 1px dashed; WIDTH: 60px; PADDING-TOP: 3px; BORDER-BOTTOM: #666 1px dashed; POSITION: absolute; HEIGHT: 20px; TEXT-ALIGN: center">
+<DIV style="FONT-SIZE: 12px"><A onmousemove="status='收藏本页';" 
+style="CURSOR: pointer" 
+onclick=window.external.AddFavorite(document.location.href,document.title) 
+onmouseout="status='';">收藏本页</A><BR><A onmousemove="status='收藏本站';" 
+style="CURSOR: pointer" 
+onclick="window.external.AddFavorite('http://www.rdxx.com/','热点信息网')" 
+onmouseout="status='';">收藏本站</A> </DIV></DIV>
+<SCRIPT type=text/javascript>
+document.getElementById('AddFav').style.pixelTop = document.documentElement.clientHeight-86;
+document.getElementById('AddFav').style.pixelLeft = document.documentElement.clientWidth-86;
+</SCRIPT>
+
+<DIV style="DISPLAY: none">
+<SCRIPT language=javascript 
+src="嵌入式Linux文件系统简介__Linux入门__Rdxx_Com.files/523559.js" 
+type=text/javascript></SCRIPT>
+</DIV></BODY></HTML>

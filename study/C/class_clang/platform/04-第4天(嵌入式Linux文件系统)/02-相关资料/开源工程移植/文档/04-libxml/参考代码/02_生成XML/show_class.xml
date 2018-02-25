@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<web_rfid>
+	<class>
+		<class_name>教师</class_name>
+	</class>
+	<class>
+		<class_name>2.26</class_name>
+	</class>
+	<class>
+		<class_name>3.21</class_name>
+	</class>
+	<class>
+		<class_name>4.12</class_name>
+	</class>
+	<class>
+		<class_name>5.12</class_name>
+	</class>
+	<class>
+		<class_name>6.5</class_name>
+	</class>
+</web_rfid>

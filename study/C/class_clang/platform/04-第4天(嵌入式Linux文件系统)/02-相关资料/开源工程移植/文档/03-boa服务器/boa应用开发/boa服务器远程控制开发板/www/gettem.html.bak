@@ -1,0 +1,17 @@
+<body bgcolor="Silver">
+<script> 
+function get_time()
+{
+	var u=function(txt) 
+	{ 
+		document.getElementById("nowDiv").innerHTML = txt; 
+	};
+	jQuery.post("/cgi-bin/get_adc_to_tem.cgi", "client",	u)
+	setTimeout("get_time()", 300); 
+}
+</script> 
+<script language="javascript" type="text/javascript" src="jquery.js" charset="utf-8"></script>
+<body onload="get_time()">
+<div id="nowDiv"></div> 
+</body>
+<body bgproperties=FIXED>

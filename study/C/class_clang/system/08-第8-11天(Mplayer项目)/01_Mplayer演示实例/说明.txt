@@ -1,0 +1,15 @@
+1、将《Mplayer_gtk_glade》拷贝到虚拟机，开发板终端进入《execute》目录，执行./play即可启动mplayer
+
+2、《execute》目录存放Mplayer的可执行文件
+
+3、《song》目录存放歌曲文件
+
+4、《lyrics》目录存放歌词文件
+
+5、《project》目录存放source insight工程文件
+
+6、《source》目录存放项目源代码
+
+7、《glade》目录存放界面布局的glade文件
+
+8、《picture》目录存放项目相关的所以图片

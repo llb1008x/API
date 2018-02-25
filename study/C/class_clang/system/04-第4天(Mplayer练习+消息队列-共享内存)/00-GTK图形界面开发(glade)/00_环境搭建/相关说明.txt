@@ -1,0 +1,7 @@
+由于开发板的库版本为gtk2.12之前的版本(gtk1.0)，所以只支持libglade模式，而Linux环境的版本比较新，只能保存GtkBuilder格式的Glade，但是能运行libglade的代码，而window的glade安装包两个格式都支持，所以我们主要使用window的glade设计界面，然后在Linux编译运行代码。
+
+1) window环境搭建
+找到glade3-3.6.7-with-GTK+.exe安装包，默认配置安装
+
+2) Linux环境运行编译搭建
+在终端敲在线安装命令：sudo apt-get install glade libglade2-dev

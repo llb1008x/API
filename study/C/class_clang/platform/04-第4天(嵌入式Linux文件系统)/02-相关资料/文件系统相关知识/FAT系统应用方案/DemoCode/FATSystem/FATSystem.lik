@@ -1,0 +1,91 @@
+Version: 3.0
+Options: m37
+Obj: "C:\PROGRA~1\Sunplus\UNSPID~1.0\startupD.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\Resource.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\IRQ.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\Main.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\SD_Hardware.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\SD_CRC.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\SD_Driver.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\SD_Command.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\Key.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\SPLC501User.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\SPLC501Driver_IO.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\DataOSforLCD.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\FAT_File.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\FAT_Dir.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\FAT_Disk.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\FAT_Driver.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\FAT_FAT.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\FAT_FDT.obj"
+Obj: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\FAT_Cache.obj"
+Lib: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\.\clib.lib"
+Lib: "C:\Program Files\Sunplus\unSP IDE 2.0.0\library\CMacro\CMacro1016.lib"
+Output: "E:\_Work\_2007GraduateProject\FAT System\FATSystem_backup\Debug\FATSystem.S37"
+;Locate: TEXT in "SD_CRC.obj" at 8009 
+;Align: TEXT in "SD_CRC.obj" with 0 
+;Locate: IRAM in "FAT_Cache.obj" at F0A5  linkat 5 
+;Align: IRAM in "FAT_Cache.obj" with 0 
+;Locate: RAM in "DataOSforLCD.obj" at 1 
+;Align: RAM in "DataOSforLCD.obj" with 0 
+;Locate: CODE in "FAT_FDT.obj" at 8235 
+;Align: CODE in "FAT_FDT.obj" with 0 
+;Locate: CODE in "FAT_File.obj" at 9586 
+;Align: CODE in "FAT_File.obj" with 0 
+;Locate: CODE in "SPLC501User.obj" at A778 
+;Align: CODE in "SPLC501User.obj" with 0 
+;Locate: CODE in "FAT_FAT.obj" at B92C 
+;Align: CODE in "FAT_FAT.obj" with 0 
+;Locate: CODE in "FAT_Dir.obj" at C3AF 
+;Align: CODE in "FAT_Dir.obj" with 0 
+;Locate: CODE in "FAT_Disk.obj" at CC12 
+;Align: CODE in "FAT_Disk.obj" with 0 
+;Locate: CODE in "SD_Command.obj" at D2AC 
+;Align: CODE in "SD_Command.obj" with 0 
+;Locate: CODE in "SD_Driver.obj" at D924 
+;Align: CODE in "SD_Driver.obj" with 0 
+;Locate: CODE in "FAT_Cache.obj" at DF8A 
+;Align: CODE in "FAT_Cache.obj" with 0 
+;Locate: CODE in "FAT_Driver.obj" at E4F9 
+;Align: CODE in "FAT_Driver.obj" with 0 
+;Locate: CODE in "Main.obj" at E7D4 
+;Align: CODE in "Main.obj" with 0 
+;Locate: CODE in "SPLC501Driver_IO.obj" at EA74 
+;Align: CODE in "SPLC501Driver_IO.obj" with 0 
+;Locate: CODE in "DataOSforLCD.obj" at EC6C 
+;Align: CODE in "DataOSforLCD.obj" with 0 
+;Locate: CODE in "Key.obj" at ED32 
+;Align: CODE in "Key.obj" with 0 
+;Locate: CODE in "SD_CRC.obj" at EDE3 
+;Align: CODE in "SD_CRC.obj" with 0 
+;Locate: CODE in "SD_Hardware.obj" at EE90 
+;Align: CODE in "SD_Hardware.obj" with 0 
+;Locate: CODE in "divu2" of "CMacro1016.lib"  at EF13 
+;Align: CODE in "divu2" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "divi2" of "CMacro1016.lib"  at EF68 
+;Align: CODE in "divi2" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "mulu2" of "CMacro1016.lib"  at EFAB 
+;Align: CODE in "mulu2" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "lshiu2" of "CMacro1016.lib"  at EFD2 
+;Align: CODE in "lshiu2" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "rshu2" of "CMacro1016.lib"  at EFF0 
+;Align: CODE in "rshu2" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "mulu1" of "CMacro1016.lib"  at F00E 
+;Align: CODE in "mulu1" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "lshiu1" of "CMacro1016.lib"  at F02C 
+;Align: CODE in "lshiu1" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "rshu1" of "CMacro1016.lib"  at F041 
+;Align: CODE in "rshu1" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "muli2" of "CMacro1016.lib"  at F056 
+;Align: CODE in "muli2" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "modu2" of "CMacro1016.lib"  at F069 
+;Align: CODE in "modu2" of "CMacro1016.lib"  with 0 
+;Locate: CODE in "MEMSET" of "clib.lib"  at F07C 
+;Align: CODE in "MEMSET" of "clib.lib"  with 0 
+;Locate: CODE in "STRCPY" of "clib.lib"  at F08C 
+;Align: CODE in "STRCPY" of "clib.lib"  with 0 
+;Locate: CODE in "STRLEN" of "clib.lib"  at F099 
+;Align: CODE in "STRLEN" of "clib.lib"  with 0 
+;Locate: SDCammand_ptsec in "FAT_Driver.obj" at 8233 
+;Align: SDCammand_ptsec in "FAT_Driver.obj" with 0 
+;Locate: __sn_init_table at 8000 

@@ -1,0 +1,269 @@
+#下面这行的内容，表示这个shell脚本的解释器是/bin/sh，给的解释器的参数为-e，
+#这个参数的意思是，当shell返回值为非零的时候，shell马上退出执行。
+#在shell脚本里面也可以没有这一行，这一行不是必须的，
+#如果没有这一行的话，那么shell脚本就会用当前运行环境下的默认的shell来执行。
+
+#!/bin/sh -e
+
+# 2013年03月22日 整理u-boot的配置过程注释  by hbb
+
+# Script to create header files and links to configure
+# U-Boot for a specific board.
+#
+# Parameters:  Target  Architecture  CPU  Board [VENDOR] [SOC]
+#
+# (C) 2002-2006 DENX Software Engineering, Wolfgang Denk <wd@denx.de>
+#
+
+#APPEND变量与BOARD_NAME变量都设置了默认值，如果后面对变量值有修改就以后面的为准，没有修改就是默认值了。
+#这里的APPEND的参数的意义，实际上就是用来标识是否产生一个新的配置文件，还是直接把生成的新的配置信息写到旧的文件后面。
+
+#mkconfig  unsp210  arm s5pc11x unsp210 samsung s5pc110 #配置u-boot的命令-由make unsp210_config翻译过来#
+# $0        $1     $2    $3      $4      $5      $6
+
+
+APPEND=no # Default: Create new config file
+BOARD_NAME="" # Name to print in make output
+
+# $#代表的是传入脚本的参数的个数，-gt表示是如果左边参数比右边的参数大，则返回true，否则为false
+# $1代表的是传入的第一个参数的内容；$2表示传入的第二个参数的内容，
+# 以此类推，shift表示参数都左移一位，原来的$3变为$2，$2变为$1，$1的内容则被丢弃。
+# 这个地方，实际上是处理了一些附加的参数的问题，如果是“--”，则丢弃不作处理，如果是-a，则把APPEND的值设置为yes；
+# 如果是-n，则表示后面跟的是板子的名称
+# ${a%%pattern}是shell中的一个替换语法，表示把变量a中的内容，从左至右，最大程度上把符合pattern样式的字符串删掉
+# 这里可以看出，如果-n后面跟的是类似于smdk2410_config的参数的话，则最后汇编成smdk2410
+# 如果是其他的值，则退出循环，不执行了
+# 在makefile中的动作其实并不会触发这里的处理逻辑，估计这里是作者为了调试方便，
+# 需要单独运行此脚本的时候，加的一些对参数的处理。
+# 下面的这8行的作用是：
+# 判断第11行的这条命令中是否存在“--” “-a” “-n” “*”
+# 如果没有这些符号则推出即可
+
+while [ $# -gt 0 ] ; do
+case "$1" in
+--) shift ; break ;;
+-a) shift ; APPEND=yes ;;
+-n) shift ; BOARD_NAME="${1%%_config}" ; shift ;;
+*)  break ;;
+esac
+done
+
+
+
+# 这句话的意思是：
+# 如果已经定义了“BOARD_NAME”折执行前半部分；如果没有定义则执行后半部分
+# 看一下16行显然“BOARD_NAME”为空，没有定义；因此执行执行后半部分
+# 给“BOARD_NAME”传参数“$1”;则翻译成下面这句话：
+# BOARD_NAME=unsp210
+# 下面的语句中$#表示什么意思呢？表示的是上面的配置u-boot的命令中的参数的个数
+# 即11行中有6个参数；44行和45行表示参数的个数小于4个的话退出或者大于6个也要退出
+
+[ "${BOARD_NAME}" ] || BOARD_NAME="$1"
+
+# -lt 是指 less than
+
+[ $# -lt 4 ] && exit 1
+[ $# -gt 6 ] && exit 1
+
+echo "Configuring for ${BOARD_NAME} board..." #在u-boot配置时会打印这句话#
+
+#
+# Create link to architecture specific headers
+#
+#当用户指定的$OBJTREE与$SRCTREE不一致的时候会做如下一些事情：
+#在$OBJTREE下建立include文件夹
+#在$OBJTREE下建立include2文件夹
+#进入到include2文件夹，其实就是$OBJTREE文件夹下的include2
+#删除asm，其实往后看就知道了，这是一个文件夹，是以link的方式建立的
+#然后建立一个asm的文件夹，这个文件夹是指向${SRCTREE}/include/asm-$2的，$2这个参数#多指CPU架构类型如：PPC,ARM。
+#给变量LNPREFIX赋值。这个变量在以后的执行会用到，所以这里给的asm的位置，是相对于
+#后来执行的时候，当前工作目录与asm之间的关系来定的。
+
+
+#进入到$OBJTREE中的include文件夹（之前是在include2里）。
+#删除掉asm-$2文件夹，其实就是asm-arm文件夹。
+#删除掉asm文件夹
+#建立一个新的asm-$2文件夹，其实就是asm-arm文件夹
+#建立一个名为asm的link，这个link指向新建立的asm-arm文件夹。
+#现在看一下整个目录大概的结构：
+#${OBJTREE}
+#Include
+#asm-arm
+#asm -> ./asm-arm
+#include2
+#asm -> ${SRCTREE}/include/asm-arm
+#可以看到，目前在include下的asm-arm与asm其实是同一个文件夹，并且内容为空，include2
+#文件夹下的asm是指向了源码树中的${SRCTREE}/include/asm-arm文件夹。
+#如果"$SRCTREE"与"$OBJTREE"是同一个文件（大多数情况下，咱们都是这种方式来编译的），
+#那么就是仅仅在include文件夹下，建立一个名为asm的link，直接指向asm-$2，即asm-arm。
+#最后删除asm-arm/arch文件夹。
+
+
+
+# 判断这两个关键字相等还是不相等，需要查询Makefile文件，
+# OBJTREE := $(if $(BUILD_DIR),$(BUILD_DIR),$(CURDIR))
+# 解释：如果定义了BUILD_DIR则OBJTREE=BUILD_DIR，如果没定义BUILD_DIR则OBJTREE=CURDIR
+# 此时去makefile文件中查阅一下，看看是否定义了BUILD_DIR，检查后发现makefile文件中没有定义BUILD_DIR
+#
+# SRCTREE := $(CURDIR)
+# 因此 SRCTREE 和 OBJTREE 相等
+#
+
+if [ "$SRCTREE" != "$OBJTREE" ] ; then #如果"$SRCTREE"和"$OBJTREE"不相等的话，则执行下面的这句话#
+mkdir -p ${OBJTREE}/include
+mkdir -p ${OBJTREE}/include2
+cd ${OBJTREE}/include2
+rm -f asm
+ln -s ${SRCTREE}/include/asm-$2 asm
+LNPREFIX="../../include2/asm/"
+cd ../include
+rm -rf asm-$2
+rm -f asm
+mkdir asm-$2
+ln -s asm-$2 asm
+else #相不相等看上面52行的注释#
+cd ./include #进入当前目录下的include文件夹#
+rm -f asm                 #删除之前的链接文件asm，以防影响下面将要使用的或将要生成的asm#
+ln -s asm-$2 asm #这里$2是指11行中的arm这个参数；翻译后：ln -S asm-arm asm  具体解释见79行#
+fi
+
+# 76行这句话相当于建立一个链接文件，它的名字叫做asm，它指向asm-arm；见下图
+# 为什么这样做呢？我们可以看一下include目录下有很多的asm，分别是不同平台的，不同架构的；如下图所示
+# 这样做的好处是：方便使用，怎样看出他方便使用呢？假设我们使用#include <asm-i386/type.h>或者其他架构的头文件如
+# #include<asm-arm/type.h>如果我们使用上面的链接就可以在包含不同架构的头文件时不必频繁修改，
+# 直接使用#include <asm/type.h>  
+
+rm -f asm-$2/arch #翻译后得到：rm -f asm-arm/arch
+
+
+#下面第一句中连接两个判断的-o，相当于or的意思，就是表示的“或”。意思就是如果第6
+#个参数为空或是为NULL，则在include下建立一个asm-$2/arch的link，指向
+#${LNPREFIX}arch-$3，否则就在include下建立一个asm-$2/arch的link，指向
+#${LNPREFIX}arch-$6
+
+if [ -z "$6" -o "$6" = "NULL" ] ; then # 如果第六个参数为零或者为NULL
+ln -s ${LNPREFIX}arch-$3 asm-$2/arch # ln -s $
+else # 否则
+ln -s ${LNPREFIX}arch-$6 asm-$2/arch # 此文件没有定义LNPREFIX；则翻译为 ln -s arch-s5pc110 asm-arm/arch 详93行
+fi
+
+#
+#解释命令：ln -s arch-s5pc110 asm-arm/arch
+#在asm-arch目录下建立链接文件：arch指向arch-s5pc110
+#如下图所示
+#
+
+
+# create link for s3c24xx SoC
+if [ "$3" = "s3c24xx" ] ; then # 如果s5pc11x=s3c24xx 则执行下面语句（ NO ）
+rm -f regs.h
+ln -s $6.h regs.h
+rm -f asm-$2/arch
+ln -s arch-$3 asm-$2/arch
+fi
+
+# create link for s3c64xx SoC
+if [ "$3" = "s3c64xx" ] ; then # 如果s5pc11x=s3c64xx 则执行下面语句（ NO ）
+rm -f regs.h
+ln -s $6.h regs.h
+rm -f asm-$2/arch
+ln -s arch-$3 asm-$2/arch
+fi
+
+# create link for s5pc1xx SoC
+if [ "$3" = "s5pc1xx" ] ; then # 如果s5pc11x=s5pc1xx 则执行下面语句（ NO ）
+        rm -f regs.h
+        ln -s $6.h regs.h
+        rm -f asm-$2/arch
+        ln -s arch-$3 asm-$2/arch
+fi
+
+# create link for s5pc11x SoC
+if [ "$3" = "s5pc11x" ] ; then # 如果s5pc11x=s5pc11x 则执行下面语句（ Yes ）
+        rm -f regs.h # 删除regs.h
+        ln -s $6.h regs.h # 生成链接文件regs.h,它指向s5pc110.h；目录在include文件夹下
+        rm -f asm-$2/arch # 删除asm-arm/arch这个链接文件
+        ln -s arch-$3 asm-$2/arch # 生成链接文件asm-arm/arch指向arch-s5pc11x
+fi
+
+# create link for s5p64xx SoC
+if [ "$3" = "s5p64xx" ] ; then # 如果s5pc11x=s5pc11x 则执行下面语句（ NO ）
+rm -f regs.h
+ln -s $6.h regs.h
+rm -f asm-$2/arch
+ln -s arch-$3 asm-$2/arch
+fi
+
+# create link for s5p644x SoC
+if [ "$3" = "s5p644x" ] ; then # 如果s5pc11x=s5p644x 则执行下面语句（ NO ）
+rm -f regs.h
+ln -s $6.h regs.h
+rm -f asm-$2/arch
+ln -s arch-$3 asm-$2/arch
+fi
+
+#如果第二个参数是arm的话，则删除include/asm-$2/proc文件，实际上就是
+#include/asm-arm/proc文件夹，建立一个新的link，在include/asm-$2/proc处，也即
+#include/asm-arm/proc，指向${LNPREFIX}proc-armv文件夹
+
+if [ "$2" = "arm" ] ; then # 判断 $2是否等于=arm 相等则执行下面语句（ YES ）
+rm -f asm-$2/proc # 删除asm-arm/proc
+ln -s ${LNPREFIX}proc-armv asm-$2/proc # 生成链接文件在asm-arm/proc并指向proc-armv
+fi
+
+# create link for s3c64xx-mp SoC
+if [ "$3" = "s3c64xx-mp" ] ; then # 判断 $3 是否等于 s3c64xx-mp ? 相等则执行下面语句（ NO ）
+rm -f regs.h
+ln -s $6.h regs.h
+rm -f asm-$2/arch
+ln -s arch-$3 asm-$2/arch
+fi
+
+#
+# Create include file for Make
+#
+#第一行，输出ARCH = $2，即ARCH = arm到config.mk，也即include/config.mk，注意这里
+#用了一个>，它表示重新生成一个config.mk文件，如果有旧的，则覆盖
+#第二行，同理，输出CPU = arm920t到config.mk中
+#第三行，同理，输出BOARD = smdk2410到config.mk
+#第四行，判断，如果$5不为空，且$5的值不为NULL，
+#则把VENDOR = $5的值输出到config.mk中
+#第五行，同理，把SOC输出到config.mk中
+
+echo "ARCH   = $2" >  config.mk # 打印 ARCH  = arm 同时新建并输出到config.mk
+echo "CPU    = $3" >> config.mk # 打印 CPU   = s5pc11x 并且输出到config.mk
+echo "BOARD  = $4" >> config.mk # 打印 BOARD = unsp210 并且输出到config.mk
+
+# 上面三句话执行完成后，会生成config.mk并且内容是：
+# ARCH  = arm
+# CPU   = s5pc11x
+# BOARD = unsp210
+# >  表示“新建”   
+# >> 表示“追加”
+ 
+# 第5个参数存在并且不等于NULL 以“VENDOR = samsung”形式追加到config.mk中
+[ "$5" ] && [ "$5" != "NULL" ] && echo "VENDOR = $5" >> config.mk
+
+# 第6个参数存在并且不等于NULL 以“SOC    = s5pc110”形式追加到config.mk中
+[ "$6" ] && [ "$6" != "NULL" ] && echo "SOC    = $6" >> config.mk # s5pc110 并且输出到config.mk ??
+
+
+#
+# Create board specific header file - 创建一个和开发板相关的头文件
+#
+#如果APPEND的值为yes，则写入一空行到已经存在的config.h中，也即include/config.h中，
+#如果不是，则生成一个新的config.h，如果旧的文件存在，则覆盖。
+
+if [ "$APPEND" = "yes" ] # Append to existing config file #APPEND = yes
+then
+echo >> config.h # 追加到 config.h
+else
+> config.h # Create new config file # 创建 config.h
+fi
+
+# 下面两行执行后会把相关的内容追加到config.h中
+echo "/* Automatically generated - do not edit */" >>config.h
+echo "#include <configs/$1.h>" >>config.h
+
+exit 0
+

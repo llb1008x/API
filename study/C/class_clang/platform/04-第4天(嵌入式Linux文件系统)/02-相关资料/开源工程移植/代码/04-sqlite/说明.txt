@@ -1,0 +1,3 @@
+sqlite_pc.tar.gz是编译好的pc版的sqlite直接解压应用即可
+sqlite_arm.tar.gz是编译好的arm版的sqlite解压复制到开发板即可
+

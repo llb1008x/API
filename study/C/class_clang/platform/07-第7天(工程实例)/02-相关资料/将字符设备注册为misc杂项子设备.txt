@@ -1,0 +1,30 @@
+
+杂项设备（misc device）特殊的字符设备。
+
+杂项设备也是在嵌入式系统中用得比较多的一种设备驱动。
+在Linux内核的include\linux目录下有Miscdevice.h文件，要把自己定义的miscdevice从设备定义在这里。
+其实是因为这些字符设备不符合预先确定的字符设备范畴，所有这些设备采用主编号10，一起归于miscdevice
+其实misc_register就是用主标号10调用register_chrdev()的。
+
+在内核中，misc杂项设备驱动接口是对一些字符设备的简单封装，他们共享一个主设备号，有不同的次设备号，共享一个open调用，其他的操作函数在打开后运用linux驱动程序的方法重载进行装载。
+
+内核维护一个misc_list链表，misc设备在misc_register注册的时候链接到这个链表，在misc_deregister中解除链接.
+
+struct miscdevice  {  
+    int minor;  
+    const char *name;  
+    const struct file_operations *fops;  
+    struct list_head list;  
+    struct device *parent;  
+    struct device *this_device;  
+    const char *nodename;  
+    mode_t mode;  
+}; 
+这个结构体是misc设备基本的结构体，在注册misc设备的时候必须要声明并初始化一个这样的结构体，但其中一般只需填充name minor fops字段就可以了
+static struct miscdevice misc = {  
+    .minor = MISC_DYNAMIC_MINOR,  
+    .name = DEVICE_NAME,  
+    .fops = &dev_fops,  
+}; 
+ 一般的时候在fops不用实现open方法，因为最初的方法misc_ops包含了open方法。
+ 其中minor如果填充MISC_DYNAMIC_MINOR，则是动态次设备号，次设备号由misc_register动态分配的。

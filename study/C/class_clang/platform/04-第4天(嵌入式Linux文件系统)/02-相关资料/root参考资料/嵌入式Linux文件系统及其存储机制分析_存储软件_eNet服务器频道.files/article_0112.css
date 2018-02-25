@@ -1,0 +1,510 @@
+.bor {
+	BORDER-RIGHT: #c4e1ff 1px solid; BORDER-TOP: #c4e1ff 1px solid; BORDER-LEFT: #c4e1ff 1px solid; BORDER-BOTTOM: #c4e1ff 1px solid
+}
+.article_newbg {
+	BACKGROUND: url(../images/atricle_topbg.gif) repeat-x; WIDTH: 100%; HEIGHT: 34px
+}
+.article_newnav {
+	MARGIN: 0px auto; WIDTH: 980px
+}
+.enetlogo_article {
+	MARGIN-TOP: 5px; FLOAT: left; WIDTH: 118px
+}
+.article_nav {
+	MARGIN-TOP: 5px; FLOAT: right
+}
+.article_nav LI {
+	DISPLAY: inline; FLOAT: left; LINE-HEIGHT: 24px; HEIGHT: 24px
+}
+.article_nav LI.navline {
+	BACKGROUND: url(../images/navline.gif) no-repeat; MARGIN: 2px 8px 0px; WIDTH: 2px; HEIGHT: 19px
+}
+.article_nav LI A {
+	FONT-SIZE: 14px
+}
+.article_nav LI.artnavmar {
+	MARGIN: 2px 2px 0px
+}
+.article_nav A.specnav {
+	FLOAT: left; MARGIN: 0px 5px 0px 0px; TEXT-DECORATION: none
+}
+.article_nav A SPAN {
+	PADDING-RIGHT: 18px; DISPLAY: block; PADDING-LEFT: 5px; BACKGROUND: url(../images/1_03.gif) no-repeat right 7px; FLOAT: left; PADDING-BOTTOM: 0px; COLOR: #16387c; PADDING-TOP: 0px
+}
+.article_nav A SPAN {
+	FLOAT: none
+}
+.article_nav A:hover SPAN {
+	COLOR: #c00
+}
+.article_nav LI.selected A {
+	BACKGROUND-POSITION: 0px 0px
+}
+.article_nav LI.selected A SPAN {
+	BACKGROUND-POSITION: 100% -45px; COLOR: #c00
+}
+.article_nav A:hover {
+	BACKGROUND-POSITION: 0% 0px; TEXT-DECORATION: none
+}
+.article_nav LI.selected A:hover {
+	BACKGROUND-POSITION: 0% 0px; TEXT-DECORATION: none
+}
+.article_nav A:hover SPAN {
+	BACKGROUND-POSITION: 100% -45px
+}
+.article_nav LI.selected A:hover SPAN {
+	BACKGROUND-POSITION: 100% -45px
+}
+.dropmenudiv_d {
+	BORDER-RIGHT: #aedfff 1px solid; BORDER-TOP: #aedfff 1px solid; Z-INDEX: 100; VISIBILITY: hidden; BORDER-LEFT: #aedfff 1px solid; WIDTH: 82px; LINE-HEIGHT: 18px; BORDER-BOTTOM: #aedfff 1px solid; POSITION: absolute; TOP: 0px; BACKGROUND-COLOR: #fff
+}
+.dropmenudiv_d A {
+	BORDER-RIGHT: #aedfff 0px solid; PADDING-RIGHT: 0px; BORDER-TOP: #aedfff 0px solid; DISPLAY: block; PADDING-LEFT: 0px; FONT-SIZE: 14px; PADDING-BOTTOM: 2px; BORDER-LEFT: #aedfff 0px solid; WIDTH: auto; COLOR: #16387c; TEXT-INDENT: 5px; PADDING-TOP: 2px; BORDER-BOTTOM: #aedfff 1px solid; TEXT-DECORATION: none
+}
+ HTML .dropmenudiv_d A {
+	COLOR: #16387c
+}
+.dropmenudiv_d A:hover {
+	COLOR: #c00; BACKGROUND-COLOR: #c8eeff
+}
+.art_adRtit {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; BACKGROUND: url(../images/art_adRtit.gif) repeat-y; WIDTH: 220px; PADDING-TOP: 5px; HEIGHT: 17px; TEXT-ALIGN: center
+}
+.art_adRlink {
+	BACKGROUND: url(../images/rlinkbg.gif) repeat-x 50% bottom; WIDTH: 220px; PADDING-TOP: 8px
+}
+.art_adRlink LI {
+	PADDING-LEFT: 8px; BACKGROUND: url(../images/fk.gif) no-repeat 0px 5px; MARGIN-BOTTOM: 6px; MARGIN-LEFT: 18px; OVERFLOW: hidden; WIDTH: 177px; HEIGHT: 14px
+}
+.art_adRlink LI A {
+	COLOR: #0004a4
+}
+.art_Left {
+	FLOAT: left; WIDTH: 674px; MARGIN-RIGHT: 6px
+}
+.art_right {
+	FLOAT: left; WIDTH: 300px
+}
+.artLeftcon {
+	WIDTH: 672px
+}
+.artRightcon {
+	WIDTH: 298px
+}
+.posibg {
+	BACKGROUND: url(../images/posibg.gif) repeat-x; HEIGHT: 34px
+}
+.chalogo {
+	FLOAT: left; WIDTH: 128px; MARGIN-RIGHT: 10px
+}
+.posilink {
+	FLOAT: left; WIDTH: 300px; COLOR: #000; LINE-HEIGHT: 34px
+}
+.posilink A {
+	COLOR: #1340bf; TEXT-DECORATION: underline
+}
+.not_sea {
+	MARGIN-TOP: 3px
+}
+.artcon {
+	BACKGROUND: #fafbff; PADDING-BOTTOM: 30px
+}
+.artcon H1 {
+	PADDING-BOTTOM: 11px; MARGIN: 0px auto 10px; WIDTH: 622px; PADDING-TOP: 36px; BORDER-BOTTOM: #c7e2ff 1px solid; TEXT-ALIGN: center
+}
+.artcon H1 A {
+	FONT-SIZE: 20px; COLOR: #000
+}
+.laiy {
+	TEXT-ALIGN: center
+}
+.artintro {
+	BORDER-RIGHT: #eaebed 1px solid; PADDING-RIGHT: 15px; BORDER-TOP: #eaebed 1px solid; PADDING-LEFT: 15px; BACKGROUND: #fff; PADDING-BOTTOM: 5px; MARGIN: 20px auto 0px; BORDER-LEFT: #eaebed 1px solid; WIDTH: 587px; COLOR: #787878; LINE-HEIGHT: 18px; PADDING-TOP: 10px; BORDER-BOTTOM: #eaebed 1px solid
+}
+.artTxt {
+	FONT-SIZE: 14px; MARGIN: 0px auto; WIDTH: 607px; COLOR: #000; LINE-HEIGHT: 20px
+}
+.artTxt P {
+	MARGIN-TOP: 20px; FONT-SIZE: 14px; COLOR: #000; LINE-HEIGHT: 20px
+}
+.artTxt H1 {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; MARGIN: 5px 0px; LINE-HEIGHT: 164.28%
+}
+.artTxt H2 {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; MARGIN: 5px 0px; LINE-HEIGHT: 164.28%
+}
+.artTxt H3 {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; MARGIN: 5px 0px; LINE-HEIGHT: 164.28%
+}
+.artTxt H4 {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; MARGIN: 5px 0px; LINE-HEIGHT: 164.28%
+}
+.artTxt H5 {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; MARGIN: 5px 0px; LINE-HEIGHT: 164.28%
+}
+.artTxt H6 {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; MARGIN: 5px 0px; LINE-HEIGHT: 164.28%
+}
+.artTxt_16  {
+	FONT-SIZE: 16px
+}
+.artTxt_16 P {
+	FONT-SIZE: 16px
+}
+.artTxt_16 H1 {
+	FONT-SIZE: 16px
+}
+.artTxt_16 H2 {
+	FONT-SIZE: 16px
+}
+.artTxt_16 H3 {
+	FONT-SIZE: 16px
+}
+.artTxt_16 H4 {
+	FONT-SIZE: 16px
+}
+.artTxt_16 H5 {
+	FONT-SIZE: 16px
+}
+.artTxt_16 H6 {
+	FONT-SIZE: 16px
+}
+.artTxt_14  {
+	FONT-SIZE: 14px
+}
+.artTxt_14 P {
+	FONT-SIZE: 14px
+}
+.artTxt_14 H1 {
+	FONT-SIZE: 14px
+}
+.artTxt_14 H2 {
+	FONT-SIZE: 14px
+}
+.artTxt_14 H3 {
+	FONT-SIZE: 14px
+}
+.artTxt_14 H4 {
+	FONT-SIZE: 14px
+}
+.artTxt_14 H5 {
+	FONT-SIZE: 14px
+}
+.artTxt_14 H6 {
+	FONT-SIZE: 14px
+}
+.artTxt_12  {
+	FONT-SIZE: 12px
+}
+.artTxt_12 P {
+	FONT-SIZE: 12px
+}
+.artTxt_12 H1 {
+	FONT-SIZE: 12px
+}
+.artTxt_12 H2 {
+	FONT-SIZE: 12px
+}
+.artTxt_12 H3 {
+	FONT-SIZE: 12px
+}
+.artTxt_12 H4 {
+	FONT-SIZE: 12px
+}
+.artTxt_12 H5 {
+	FONT-SIZE: 12px
+}
+.artTxt_12 H6 {
+	FONT-SIZE: 12px
+}
+.arttxt2 {
+	MARGIN-TOP: 34px; MARGIN-LEFT: 32px; WIDTH: 600px
+}
+.arttxt2 P {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; MARGIN-BOTTOM: 8px; COLOR: #000
+}
+.arttxt2 LI {
+	PADDING-LEFT: 8px; BACKGROUND: url(../images/fk.gif) no-repeat 0px 15px; LINE-HEIGHT: 35px
+}
+.arttxt2 LI A {
+	FONT-SIZE: 14px; COLOR: #1645c9; TEXT-DECORATION: underline
+}
+.arttxt2 LI.font_red A {
+	COLOR: #c00
+}
+.condh {
+	MARGIN-TOP: 10px; FLOAT: left; WIDTH: 300px
+}
+.condh LI {
+	MARGIN-BOTTOM: 8px; OVERFLOW: hidden; WIDTH: 300px; COLOR: #000; HEIGHT: 14px
+}
+.condh LI A {
+	COLOR: #05009b
+}
+.dhmarg {
+	DISPLAY: inline; MARGIN-LEFT: 15px; MARGIN-RIGHT: 29px
+}
+.artscon {
+	MARGIN-TOP: 12px; PADDING-LEFT: 23px
+}
+.arts1 {
+	FLOAT: left; WIDTH: 45px; PADDING-TOP: 3px
+}
+.arts1 INPUT {
+	MARGIN-TOP: -3px; VERTICAL-ALIGN: middle
+}
+.arts2 {
+	BORDER-RIGHT: #4da4cf 1px solid; BORDER-TOP: #4da4cf 1px solid; FLOAT: left; BORDER-LEFT: #4da4cf 1px solid; WIDTH: 210px; BORDER-BOTTOM: #4da4cf 1px solid; HEIGHT: 20px
+}
+.arts2 INPUT.inp1 {
+	BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; BACKGROUND: #fff; BORDER-BOTTOM-WIDTH: 0px; WIDTH: 160px; HEIGHT: 20px; BORDER-RIGHT-WIDTH: 0px
+}
+.arts2 INPUT.inp2 {
+	BORDER-TOP-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; BACKGROUND: url(../images/inp2.gif) no-repeat; BORDER-BOTTOM-WIDTH: 0px; WIDTH: 50px; CURSOR: hand; HEIGHT: 22px; BORDER-RIGHT-WIDTH: 0px
+}
+.artscon2 {
+	BORDER-RIGHT: #b4b5c7 1px solid; BORDER-TOP: #b4b5c7 1px solid; MARGIN-TOP: 10px; MARGIN-LEFT: 20px; BORDER-LEFT: #b4b5c7 1px solid; WIDTH: 596px; BORDER-BOTTOM: #b4b5c7 1px solid
+}
+.sbg {
+	BORDER-RIGHT: #b4b5c7 1px solid; BACKGROUND: url(../images/sbg.gif) repeat-x; FLOAT: left; WIDTH: 94px; COLOR: #5b5e63; PADDING-TOP: 3px; HEIGHT: 15px; TEXT-ALIGN: center
+}
+.slink {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 10px; FLOAT: left; PADDING-BOTTOM: 0px; WIDTH: 481px; LINE-HEIGHT: 15px; PADDING-TOP: 3px; HEIGHT: 15px
+}
+.slink A {
+	COLOR: #00009f
+}
+.pinglun {
+	PADDING-RIGHT: 44px; MARGIN-TOP: 10px; PADDING-TOP: 3px; TEXT-ALIGN: right
+}
+.pinglun IMG {
+	MARGIN-TOP: -2px; VERTICAL-ALIGN: middle; MARGIN-RIGHT: 5px
+}
+.artline {
+	MARGIN-TOP: 10px; BACKGROUND: #c8daf2; MARGIN-BOTTOM: 10px; MARGIN-LEFT: 20px; OVERFLOW: hidden; WIDTH: 598px; HEIGHT: 1px
+}
+.artlx {
+	PADDING-BOTTOM: 10px; MARGIN-LEFT: 27px; WIDTH: 631px
+}
+.artmail {
+	PADDING-LEFT: 20px; BACKGROUND: url(../images/mail.gif) no-repeat 0px 2px; FLOAT: left; COLOR: #626262; HEIGHT: 14px
+}
+.artmail A {
+	COLOR: #00009f; TEXT-DECORATION: underline
+}
+.artmail A:hover {
+	COLOR: #c00
+}
+.artRlink {
+	FLOAT: right
+}
+.artRlink LI {
+	DISPLAY: inline; FLOAT: left; LINE-HEIGHT: 20px; MARGIN-RIGHT: 18px; HEIGHT: 20px
+}
+.artRlink LI.artRlinkline {
+	BACKGROUND: #c7d9f1; WIDTH: 1px; HEIGHT: 20px
+}
+.artRlink LI A {
+	COLOR: #00009f; TEXT-DECORATION: underline
+}
+.art334 {
+	FLOAT: left; WIDTH: 332px
+}
+.marR6 {
+	MARGIN-RIGHT: 6px
+}
+.txt280 {
+	MARGIN-TOP: 14px; MARGIN-LEFT: 20px; WIDTH: 280px
+}
+.txt280 LI {
+	PADDING-LEFT: 8px; BACKGROUND: url(../images/fk.gif) no-repeat 0px 5px; MARGIN-BOTTOM: 8px; OVERFLOW: hidden; WIDTH: 272px; HEIGHT: 14px
+}
+.txt280 LI A {
+	COLOR: #00009f
+}
+.txtnum16 {
+	MARGIN-TOP: 14px; MARGIN-LEFT: 20px; WIDTH: 290px
+}
+.txtnum16 LI {
+	PADDING-LEFT: 15px; BACKGROUND: url(../images/fk.gif) no-repeat 0px 5px; MARGIN-BOTTOM: 5px; OVERFLOW: hidden; WIDTH: 275px; HEIGHT: 1%
+}
+.txtnum16 LI A {
+	DISPLAY: block; FONT-SIZE: 14px; FLOAT: left; OVERFLOW: hidden; WIDTH: 240px; COLOR: #00009f; HEIGHT: 16px
+}
+.txtnum16 LI SPAN {
+	DISPLAY: block; FONT-SIZE: 14px; FLOAT: right; WIDTH: 32px; COLOR: #333
+}
+.font_black LI A {
+	COLOR: #000
+}
+.hotzt {
+	PADDING-RIGHT: 5px; PADDING-LEFT: 4px; FONT-WEIGHT: bold; FONT-SIZE: 13px; BACKGROUND: #f6f6f6; FLOAT: left; PADDING-BOTTOM: 16px; WIDTH: 13px; MARGIN-RIGHT: 14px; PADDING-TOP: 16px
+}
+.txt240 {
+	MARGIN-TOP: 8px; FLOAT: left; WIDTH: 245px
+}
+.txt240 LI {
+	MARGIN-BOTTOM: 3px; OVERFLOW: hidden; WIDTH: 245px; HEIGHT: 1%
+}
+.txt240 LI .artchLeft {
+	FLOAT: left; OVERFLOW: hidden; WIDTH: 60px; COLOR: #666; HEIGHT: 14px
+}
+.txt240 LI .artchRight {
+	FLOAT: right; OVERFLOW: hidden; WIDTH: 175px; HEIGHT: 14px
+}
+.txt240 LI .artchLeft A {
+	COLOR: #666
+}
+.txt240 LI .artchRight A {
+	COLOR: #000; TEXT-DECORATION: underline
+}
+.txt240 LI A:hover {
+	COLOR: #c00
+}
+.txt280 LI A:hover {
+	COLOR: #c00
+}
+.artRlink LI A:hover {
+	COLOR: #c00
+}
+.slink A:hover {
+	COLOR: #c00
+}
+.condh LI A:hover {
+	COLOR: #c00
+}
+.laiy A:hover {
+	COLOR: #c00
+}
+.posilink A:hover {
+	COLOR: #c00
+}
+.art_adRlink LI A:hover {
+	COLOR: #c00
+}
+.arttxt2 LI A:hover {
+	COLOR: #c00
+}
+.artcon H1 A:hover {
+	COLOR: #c00
+}
+.txtnum16 LI A:hover {
+	COLOR: #c00
+}
+.font_black LI A:hover {
+	COLOR: #c00
+}
+.pic110 {
+	MARGIN-TOP: 15px; DISPLAY: inline; FLOAT: left; MARGIN-LEFT: 12px; OVERFLOW: hidden; WIDTH: 110px; MARGIN-RIGHT: 18px; HEIGHT: 85px
+}
+.cptxt {
+	MARGIN-TOP: 8px; FLOAT: left; WIDTH: 145px; COLOR: #000; LINE-HEIGHT: 20px; HEIGHT: 98px
+}
+.cpmore {
+	CLEAR: both; PADDING-LEFT: 8px; PADDING-BOTTOM: 10px; OVERFLOW: hidden; PADDING-TOP: 5px; HEIGHT: 1%
+}
+.cpmore LI {
+	DISPLAY: inline; FLOAT: left; MARGIN-LEFT: 4px; COLOR: #000; LINE-HEIGHT: 20px
+}
+.cpmore LI.morebg {
+	BORDER-RIGHT: #d7d6dc 1px solid; BORDER-TOP: #d7d6dc 1px solid; BACKGROUND: url(../images/sbg.gif) repeat-x; BORDER-LEFT: #d7d6dc 1px solid; WIDTH: 43px; LINE-HEIGHT: 18px; BORDER-BOTTOM: #d7d6dc 1px solid; HEIGHT: 18px; TEXT-ALIGN: center
+}
+.art_changebg {
+	BACKGROUND: url(../images/changebg.gif) repeat-x; HEIGHT: 29px
+}
+.art_changebg LI {
+	PADDING-RIGHT: 15px; PADDING-LEFT: 15px; FLOAT: left; PADDING-TOP: 7px; HEIGHT: 22px
+}
+.art_changebg LI.wid1 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; WIDTH: 1px; PADDING-TOP: 0px
+}
+.art_changebg LI.actbg {
+	FONT-WEIGHT: bold; BACKGROUND: url(../images/actbg.gif) no-repeat; WIDTH: 55px; CURSOR: pointer; TEXT-ALIGN: center
+}
+.pad10 LI {
+	PADDING-RIGHT: 3px; PADDING-LEFT: 3px
+}
+.pad10 LI.actbg {
+	WIDTH: 79px
+}
+.atrilibg {
+	BACKGROUND: url(/notebook/new_note/images/li_07.jpg) no-repeat; MARGIN: 8px auto 0px; WIDTH: 260px
+}
+.atrilibg LI {
+	MARGIN-BOTTOM: 5px; MARGIN-LEFT: 25px; OVERFLOW: hidden; WIDTH: 245px; HEIGHT: 14px
+}
+.atrilibg LI SPAN {
+	DISPLAY: block; FLOAT: right; WIDTH: 40px
+}
+.atrilibg LI SPAN.atrilibgleft {
+	DISPLAY: block; FLOAT: left; WIDTH: 197px
+}
+.artprice LI SPAN {
+	DISPLAY: block; FLOAT: right; WIDTH: 70px; COLOR: #0036cb
+}
+.artprice LI SPAN.atrilibgleft {
+	DISPLAY: block; FLOAT: left; WIDTH: 167px
+}
+.pic123 {
+	MARGIN-TOP: 14px; DISPLAY: inline; BACKGROUND: #efefef; FLOAT: left; PADDING-BOTTOM: 6px; MARGIN-LEFT: 16px; WIDTH: 125px; TEXT-ALIGN: center
+}
+.pic123 IMG {
+	BORDER-RIGHT: #989898 1px solid; BORDER-TOP: #989898 1px solid; MARGIN-BOTTOM: 6px; BORDER-LEFT: #989898 1px solid; BORDER-BOTTOM: #989898 1px solid
+}
+#atrcon1 {
+	DISPLAY: none
+}
+#atrcon2 {
+	DISPLAY: none
+}
+#atrcon3 {
+	DISPLAY: none
+}
+#batrcon1 {
+	DISPLAY: none
+}
+#batrcon2 {
+	DISPLAY: none
+}
+#batrcon3 {
+	DISPLAY: none
+}
+.tit6 A.more {
+	PADDING-RIGHT: 10px; MARGIN-TOP: -20px; DISPLAY: block; FLOAT: right
+}
+.ztpage {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 15px; MARGIN: 10px auto 0px; OVERFLOW: hidden; WIDTH: 340px; PADDING-TOP: 15px; HEIGHT: 1%
+}
+.ztpage LI {
+	FLOAT: left; MARGIN-BOTTOM: 8px; MARGIN-RIGHT: 10px
+}
+.ztpage LI A {
+	BORDER-RIGHT: #6dbef7 1px solid; BORDER-TOP: #6dbef7 1px solid; DISPLAY: block; OVERFLOW: hidden; BORDER-LEFT: #6dbef7 1px solid; WIDTH: 18px; LINE-HEIGHT: 18px; BORDER-BOTTOM: #6dbef7 1px solid; HEIGHT: 18px; TEXT-ALIGN: center
+}
+.ztpage LI A.av {
+	BACKGROUND: #dbeefb; COLOR: #c00; TEXT-DECORATION: none
+}
+.ztpage LI A:hover {
+	BACKGROUND: #dbeefb; COLOR: #c00; TEXT-DECORATION: none
+}
+.ztpage LI A.upage {
+	WIDTH: 50px
+}
+.art_sj IMG {
+	MARGIN-TOP: 6px; MARGIN-RIGHT: 5px
+}
+.adtxt {
+	MARGIN: 15px auto 0px; WIDTH: 600px; TEXT-ALIGN: center
+}
+.adtxt A {
+	FONT-SIZE: 14px; COLOR: #c00
+}
+.mart10clear {
+	MARGIN-TOP: 0px
+}
+.zdpic {
+	paddig-top: 3px
+}
+.zdpic IMG {
+	MARGIN-TOP: -3px; VERTICAL-ALIGN: middle
+}

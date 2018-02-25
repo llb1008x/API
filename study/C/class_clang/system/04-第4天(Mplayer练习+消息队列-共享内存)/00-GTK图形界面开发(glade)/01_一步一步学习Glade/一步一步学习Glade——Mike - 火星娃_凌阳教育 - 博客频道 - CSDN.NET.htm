@@ -1,0 +1,1022 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0053)http://blog.csdn.net/sun_app/article/details/18089403 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>一步一步学习Glade——Mike - 火星娃_凌阳教育
+        - 博客频道 - CSDN.NET</title>
+    
+    <meta name="description" content="Glade是GTK＋的界面辅助设计工具，可以通过拖放控件的方式快速设计出用户界面，这样的优势在于在设计的同时能直观地看到界面上的控件，并且可以随时调整界面上的设计。">
+    <script type="text/javascript" async="" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ga.js"></script><script src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/jquery.js" type="text/javascript"></script>
+    <script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ad.js"></script>
+        <!--new top-->
+       
+        <link rel="stylesheet" href="http://static.csdn.net/public/common/toolbar/css/index.css">
+        <!--new top-->
+
+    <link rel="Stylesheet" type="text/css" href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/style.css">
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/u013293310/rss/list">
+    <link rel="shortcut icon" href="http://blog.csdn.net/favicon.ico">
+    <link type="text/css" rel="stylesheet" href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/default_big.css">
+ 
+
+<link href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/bdsstyle.css" rel="stylesheet" type="text/css"><script type="text/javascript" charset="utf-8" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/tracking.js"></script><script type="text/javascript" charset="utf-8" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/main.js"></script><script type="text/javascript" charset="utf-8" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/main(1).js"></script><link rel="stylesheet" type="text/css" href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/style(1).css"><script src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/logger.js"></script></head>
+<body><div id="BAIDU_DUP_fp_wrapper" style="position: absolute; left: -1px; bottom: -1px; z-index: 0; width: 0px; height: 0px; overflow: hidden; visibility: hidden; display: none; "><iframe id="BAIDU_DUP_fp_iframe" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/o.htm" style="width: 0px; height: 0px; visibility: hidden; display: none; "></iframe></div><iframe style="display: none; " frameborder="0"></iframe><div id="bdshare_s" style="display: block; "><iframe id="bdsIfr" style="position:absolute;display:none;z-index:9999;" frameborder="0"></iframe><div id="bdshare_l" style="display: none; "><div id="bdshare_l_c"><h6>分享到</h6><ul><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_mshare mshare">一键分享</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_qzone qqkj">QQ空间</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_tsina xlwb">新浪微博</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_bdysc bdysc">百度云收藏</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_renren rrw">人人网</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_tqq txwb">腾讯微博</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_bdxc bdxc">百度相册</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_kaixin001 kxw">开心网</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_tqf txpy">腾讯朋友</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_tieba bdtb">百度贴吧</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_douban db">豆瓣网</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_tsohu shwb">搜狐微博</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_bdhome bdhome">百度新首页</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_sqq sqq">QQ好友</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_thx thx">和讯微博</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="bds_more">更多...</a></li></ul><p><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="goWebsite">百度分享</a></p></div></div></div>
+    
+   
+      <!--new top-->
+    <script id="toolbar-tpl-scriptId" fixed="true" prod="blog" skin="black" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/html.js" type="text/javascript"></script><div class="csdn-toolbar csdn-toolbar-skin-black ">        <div class="container row center-block ">          <div class="col-md-3 pull-left logo clearfix"><a href="http://www.csdn.net/?ref=toolbar" title="CSDN首页" target="_blank" class="icon"></a><a title="频道首页" href="http://blog.csdn.net/?ref=toolbar" target="_blank" class="img blog-icon"></a></div>          <div class="pull-right login-wrap ">            <ul class="btns">              <li class="loginlink"><a href="https://passport.csdn.net/account/login?ref=toolbar" target="_top">登录&nbsp;</a>|<a target="_top" href="https://passport.csdn.net/account/register?ref=toolbar">&nbsp;注册</a></li>              <li class="search">                <div class="icon on-search-icon">                  <div class="wrap">                    <div class="curr-icon-wrap">                      <div class="curr-icon"></div>                    </div>                    <form action="http://so.csdn.net/search?ref=toolbar" method="get" target="_blank">                      <div class="border">                        <input placeholder="搜索" type="text" value="" name="q" accesskey="2"><span class="icon-enter-sm"></span>                      </div>                    </form>                  </div>                </div>              </li>              <li class="favor">                <div class="icon on-favor-icon">                  <div class="wrap">                    <div class="curr-icon-wrap">                      <div class="curr-icon"></div>                    </div>                    <div style="display:none;" class="favor-success"><span class="msg">收藏成功</span>                      <div class="btns"><span class="btn btn-primary ok">确定</span></div>                    </div>                    <div style="display:none;" class="favor-failed"><span class="icon-danger-lg"></span><span class="msg">收藏失败，请重新收藏</span>                      <div class="btns"><span class="btn btn-primary ok">确定</span></div>                    </div>                    <form role="form" class="form-horizontal favor-form">                      <div class="form-group">                        <div class="clearfix">                          <label for="input-title" class="col-sm-2 control-label">标题</label>                          <div class="col-sm-10">                            <input id="inputTitle" type="text" placeholder="" class="title form-control">                          </div>                        </div>                        <div class="alert alert-danger"><strong></strong>标题不能为空</div>                      </div>                      <div class="form-group">                        <label for="input-url" class="col-sm-2 control-label">网址</label>                        <div class="col-sm-10">                          <input id="input-url" type="text" placeholder="" class="url form-control">                        </div>                      </div>                      <div class="form-group">                        <label for="input-tag" class="col-sm-2 tag control-label">标签</label>                        <div class="col-sm-10">                          <input id="input-tag" type="text" class="form-control tag">                        </div>                      </div>                      <div class="form-group">                        <label for="input-description" class="description col-sm-2 control-label">摘要</label>                        <div class="col-sm-10">                          <textarea id="input-description" class="form-control description"></textarea>                        </div>                      </div>                      <div class="form-group">                        <div class="col-sm-offset-2 col-sm-10 ft">                          <div class="col-sm-4 pull-left">                            <div class="checkbox">                              <label>                                <input type="checkbox" name="share" checked="checked" class="share">公开                              </label>                            </div>                          </div>                          <div class="col-sm-8 pull-right favor-btns">                            <button type="button" class="cancel btn btn-default">取消</button>                            <button type="submit" class="submit btn btn-primary">收藏</button>                          </div>                        </div>                      </div>                    </form>                  </div>                </div>              </li>              <li class="notify">                <div style="display: none; " class="number"></div>                <div style="display: none; " class="icon-hasnotes-sm"></div>                <div id="header_notice_num"></div>                <div class="icon on-notify-icon">                  <div class="wrap">                    <div class="curr-icon-wrap">                      <div class="curr-icon"></div>                    </div>                    <div id="note1" class="csdn_note">                      <div class="box"><div class="notifications notice_list_con curr">  <a href="javascript:void 0" class="close1"></a>  <div class="menu_title">    <span class="title"><a href="http://notify.csdn.net/" target="_blank" class="go_all">查看所有通知</a></span>  </div>  <div class="loading"></div>  <div class="empty">暂没有新通知</div>  <div class="notice_content"></div></div><div class="notifications detail_con" style="display: none">  <div class="menu_title">    <span class="title">      <a class="go_back" href="javascript:void 0;">返回通知列表</a>      <a class="notifications_page_none nextnote" href="javascript:void 0;">下一条</a>      <a class="notifications_page prvnote" href="javascript:void 0;">上一条</a>    </span>  </div>  <div class="notice_content"></div></div><div class="error"></div></div>                    <iframe src="about:block" frameborder="0" allowtransparency="true" style="z-index:-1;position:absolute;top:0;left:0;width:100%;height:100%;background:transparent"></iframe></div>                  </div>                </div>              </li>              <li class="ugc">                <div class="icon on-ugc-icon">                  <div class="wrap clearfix">                    <div class="curr-icon-wrap">                      <div class="curr-icon"></div>                    </div>                    <dl>                      <dt><a href="http://geek.csdn.net/news/expert?ref=toolbar" target="_blank" class="p-news clearfix"><em class="icon"></em><span>分享资讯</span></a></dt>                      <dt><a href="http://share.csdn.net/slides/new?ref=toolbar" target="_blank" class="p-doc clearfix"><em class="icon"></em><span>传PPT/文档</span></a></dt>                      <dt><a href="http://bbs.csdn.net/topics/new?ref=toolbar" target="_blank" class="p-ask clearfix"><em class="icon"></em><span>提问题</span></a></dt>                      <dt><a href="http://write.blog.csdn.net/postedit?ref=toolbar" target="_blank" class="p-blog clearfix"><em class="icon"></em><span>写博客</span></a></dt>                      <dt><a href="http://u.download.csdn.net/upload?ref=toolbar" target="_blank" class="p-src clearfix"><em class="icon"></em><span>传资源</span></a></dt>                      <dt><a href="https://code.csdn.net/projects/new?ref=toolbar" target="_blank" class="c-obj clearfix"><em class="icon"></em><span>创建项目</span></a></dt>                      <dt><a href="https://code.csdn.net/snippets/new?ref=toolbar" target="_blank" class="c-code clearfix"><em class="icon"></em><span>创建代码片</span></a></dt>                    </dl>                  </div>                </div>              </li>              <li class="profile">                <div class="icon on-profile-icon"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/2_u013293310.jpg" class="curr-icon-img">                  <div class="wrap clearfix">                    <div class="curr-icon-wrap">                      <div class="curr-icon"></div>                    </div>                    <div class="bd">                      <dl class="clearfix">                        <dt class="pull-left img"><a target="_blank" href="https://my.csdn.net/?ref=toolbar" class="avatar"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/2_u013293310.jpg"></a></dt>                        <dd class="info"><a target="_blank" href="http://my.csdn.net/?ref=toolbar" class="nickname">u013293310</a><span class="dec"><a class="fill-dec" href="https://passport.csdn.net/account/profile" target="_blank">编辑自我介绍，让更多人了解你<span class="write-icon"></span></a></span></dd>                      </dl>                    </div>                    <div class="ft clearfix"><a target="_blank" href="https://passport.csdn.net/account/profile?ref=toolbar" class="pull-left"><span class="icon settings"></span>设置</a><a href="http://passport.csdn.net/account/logout?ref=toolbar" target="_top" class="pull-right"><span class="icon quit"></span>退出</a></div>                  </div>                </div>              </li>              <li class="apps">                <div class="icon on-apps-icon">                  <div class="wrap clearfix">                    <div class="curr-icon-wrap">                      <div class="curr-icon"></div>                    </div>                  <div class="detail">                    <dl>                      <dt>                        <h5>社区</h5>                      </dt>                      <dd> <a href="http://blog.csdn.net/?ref=toolbar" target="_blank">博客</a></dd>                      <dd> <a href="http://bbs.csdn.net/?ref=toolbar" target="_blank">论坛</a></dd>                      <dd> <a href="http://download.csdn.net/?ref=toolbar" target="_blank">下载</a></dd>                      <dd><a href="http://share.csdn.net/?ref=toolbar" target="_blank">Share</a></dd>                      <dd><a href="http://geek.csdn.net/?ref=toolbar" target="_blank">极客头条</a></dd>                    </dl>                  </div>                  <div class="detail">                    <dl>                      <dt>                        <h5>服务</h5>                      </dt>                      <dd> <a href="https://code.csdn.net/?ref=toolbar" target="_blank">CODE</a></dd>                      <dd> <a href="http://hero.csdn.net/?ref=toolbar" target="_blank">英雄会</a></dd>                      <dd> <a href="http://huiyi.csdn.net/meeting?ref=toolbar" target="_blank">会议</a></dd>                    </dl>                  </div>                  <div class="detail last">                    <dl>                      <dt>                        <h5>俱乐部</h5>                      </dt>                      <dd> <a href="http://student.csdn.net/?ref=toolbar" target="_blank">高校俱乐部</a></dd>                    </dl>                  </div>                </div>              </div>            </li>            </ul>          </div>        </div>    </div>
+     <!--new top-->
+    <div id="container">
+        <div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h2>
+                <a href="http://blog.csdn.net/sun_app">火星娃_凌阳教育</a></h2>
+            <h3>地球人都知道的应用开发</h3>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>
+                <li id="btnContents"><a href="http://blog.csdn.net/sun_app?viewmode=contents"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_mulu&#39;])">
+                    <img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_list.gif">目录视图</span></a></li>
+                <li id="btnView"><a href="http://blog.csdn.net/sun_app?viewmode=list"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_zhaiyao&#39;])">
+                    <img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_summary.gif">摘要视图</span></a></li>
+                <li id="btnRss"><a href="http://blog.csdn.net/sun_app/rss/list"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_RSS&#39;])">
+                    <img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_rss.gif">订阅</span></a></li>
+                <li id="btnManage"><a href="http://write.blog.csdn.net/"><span>
+                    <img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_set.gif">管理博客</span></a></li>
+                <li id="btnWrite"><a href="http://write.blog.csdn.net/postedit"><span>
+                    <img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_write.gif">写新文章</span></a></li>
+</ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "u013293310";
+    var _blogger = username;
+    var blog_address = "http://blog.csdn.net/sun_app";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "u013293310";
+</script>
+
+        <div id="body">
+            <div id="main">
+                <div class="main">
+<div class="notice tracking-ad" data-mod="popu_3"> 
+
+
+<a href="http://bbs.csdn.net/topics/390708348" target="_blank"><font color="red">【大声说出你的爱】CSDN社区情人节特别活动
+</font></a>
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+<a href="http://www.csdn.net/article/2014-02-11/2818358" target="_blank">
+<font color="red">专访李云：从通讯行业的架构师到互联网“新兵”</font></a>
+&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+<a href="http://bbs.csdn.net/topics/390708540" target="_blank">
+<font color="blue">电子版《程序员》杂志免费领</font></a>
+
+
+
+
+</div>                    <link href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/comment1.css" type="text/css" rel="stylesheet">
+<link href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/style1.css" type="text/css" rel="stylesheet">
+<div id="article_details" class="details">
+    <div class="article_title">
+    <span class="ico ico_type_Original"></span>
+    <h1>
+        <span class="link_title"><a href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET.htm">
+        一步一步学习Glade——Mike
+        </a></span>
+    </h1>
+</div>
+
+    <div class="article_manage">
+        <span class="link_categories">
+        分类：
+            <a href="http://blog.csdn.net/u013293310/article/category/1827821">图形界面GUI开发</a> 
+        </span>
+    <span class="link_postdate">2014-01-10 18:30</span>
+    <span class="link_view" title="阅读次数">205人阅读</span>
+    <span class="link_comments" title="评论次数"><a href="http://blog.csdn.net/sun_app/article/details/18089403#comments" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_pinglun&#39;])">评论</a>(0)</span>
+    <span class="link_collect"><a href="javascript:void(0);" onclick="javascript:_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_shoucang&#39;]);collectArticle(&#39;一步一步学习Glade——Mike&#39;,&#39;18089403&#39;);return false;" title="收藏">收藏</a></span>
+    
+    <span class="link_edit"><a href="http://write.blog.csdn.net/postedit/18089403" title="编辑">编辑</a></span>
+    <span class="link_delete"><a href="javascript:void(0);" onclick="javascript:deleteArticle(18089403);return false;" title="删除">删除</a></span>
+</div>
+
+    
+<div style="clear:both"></div><div style="border:solid 1px #ccc; background:#eee; float:left; min-width:200px;padding:4px 10px;"><p style="text-align:right;margin:0;"><span style="float:left;">目录<a href="http://blog.csdn.net/sun_app/article/details/18089403#" title="系统根据文章中H1到H6标签自动生成文章目录">(?)</a></span><a href="http://blog.csdn.net/sun_app/article/details/18089403#" onclick="javascript:return openct(this);" title="展开">[+]</a></p><ol style="display:none;margin-left:14px;padding-left:14px;line-height:160%;"><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#t0">搭建环境</a></li><li><a href="http://blog.csdn.net/sun_app/article/details/18089403#t1">Glade的操作使用</a></li></ol></div><div style="clear:both"></div><div id="article_content" class="article_content">
+
+<p><span style="font-size:24px"><span style="white-space:pre"></span>Glade是GTK＋的界面辅助设计工具，可以通过拖放控件的方式快速设计出用户界面，这样的优势在于在设计的同时能直观地看到界面上的控件，并且可以随时调整界面上的设计。</span></p>
+<p><span style="font-size:24px"><br>
+</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>由于开发板的库版本为gtk2.12之前的版本(gtk1.0)，所以只支持libglade模式，而Linux环境的版本比较新，只能保存GtkBuilder格式的Glade，但是能运行libglade的代码，而window的glade安装包两种格式都支持，<span style="color:#ff0000">所以我们主要使用window的glade设计界面，然后在Linux编译运行代码。</span><br>
+</span></p>
+<p><span style="color:#ff0000"><span style="font-size:24px"><br>
+</span></span></p>
+<h1><a name="t0"></a><span style="font-size:24px"><span style="white-space:pre"></span>搭建环境：</span></h1>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>1）安装windows版本的glade （ glade3-3.6.7-with-GTK+.exe ）</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"><a target="_blank" href="http://download.csdn.net/detail/u013293310/6829273">安装包下载地址：</a></span>&nbsp;<a target="_blank" href="http://download.csdn.net/detail/u013293310/6829273" style="white-space:pre">http://download.csdn.net/detail/u013293310/6829273</a></span></p>
+<p><span style="font-size:24px">&nbsp; &nbsp;<span style="white-space:pre"> </span>双击后一直“下一步”即可</span></p>
+<p style="text-align:center"><span style="white-space:pre"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110173431312" alt=""></span></span></p>
+<p style="text-align:left"><span style="white-space:pre"><span style="font-size:24px">安装完成后，在电脑桌面生成如下图标：</span></span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110173600000" alt=""></span></p>
+<p style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span>2）安装Linux的编译运行环境</span></p>
+<p style="text-align:left"><span style="white-space:pre"><span style="font-size:24px">在终端敲在线安装命令：<br>
+&nbsp; &nbsp; sudo apt-get install libgtk2.0*<br>
+　sudo apt-get install glade libglade2-dev</span></span></p>
+<p style="text-align:left"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110173757515" alt=""><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110173807750" alt=""><br>
+</span></p>
+<p style="text-align:left"><span style="font-size:24px"><br>
+</span></p>
+<h1><a name="t1"></a><span style="font-size:24px"><span style="white-space:pre"></span>Glade的操作使用</span></h1>
+<p style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span>使用Glade编程(双击windows桌面上的“Glade-3.6.6”)<br>
+</span></p>
+<p style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span>启动时，会弹出一个多余的对话框，直接关闭即可。<br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110174109828" alt=""><br>
+</span></p>
+<p style="text-align:left"></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span></span></p>
+<p><span style="font-size:24px"><br>
+</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>Glade<span style="font-family:宋体">的整体框图：</span></span></p>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110174216281" alt=""></span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left">
+<p><span style="font-size:24px"><strong><span style="white-space:pre"></span><span style="color:#ff0000">常用控件选择区：</span></strong>列举了常用的控件，常用的有三类：顶层(<span style="font-family:宋体">主窗口等</span><span style="font-family:Times New Roman">)</span>，容器(<span style="font-family:宋体">各种布局容器等</span><span style="font-family:Times New Roman">)</span>，控制和显示(<span style="font-family:宋体">按钮、便签、图片控件等</span><span style="font-family:Times New Roman">)</span></span></p>
+<p><span style="font-size:24px"><span style="font-family:Times New Roman"><span style="white-space:pre"></span></span><span style="white-space:pre; font-family:&#39;Times New Roman&#39;">当鼠标放在控件时，会自动显示控件的中文文字，同时，还能人为设置，如下图：</span></span></p>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110174500718" alt=""></span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110174528781" alt=""><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span><strong><span style="color:#ff0000">界面编辑区：</span></strong>把控件拖放在这进行进行相应的布局<br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span><span style="color:#ff0000"><strong>控件监视区：</strong></span>能够看到界面上所有的控件，同时，选中这个控件，可以看到这个控件的具体类型<br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110174728406" alt=""><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span><strong><span style="color:#ff0000">属性编辑区：</span></strong>编辑选中控件的常用属性，如窗口设置标题、窗口类型、屏幕上显示位置等。<br>
+<br>
+<br>
+<span style="white-space:pre"></span><strong><span style="color:#ff0000">工具栏：</span></strong>常用的有以下几个按钮<br>
+<span style="white-space:pre"></span>打开：打开一个已经存在的glade文件<br>
+<span style="white-space:pre"></span>保存：保存一个glade文件<br>
+<span style="white-space:pre"></span>选择：按了这个按钮， 才能选择控件<br>
+<span style="white-space:pre"></span>拖拽调整大小：按了这个按钮，才能移动控件的位置，改变控件的大小<br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110174908593" alt=""><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span>现在开始学习Glade的操作。<br>
+<span style="white-space:pre"></span><span style="color:#ff0000">选择控件时，一定要先按工具栏的“选择”按钮<br>
+<span style="white-space:pre"></span>操作时，支持撤销(Ctrl+z)和恢复(Ctrl+y)等window的快捷键</span><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span><span style="color:#ff0000"><strong>第一步：选择窗口</strong></span><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175116968" alt=""><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175130984" alt=""><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span><strong><span style="color:#ff0000">第二步：改变窗口的常用属性</span></strong><br>
+<span style="white-space:pre"></span>1）设置窗口标题：我们一起学习Glade<br>
+<span style="white-space:pre"></span>2）固定窗口大小<br>
+<span style="white-space:pre"></span>3）设置窗口位置：中心<br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175311906" alt=""><br>
+</span></div>
+<div style="text-align:left">
+<p><span style="font-size:24px"><span style="white-space:pre"></span>4）设置窗口的宽度和高度</span></p>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175401265" alt=""></span></div>
+</div>
+<div style="text-align:left"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span><strong><span style="color:#ff0000">第三步：窗口添加固定布局(固定布局能允许用户任意布局，所以我们选择此布局)</span></strong><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175436687" alt=""><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175506640" alt=""><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span><span style="color:#ff0000"><strong>第四步：添加两个按钮</strong></span><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175537937" alt=""><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175553515" alt=""><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175606390" alt=""><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span><span style="color:#ff0000"><strong>第五步：调整按钮的位置以及其大小(有两种方法可以设置)</strong></span><br>
+<span style="white-space:pre"></span>1）在界面编辑区里通过拖拽方式进行调整<br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175639781" alt=""><br>
+</span></div>
+<div style="text-align:center"><span style="font-size:24px"><br>
+</span></div>
+<div style="text-align:left"><span style="font-size:24px"><span style="white-space:pre"></span>2）通过属性编辑区进行设置</span>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>a)&nbsp;设置控件的起点坐标</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175721562" alt=""><br>
+</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>b）设置控件的宽度和高度</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175803921" alt=""><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175820359" alt=""><br>
+</span></p>
+<p><span style="font-size:24px"><br>
+</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span><strong><span style="color:#ff0000">第六步：设置按钮的属性</span></strong><br>
+</span></p>
+<p></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>1）第一个按钮作为带文本内容的普通按钮</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175910359" alt=""><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110175931781" alt=""><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><br>
+</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>2）第二按钮作为没边框带图标的按钮<br>
+<span style="white-space:pre"></span>按钮本身就是一个容器，带图标的按钮其实就是在按钮这个容器里放一个图片控件。<br>
+<span style="white-space:pre"></span>a）按钮去表框<br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180021140" alt=""><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180142875" alt=""><br>
+</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>b）把按钮的容器显示出来</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180216437" alt=""><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180242937" alt=""><br>
+</span></p>
+<p></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>C）在按钮容器里添加图片控件</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180330796" alt=""><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180347046" alt=""><br>
+</span></p>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180415906" alt=""></span></div>
+<p><span style="font-size:24px"><br>
+</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span><strong><span style="color:#ff0000">第七步：根据需要修改控件的标识名称</span></strong><br>
+<span style="white-space:pre"></span>到这里，我们的界面就已经设置好了，可以保存这个界面，然后通过代码操作这个界面。在代码操作时，我们需要关心的是，如何通过代码获得这个界面的控件，如本例子中的(主窗口，按钮)，而在界面里，每个控件都有一个标识名称，这个标识名称就是在控件监视区的名字，<span style="color:#ff0000">我们代码里就通过这个标识名称来获取界面里的控件</span>：<br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180456984" alt=""><br>
+</span></p>
+<p><span style="font-size:24px"><br>
+</span></p>
+<p><span style="font-size:24px"><br>
+</span></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span>这个标识名称是可以修改的，如下图<br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180526156" alt=""><br>
+</span></p>
+<p style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180548562" alt=""><br>
+</span></p>
+<p><span style="font-size:24px"><br>
+</span></p>
+<p></p>
+<p><span style="font-size:24px"><span style="white-space:pre"></span><span style="color:#ff0000"><strong>第八步：保存界面</strong></span></span></p>
+<div style="text-align:center"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110180617671" alt=""></span></div>
+<p><span style="font-size:24px"><br>
+</span></p>
+<p><span style="font-size:24px"><span style="color:#ff0000"><strong><span style="white-space:pre"></span>第九步：代码操作</strong></span><br>
+</span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><span style="white-space:pre"></span>首先需要引用libglade的头文件：</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"></span></span></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 15041px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_1" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_1" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=1&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="preprocessor">#include&nbsp;&lt;glade/glade.h&gt;</span><span>&nbsp;&nbsp;</span></span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_1_5432027" name="code" class="cpp" style="display: none; ">#include &lt;glade/glade.h&gt;</pre><br>
+<br>
+<p></p>
+<p></p>
+<p><br>
+</p>
+</div>
+<div style="text-align:left"><span style="white-space:pre"><span style="font-size:24px"><span style="white-space:pre"></span>这里主要用到两个接口操作libglade界面：读取界面，获取界面的控件。<br>
+</span></span>
+<p></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 15256px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_2" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_2" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=2&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="comment">//载入并新建整个界面</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>GladeXML&nbsp;*gxml&nbsp;=&nbsp;glade_xml_new(<span class="string">"demo.glade"</span><span>,&nbsp;NULL,&nbsp;NULL);&nbsp;&nbsp;</span></span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_2_6951988" name="code" class="cpp" style="display: none; ">//载入并新建整个界面
+GladeXML *gxml = glade_xml_new("demo.glade", NULL, NULL);</pre>
+<p></p>
+<span style="font-size:24px"><br>
+<span style="white-space:pre"></span>接着，通过gxml这个变量就可以获得界面里的控件。</span></div>
+<div style="text-align:left"><span style="font-size:24px"></span><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 15413px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_3" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_3" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=3&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="comment">//&nbsp;获取主窗口，"window1"为界面监视区的标识名称</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>GtkWidget&nbsp;*window&nbsp;=&nbsp;glade_xml_get_widget(gxml,<span class="string">"window1"</span><span>);&nbsp;&nbsp;</span></span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_3_7454088" name="code" class="cpp" style="display: none; ">// 获取主窗口，"window1"为界面监视区的标识名称
+GtkWidget *window = glade_xml_get_widget(gxml,"window1");</pre>
+<p><span style="white-space:pre"><span style="font-size:24px"><br>
+</span></span></p>
+<span style="font-size:24px"><span style="white-space:pre"></span>后期写gtk代码，就无需花太多时间在控件的创建，已经界面的布局上了。</span></div>
+<div style="text-align:left"><span style="font-size:24px"></span><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 15596px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_4" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_4" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=4&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="preprocessor">#include&nbsp;&lt;glade/glade.h&gt;&nbsp;&nbsp;//&nbsp;glade所需头文件</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span><span class="preprocessor">#include&nbsp;&lt;gtk/gtk.h&gt;</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span><span class="datatypes">int</span><span>&nbsp;main(</span><span class="datatypes">int</span><span>&nbsp;argc,</span><span class="datatypes">char</span><span>&nbsp;*argv[])&nbsp;&nbsp;</span></span></li><li class="alt"><span>{&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_init(&amp;argc,&amp;argv);&nbsp;&nbsp;<span class="comment">//&nbsp;初始化</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;载入并新建整个界面</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GladeXML&nbsp;*gxml&nbsp;=&nbsp;glade_xml_new(<span class="string">"demo.glade"</span><span>,&nbsp;NULL,&nbsp;NULL);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取界面里的窗口控件</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GtkWidget&nbsp;*window&nbsp;=&nbsp;glade_xml_get_widget(gxml,<span class="string">"window1"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_show_all(window);&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;显示所有控件</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_main();&nbsp;<span class="comment">//&nbsp;主事件循环</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_4_9755382" name="code" class="cpp" style="display: none; ">#include &lt;glade/glade.h&gt;	// glade所需头文件
+#include &lt;gtk/gtk.h&gt;
+
+int main(int argc,char *argv[])
+{
+
+	gtk_init(&amp;argc,&amp;argv);	// 初始化
+	
+	// 载入并新建整个界面
+	GladeXML *gxml = glade_xml_new("demo.glade", NULL, NULL);
+	// 获取界面里的窗口控件
+	GtkWidget *window = glade_xml_get_widget(gxml,"window1");
+
+	gtk_widget_show_all(window);	// 显示所有控件
+	
+	gtk_main(); // 主事件循环
+	
+	return 0;   
+}</pre><span style="font-size:24px"><br>
+<span style="white-space:pre"></span>在用gcc编译时，记得加上的命令参数( ` 为数字1前面的单引号)</span></div>
+<div style="text-align:left"><span style="font-size:24px"></span><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 16093px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_5" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_5" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=5&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span>`pkg-config&nbsp;--cflags&nbsp;--libs&nbsp;gtk+-2.0&nbsp;libglade-2.0`&nbsp;&nbsp;</span></span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_5_8992014" name="code" class="cpp" style="display: none; ">`pkg-config --cflags --libs gtk+-2.0 libglade-2.0`</pre></div>
+<div style="text-align:left"><span style="font-size:24px"><br>
+<img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110181338656" alt=""><br>
+<br>
+</span>
+<p></p>
+<p></p>
+<p><span style="white-space:pre"><span style="white-space:pre"><span style="font-size:24px"><span style="white-space:pre"></span>程序运行效果图：<br>
+</span></span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110181406406" alt=""><br>
+</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><br>
+</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><br>
+</span></span></p>
+<p><span style="white-space:pre"><span style="white-space:pre"><span style="font-size:24px"><span style="white-space:pre"></span>接着，我们给带图标的按钮设置图片的内容，当前路径下有一张 ”next.bmp” 图片（任意图片格式即可）。<br>
+</span></span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110181439859" alt=""><br>
+</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><br>
+</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><span style="white-space:pre"></span>首先，获取界面里图片控件。</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"></span></span></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 17196px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_6" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_6" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=6&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="comment">//&nbsp;获取图片控件</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>GtkWidget&nbsp;*image=&nbsp;glade_xml_get_widget(gxml,<span class="string">"image1"</span><span>);&nbsp;&nbsp;</span></span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_6_6866227" name="code" class="cpp" style="display: none; ">// 获取图片控件
+GtkWidget *image= glade_xml_get_widget(gxml,"image1");</pre>
+<p></p>
+<span style="font-size:24px"><br>
+<span style="white-space:pre"></span>接着，通过下面接口给图片控件设置图片</span>
+<p></p><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 17353px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_7" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_7" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=7&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="comment">/*&nbsp;功能：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;给创建好的图片控件重新设计一张图片</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*&nbsp;image：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;图片控件</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*&nbsp;file_path:&nbsp;&nbsp;&nbsp;图片的路径</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*&nbsp;w,&nbsp;h：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;指定图片的宽度和高度</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span><span class="keyword">void</span><span>&nbsp;load_image(GtkWidget&nbsp;*image,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">char</span><span>&nbsp;*file_path,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;w,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;h&nbsp;)&nbsp;&nbsp;</span></span></li><li class="alt"><span>{&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_image_clear(&nbsp;GTK_IMAGE(image)&nbsp;);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;清除图像</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*src_pixbuf&nbsp;=&nbsp;gdk_pixbuf_new_from_file(file_path,&nbsp;NULL);&nbsp;&nbsp;<span class="comment">//&nbsp;创建图片资源</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*dest_pixbuf&nbsp;=&nbsp;gdk_pixbuf_scale_simple(src_pixbuf,&nbsp;w,&nbsp;h,&nbsp;GDK_INTERP_BILINEAR);&nbsp;<span class="comment">//&nbsp;指定大小</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_image_set_from_pixbuf(GTK_IMAGE(image),&nbsp;dest_pixbuf);&nbsp;<span class="comment">//&nbsp;图片控件重新设置一张图片(pixbuf)</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(src_pixbuf);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;释放资源</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(dest_pixbuf);&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;释放资源</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140211_7_6546948" name="code" class="cpp" style="display: none; ">/* 功能： 		给创建好的图片控件重新设计一张图片
+ * image：		图片控件
+ * file_path: 	图片的路径
+ * w, h：		指定图片的宽度和高度
+ */
+void load_image(GtkWidget *image, const char *file_path, const int w, const int h )
+{
+	gtk_image_clear( GTK_IMAGE(image) );        // 清除图像
+	GdkPixbuf *src_pixbuf = gdk_pixbuf_new_from_file(file_path, NULL);	// 创建图片资源
+	GdkPixbuf *dest_pixbuf = gdk_pixbuf_scale_simple(src_pixbuf, w, h, GDK_INTERP_BILINEAR); // 指定大小
+	gtk_image_set_from_pixbuf(GTK_IMAGE(image), dest_pixbuf); // 图片控件重新设置一张图片(pixbuf)
+	g_object_unref(src_pixbuf);		// 释放资源
+	g_object_unref(dest_pixbuf);	// 释放资源
+}</pre><br>
+<br>
+<p></p>
+<span style="font-size:24px"><br>
+<span style="white-space:pre"></span>完整代码如下：</span></div>
+<div style="text-align:left"><span style="font-size:24px"></span><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 17879px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_8" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_8" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=8&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="preprocessor">#include&nbsp;&lt;glade/glade.h&gt;&nbsp;&nbsp;//&nbsp;glade所需头文件</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span><span class="preprocessor">#include&nbsp;&lt;gtk/gtk.h&gt;</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span><span class="comment">/*&nbsp;功能：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;给创建好的图片控件重新设计一张图片</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*&nbsp;image：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;图片控件</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*&nbsp;file_path:&nbsp;&nbsp;&nbsp;图片的路径</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*&nbsp;w,&nbsp;h：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;指定图片的宽度和高度</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span><span class="keyword">void</span><span>&nbsp;load_image(GtkWidget&nbsp;*image,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">char</span><span>&nbsp;*file_path,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;w,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;h&nbsp;)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_image_clear(&nbsp;GTK_IMAGE(image)&nbsp;);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;清除图像</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*src_pixbuf&nbsp;=&nbsp;gdk_pixbuf_new_from_file(file_path,&nbsp;NULL);&nbsp;&nbsp;<span class="comment">//&nbsp;创建图片资源</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*dest_pixbuf&nbsp;=&nbsp;gdk_pixbuf_scale_simple(src_pixbuf,&nbsp;w,&nbsp;h,&nbsp;GDK_INTERP_BILINEAR);&nbsp;<span class="comment">//&nbsp;指定大小</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_image_set_from_pixbuf(GTK_IMAGE(image),&nbsp;dest_pixbuf);&nbsp;<span class="comment">//&nbsp;图片控件重新设置一张图片(pixbuf)</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(src_pixbuf);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;释放资源</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(dest_pixbuf);&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;释放资源</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span><span class="datatypes">int</span><span>&nbsp;main(</span><span class="datatypes">int</span><span>&nbsp;argc,</span><span class="datatypes">char</span><span>&nbsp;*argv[])&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_init(&amp;argc,&amp;argv);&nbsp;&nbsp;<span class="comment">//&nbsp;初始化</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;载入并新建整个界面</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;GladeXML&nbsp;*gxml&nbsp;=&nbsp;glade_xml_new(<span class="string">"demo.glade"</span><span>,&nbsp;NULL,&nbsp;NULL);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取界面里的窗口控件</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;GtkWidget&nbsp;*window&nbsp;=&nbsp;glade_xml_get_widget(gxml,<span class="string">"window1"</span><span>);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取图片控件</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;GtkWidget&nbsp;*image=&nbsp;glade_xml_get_widget(gxml,<span class="string">"image1"</span><span>);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_show_all(window);&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;显示所有控件</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取图片控件的宽度和高度，必须放在gtk_widget_show_all()函数后</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;w&nbsp;=&nbsp;image-&gt;allocation.width;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;h&nbsp;=&nbsp;image-&gt;allocation.height;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;load_image(image,&nbsp;<span class="string">"next.bmp"</span><span>,&nbsp;w,&nbsp;h);&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="comment">//&nbsp;给图片控件设置内容</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_main();&nbsp;<span class="comment">//&nbsp;主事件循环</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_8_4990826" name="code" class="cpp" style="display: none; ">#include &lt;glade/glade.h&gt;	// glade所需头文件
+#include &lt;gtk/gtk.h&gt;
+
+/* 功能： 		给创建好的图片控件重新设计一张图片
+ * image：		图片控件
+ * file_path: 	图片的路径
+ * w, h：		指定图片的宽度和高度
+ */
+void load_image(GtkWidget *image, const char *file_path, const int w, const int h )
+{
+	gtk_image_clear( GTK_IMAGE(image) );        // 清除图像
+	GdkPixbuf *src_pixbuf = gdk_pixbuf_new_from_file(file_path, NULL);	// 创建图片资源
+	GdkPixbuf *dest_pixbuf = gdk_pixbuf_scale_simple(src_pixbuf, w, h, GDK_INTERP_BILINEAR); // 指定大小
+	gtk_image_set_from_pixbuf(GTK_IMAGE(image), dest_pixbuf); // 图片控件重新设置一张图片(pixbuf)
+	g_object_unref(src_pixbuf);		// 释放资源
+	g_object_unref(dest_pixbuf);	// 释放资源
+}
+
+int main(int argc,char *argv[])
+{
+
+	gtk_init(&amp;argc,&amp;argv);	// 初始化
+	
+	// 载入并新建整个界面
+	GladeXML *gxml = glade_xml_new("demo.glade", NULL, NULL);
+	// 获取界面里的窗口控件
+	GtkWidget *window = glade_xml_get_widget(gxml,"window1");
+	// 获取图片控件
+	GtkWidget *image= glade_xml_get_widget(gxml,"image1");
+
+	gtk_widget_show_all(window);	// 显示所有控件
+	
+	// 获取图片控件的宽度和高度，必须放在gtk_widget_show_all()函数后
+	int w = image-&gt;allocation.width;
+	int h = image-&gt;allocation.height;
+	load_image(image, "next.bmp", w, h);	// 给图片控件设置内容
+	
+	gtk_main(); // 主事件循环
+	
+	return 0;   
+}</pre><span style="font-size:24px"><br>
+<span style="white-space:pre"></span>程序运行效果图：<br>
+</span>
+<p></p>
+<p style="text-align:center"><span style="white-space:pre"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110181724109" alt=""><br>
+</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><br>
+</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><span style="white-space:pre"></span>接着，我们给窗口设置一张背景图。<br>
+<span style="white-space:pre"></span>给窗口设置背景背景图的接口：</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"></span></span></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 19563px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_9" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_9" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=9&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="comment">/*&nbsp;功能：&nbsp;&nbsp;设置背景图</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*&nbsp;widget:&nbsp;主窗口</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*&nbsp;path：&nbsp;&nbsp;图片路径</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*&nbsp;w,&nbsp;h:&nbsp;&nbsp;&nbsp;图片的大小</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span><span class="keyword">void</span><span>&nbsp;chang_background(GtkWidget&nbsp;*widget,&nbsp;</span><span class="keyword">const</span><span>&nbsp;gchar&nbsp;*path,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;w,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;h)&nbsp;&nbsp;</span></span></li><li class="alt"><span>{&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_set_app_paintable(widget,&nbsp;TRUE);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//允许窗口可以绘图</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_realize(widget);&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;更改背景图时，图片会重叠</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;这时要手动调用下面的函数，让窗口绘图区域失效，产生窗口重绘制事件（即&nbsp;expose&nbsp;事件）。</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_queue_draw(widget);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*src_pixbuf&nbsp;=&nbsp;gdk_pixbuf_new_from_file(path,&nbsp;NULL);&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;创建图片资源对象</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;w,&nbsp;h是指定图片的宽度和高度</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*dst_pixbuf&nbsp;=&nbsp;gdk_pixbuf_scale_simple(src_pixbuf,&nbsp;w,&nbsp;h,&nbsp;GDK_INTERP_BILINEAR);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixmap&nbsp;*pixmap&nbsp;=&nbsp;NULL;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;创建pixmap图像;&nbsp;</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;NULL：不需要蒙版;&nbsp;</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;123：&nbsp;0~255，透明到不透明</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gdk_pixbuf_render_pixmap_and_mask(dst_pixbuf,&nbsp;&amp;pixmap,&nbsp;NULL,&nbsp;128);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;通过pixmap给widget设置一张背景图，最后一个参数必须为:&nbsp;FASLE</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gdk_window_set_back_pixmap(widget-&gt;window,&nbsp;pixmap,&nbsp;FALSE);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;释放资源</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(src_pixbuf);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(dst_pixbuf);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(pixmap);&nbsp;&nbsp;</span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_9_116021" name="code" class="cpp" style="display: none; ">/* 功能：  设置背景图
+ * widget: 主窗口
+ * path：  图片路径
+ * w, h:   图片的大小
+ */
+void chang_background(GtkWidget *widget, const gchar *path, const int w, const int h)
+{
+	gtk_widget_set_app_paintable(widget, TRUE);		//允许窗口可以绘图
+    gtk_widget_realize(widget);	
+	
+	/* 更改背景图时，图片会重叠
+	 * 这时要手动调用下面的函数，让窗口绘图区域失效，产生窗口重绘制事件（即 expose 事件）。
+	 */
+	gtk_widget_queue_draw(widget);
+	
+    GdkPixbuf *src_pixbuf = gdk_pixbuf_new_from_file(path, NULL);	// 创建图片资源对象
+    // w, h是指定图片的宽度和高度
+    GdkPixbuf *dst_pixbuf = gdk_pixbuf_scale_simple(src_pixbuf, w, h, GDK_INTERP_BILINEAR);
+
+	GdkPixmap *pixmap = NULL;
+	
+	/* 创建pixmap图像; 
+	 * NULL：不需要蒙版; 
+	 * 123： 0~255，透明到不透明
+	 */
+    gdk_pixbuf_render_pixmap_and_mask(dst_pixbuf, &amp;pixmap, NULL, 128);
+    // 通过pixmap给widget设置一张背景图，最后一个参数必须为: FASLE
+	gdk_window_set_back_pixmap(widget-&gt;window, pixmap, FALSE);
+    
+	// 释放资源
+	g_object_unref(src_pixbuf);
+    g_object_unref(dst_pixbuf);
+    g_object_unref(pixmap);
+}</pre>
+<p></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><br>
+</span></span></p>
+<span style="font-size:24px"><span style="white-space:pre"></span>下面是完整代码：</span></div>
+<div style="text-align:left"><span style="font-size:24px"></span><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a><a href="https://code.csdn.net/snippets/151297" target="_blank" title="在CODE上查看代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/CODE_ico.png" width="12" height="12" alt="在CODE上查看代码片" style="position:relative;top:1px;left:2px;"></a><a href="https://code.csdn.net/snippets/151297/fork" target="_blank" title="派生到我的代码片" style="text-indent:0;"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ico_fork.svg" width="12" height="12" alt="派生到我的代码片" style="position:relative;top:2px;left:2px;"></a><div style="position: absolute; left: 514px; top: 20423px; width: 29px; height: 14px; z-index: 99; "><embed id="ZeroClipboardMovie_10" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="29" height="14" name="ZeroClipboardMovie_10" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=10&amp;width=29&amp;height=14" wmode="transparent"></div></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="preprocessor">#include&nbsp;&lt;glade/glade.h&gt;&nbsp;&nbsp;//&nbsp;glade所需头文件</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span><span class="preprocessor">#include&nbsp;&lt;gtk/gtk.h&gt;</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span><span class="comment">/*&nbsp;功能：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;给创建好的图片控件重新设计一张图片</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*&nbsp;image：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;图片控件</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*&nbsp;file_path:&nbsp;&nbsp;&nbsp;图片的路径</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*&nbsp;w,&nbsp;h：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;指定图片的宽度和高度</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span><span class="keyword">void</span><span>&nbsp;load_image(GtkWidget&nbsp;*image,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">char</span><span>&nbsp;*file_path,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;w,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;h&nbsp;)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_image_clear(&nbsp;GTK_IMAGE(image)&nbsp;);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;清除图像</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*src_pixbuf&nbsp;=&nbsp;gdk_pixbuf_new_from_file(file_path,&nbsp;NULL);&nbsp;&nbsp;<span class="comment">//&nbsp;创建图片资源</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*dest_pixbuf&nbsp;=&nbsp;gdk_pixbuf_scale_simple(src_pixbuf,&nbsp;w,&nbsp;h,&nbsp;GDK_INTERP_BILINEAR);&nbsp;<span class="comment">//&nbsp;指定大小</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_image_set_from_pixbuf(GTK_IMAGE(image),&nbsp;dest_pixbuf);&nbsp;<span class="comment">//&nbsp;图片控件重新设置一张图片(pixbuf)</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(src_pixbuf);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;释放资源</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(dest_pixbuf);&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;释放资源</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span><span class="comment">/*&nbsp;功能：&nbsp;&nbsp;设置背景图</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*&nbsp;widget:&nbsp;主窗口</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*&nbsp;path：&nbsp;&nbsp;图片路径</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;*&nbsp;w,&nbsp;h:&nbsp;&nbsp;&nbsp;图片的大小</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span><span class="keyword">void</span><span>&nbsp;chang_background(GtkWidget&nbsp;*widget,&nbsp;</span><span class="keyword">const</span><span>&nbsp;gchar&nbsp;*path,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;w,&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;h)&nbsp;&nbsp;</span></span></li><li class="alt"><span>{&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_set_app_paintable(widget,&nbsp;TRUE);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//允许窗口可以绘图</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_realize(widget);&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;更改背景图时，图片会重叠</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;这时要手动调用下面的函数，让窗口绘图区域失效，产生窗口重绘制事件（即&nbsp;expose&nbsp;事件）。</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_queue_draw(widget);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*src_pixbuf&nbsp;=&nbsp;gdk_pixbuf_new_from_file(path,&nbsp;NULL);&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;创建图片资源对象</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;w,&nbsp;h是指定图片的宽度和高度</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixbuf&nbsp;*dst_pixbuf&nbsp;=&nbsp;gdk_pixbuf_scale_simple(src_pixbuf,&nbsp;w,&nbsp;h,&nbsp;GDK_INTERP_BILINEAR);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GdkPixmap&nbsp;*pixmap&nbsp;=&nbsp;NULL;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;创建pixmap图像;&nbsp;</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;NULL：不需要蒙版;&nbsp;</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;123：&nbsp;0~255，透明到不透明</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gdk_pixbuf_render_pixmap_and_mask(dst_pixbuf,&nbsp;&amp;pixmap,&nbsp;NULL,&nbsp;128);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;通过pixmap给widget设置一张背景图，最后一个参数必须为:&nbsp;FASLE</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gdk_window_set_back_pixmap(widget-&gt;window,&nbsp;pixmap,&nbsp;FALSE);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;释放资源</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(src_pixbuf);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(dst_pixbuf);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;g_object_unref(pixmap);&nbsp;&nbsp;</span></li><li class=""><span>}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span><span class="datatypes">int</span><span>&nbsp;main(</span><span class="datatypes">int</span><span>&nbsp;argc,</span><span class="datatypes">char</span><span>&nbsp;*argv[])&nbsp;&nbsp;</span></span></li><li class="alt"><span>{&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_init(&amp;argc,&amp;argv);&nbsp;&nbsp;<span class="comment">//&nbsp;初始化</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;载入并新建整个界面</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GladeXML&nbsp;*gxml&nbsp;=&nbsp;glade_xml_new(<span class="string">"demo.glade"</span><span>,&nbsp;NULL,&nbsp;NULL);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取界面里的窗口控件</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GtkWidget&nbsp;*window&nbsp;=&nbsp;glade_xml_get_widget(gxml,<span class="string">"window1"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取图片控件</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GtkWidget&nbsp;*image=&nbsp;glade_xml_get_widget(gxml,<span class="string">"image1"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取按钮1</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GtkWidget&nbsp;*button_previous=&nbsp;glade_xml_get_widget(gxml,<span class="string">"button_previous"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取按钮2</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;GtkWidget&nbsp;*button_next=&nbsp;glade_xml_get_widget(gxml,<span class="string">"button_next"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_widget_show_all(window);&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;显示所有控件</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;获取图片控件的宽度和高度，必须放在gtk_widget_show_all()函数后</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;w&nbsp;=&nbsp;image-&gt;allocation.width;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;h&nbsp;=&nbsp;image-&gt;allocation.height;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;给图片控件设置内容</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;load_image(image,&nbsp;<span class="string">"next.bmp"</span><span>,&nbsp;w,&nbsp;h);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;给主窗口设置背景图</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;chang_background(window,&nbsp;<span class="string">"bg.jpg"</span><span>,&nbsp;800,&nbsp;480);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;gtk_main();&nbsp;<span class="comment">//&nbsp;主事件循环</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre code_snippet_id="151297" snippet_file_name="blog_20140113_10_465468" name="code" class="cpp" style="display: none; ">#include &lt;glade/glade.h&gt;	// glade所需头文件
+#include &lt;gtk/gtk.h&gt;
+
+/* 功能： 		给创建好的图片控件重新设计一张图片
+ * image：		图片控件
+ * file_path: 	图片的路径
+ * w, h：		指定图片的宽度和高度
+ */
+void load_image(GtkWidget *image, const char *file_path, const int w, const int h )
+{
+	gtk_image_clear( GTK_IMAGE(image) );        // 清除图像
+	GdkPixbuf *src_pixbuf = gdk_pixbuf_new_from_file(file_path, NULL);	// 创建图片资源
+	GdkPixbuf *dest_pixbuf = gdk_pixbuf_scale_simple(src_pixbuf, w, h, GDK_INTERP_BILINEAR); // 指定大小
+	gtk_image_set_from_pixbuf(GTK_IMAGE(image), dest_pixbuf); // 图片控件重新设置一张图片(pixbuf)
+	g_object_unref(src_pixbuf);		// 释放资源
+	g_object_unref(dest_pixbuf);	// 释放资源
+}
+
+/* 功能：  设置背景图
+ * widget: 主窗口
+ * path：  图片路径
+ * w, h:   图片的大小
+ */
+void chang_background(GtkWidget *widget, const gchar *path, const int w, const int h)
+{
+	gtk_widget_set_app_paintable(widget, TRUE);		//允许窗口可以绘图
+    gtk_widget_realize(widget);	
+	
+	/* 更改背景图时，图片会重叠
+	 * 这时要手动调用下面的函数，让窗口绘图区域失效，产生窗口重绘制事件（即 expose 事件）。
+	 */
+	gtk_widget_queue_draw(widget);
+	
+    GdkPixbuf *src_pixbuf = gdk_pixbuf_new_from_file(path, NULL);	// 创建图片资源对象
+    // w, h是指定图片的宽度和高度
+    GdkPixbuf *dst_pixbuf = gdk_pixbuf_scale_simple(src_pixbuf, w, h, GDK_INTERP_BILINEAR);
+
+	GdkPixmap *pixmap = NULL;
+	
+	/* 创建pixmap图像; 
+	 * NULL：不需要蒙版; 
+	 * 123： 0~255，透明到不透明
+	 */
+    gdk_pixbuf_render_pixmap_and_mask(dst_pixbuf, &amp;pixmap, NULL, 128);
+    // 通过pixmap给widget设置一张背景图，最后一个参数必须为: FASLE
+	gdk_window_set_back_pixmap(widget-&gt;window, pixmap, FALSE);
+    
+	// 释放资源
+	g_object_unref(src_pixbuf);
+    g_object_unref(dst_pixbuf);
+    g_object_unref(pixmap);
+}
+
+int main(int argc,char *argv[])
+{
+
+	gtk_init(&amp;argc,&amp;argv);	// 初始化
+	
+	// 载入并新建整个界面
+	GladeXML *gxml = glade_xml_new("demo.glade", NULL, NULL);
+	// 获取界面里的窗口控件
+	GtkWidget *window = glade_xml_get_widget(gxml,"window1");
+	// 获取图片控件
+	GtkWidget *image= glade_xml_get_widget(gxml,"image1");
+	// 获取按钮1
+	GtkWidget *button_previous= glade_xml_get_widget(gxml,"button_previous");
+	// 获取按钮2
+	GtkWidget *button_next= glade_xml_get_widget(gxml,"button_next");
+
+	gtk_widget_show_all(window);	// 显示所有控件
+	
+	// 获取图片控件的宽度和高度，必须放在gtk_widget_show_all()函数后
+	int w = image-&gt;allocation.width;
+	int h = image-&gt;allocation.height;
+	// 给图片控件设置内容
+	load_image(image, "next.bmp", w, h);
+	
+	// 给主窗口设置背景图
+	chang_background(window, "bg.jpg", 800, 480);
+	
+	gtk_main(); // 主事件循环
+	
+	return 0;   
+}</pre><br>
+<br>
+<span style="font-size:24px"><span style="white-space:pre"></span></span>
+<div style="text-align:left"><span style="font-size:24px"><br>
+</span></div>
+程序运行效果图：
+<p></p>
+<p style="text-align:center"><span style="white-space:pre"><span style="white-space:pre"><span style="font-size:24px"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/20140110182015703" alt=""></span></span></span></p>
+<p style="text-align:left"><span style="white-space:pre"><span style="white-space:pre"><span style="font-size:24px"><br>
+</span></span></span></p>
+<p style="text-align:left"><span style="white-space:pre"><span style="white-space:pre"><span style="font-size:24px"><a target="_blank" href="http://download.csdn.net/detail/u013293310/6839475"><span style="white-space:pre"></span>源代码下载地址：http://download.csdn.net/detail/u013293310/6839475</a><br>
+</span></span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"><br>
+</span></span></p>
+<p><span style="white-space:pre"><span style="font-size:24px"></span></span></p>
+</div>
+</div>
+
+</div>
+
+
+
+<!-- Baidu Button BEGIN -->
+<div id="bdshare" class="bdshare_t bds_tools get-codes-bdshare" style="float: right;">
+<a class="bds_qzone" title="分享到QQ空间" href="http://blog.csdn.net/sun_app/article/details/18089403#"></a>
+<a class="bds_tsina" title="分享到新浪微博" href="http://blog.csdn.net/sun_app/article/details/18089403#"></a>
+<a class="bds_tqq" title="分享到腾讯微博" href="http://blog.csdn.net/sun_app/article/details/18089403#"></a>
+<a class="bds_renren" title="分享到人人网" href="http://blog.csdn.net/sun_app/article/details/18089403#"></a>
+<a class="bds_t163" title="分享到网易微博" href="http://blog.csdn.net/sun_app/article/details/18089403#"></a>
+<span class="bds_more">更多</span>
+<a class="shareCount" href="http://blog.csdn.net/sun_app/article/details/18089403#" title="累计分享0次">0</a>
+</div>
+<!-- Baidu Button END -->
+
+
+<!--192.168.100.33-->
+<div class="article_next_prev">
+            <li class="prev_article"><span>上一篇：</span><a href="http://blog.csdn.net/sun_app/article/details/18082555" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_shangyipian&#39;])">ubuntu12.04  U盘挂载总结--delong</a></li>
+            <li class="next_article"><span>下一篇：</span><a href="http://blog.csdn.net/sun_app/article/details/18263299" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_xiayipian&#39;])">dd命令、cp命令详解+dd命令、cp命令对比---delong</a></li>
+</div>
+
+<!-- Baidu Button BEGIN -->
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=1536434" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/bds_s_v2.js"></script>
+
+<script type="text/javascript">
+    document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->
+
+        <div id="digg" articleid="18089403">
+            <dl id="btnDigg" class="digg digg_enable">
+                <dt onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_ding&#39;])">顶</dt>
+                <dd>1</dd>
+            </dl>
+            <dl id="btnBury" class="digg digg_enable">
+                <dt onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_cai&#39;])">踩</dt>
+                <dd>0</dd>
+            </dl>
+        </div>
+</div>
+    <div id="ad_cen">
+        <script type="text/javascript">            BAIDU_CLB_SLOT_ID = "117306";</script>
+        <script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/o.js"></script><div id="BAIDU_DUP_wrapper_117306_0"></div><script charset="utf-8" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ecom"></script><script charset="utf-8" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/fixed7o.js"></script><script type="text/javascript"><!--
+google_ad_client = "ca-pub-1076724771190722";
+/* blog正文下方728x90 */
+google_ad_slot = "4497271841";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent"><iframe width="728" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){try{h=s.upd(h,i)}catch(e){}w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;"></iframe></ins></ins>
+    </div>
+    <script type="text/javascript">
+        //new Ad(4, 'ad_cen');
+    </script>
+<div id="comment_title" class="panel_head">
+    查看评论<a name="comments"></a></div>
+<div id="comment_list"><br>&nbsp;&nbsp;暂无评论<br><br><div class="clear"></div></div>
+<div id="comment_bar">
+</div>
+<div id="comment_form"><a name="commentbox"></a><a name="reply"></a><a name="quote"></a><form action="http://blog.csdn.net/u013293310/comment/submit?id=18089403" method="post" onsubmit="return subform(this);"><div class="commentform"><div class="panel_head">发表评论</div><ul><li class="left">用 户 名：</li><li class="right">u013293310</li></ul><ul><li class="left">评论内容：</li><li class="right" style="position:relative;"><div id="ubbtools"><a href="http://blog.csdn.net/sun_app/article/details/18089403#insertcode" code="code"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/code.gif" border="0" alt="插入代码" title="插入代码"></a></div><div id="lang_list" style="position: absolute; top: 28px; left: 0px; display: none;"><a class="long_name" href="http://blog.csdn.net/sun_app/article/details/18089403#html">HTML/XML</a><a class="long_name" href="http://blog.csdn.net/sun_app/article/details/18089403#objc">objective-c</a><a class="zhong_name" href="http://blog.csdn.net/sun_app/article/details/18089403#delphi">Delphi</a><a class="zhong_name" href="http://blog.csdn.net/sun_app/article/details/18089403#ruby">Ruby</a><a href="http://blog.csdn.net/sun_app/article/details/18089403#php">PHP</a><a class="duan_name" href="http://blog.csdn.net/sun_app/article/details/18089403#csharp">C#</a><a style=" border-right: none;" class="duan_name" href="http://blog.csdn.net/sun_app/article/details/18089403#cpp">C++</a><a style=" border-bottom:none;" class="long_name" href="http://blog.csdn.net/sun_app/article/details/18089403#javascript">JavaScript</a><a style=" border-bottom:none;" class="long_name" href="http://blog.csdn.net/sun_app/article/details/18089403#vb">Visual Basic</a><a style=" border-bottom:none;" class="zhong_name" href="http://blog.csdn.net/sun_app/article/details/18089403#python">Python</a><a style=" border-bottom:none;" class="zhong_name" href="http://blog.csdn.net/sun_app/article/details/18089403#java">Java</a><a style="border-bottom:none;" class="duan_name" href="http://blog.csdn.net/sun_app/article/details/18089403#css">CSS</a><a style="border-bottom:none;" class="duan_name" href="http://blog.csdn.net/sun_app/article/details/18089403#sql">SQL</a><a style="border:none;" class="duan_name" href="http://blog.csdn.net/sun_app/article/details/18089403#plain">其它</a></div><textarea class="comment_content" name="comment_content" id="comment_content" style="width: 400px; height: 200px;"></textarea></li></ul><ul><input type="hidden" id="comment_replyId" name="comment_replyId"><input type="hidden" id="comment_userId" name="comment_userId" value="521203"><input type="hidden" id="commentId" name="commentId" value=""><input type="submit" class="comment_btn" value="提交">&nbsp;&nbsp;<span id="tip_comment" style="color: Red; display: none;"></span></ul></div></form></div>
+<div class="announce">
+    * 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+<script type="text/javascript">
+    var fileName = '18089403';
+    var commentscount = 0;
+    var islock = false
+</script>
+<script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/comment.js"></script>
+    <div id="ad_bot">
+    <iframe id="ad_frm_0" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 984px; height: 170px; " src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ad(1).htm"></iframe></div>
+    <script type="text/javascript">
+    new Ad(5, 'ad_bot');
+    </script>
+<div id="report_dialog">
+</div>
+<div id="d-top" style="display: block; ">
+    <a id="d-top-a" href="http://blog.csdn.net/sun_app/article/details/18089403#" title="回到顶部" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_huidaodingbu&#39;])">
+        <img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/top.png" alt="TOP"></a>
+</div>
+<script type="text/javascript">
+    $(function ()
+    {
+        var d_top = $('#d-top');
+        document.onscroll = function ()
+        {
+            var scrTop = (document.body.scrollTop || document.documentElement.scrollTop);
+            if (scrTop > 500)
+            {
+                d_top.show();
+            } else
+            {
+                d_top.hide();
+            }
+        }
+        $('#d-top-a').click(function ()
+        {
+            scrollTo(0, 0);
+            this.blur();
+            return false;
+        });
+    });
+  
+</script>
+<style type="text/css">
+    .tag_list
+    {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 1px solid #D7CBC1;
+        color: #000000;
+        font-size: 12px;
+        line-height: 20px;
+        list-style: none outside none;
+        margin: 10px 2% 0 1%;
+        padding: 1px;
+    }
+    .tag_list h5
+    {
+        background: none repeat scroll 0 0 #E0DBD3;
+        color: #47381C;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 5px;
+        margin: 0;
+    }
+    .tag_list h5 a
+    {
+        color: #47381C;
+    }
+    .classify
+    {
+        margin: 10px 0;
+        padding: 4px 12px 8px;
+    }
+    .classify a
+    {
+        margin-right: 20px;
+        white-space: nowrap;
+    }
+</style>
+<div class="tag_list">
+    <h5>
+        <a href="http://www.csdn.net/tag/" target="_blank">核心技术类目</a></h5>
+    <div class="classify">
+<a title="全部主题" href="http://www.csdn.net/tag" target="_blank" onclick="LogClickCount(this,336);">全部主题</a>
+<a title="Java" href="http://www.csdn.net/tag/Java" target="_blank" onclick="LogClickCount(this,336);">Java</a>
+<a title="VPN" href="http://www.csdn.net/tag/vpn" target="_blank" onclick="LogClickCount(this,336);">VPN</a>
+<a title="Android" href="http://www.csdn.net/tag/android" target="_blank" onclick="LogClickCount(this,336);">Android</a>
+<a title="iOS" href="http://www.csdn.net/tag/ios" target="_blank" onclick="LogClickCount(this,336);">iOS</a>
+<a title="ERP" href="http://www.csdn.net/tag/erp" target="_blank" onclick="LogClickCount(this,336);">ERP</a>
+<a title="IE10" href="http://www.csdn.net/tag/ie10" target="_blank" onclick="LogClickCount(this,336);">IE10</a>
+<a title="Eclipse" href="http://www.csdn.net/tag/eclipse" target="_blank" onclick="LogClickCount(this,336);">Eclipse</a>
+<a title="CRM" href="http://www.csdn.net/tag/crm" target="_blank" onclick="LogClickCount(this,336);">CRM</a>
+<a title="JavaScript" href="http://www.csdn.net/tag/javascript" target="_blank" onclick="LogClickCount(this,336);">JavaScript</a>
+<a title="Ubuntu" href="http://www.csdn.net/tag/ubuntu" target="_blank" onclick="LogClickCount(this,336);">Ubuntu</a>
+<a title="NFC" href="http://www.csdn.net/tag/nfc" target="_blank" onclick="LogClickCount(this,336);">NFC</a>
+<a title="WAP" href="http://www.csdn.net/tag/wap" target="_blank" onclick="LogClickCount(this,336);">WAP</a>
+<a title="jQuery" href="http://www.csdn.net/tag/jquery" target="_blank" onclick="LogClickCount(this,336);">jQuery</a>
+<a title="数据库" href="http://www.csdn.net/tag/%E6%95%B0%E6%8D%AE%E5%BA%93" target="_blank" onclick="LogClickCount(this,336);">数据库</a>
+<a title="BI" href="http://www.csdn.net/tag/bi" target="_blank" onclick="LogClickCount(this,336);">BI</a>
+<a title="HTML5" href="http://www.csdn.net/tag/html5" target="_blank" onclick="LogClickCount(this,336);">HTML5</a>
+<a title="Spring" href="http://www.csdn.net/tag/spring" target="_blank" onclick="LogClickCount(this,336);">Spring</a>
+<a title="Apache" href="http://www.csdn.net/tag/apache" target="_blank" onclick="LogClickCount(this,336);">Apache</a>
+<a title="Hadoop" href="http://www.csdn.net/tag/hadoop" target="_blank" onclick="LogClickCount(this,336);">Hadoop</a>
+<a title=".NET" href="http://www.csdn.net/tag/.net" target="_blank" onclick="LogClickCount(this,336);">.NET</a>
+<a title="API" href="http://www.csdn.net/tag/api" target="_blank" onclick="LogClickCount(this,336);">API</a>
+<a title="HTML" href="http://www.csdn.net/tag/html" target="_blank" onclick="LogClickCount(this,336);">HTML</a>
+<a title="SDK" href="http://www.csdn.net/tag/sdk" target="_blank" onclick="LogClickCount(this,336);">SDK</a>
+<a title="IIS" href="http://www.csdn.net/tag/iis" target="_blank" onclick="LogClickCount(this,336);">IIS</a>
+<a title="Fedora" href="http://www.csdn.net/tag/fedora" target="_blank" onclick="LogClickCount(this,336);">Fedora</a>
+<a title="XML" href="http://www.csdn.net/tag/xml" target="_blank" onclick="LogClickCount(this,336);">XML</a>
+<a title="LBS" href="http://www.csdn.net/tag/lbs" target="_blank" onclick="LogClickCount(this,336);">LBS</a>
+<a title="Unity" href="http://www.csdn.net/tag/unity" target="_blank" onclick="LogClickCount(this,336);">Unity</a>
+<a title="Splashtop" href="http://www.csdn.net/tag/splashtop" target="_blank" onclick="LogClickCount(this,336);">Splashtop</a>
+<a title="UML" href="http://www.csdn.net/tag/uml" target="_blank" onclick="LogClickCount(this,336);">UML</a>
+<a title="components" href="http://www.csdn.net/tag/components" target="_blank" onclick="LogClickCount(this,336);">components</a>
+<a title="Windows Mobile" href="http://www.csdn.net/tag/windowsmobile" target="_blank" onclick="LogClickCount(this,336);">Windows Mobile</a>
+<a title="Rails" href="http://www.csdn.net/tag/rails" target="_blank" onclick="LogClickCount(this,336);">Rails</a>
+<a title="QEMU" href="http://www.csdn.net/tag/qemu" target="_blank" onclick="LogClickCount(this,336);">QEMU</a>
+<a title="KDE" href="http://www.csdn.net/tag/kde" target="_blank" onclick="LogClickCount(this,336);">KDE</a>
+<a title="Cassandra" href="http://www.csdn.net/tag/cassandra" target="_blank" onclick="LogClickCount(this,336);">Cassandra</a>
+<a title="CloudStack" href="http://www.csdn.net/tag/cloudstack" target="_blank" onclick="LogClickCount(this,336);">CloudStack</a>
+<a title="FTC" href="http://www.csdn.net/tag/ftc" target="_blank" onclick="LogClickCount(this,336);">FTC</a>
+<a title="coremail" href="http://www.csdn.net/tag/coremail" target="_blank" onclick="LogClickCount(this,336);">coremail</a>
+<a title="OPhone " href="http://www.csdn.net/tag/ophone" target="_blank" onclick="LogClickCount(this,336);">OPhone </a>
+<a title="CouchBase" href="http://www.csdn.net/tag/couchbase" target="_blank" onclick="LogClickCount(this,336);">CouchBase</a>
+<a title="云计算" href="http://www.csdn.net/tag/%E4%BA%91%E8%AE%A1%E7%AE%97" target="_blank" onclick="LogClickCount(this,336);">云计算</a>
+<a title="iOS6" href="http://www.csdn.net/tag/iOS6" target="_blank" onclick="LogClickCount(this,336);">iOS6</a>
+<a title="Rackspace " href="http://www.csdn.net/tag/rackspace" target="_blank" onclick="LogClickCount(this,336);">Rackspace </a>
+<a title="Web App" href="http://www.csdn.net/tag/webapp" target="_blank" onclick="LogClickCount(this,336);">Web App</a>
+<a title="SpringSide" href="http://www.csdn.net/tag/springside" target="_blank" onclick="LogClickCount(this,336);">SpringSide</a>
+<a title="Maemo" href="http://www.csdn.net/tag/maemo" target="_blank" onclick="LogClickCount(this,336);">Maemo</a>
+<a title="Compuware" href="http://www.csdn.net/tag/compuware" target="_blank" onclick="LogClickCount(this,336);">Compuware</a>
+<a title="大数据" href="http://www.csdn.net/tag/%E5%A4%A7%E6%95%B0%E6%8D%AE" target="_blank" onclick="LogClickCount(this,336);">大数据</a>
+<a title="aptech" href="http://www.csdn.net/tag/aptech" target="_blank" onclick="LogClickCount(this,336);">aptech</a>
+<a title="Perl" href="http://www.csdn.net/tag/perl" target="_blank" onclick="LogClickCount(this,336);">Perl</a>
+<a title="Tornado" href="http://www.csdn.net/tag/tornado" target="_blank" onclick="LogClickCount(this,336);">Tornado</a>
+<a title="Ruby" href="http://www.csdn.net/tag/ruby" target="_blank" onclick="LogClickCount(this,336);">Ruby</a>
+<a title="Hibernate" href="http://www.csdn.net/hibernate" target="_blank" onclick="LogClickCount(this,336);">Hibernate</a>
+<a title="ThinkPHP" href="http://www.csdn.net/tag/thinkphp" target="_blank" onclick="LogClickCount(this,336);">ThinkPHP</a>
+<a title="Spark" href="http://www.csdn.net/tag/spark" target="_blank" onclick="LogClickCount(this,336);">Spark</a>
+<a title="HBase" href="http://www.csdn.net/tag/hbase" target="_blank" onclick="LogClickCount(this,336);">HBase</a>
+<a title="Pure" href="http://www.csdn.net/tag/pure" target="_blank" onclick="LogClickCount(this,336);">Pure</a>
+<a title="Solr" href="http://www.csdn.net/tag/solr" target="_blank" onclick="LogClickCount(this,336);">Solr</a>
+<a title="Angular" href="http://www.csdn.net/tag/angular" target="_blank" onclick="LogClickCount(this,336);">Angular</a>
+<a title="Cloud Foundry" href="http://www.csdn.net/tag/cloudfoundry" target="_blank" onclick="LogClickCount(this,336);">Cloud Foundry</a>
+<a title="Redis" href="http://www.csdn.net/tag/redis" target="_blank" onclick="LogClickCount(this,336);">Redis</a>
+<a title="Scala" href="http://www.csdn.net/tag/scala" target="_blank" onclick="LogClickCount(this,336);">Scala</a>
+<a title="Django" href="http://www.csdn.net/tag/django" target="_blank" onclick="LogClickCount(this,336);">Django</a>
+<a title="Bootstrap" href="http://www.csdn.net/tag/bootstrap" target="_blank" onclick="LogClickCount(this,336);">Bootstrap</a>
+    </div>
+</div>
+
+                    <div class="clear">
+                    </div>
+                </div>
+            </div>
+            <div id="side">
+    <div class="side">
+<div id="panel_Profile" class="panel">
+<ul class="panel_head"><span>个人资料</span></ul>
+<ul class="panel_body profile">
+<div id="blog_userface">
+    <a href="http://my.csdn.net/u013293310" target="_blank">
+    <img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/1_u013293310.jpg" title="访问我的空间" style="max-width:90%">
+    </a>
+    <br>
+    <span><a href="http://my.csdn.net/u013293310" class="user_name" target="_blank">u013293310</a></span>
+</div>
+<div class="interact" style="display: none; ">
+<a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_guanzhu&#39;])"></a>
+<a href="javascript:void(0);" class="letter" onclick="loginto(1)" title="[发私信]"></a>
+</div>
+<div id="blog_medal">
+<div id="bms_box"><a href="http://medal.blog.csdn.net/allmedal.aspx" target="_blank"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/holdon_s.gif" onmouseover="m_over_m(this,0)" onmouseout="m_out_m()" alt=""></a></div></div>
+<ul id="blog_rank">
+    <li>访问：<span>963次</span></li>
+    <li>积分：<span>141分</span></li>
+    <li>排名：<span>千里之外</span></li>
+</ul>
+<ul id="blog_statistics">
+    <li>原创：<span>13篇</span></li>
+    <li>转载：<span>1篇</span></li>
+    <li>译文：<span>0篇</span></li>
+    <li>评论：<span>0条</span></li>
+</ul>
+</ul>
+</div>
+
+
+<div id="custom_column_28247373" class="panel">
+<ul class="panel_head"><span>好友链接</span></ul>
+<ul class="panel_body">
+
+<li></li><li><a href="http://blog.sina.com.cn/123seasky" target="_blank">修海的博客</a> </li><li><a href="http://blog.csdn.net/laoxuladeng/" target="_blank">登伟的博客</a> </li><li><a href="http://my.csdn.net/zidier215" target="_blank">德龙的博客</a> </li><li><a href="http://www.cnblogs.com/hnrainll" target="_blank">文浩的博客</a> </li><li><a href="http://www.cnblogs.com/lightsalt" target="_blank">吕峰的博客</a> </li><li><a href="http://blog.csdn.net/zhaoxiutao" target="_blank">秀涛的博客</a> </li><li></li><li><a href="http://blog.csdn.net/sunpluseduandroid" target="_blank">java、android开发的博客</a>
+</li><li><a href="http://blog.csdn.net/sunplusedunetwork" target="_blank">嵌入式Linux网络开发的博客</a>
+</li><li><a href="http://blog.csdn.net/sun_app" target="_blank">嵌入式Linux系统开发的博客</a> </li><li><a href="http://blog.csdn.net/eduplatform" target="_blank">嵌入式Linux平台开发的博客</a>
+</li><li><a href="http://blog.csdn.net/edudriver" target="_blank">嵌入式Linux驱动开发的博客</a> </li><li></li>
+</ul>
+</div><div id="panel_Category" class="panel">
+<ul class="panel_head"><span>文章分类</span></ul>
+<ul class="panel_body">
+<li>
+<a href="http://blog.csdn.net/sun_app/article/category/1850561">Linux操作系统基础</a><span>(2)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/category/1827799">Linux操作系统开发</a><span>(3)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/category/1827821">图形界面GUI开发</a><span>(9)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/category/1827823">多媒体开发</a><span>(1)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/category/1827867">软件工具使用</a><span>(1)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/category/1827871">精品转载</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/category/1827873">业界新闻</a><span>(0)</span>
+</li>
+</ul>
+</div><div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字"></span>
+        <input id="btnSubmit" type="submit" value="搜索" title="search in blog">
+        <input type="hidden" name="q" id="inputQ">
+        <input type="hidden" name="t" value="blog">
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div><div id="panel_Archive" class="panel">
+<ul class="panel_head"><span>文章存档</span></ul>
+<ul class="panel_body">
+<div id="archive_list">
+<!--归档统计-->
+<li><a href="http://blog.csdn.net/sun_app/article/month/2014/02">2014年02月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/sun_app/article/month/2014/01">2014年01月</a><span>(10)</span></li><li><a href="http://blog.csdn.net/sun_app/article/month/2013/12">2013年12月</a><span>(3)</span></li>
+</div>
+</ul>
+</div>
+<div id="hotarticls" class="panel">
+<ul class="panel_head"><span>阅读排行</span></ul>
+<ul class="panel_body itemlist">
+<li>
+<a href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET.htm" title="一步一步学习Glade——Mike">一步一步学习Glade——Mike</a><span>(201)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18263299" title="dd命令、cp命令详解+dd命令、cp命令对比---delong">dd命令、cp命令详解+dd命令、cp命令对比---delong</a><span>(142)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/17682957" title="gtk中使用glade">gtk中使用glade</a><span>(119)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/17691353" title="linux线程池的实现">linux线程池的实现</a><span>(54)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18046951" title="automake编译gtk+程序">automake编译gtk+程序</a><span>(51)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18041779" title="GTK自定义函数之透明列表(5)-bobo">GTK自定义函数之透明列表(5)-bobo</a><span>(46)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18039919" title="GTK自定义函数(1)-bobo">GTK自定义函数(1)-bobo</a><span>(41)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18040677" title="GTK自定义函数之图片、按钮(2)-bobo">GTK自定义函数之图片、按钮(2)-bobo</a><span>(41)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18043157" title="GTK自定义函数之滑动密码锁(6)-bobo">GTK自定义函数之滑动密码锁(6)-bobo</a><span>(40)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/17612129" title="火星娃上线了">火星娃上线了</a><span>(40)</span>
+</li>
+</ul>
+</div>
+<div id="hotarticls2" class="panel">
+<ul class="panel_head"><span>评论排行</span></ul>
+<ul class="panel_body itemlist">
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/17612129" title="火星娃上线了">火星娃上线了</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18263299" title="dd命令、cp命令详解+dd命令、cp命令对比---delong">dd命令、cp命令详解+dd命令、cp命令对比---delong</a><span>(0)</span>
+</li>
+<li>
+<a href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET.htm" title="一步一步学习Glade——Mike">一步一步学习Glade——Mike</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18082555" title="ubuntu12.04  U盘挂载总结--delong">ubuntu12.04  U盘挂载总结--delong</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18046951" title="automake编译gtk+程序">automake编译gtk+程序</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18043157" title="GTK自定义函数之滑动密码锁(6)-bobo">GTK自定义函数之滑动密码锁(6)-bobo</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18041779" title="GTK自定义函数之透明列表(5)-bobo">GTK自定义函数之透明列表(5)-bobo</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18041437" title="GTK自定义函数之滚动窗口(4)-bobo">GTK自定义函数之滚动窗口(4)-bobo</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18040873" title="GTK自定义函数之控件大小、颜色(3)-bobo">GTK自定义函数之控件大小、颜色(3)-bobo</a><span>(0)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/sun_app/article/details/18040677" title="GTK自定义函数之图片、按钮(2)-bobo">GTK自定义函数之图片、按钮(2)-bobo</a><span>(0)</span>
+</li>
+</ul>
+</div>
+<div id="homepageArticles" class="panel tracking-ad" data-mod="popu_4">
+<ul class="panel_head"><span>推荐文章</span></ul>
+<ul class="panel_body" id="ad_commend"><iframe id="ad_frm_1" frameborder="0" scrolling="no" style="border-width: 0px; overflow: hidden; width: 194px; height: 272px; " src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ad.htm"></iframe></ul>
+</div>
+<script type="text/javascript">
+ new Ad(12, 'ad_commend');
+</script>    </div>
+    <div class="clear">
+    </div>
+</div>
+
+            <div class="clear">
+            </div>
+        </div>
+        
+
+<script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/newblog.min.js"></script>
+<script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/showblogmedal.ashx"></script>
+<script type="text/javascript">
+    document.write('<script type="text/javascript" src="http://csdnimg.cn/pubfooter/js/publib_footer.js?' + Math.floor(new Date() / 120000).toString(36) + '="></' + 'script>');
+</script><script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/publib_footer.js"></script><link rel="stylesheet" type="text/css" href="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/pub_footer_2012.css"><div id="pub_footerall" class="pub_footerall"><dl><dt></dt> <dd><a href="http://www.csdn.net/company/about.html" target="_blank">公司简介</a>|<a href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</a>|<a href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</a>|<a href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</a>|<a href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</a>|<a href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</a>|<a href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</a>|<a href="mailto:webmaster@csdn.net">问题报告</a></dd><dd><a href="http://wpa.qq.com/msgrd?v=3&uin=2355263776&site=qq&menu=yes" target="_blank" class="qq">QQ客服</a> <a href="http://e.weibo.com/csdnsupport/profile" target="_blank" class="weibo">微博客服</a> <a href="http://bbs.csdn.net/forums/Service" target="_blank" class="online">论坛反馈</a> <a href="mailto:webmaster@csdn.net" class="email">联系邮箱：webmaster@csdn.net</a> <span class="phone">服务热线：400-600-2320</span></dd><dd>京&nbsp;ICP&nbsp;证&nbsp;070598&nbsp;号</dd><dd>北京创新乐知信息技术有限公司 版权所有</dd><dd>江苏乐知网络技术有限公司 提供商务支持</dd><dd>Copyright © 1999-2014, CSDN.NET, All Rights Reserved&nbsp;<a href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/gongshang_logos.gif" alt="GongshangLogo" title=""></a></dd></dl></div><div id="note1" class="csdn_note" style="display:none; position:absolute; z-index:9999; width:440px">  <span class="notice_top_arrow"><span class="inner"></span></span>  <div class="box"></div></div><div class="csdn_notice_tip" style="display: none; position: absolute; z-index: 9990; width: 170px; ">  <iframe src="about:blank" frameborder="0" scrolling="no" style="z-index:-1;position:absolute;top:0;left:0;width:100%;height:100%;background:transparent"></iframe>  <div class="tip_text">您有<strong>0</strong>条新通知</div>  <a href="javascript:void 0" class="close2"></a></div><script id="noticeScript" type="text/javascript" btnid="header_notice_num" wrapid="note1" count="5" subcount="5" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/notify.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script><img src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/pv.aspx" border="0" width="0" height="0">
+<script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/counter.js"></script><script type="text/javascript" charset="UTF-8" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/msg.popup.js"></script>
+<script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/ad-blog.js"></script>
+<script type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/count.js"></script><iframe src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/logs.htm" frameborder="0" width="0" height="0"></iframe>
+<script type="text/javascript">
+    $(function () {
+        function __get_code_toolbar(snippet_id) {
+            return $("<a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "' target='_blank' title='在CODE上查看代码片' style='text-indent:0;'><img src='https://code.csdn.net/assets/CODE_ico.png' width=12 height=12 alt='在CODE上查看代码片' style='position:relative;top:1px;left:2px;'/></a>"
+                    + "<a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "/fork' target='_blank' title='派生到我的代码片'  style='text-indent:0;'><img src='https://code.csdn.net/assets/ico_fork.svg' width=12 height=12 alt='派生到我的代码片' style='position:relative;top:2px;left:2px;'/></a>");
+        }
+        
+        $("[code_snippet_id]").each(function () {
+            __s_id = $(this).attr("code_snippet_id");
+            if (__s_id != null && __s_id != "" && __s_id != 0 && parseInt(__s_id) > 70020) {
+                __code_tool = __get_code_toolbar(__s_id);
+                $(this).prev().find(".tools").append(__code_tool);
+            }
+        });
+    });
+</script>
+
+    </div>
+      <!--new top-->
+    
+    <script id="csdn-toolbar-id" btnid="header_notice_num" wrapid="note1" count="5" subcount="5" type="text/javascript" src="./一步一步学习Glade——Mike - 火星娃_凌阳教育 - 博客频道 - CSDN.NET_files/toolbar.js"></script>
+     <!--new top-->
+
+
+</body></html>

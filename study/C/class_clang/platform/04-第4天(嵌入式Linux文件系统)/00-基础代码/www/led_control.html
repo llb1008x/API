@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<script language="javascript" src="led_control.js"></script>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>SunPlusAPP embedded web Server</title>
+<link rel="stylesheet" type="text/css" href="css/theme.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body onload='get_led_status()'>
+	<div id="container">
+    	<div id="header">
+        	<h2>SunPlusApp embedded web Server</h2>
+			<div id="topmenu">
+				<ul>
+					<li  class="current"><a href="led_control.html">LED Control</a></li>
+					<li><a href="send_message.html">Send Message</a></li>
+				 </ul>
+			 </div>
+   		</div>
+		<div id="wrapper"  align='center'>
+			<div id="content" align="center">
+			<h1 align='center'>LED Control</h1>
+			<table align='center'  border='10' cellpadding='0' cellspacing='0'> 
+				<tr height = '30' align='center'>
+					<th width='100' align='center'>LED1</th>
+					<th width='100' align='center'>LED2</th>
+					<th width='100' align='center'>LED3</th>
+				</tr>
+				<tr height = '80' align='center'>
+					<td width='100' align='center'><img src='./img/led_off.png' id='led1' onclick='switch_led(1, g_led1_flag)'></td>
+					<td width='100' align='center'><img src='./img/led_off.png' id='led2' onclick='switch_led(2, g_led2_flag)'></td>
+					<td width='100' align='center'><img src='./img/led_off.png' id='led3' onclick='switch_led(3, g_led3_flag)'></td>
+				</tr>
+				<tr height = '50' align='center'>
+					<td width='100' align='center'></td>
+					<td width='100' align='center'><img src='./img/alloff.png' id='ledall' onclick='switch_led(4, g_ledall_flag)'></td>
+					<td width='100' align='center'></td>
+				</tr>
+			</table>
+			</div>
+		</div>
+     </div>
+</body>
+</html>

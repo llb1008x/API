@@ -1,0 +1,4 @@
+gcc -c -o main.o main.c 
+gcc -c -o start.o start.S
+ld -Ttext=0x0000 -o out_elf main.o start.o
+objcopy -O binary -S out_elf out.bin

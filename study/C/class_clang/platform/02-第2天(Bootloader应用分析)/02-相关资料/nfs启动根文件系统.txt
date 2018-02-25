@@ -1,0 +1,5 @@
+param set linux_cmd_line "noinitrd root=/dev/nfs nfsroot=/home/edu/rootfs/,rsize=1024,wsize=1024 ip=172.20.223.118:172.20.223.151:172.20.223.254:255.255.255.0::eth0:off init=/linuxrc console=ttySAC0"
+
+setenv bootargs noinitrd root=/dev/mtdblock2 init=linuxrc console=ttySAC0,115200
+
+setenv bootargs noinitrd root=/dev/nfs nfsroot=/home/edu/rootfs/,rsize=1024,wsize=1024 ip=172.20.223.118:172.20.223.151:172.20.223.254:255.255.255.0::eth0:off init=/linuxrc console=ttySAC0
