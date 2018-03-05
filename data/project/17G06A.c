@@ -493,8 +493,8 @@
 
 
 				4. adb bugreport > bugreport.txt
-				adb shell logcat -b main -v threadtime > android.log
-				adb shell cat dmesg  > dmesg.log
+				   adb shell logcat -b main -v threadtime > android.log
+				   adb shell cat dmesg  > dmesg.log
 
 			}
 	}

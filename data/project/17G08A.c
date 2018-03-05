@@ -635,7 +635,7 @@
 			POWER_SUPPLY_TYPE_USB_ACA,	/* Accessory Charger Adapters */		7
 			POWER_SUPPLY_TYPE_USB_HVDCP,	/* High Voltage DCP */				8
 			POWER_SUPPLY_TYPE_USB_HVDCP_3,	/* Efficient High Voltage DCP */	9
-			POWER_SUPPLY_TYPE_USB_PD,	/* Power Delivery */
+			POWER_SUPPLY_TYPE_USB_PD,	/* Power Delivery */					10
 			POWER_SUPPLY_TYPE_WIRELESS,	/* Accessory Charger Adapters */
 			POWER_SUPPLY_TYPE_USB_FLOAT,	/* Floating charger */
 			POWER_SUPPLY_TYPE_BMS,		/* Battery Monitor System */
