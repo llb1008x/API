@@ -449,9 +449,22 @@
 
     Linux三剑客之awk命令
     https://www.cnblogs.com/ginvip/p/6352157.html
+    
+    一篇文章了解相见恨晚的 Android Binder 进程间通讯机制
+    http://blog.csdn.net/freekiteyu/article/details/70082302
 }
 
 
+
+人工智能
+{
+
+	TensorFlow 如何入门？
+	https://www.zhihu.com/question/49909565
+	
+	tensorflow中文社区
+	http://www.tensorfly.cn/index.html
+}
 
 
 

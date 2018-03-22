@@ -140,14 +140,18 @@
 
 18Y07A
 {
-   android o版本上bring up
+   	android o版本上bring up
    
-   hardware : 
-   	cpu:mt6763
-   	pmic:mt6356,mt6370
+	hardware : 
+	cpu:mt6763
+	pmic:mt6356,mt6370
    	
+   	编译 dts文件
+   	./TmakeGionee BJ18Y07A01_A -i odmdtboimage
    	
-   	//Gionee <GN_BY_CHG> <lilubao> <20180208> modify for platform change begin
+   	反编dtb
+   	./out/target/product/k63v2_64_bsp/obj/KERNEL_OBJ/scripts/dtc/dtc -I dtb -O dts -o for_mtk.dts out/target/product/k63v2_64_bsp/obj/KERNEL_OBJ/arch/arm64/boot/dts/mediatek/k63v2_64_bsp.dtb -f
+  	//Gionee <GN_BY_CHG> <lilubao> <20180208> modify for platform change begin
    
     
 }
