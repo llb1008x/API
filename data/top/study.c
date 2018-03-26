@@ -230,6 +230,100 @@
         在 ./linux/mm 中找到。
 
     添加一个驱动模块
+    
+    
+    搭建一个tftp服务器：
+    {
+        TFTP(Trivial File Transfer Protocol,简单文件传输协议),是一个基于 UDP 协议实现的用于在客户
+        机和服务器之间进行简单文件传输的协议,适合于开销不大、不复杂的应用场合。TFTP 协议专门为小文件传
+        输而设计,只能从服务器上获取文件,或者向服务器写入文件,不能列出目录,也不能进行认证。
+        根据上面关于 TFTP 的介绍,实现 TFTP 我们需要搭建一个 TFTP 的服务器,iTOP-4412 开发板当做客
+        户端。
+        使用的虚拟机 Ubuntu 来当做服务器,下面我们先讲解一下服务器端的配置。
+        根据上面关于 TFTP 的介绍,实现 TFTP 最终需要搭建一个 TFTP 的服务器,iTOP-4412 开发板当做客
+        户端。
+        
+        搭建服务器
+            在的虚拟机 Ubuntu 上打开终端,首先输入命令:sudo apt-get install xinetd,安装 xinetd。安装完
+            xinetd,接下来输入命令安装 tftp 和 tftpd:sudo apt-get install tftp tftpd。
+            然后建立 TFTP 的配置文件,使用命令:vi /etc/xinetd.d/tftp 建立文件,写入下面的代码:
+            
+            service tftp
+            {
+                socket_type = dgram
+                protocol    = udp
+                wait        = yes
+                user        = root
+                server      = /usr/sbin/in.tftpd
+                server_args = -s /home/llb/project/PRO/exynos4412/tftpboot
+                disable     = no
+                per_source  = 11
+                cps         = 100 2
+                flags       = IPv4
+            }
+
+            其中 server_args 设置的/var/tftpboot 目录是 tftp 服务器的目录
+            
+            先互ping一下看是否联通
+            如果返回上面的信息就表示开发板和 TFTP 服务器是连通的,现在我们获取 TFTP 上的文件,在开发板
+            的串口输入:tftp -g -l test.txt -r test.txt 192.168.31.18
+            
+            
+            这个地方好像一直是只可以从服务器上下载，不能往上推文件
+            tftp -g -r file ip//从TFTP下载文件
+            tftp -p -l file ip//向TFTP上传文件
+    
+    }
+    
+    
+    搭建nfs服务器
+    {
+        NFS 是 Network FileSystem 的缩写,是由 SUN 公司研制的 UNIX 表示层协议(pressentation layer
+        protocol),NFS 是基于 UDP/IP 协议的应用。它的最大功能就是可以通过网络让不同的机器,不通的操作
+        系统彼此共享文件,可以通过 NFS 挂载远程主机的目录,访问该目录就像访问本地目录一样,所以也可以简
+        单的将它看做一个文件服务器。通过 NFS 服务,可以实现在线调试文件系统或应用程序,而不用像传统的方
+        式生成文件系统镜像,然后烧写到 iTOP-4412 的 eMMC 里,最后再启动开发板。通过 NFS 服务可以提高
+        我们的调试效率。
+        
+        sudo apt-get install nfs-kernel-server
+        
+        安装完成,接下来需要配置/etc/exports,使用 vi 命令打开/etc/exports,在/etc/export 文件的最后
+一行添加:
+        /home/llb/project/PRO/exynos4412/nfs *(rw,sync,no_root_squash)
+        
+        接下来重启 portmap 服务,在控制台输入“/etc/init.d/rpcbind restart”命令,然后重启 nfs 服务,
+输入“/etc/init.d/nfs-kernel-server restart”命令。
+
+
+        完成前面的搭建工作之后,就可以在虚拟机 Ubuntu 本机上验证一下,例如把/home/llb/project/PRO/exynos4412/nfs
+挂载到/mnt 目录下,需要输入“sudo mount -t nfs localhost:/home/llb/project/PRO/exynos4412/nfs /mnt”命令。
+
+        实现 nfs 文件系统需要修改 Linux 最小文件系统的 etc/init.d/ifconfig-eth0 文件,使用 vi 命令修改第
+八行,修改为“if grep -q nfs /proc/mounts ; then”,修改完成后保存并退出
+
+        root=/dev/nfs rw nfsroot=192.168.31.18:/home/llb/project/PRO/exynos4412/nfs
+ip=192.168.31.230:192.168.31.18:192.168.31.1:255.255.255.0:iTOP:eth0:off rootfstype=ext4
+init=/linuxrc console=ttySAC2,115200"
+
+        Boot options 配置界面,然后再 Default kernel command 里面输入:
+        root=/dev/nfs rw nfsroot=192.168.1.103:/home/topeet/linux/app/system
+        ip=192.168.1.230:192.168.1.103:192.168.1.1:255.255.255.0:iTOP:eth0:off rootfstype=ext4
+        init=/linuxrc console=ttySAC2,115200"。
+        下面讲解一下上面输入命令的命令里面的几个参数:
+        root=/dev/nfs rw nfsroot=192.168.1.103:/home/minilinux/system 表示挂载的 nfs 服务器 ip 是
+        192.168.1.103,挂载的目录是/home/minilinux/system,(注意:/home/minilinux/是前面我们搭建 nfs
+        服务器设置的)
+        ip=192.168.1.230:192.168.1.103:192.168.1.1:255.255.255.0:iTOP:eth0:off 这里面,第一个
+        ip192.168.1.230 是我们开发板的 ip 地址,第二个 ip192.168.1.103 是 nfs 服务器的 ip,第三个 ip192.168.1.1
+        是开发板的网关,255.255.255.0 是子网掩码,iTOP 是开发主机的名字(一般无关紧要,可以随便填写),
+        eth0 是网卡设备的名称。
+        至此,Linux 内核的配置就完成了,退出 make menuconfig 配置,会弹出保存窗口,使用键盘的左右
+        方向键,选中上图的”Yes“,然后输入回车,退出保存配置,如下图:
+        然后输入 make 命令开始编译内核,这样 Linux 内核支持 nfs 制作完成了。
+        将新生成的内核烧写到开发板,重启开发板,就可以使用 NFS 文件系统了。
+    
+    }
+    
             
 }
 
