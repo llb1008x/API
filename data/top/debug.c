@@ -161,7 +161,207 @@
 
 
 
+{
+	Hi, Dear Customer
 
+	Thanks for attending Qualcomm PMIC HW/SW training in Shenzhen/Shanghai/Beijing!
+
+	Following are Doc and KBA list we mentioned during the training and some Key KBAs, please download from createpoint. Please pay attention that the download  need  your company have related license for specific platform.
+
+	·        PMIC Doc
+
+	·        PMIC training agenda for 2018:80-PH648-1_A
+
+	·        PMIC Master Doc
+
+	o   PMIC SOFTWARE MASTER DOCUMENT  80-NR097-1
+
+	·        SDM632 PMIC software docs:
+
+	o   80-PF208-23:SDM632 LINUX ANDROID PMIC SOFTWARE DRIVERS OVERVIEW
+
+	o   80-PF208-77 A: Linux Android PMIC Charger User Guide
+
+	o   80-PF208-74 Linux Android PMIC Qualcomm Battery Gauge User Guide
+
+	·        PMIC HW KBA:
+
+	·        PMIC HW master KBA
+
+	·        KBA-180301233200_How to create PMIC hardware case
+
+	·        KBA-180301235115_Master KBA for PMIC hardware
+
+	·        KBA-170922203829 SDM670 Hardware PMIC FAQ
+
+	·        PMIC HW Key KBA
+
+	·        KBA-180117180930 How to create and track a case on Battery Characterization test request for BMS/VBMS/Fuel Gauge/QGauge modeling
+
+	·        KBA-171130063743-About open detection of flash drivers
+
+	·        KBA-171204062226-About flash headroom auto-mode
+
+	·        KBA-171204062937-About short detection of flash drivers
+
+	·        KBA-171204064008-About the support of high Vf flash-LED
+
+	·        PMIC SW KBA
+
+	·        PMIC SW Master KBA
+
+	o   KBA-170522201700: PMIC MASTER KBA
+
+	o   KBA-170809015513 MSM8998/SDM660 master KBA
+
+	·        PMIC SW case submit KBA
+
+	o   KBA-180130012928: How to submit case for PMIC backlight issue
+
+	o   KBA-180131180158: How to submit case for PMIC haptic issue
+
+	o   KBA-180131181205: How to submbit case for PMIC RTC issue
+
+	o   KBA-180131182125: How to submbit a case for PMIC LDO/GPIO/MPP issue
+
+	o   KBA-180131231940: How to submbit case for Charger issues
+
+	o   KBA-180131175307: How to submit case for PMIC FG issue
+
+	o   KBA-180201004046: how to fill case for PMIC stability issue
+
+	·        PMIC Key KBA
+
+	KBA-180201192828: How to avoid SOC drop fast to 0% when device standby in low temperature environment
+
+	KBA-180316105244: How to configure the FG slope limiter (pm660/pmi8998)
+
+	KBA-170811194942: [PMIC] [Howto] [pm8998/pm660] pwrkey_long_press_check in XBL
+
+	KBA-170801193542: [PMIC] [UEFI] [Haptic] How to implement the bootup vibrating
+
+	KBA-180227174345: how to config warm reset as hard reset
+
+	KBA-180123005428: How to check pon/poff reason of 845/660/8998
+
+	KBA-171027055722: Android O - Enable Battery Charging LED blink functionality.
+
+	KBA-180130003034: How to capture PBUS logs
+
+	KBA-180131232330: DCIN config for wireless charging
+
+	KBA-180202011253: how to support float charger
+
+	KBA-180123005428: How to check pon/poff reason of 845/660/8998
+
+	KBA-180125225926: How to analyze RPMH regulator crash
+
+	KBA-180117230729: power key rebooting system during power off charger
+
+	KBA-180117191119: How to read battery temp in SBL by access FG SRAM
+
+	KBA-180117190411: How to use mpp4 out pwm control lcd backlight
+
+	KBA-180117183328: How to disable charger when the usb is connected.
+
+	KBA-180117180758: how to modify the battery maximum charging voltage
+
+	KBA-180117011920: How to get the vbus voltage and usbin current
+
+	KBA-171218012414: How to change charger current when usb bus suspend while connect to SDP/CDP?
+
+	KBA-171218011209: How to check why power off charge current <=100mA when connect to SDP/CDP?
+
+	KBA-170812191927: [PMIC][8998/660]How to force QC3.0 to output 9V
+
+	KBA-171218010855: PM660A detect improvement
+
+	KBA-171204002845: How to enable or disable VCOIN charge
+
+	KBA-171102193405: [rock bottom power optimize ] GPIO_19 of PM8998 config 
+
+	KBA-170927035929: How to avoid battery missing when battery id is wrongly detected
+
+	KBA-170927035929: How to avoid battery missing when battery id is wrongly detected
+
+	KBA-160922193934: How to trigger Battery id re-detection
+
+	KBA-170927035929: How to avoid battery missing when battery id is wrongly detected
+
+	KBA-170827102115: [PMIC] [Howto] [PMD9607] How to access PMD9607 GPIO5 in APPS side and use it as general input/output and interrupt source?
+
+	KBA-170823023054: Breathing light & Blinking light
+
+	KBA-170823015813: How to set battery NTC paraments
+
+	KBA-170815201537: [PMIC] WA for reverse boost issue on SDM660 platform
+
+	KBA-170815012223: [PMIC][PM8998/PM660] Where to read RRADC and VADC from ADB
+
+	KBA-170815002930: [PMIC][PM8998/PM660] How to use BB_CLK at kernel side
+
+	BA-170812205607: [PMIC][PM660][Howto] How to configure the LCD power in XBL?
+
+	KBA-170812031305: [PMIC][8998/660][Howto] How to configure JEITA Compensation
+
+	KBA-170812085014: [PMIC][8998/660]Q&A: How does UEFI jump to QcomChargerApp?
+
+	KBA-170812021101: [PMIC] [8998/660] How to recover some special adapter which is mistakenly detected as QC2.0
+
+	KBA-170812191927: [PMIC][8998/660]How to force QC3.0 to output 9V?
+
+	KBA-170812093750: [PMIC][8998/660] Configuration for the design of NTC/BAT_THERM thermistor
+
+	KBA-170811194942: [PMIC] [Howto] [pm8998/pm660] pwrkey_long_press_check in XBL
+
+	KBA-170811193324: [PMIC] [Howto] PS_HOLD: How to config it as a warm reset trigger?
+
+	KBA-170812012926: [PMIC] [8998/660] [Howto] How to configure the SDP charger ICL in XBL?
+
+	KBA-170811202408: [PMIC] [PMI8998/PM660] What's the format of UEFI battery profile, and how to match the BAT_ID.
+
+	KBA-170812005012: [PMIC][Howto][8998/660] How to configure the modem owned PM_GPIO in AP side
+
+	KBA-170810195603: how to customize input current limit of hvdcp
+
+	KBA-170810062429: [660]how to avoid 500mS delay after resume charging from suspend
+
+	KBA-170810034101: [660]How to disable HVDCP
+
+	KBA-170810032508: [660]How to disable OCP broadcast enable bit
+
+	KBA-170810025939: [660]How to rerun APSD
+
+	KBA-170810190908: [PM8998/660]how to config gpio as adc function and read the vadc of gpio  in AP
+
+	KBA-170810191057: [PM8998/660] how to config gpio as acd function and read vadc of gpio in xbl /mpss
+
+	KBA-170810182506: how to config RFLCK2 drive strength
+
+	KBA-170810024900: [660]How to get PM660 and PM660A version
+
+	KBA-170810024205: [660]How to resume charge when charger voltage up 5v -> 4v ->5v
+
+	KBA-170809182138: [8909]how to configure  to support MSM8909 + PM8916
+
+	KBA-170802230515: [PMIC] How to analyze RPM regulator crash on 8998 and 660 platform
+
+	KBA-170802225403: [8998]How to disable wled psm mode
+
+	KBA-170802211926: [PMIC] How to configure combo key (power key + volume down) to trigger system crash
+
+	KBA-170511004945: UEFI NPA overview
+
+	KBA-170802194752: How to enable power off RTC alarm
+
+	KBA-170802192516: [PMIC 8998/660] How to select fuel gauge to terminate charging during the taper charging phase
+
+	KBA-170802145658: How to set mode of regulator for customer own driver
+
+	KBA-170801193542: [PMIC] [UEFI] [Haptic] How to implement the bootup vibrating
+
+
+}
 
 
 
