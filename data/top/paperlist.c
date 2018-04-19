@@ -110,6 +110,10 @@
 
 	千万别乱用单位：详解电池的mAh和Wh的区别
 	http://libattery.ofweek.com/2015-06/ART-36001-11002-28964256.html
+	
+	
+	高通Quick Charge高速充电原理分析
+	https://www.cnblogs.com/lxjshuju/p/7252468.html
 
 }
 
@@ -193,6 +197,9 @@
 	    
 	    android adb源码分析(1) 
 	    http://blog.csdn.net/xgbing/article/details/52058390
+	    
+	    USB2.0协议分析
+	    https://blog.csdn.net/weijory/article/details/78272796
 	
 	}
 }

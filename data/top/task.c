@@ -1,5 +1,5 @@
 
-
+POWER_SUPPLY_PROP_FG_RESET_CLOCK
 
 遇到一个问题站在设计者的角度还是使用者的角度，转换思考的角度有些问题就可以想清楚点
 

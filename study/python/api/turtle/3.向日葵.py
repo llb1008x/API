@@ -5,6 +5,7 @@ from turtle import *
 color('red','yellow')
 
 begin_fill()
+speed(0.5)
 while True:
     forward(200)
     right(170)

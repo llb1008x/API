@@ -5010,7 +5010,7 @@ out:
 	
 	
 
-	2.<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22
+	2.<3>[ 6390.077984] .(0)[5487:kworker/0:0]power_supply charger: driver failed to report `charge_type' property: -22'
 	
 	mtk_chg_type_det.c 这个里面注册了charger到power supply但是没有charger_type这个节点所以一直报错 
 	charge_type
