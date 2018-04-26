@@ -462,6 +462,18 @@
     
     C语言终极面试宝典
 	http://blog.csdn.net/ffmxnjm/article/details/51519976
+
+	4412 adc
+	{
+		基于ARM4412的ADC原理及实现
+		https://blog.csdn.net/jianwen_hi/article/details/53290461
+
+		Exynos4412 ADC 设备驱动开发
+		https://blog.csdn.net/zqixiao_09/article/details/50916781
+	} 
+	
+	kernel  启动流程分析
+	https://blog.csdn.net/ooonebook/article/details/52690132
 }
 
 

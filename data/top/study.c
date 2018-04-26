@@ -108,9 +108,47 @@
 
 
 
+
+
+
 /*4412开发板*/
 {
-    下面是设置 PC 机和开发板以太网的例子:
+    烧写镜像文件
+    {
+           烧写镜像文件不能用fastboot，需要通过串口进入uboot模式
+        需要注意的是,fastboot 命令只能用来和开发板的 Uboot 模式进行交互,前面烧写镜像时提到的那些
+        命令也都是运行在开发板的 UBOOT 模式。 
+
+           烧写步骤：
+        1.四个镜像文件
+        system.img ，ramdisk-uboot.img，u-boot-iTOP-4412.bin，u-boot-iTOP-4412.bin
+
+        2.打开超级终端,然后上电启动开发板,按“回车”,进入 Uboot 模式,不明白 Uboot 模式可以
+        参考前面“Uboot 模式和文件系统模式”。如下图所示,进入 Uboot 模式
+
+        3.创建 eMMC 分区并格式化。如果原来已经做过此步骤,则可以跳过,不必每次烧写前都分区和格
+        式化。在超级终端中,输入下面分区和格式化命令。
+        —fdisk -c 0
+        —fatformat mmc 0:1
+        —ext3format mmc 0:2
+        —ext3format mmc 0:3
+        —ext3format mmc 0:4
+
+        (5)在 Windows 命令行中,输入下面的命令:
+        fastboot flash bootloader u-boot-iTOP-4412.bin
+        特别提醒,不建议用户烧写“u-boot-iTOP-4412.bin”这个文件,可跳过此步骤,因为出厂前已经烧
+        写过这个镜像文件了。
+        fastboot flash boot boot.img
+        fastboot flash kernel zImage
+        fastboot flash ramdisk ramdisk-uboot.img
+        fastboot flash system system.img
+        fastboot -w
+    }
+
+
+    搭建最小服务器
+    {
+            下面是设置 PC 机和开发板以太网的例子:
         1)设置 PC 主机 IPV4 地址为 192.168.1.2(IP 地址可以根据实际情况选择)
         2)连接开发板和主机的串口,网口,启动开发板,系统启动后,设置 Android 的 IP 地址和主机在同一
         个网段,例如,在串口中输入:
@@ -126,96 +164,135 @@
         setprop net.dns1 192.168.1.1
 
 
-    烧写镜像文件不能用fastboot，需要通过串口进入uboot模式
-    需要注意的是,fastboot 命令只能用来和开发板的 Uboot 模式进行交互,前面烧写镜像时提到的那些
-命令也都是运行在开发板的 UBOOT 模式。
+            搭建一个tftp服务器：
+        {
+            TFTP(Trivial File Transfer Protocol,简单文件传输协议),是一个基于 UDP 协议实现的用于在客户
+            机和服务器之间进行简单文件传输的协议,适合于开销不大、不复杂的应用场合。TFTP 协议专门为小文件传
+            输而设计,只能从服务器上获取文件,或者向服务器写入文件,不能列出目录,也不能进行认证。
+            根据上面关于 TFTP 的介绍,实现 TFTP 我们需要搭建一个 TFTP 的服务器,iTOP-4412 开发板当做客
+            户端。
+            使用的虚拟机 Ubuntu 来当做服务器,下面我们先讲解一下服务器端的配置。
+            根据上面关于 TFTP 的介绍,实现 TFTP 最终需要搭建一个 TFTP 的服务器,iTOP-4412 开发板当做客
+            户端。
+            
+            搭建服务器
+                在的虚拟机 Ubuntu 上打开终端,首先输入命令:sudo apt-get install xinetd,安装 xinetd。安装完
+                xinetd,接下来输入命令安装 tftp 和 tftpd:sudo apt-get install tftp tftpd。
+                然后建立 TFTP 的配置文件,使用命令:vi /etc/xinetd.d/tftp 建立文件,写入下面的代码:
+                
+                service tftp
+                {
+                    socket_type = dgram
+                    protocol    = udp
+                    wait        = yes
+                    user        = root
+                    server      = /usr/sbin/in.tftpd
+                    server_args = -s /home/llb/project/PRO/exynos4412/tftpboot
+                    disable     = no
+                    per_source  = 11
+                    cps         = 100 2
+                    flags       = IPv4
+                }
+
+                其中 server_args 设置的/var/tftpboot 目录是 tftp 服务器的目录
+                
+                先互ping一下看是否联通
+                如果返回上面的信息就表示开发板和 TFTP 服务器是连通的,现在我们获取 TFTP 上的文件,在开发板
+                的串口输入:tftp -g -l test.txt -r test.txt 192.168.31.18
+                
+                
+                这个地方好像一直是只可以从服务器上下载，不能往上推文件
+                tftp -g -r file ip//从TFTP下载文件
+                tftp -p -l file ip//向TFTP上传文件
+        
+        }
+
+    }
 
 
-    安装make 3.81
-    如果之前没有安装过make, 可以先在configure之后运行 sh build.sh(README文件中有说明),再运行make install.
-    解压之后，进入make-3.81目录， 
-    1)
-    ./configure  --prefix=$HOME/jdeng/local
-    2)
-    make 
-    3) optional (也可不选)
-    make check
-    4)
-    make install
-    make clean是去掉安装.
-    其中configure加安装目录是因为要装一个本地的make, 避免跟系统make冲突了，而且在服务器上也没有管理员的权限。不然默认是安装在/usr/local下。
-    --program-prefix=PREFIX
-    --program-suffix=SUFFIX 可以给程序加前缀或后缀
-    configure --help 可看帮助 
-    
-    
-    可能是ubuntu版本不一样，有差异，所以ubuntu16编译的时候有那么多的问题，但是一套源码怎么有那么多的问题
-    编译是个问题
+    内核启动流程
+    {
+            编译之后生成的System.map文件 
+        System.map是内核的内核符号表，在这里可以找到函数地址，变量地址，包括一些链接过程中的地址定义等等， 
+        build/out/linux/System.map（这里列出一些关键部分）
+
+            通过反汇编命令对vmlinux进行反汇编，可以解析出详细的汇编代码，包括了一些地址 
+        指令如下：
+        arm-linux-gnueabi-objdump -D  vmlinux  >  vmlinux_objdump.txt
+
+            通过arm-linux-gnueabi-readelf -s vmlinux查看各个段的布局
+    }
+ 
 
 
-    
-    ./build_android.sh: line 71: mkimage: command not found
 
-    ==============================================================================================================
-
-    解决方案是：
-
-    
-
-    1. 将 iTop4412_uboot_scp_20141224.tar 
-
-        iTop4412_Kernel_3.0_20150403.tar
-
-    iTop4412_ICS_20150413.tar
-
-    解压出来的三个文件夹，放在同一个目录下
-
-
-    2. 将 uboot/tools/目录里面的 mkimage.c 和 mkimage.h 复制到 /usr/bin/ 目录下
-
-    3. 执行apt-get install uboot-mkimage 命令
-
-
-    最后，使用讯为iTOP4412开发板，终于顺利生成如下四个文件：
-
-    1. system.img                       210040 KB
-
-    2. ramdisk-uboot.img                901    KB
-
-    3. u-boot-iTOP-4412.bin             515    KB
-
-    4. zImage                           3907   KB
-
-    并且通过fastboot模式，将四个文件成功烧写下载到开发板，现在开发板的Android系统，正常运行。
+    编译源码
+    {
+           安装make 3.81
+        如果之前没有安装过make, 可以先在configure之后运行 sh build.sh(README文件中有说明),再运行make install.
+        解压之后，进入make-3.81目录， 
+        1)
+        ./configure  --prefix=$HOME/jdeng/local
+        2)
+        make 
+        3) optional (也可不选)
+        make check
+        4)
+        make install
+        make clean是去掉安装.
+        其中configure加安装目录是因为要装一个本地的make, 避免跟系统make冲突了，而且在服务器上也没有管理员的权限。不然默认是安装在/usr/local下。
+        --program-prefix=PREFIX
+        --program-suffix=SUFFIX 可以给程序加前缀或后缀
+        configure --help 可看帮助 
+        
+        
+        可能是ubuntu版本不一样，有差异，所以ubuntu16编译的时候有那么多的问题，但是一套源码怎么有那么多的问题
+        编译是个问题
 
 
-    烧写步骤：
-    1.四个镜像文件
-    system.img ，ramdisk-uboot.img，u-boot-iTOP-4412.bin，u-boot-iTOP-4412.bin
+        
+        ./build_android.sh: line 71: mkimage: command not found
 
-    2.打开超级终端,然后上电启动开发板,按“回车”,进入 Uboot 模式,不明白 Uboot 模式可以
-    参考前面“Uboot 模式和文件系统模式”。如下图所示,进入 Uboot 模式
+        ==============================================================================================================
 
-    3.创建 eMMC 分区并格式化。如果原来已经做过此步骤,则可以跳过,不必每次烧写前都分区和格
-    式化。在超级终端中,输入下面分区和格式化命令。
-    —fdisk -c 0
-    —fatformat mmc 0:1
-    —ext3format mmc 0:2
-    —ext3format mmc 0:3
-    —ext3format mmc 0:4
+        解决方案是：
 
-    (5)在 Windows 命令行中,输入下面的命令:
-    fastboot flash bootloader u-boot-iTOP-4412.bin
-    特别提醒,不建议用户烧写“u-boot-iTOP-4412.bin”这个文件,可跳过此步骤,因为出厂前已经烧
-    写过这个镜像文件了。
-    fastboot flash boot boot.img
-    fastboot flash kernel zImage
-    fastboot flash ramdisk ramdisk-uboot.img
-    fastboot flash system system.img
-    fastboot -w
+        
 
-    #modify by lilubao for compile 20180113
-    export PATH=$PATH:/usr/local/arm/arm-2009q3/bin
+        1. 将 iTop4412_uboot_scp_20141224.tar 
+
+            iTop4412_Kernel_3.0_20150403.tar
+
+        iTop4412_ICS_20150413.tar
+
+        解压出来的三个文件夹，放在同一个目录下
+
+
+        2. 将 uboot/tools/目录里面的 mkimage.c 和 mkimage.h 复制到 /usr/bin/ 目录下
+
+        3. 执行apt-get install uboot-mkimage 命令
+
+
+        最后，使用讯为iTOP4412开发板，终于顺利生成如下四个文件：
+
+        1. system.img                       210040 KB
+
+        2. ramdisk-uboot.img                901    KB
+
+        3. u-boot-iTOP-4412.bin             515    KB
+
+        4. zImage                           3907   KB
+
+        并且通过fastboot模式，将四个文件成功烧写下载到开发板，现在开发板的Android系统，正常运行。
+
+        #modify by lilubao for compile 20180113
+        export PATH=$PATH:/usr/local/arm/arm-2009q3/bin
+
+
+    }
+
+
+
 
 
     内存管理：
@@ -229,51 +306,6 @@
         并放入磁盘中。这个过程称为交换,因为页面会被从内存交换到硬盘上。内存管理的源代码可以
         在 ./linux/mm 中找到。
 
-    添加一个驱动模块
-    
-    
-    搭建一个tftp服务器：
-    {
-        TFTP(Trivial File Transfer Protocol,简单文件传输协议),是一个基于 UDP 协议实现的用于在客户
-        机和服务器之间进行简单文件传输的协议,适合于开销不大、不复杂的应用场合。TFTP 协议专门为小文件传
-        输而设计,只能从服务器上获取文件,或者向服务器写入文件,不能列出目录,也不能进行认证。
-        根据上面关于 TFTP 的介绍,实现 TFTP 我们需要搭建一个 TFTP 的服务器,iTOP-4412 开发板当做客
-        户端。
-        使用的虚拟机 Ubuntu 来当做服务器,下面我们先讲解一下服务器端的配置。
-        根据上面关于 TFTP 的介绍,实现 TFTP 最终需要搭建一个 TFTP 的服务器,iTOP-4412 开发板当做客
-        户端。
-        
-        搭建服务器
-            在的虚拟机 Ubuntu 上打开终端,首先输入命令:sudo apt-get install xinetd,安装 xinetd。安装完
-            xinetd,接下来输入命令安装 tftp 和 tftpd:sudo apt-get install tftp tftpd。
-            然后建立 TFTP 的配置文件,使用命令:vi /etc/xinetd.d/tftp 建立文件,写入下面的代码:
-            
-            service tftp
-            {
-                socket_type = dgram
-                protocol    = udp
-                wait        = yes
-                user        = root
-                server      = /usr/sbin/in.tftpd
-                server_args = -s /home/llb/project/PRO/exynos4412/tftpboot
-                disable     = no
-                per_source  = 11
-                cps         = 100 2
-                flags       = IPv4
-            }
-
-            其中 server_args 设置的/var/tftpboot 目录是 tftp 服务器的目录
-            
-            先互ping一下看是否联通
-            如果返回上面的信息就表示开发板和 TFTP 服务器是连通的,现在我们获取 TFTP 上的文件,在开发板
-            的串口输入:tftp -g -l test.txt -r test.txt 192.168.31.18
-            
-            
-            这个地方好像一直是只可以从服务器上下载，不能往上推文件
-            tftp -g -r file ip//从TFTP下载文件
-            tftp -p -l file ip//向TFTP上传文件
-    
-    }
     
     
     搭建nfs服务器
@@ -328,11 +360,6 @@ init=/linuxrc console=ttySAC2,115200"
 }
 
 
-
-/*unix环境高级变成*/
-{
-	
-}
 
 
 
@@ -392,8 +419,6 @@ init=/linuxrc console=ttySAC2,115200"
 
 
 }
-
-
 
 
 
@@ -468,105 +493,105 @@ init=/linuxrc console=ttySAC2,115200"
 
 	    15.内存大小这样影响系统的性能？CPU、内存、I/O三角如何互动？它们如何综合决定系统的一些关键性能？
 
-
+        遇到一个问题站在设计者的角度还是使用者的角度，转换思考的角度有些问题就可以想清楚点
     }
 
 
-遇到一个问题站在设计者的角度还是使用者的角度，转换思考的角度有些问题就可以想清楚点
-
-
-}
-
-
-
-
-
-
-
-
-usb stack
-{
-      
-    msm_otg (msm_otg_driver)
-       
-    msm_hsusb (usb_driver)
-    
-    28nm PHY
-    – Ci13xxx_udc.c
-    – Ci13xxx_msm.c
-    android_usb (android_platform_driver)
-   
-    28nm PHY – msm_otg.c
-    android.c
-    msm_hsusb_host (ehci_msm_driver)
-    ehci-msm.c
-    ehci-msm2.c   
-    
-    
-    Similarly, platform devices defined for the USB function drivers have platform drivers
-    implemented in driver-specific files, e.g.:
-    usb_mass_storage(fsg_platform_driver):[f_mass_storage.c]
-    rndis(rndis_platform_driver)[f_rndis.c]
-    usb_diag(usb_diag_driver)[f_diag.c]   
-    
-    
-    
-    usb core probe
+    usb stack
     {
-        msm_otg_probe() [msm_otg.c]
-        Enables USB_HS1 peripheral bus clock (hs_pclk or cc_usb_hs1_hclk)
-        Enables 3.3 and 1.8 VREGs
-        Maps memory mapped (physical address) HS-USB OTG core registers to kernel address
-        space
-        Dynamically initializes the OTG state machine work queue
-        Creates a new worker thread, k_otg, to queue the OTG work queue, etc.
-         Registers the IRQ handler, i.e., msm_otg_irq
-         Registers the callback function for PMIC ID and VBUS notifications
-        ehci_msm_probe() [ehci-msm.c]; platform driver registration occurs in the EHCI host
-        controller driver (ehc-hcd.c) init function
-
-        Creates and initializes usb_hcd, used by the USB core
-        Initializes the ehci-msm host controller-specific driver structure or instance:
-        msm_hc_driver (type hc_driver) instance defined in ehci-msm.c
-        Registration with core is deferred
-        Registers the host driver with the OTG by calling otg_set_host()
-        Calls otg_set_peripheral()
-
-        usb_create_hcd
-        The HCD probe is called before DCD. Consequently, by the time the DCD registers with
-        OTG, HCD is already registered. As both DCD and HCD are registered, OTG kicks the
-        state machine. The OTG state machine initial state is OTG_STATE_UNDEFINED. In
-        this state, the USB hardware is reset and based on the ID/VBUS status, HCD/DCD is
-        activated.
-        ci13xxx_msm_probe() [ci13xxx_msm.c]
-        Maps the USB registers from physical to kernel address space
-        Calls udc_probe() [ci13xxx_udc.c]
         
+        msm_otg (msm_otg_driver)
         
-        Initializes structure variables
-        Assigns callbacks for the USB gadget driver usb_gadget_ops
-        Initializes driver hardware bank register values
+        msm_hsusb (usb_driver)
         
-       
-        Allocates and initializes a struct ci13xxx device assigned to _udc
-        Saves an offsetted base address for different register I/O APIs, i.e., hw_aread(),
-        hw_cread()
-        Calls device_register() to register it to the system
-        Calls otg_set_peripheral()
-        Creates debugfs files, if enabled
-        
-        
-        android_probe() [android.c]
-        Registers a composite driver, android_usb
-        Populates entries for the Android device of type android_dev, using platform data of the
-        android_usb_device platform device
+        28nm PHY
+        – Ci13xxx_udc.c
+        – Ci13xxx_msm.c
+        android_usb (android_platform_driver)
     
-        composite_setup() is called during the USB device enumeration to handle standard USB setup
-        requests.
-    
+        28nm PHY – msm_otg.c
+        android.c
+        msm_hsusb_host (ehci_msm_driver)
+        ehci-msm.c
+        ehci-msm2.c   
+        
+        
+        Similarly, platform devices defined for the USB function drivers have platform drivers
+        implemented in driver-specific files, e.g.:
+        usb_mass_storage(fsg_platform_driver):[f_mass_storage.c]
+        rndis(rndis_platform_driver)[f_rndis.c]
+        usb_diag(usb_diag_driver)[f_diag.c]   
+        
+        
+        
+        usb core probe
+        {
+            msm_otg_probe() [msm_otg.c]
+            Enables USB_HS1 peripheral bus clock (hs_pclk or cc_usb_hs1_hclk)
+            Enables 3.3 and 1.8 VREGs
+            Maps memory mapped (physical address) HS-USB OTG core registers to kernel address
+            space
+            Dynamically initializes the OTG state machine work queue
+            Creates a new worker thread, k_otg, to queue the OTG work queue, etc.
+            Registers the IRQ handler, i.e., msm_otg_irq
+            Registers the callback function for PMIC ID and VBUS notifications
+            ehci_msm_probe() [ehci-msm.c]; platform driver registration occurs in the EHCI host
+            controller driver (ehc-hcd.c) init function
+
+            Creates and initializes usb_hcd, used by the USB core
+            Initializes the ehci-msm host controller-specific driver structure or instance:
+            msm_hc_driver (type hc_driver) instance defined in ehci-msm.c
+            Registration with core is deferred
+            Registers the host driver with the OTG by calling otg_set_host()
+            Calls otg_set_peripheral()
+
+            usb_create_hcd
+            The HCD probe is called before DCD. Consequently, by the time the DCD registers with
+            OTG, HCD is already registered. As both DCD and HCD are registered, OTG kicks the
+            state machine. The OTG state machine initial state is OTG_STATE_UNDEFINED. In
+            this state, the USB hardware is reset and based on the ID/VBUS status, HCD/DCD is
+            activated.
+            ci13xxx_msm_probe() [ci13xxx_msm.c]
+            Maps the USB registers from physical to kernel address space
+            Calls udc_probe() [ci13xxx_udc.c]
+            
+            
+            Initializes structure variables
+            Assigns callbacks for the USB gadget driver usb_gadget_ops
+            Initializes driver hardware bank register values
+            
+        
+            Allocates and initializes a struct ci13xxx device assigned to _udc
+            Saves an offsetted base address for different register I/O APIs, i.e., hw_aread(),
+            hw_cread()
+            Calls device_register() to register it to the system
+            Calls otg_set_peripheral()
+            Creates debugfs files, if enabled
+            
+            
+            android_probe() [android.c]
+            Registers a composite driver, android_usb
+            Populates entries for the Android device of type android_dev, using platform data of the
+            android_usb_device platform device
+        
+            composite_setup() is called during the USB device enumeration to handle standard USB setup
+            requests.
+        
+        }
+        
     }
-    
+
+
 }
+
+
+
+
+
+
+
+
+
 
 
 
