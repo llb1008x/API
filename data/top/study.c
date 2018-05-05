@@ -100,6 +100,8 @@
                 
         }    
        
+        下载sdm660的代码
+        repo init -u git://codeaurora.org/platform/manifest.git -b release  -m LA.UM.6.2.r1-07700-sdm660.0.xml  --repo-url=git://codeaurora.org/tools/repo.git --repo-branch=caf-stable
 
 
 }
