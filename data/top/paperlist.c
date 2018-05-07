@@ -2,6 +2,8 @@
 
 这些都是自己之前看的博客文章的网址，最好是可以转换到成pdf或者有道云笔记
 
+Application Note: Qualcomm Quick Charge Over USB Type-C Design Recommendations (80-NH008-13) for type-C, USB PD, etc.
+80-NH008-13
 
 1.linux内核
 {
