@@ -365,6 +365,48 @@ init=/linuxrc console=ttySAC2,115200"
 
 /*python 课程*/
 {
+    python基础语法体系
+    {
+        1.编写自己的模块
+            将自己的模块加入到脚本执行路径中  sys.path.expanduser("路径")  
+
+        模块中增加测试代码：
+            #!/usr/bin/env python
+            # coding=utf-8
+
+            #正常的功能
+            def hello():
+                print("hello,world!")
+                
+                
+            #测试部分    
+            def test():
+                hello()    
+                
+            #判断是作为模块还是主程序
+            if __name__ == '__main__':test()    
+
+            #定义，导入一些公共接口
+            __all__:   
+        
+        查找帮助文档：
+            #导入库    
+            import copy
+
+            help(copy.copy)
+            #或者
+            print copy.copy.__doc__
+
+            查找源码
+            sys.path
+            #或者
+            print copy.__file__
+
+
+
+    }
+
+
     科学计算可视化
     {
       VTK: Visualization Toolkit  
@@ -401,8 +443,6 @@ init=/linuxrc console=ttySAC2,115200"
             ivtk就是可以动态改变三维对象的可视化窗口工具
         }
     }
-
-
 }
 
 
