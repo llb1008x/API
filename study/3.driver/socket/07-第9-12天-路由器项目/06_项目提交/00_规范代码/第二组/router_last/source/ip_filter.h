@@ -1,1 +1,0 @@
-#ifndef __IP_FILTER_H__#define __IP_FILTER_H__    #include "ip_link.h"#include "../project/types.h"extern void read_firewall(ROU *router);extern void write_firewall(ROU * router);#endif//__IP_FILTER_H__

@@ -1,7 +1,0 @@
-自己来实现向用户空间发送改变的状态，通过属性文件操作实现，但佣有属性文件的kobject必须要隶属于一个kset，即要有subsystem，测试方法：
-测试程序被打开时，没有任何描述符可用，所以需要自己打开标准输入输出
-	fd = open("/dev/console",O_RDWR);/* stdin */
-	fd = open("/dev/console",O_RDWR);/* stdout */
-测试：
-echo /mnt/t > /proc/sys/kernel/hotplug
-echo 0 > /sys/parent_obj/child_obj/demo_sys_att

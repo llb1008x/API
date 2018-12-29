@@ -1,6 +1,0 @@
-uboot,nboot,eboot简要区别
-uboot在linux下有这个说法，并且在XXX网站有下载。 
-
-nboot就是在2440/2410等的内部SRAM执行的4K代码，作用是把eboot搬运到内存执行 
-
-eboot作用是实现binfs、FAT分区，同时支持网卡（有些也支持USB）下载NK..........等等

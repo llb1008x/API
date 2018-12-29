@@ -1,6 +1,0 @@
-: Configure command line arguments.
-config_arg0='./Configure'
-config_args='–des -Dprefix=/home/llb/localperl'
-config_argc=2
-config_arg1='–des'
-config_arg2='-Dprefix=/home/llb/localperl'

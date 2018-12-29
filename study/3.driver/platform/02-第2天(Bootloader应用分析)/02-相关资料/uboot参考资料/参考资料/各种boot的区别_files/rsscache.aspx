@@ -1,1 +1,0 @@
-document.write('<li><a onclick="LogClickCount(this,224);" href="http://topic.csdn.net/u/20100811/15/8d13b103-1a98-45bf-8f9a-363cd38adfc7.html" target="_blank">CSDN招聘.NET开发工程师</a></li>')

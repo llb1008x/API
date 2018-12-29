@@ -1,7 +1,0 @@
-1、将整个《02_glade_demo》拷贝至虚拟机，然后make编译，运行demo
-
-2、如果是在开发板中运行，使用Makefile_arm编译，再运行
-
-3、sungtk_interface.c和sungtk_interface.h，将常用控件的设置封装好接口，包含头文件，就可以使用，请充分利用。
-
-4、《glade_file》目录下存放着制作的glade文件
