@@ -1,0 +1,8 @@
+name: FD leak
+id: 
+time: default
+method: file=main.log*, key= Too many open files, line=1
+
+
+
+

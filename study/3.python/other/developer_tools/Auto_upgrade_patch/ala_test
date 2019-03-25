@@ -1,0 +1,20 @@
+#!/bin/bash
+function getBaselabelOrBranchList()
+{
+if [ -f getBaselabelOrBranchList.txt ];then
+	rm getBaselabelOrBranchList.txt
+fi
+touch getBaselabelOrBranchList.txt
+while read i
+do	
+	if [[ -n $(echo "$i"|grep '*' ) ]];then
+		echo "$i"|awk '{print $2}' >> getBaselabelOrBranchList.txt
+	else
+		echo "$i" >> getBaselabelOrBranchList.txt
+	fi
+done < <(git branch -a|grep -v 'master')
+echo $(git tag|grep -F "7516A-T"|sort -n -r|sed -n '1,5'p) |awk -F' ' '{split($0,arr," ")}END{for(i=1;i<=NF;i++)printf("%s\n",arr[i])}' >> getBaselabelOrBranchList.txt
+`gedit getBaselabelOrBranchList.txt`
+}
+
+getBaselabelOrBranchList "$@"

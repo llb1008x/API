@@ -1,7 +1,0 @@
-name:  fd leak 重启问题
-id: 104388
-time: default
-#method: file=main_log*, key=Too many open files, line=1
-method: file=kernel_log*, key=\[\d+:surfaceflinger\]\[FDLEAK\].*dmabuf Num:\d+, line=1
-method: file=kernel_log*, key=\[\d+:surfaceflinger\]\[FDLEAK\].*Num:[2-9][0-9]*, line=1
-

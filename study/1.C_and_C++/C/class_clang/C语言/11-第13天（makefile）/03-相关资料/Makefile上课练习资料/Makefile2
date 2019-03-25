@@ -1,0 +1,9 @@
+CC=arm-linux-gcc
+main:main.o printf1.o
+
+main.o: 
+printf1.o:
+
+.PHONY:clean
+clean:
+	rm -rfv *.o main 

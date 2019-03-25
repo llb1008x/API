@@ -1,0 +1,38 @@
+操作说明:
+1.运行前安装python相关组件
+	sudo apt-get install python-pip
+	sudo pip install pyredmine
+	sudo pip install chardet 
+	sudo apt-get install python-dateutil 
+	sudo apt-get install  python-xlwt python-xlrd
+	如果安装Python2.7.6需要更新pip具体方法参考
+	http://10.8.0.20/boards/8/topics/14-modem-python2-7-6
+
+2.下载log
+	2.1
+		运行命令: ./download_log.py -a ***** -q 3617
+		说明:
+			-a ***** 制定用户的APItoken
+			"*****" :指对应的APItoken
+			APItoken获取方式:登入redmine->个人设置中,进行查询。
+	2.2
+		-q 3617，为指定查询的ID。需要在Redmine创建特定查询条件。
+		说明:
+			进入对应查询界面，查看地址栏,"="右边数字串即是
+			eg:
+			http://10.8.0.20/issues?query_id=1226
+	2.3
+	    -b 89453,89505
+	    说明:
+	        指定bugid，可以制定一组id用英文的逗号分隔。	
+ 			
+
+3.分析log
+	
+	运行命令: ./analysis_log.py
+	说明:会自动对名为“log”文件夹下的log文件进行分析，分析结果页面显示也同时生成结果文件到log文件夹中
+	
+
+
+
+

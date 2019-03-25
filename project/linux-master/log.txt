@@ -1,0 +1,2304 @@
+drivers/phy/broadcom/phy-brcm-sata.c:28:#define SATA_PCB_BANK_OFFSET				0x23c
+drivers/phy/broadcom/phy-brcm-sata.c:29:#define SATA_PCB_REG_OFFSET(ofs)			((ofs) * 4)
+drivers/phy/broadcom/phy-brcm-sata.c:33:/* Register offset between PHYs in PCB space */
+drivers/phy/broadcom/phy-brcm-sata.c:34:#define SATA_PCB_REG_28NM_SPACE_SIZE			0x1000
+drivers/phy/broadcom/phy-brcm-sata.c:39:#define SATA_PCB_REG_40NM_SPACE_SIZE			0x10
+drivers/phy/broadcom/phy-brcm-sata.c:133:static inline void __iomem *brcm_sata_pcb_base(struct brcm_sata_port *port)
+drivers/phy/broadcom/phy-brcm-sata.c:141:		size = SATA_PCB_REG_28NM_SPACE_SIZE;
+drivers/phy/broadcom/phy-brcm-sata.c:144:		size = SATA_PCB_REG_40NM_SPACE_SIZE;
+drivers/phy/broadcom/phy-brcm-sata.c:171:static void brcm_sata_phy_wr(void __iomem *pcb_base, u32 bank,
+drivers/phy/broadcom/phy-brcm-sata.c:176:	writel(bank, pcb_base + SATA_PCB_BANK_OFFSET);
+drivers/phy/broadcom/phy-brcm-sata.c:177:	tmp = readl(pcb_base + SATA_PCB_REG_OFFSET(ofs));
+drivers/phy/broadcom/phy-brcm-sata.c:179:	writel(tmp, pcb_base + SATA_PCB_REG_OFFSET(ofs));
+drivers/phy/broadcom/phy-brcm-sata.c:182:static u32 brcm_sata_phy_rd(void __iomem *pcb_base, u32 bank, u32 ofs)
+drivers/phy/broadcom/phy-brcm-sata.c:184:	writel(bank, pcb_base + SATA_PCB_BANK_OFFSET);
+drivers/phy/broadcom/phy-brcm-sata.c:185:	return readl(pcb_base + SATA_PCB_REG_OFFSET(ofs));
+drivers/phy/broadcom/phy-brcm-sata.c:195:	void __iomem *base = brcm_sata_pcb_base(port);
+drivers/phy/broadcom/phy-brcm-sata.c:231:	void __iomem *base = brcm_sata_pcb_base(port);
+drivers/xen/grant-table.c:552:	struct gnttab_free_callback **pcb;
+drivers/xen/grant-table.c:556:	for (pcb = &gnttab_free_callback_list; *pcb; pcb = &(*pcb)->next) {
+drivers/xen/grant-table.c:557:		if (*pcb == callback) {
+drivers/xen/grant-table.c:558:			*pcb = callback->next;
+drivers/media/i2c/ov6650.c:94:#define REG_SPCB		0x60
+drivers/media/pci/saa7134/saa7134.h:261:#define SAA7134_BOARD_SABRENT_TV_PCB05     115
+drivers/media/pci/saa7134/saa7134-cards.c:3702:	[SAA7134_BOARD_SABRENT_TV_PCB05] = {
+drivers/media/pci/saa7134/saa7134-cards.c:3703:		.name           = "Sabrent PCMCIA TV-PCB05",
+drivers/media/pci/saa7134/saa7134-cards.c:6634:		.driver_data  = SAA7134_BOARD_SABRENT_TV_PCB05,
+drivers/media/pci/ttpci/budget-patch.c:561:**      (check soldering pcb and pins)
+drivers/media/pci/ttpci/av7110.c:2356: * (check soldering pcb and pins)
+drivers/media/pci/bt8xx/bttv-cards.c:1204:		* just a BT848A on a small PCB!
+drivers/media/pci/bt8xx/bttv-cards.c:1566:						* The PCB can take a sbx1637/sbx1673, wiring unknown.
+drivers/media/pci/cx23885/cx23885.h:214:	 * clock rates, driven physically by crystals on the PCBs.
+drivers/media/usb/cx231xx/Makefile:2:cx231xx-y += cx231xx-avcore.o cx231xx-417.o cx231xx-pcb-cfg.o cx231xx-vbi.o
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:2:   cx231xx-pcb-config.c - driver for Conexant
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:25:static unsigned int pcb_debug;
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:26:module_param(pcb_debug, int, 0644);
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:27:MODULE_PARM_DESC(pcb_debug, "enable pcb config debug messages [video]");
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:31:static struct pcb_config cx231xx_Scenario[] = {
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:661:	struct pcb_config *p_pcb_info;
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:673:	pcb config it is related to */
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:688:			p_pcb_info =
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:695:			p_pcb_info =
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:702:			p_pcb_info = &cx231xx_Scenario[INDEX_BUSPOWER_DIF_ONLY];
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:717:			p_pcb_info =
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:726:			p_pcb_info =
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:735:			p_pcb_info =
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:746:			p_pcb_info = &cx231xx_Scenario[INDEX_SELFPOWER_DUAL];
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:758:			p_pcb_info = &cx231xx_Scenario[INDEX_SELFPOWER_TRIPLE];
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:766:			p_pcb_info =
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:780:	memcpy(&dev->current_pcb_config, p_pcb_info,
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:781:		   sizeof(struct pcb_config));
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:783:	if (pcb_debug) {
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:788:			 (dev->current_pcb_config.index) + 1);
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:791:			 dev->current_pcb_config.type);
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:794:			 dev->current_pcb_config.mode);
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:797:			 dev->current_pcb_config.speed);
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:800:			 dev->current_pcb_config.ts1_source);
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:803:			 dev->current_pcb_config.ts2_source);
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:806:			 dev->current_pcb_config.analog_source);
+drivers/media/usb/cx231xx/cx231xx-audio.c:696:	    dev->udev->actconfig->interface[dev->current_pcb_config.
+drivers/media/usb/cx231xx/cx231xx-cards.c:1318:	/* Query cx231xx to find what pcb config it is related to */
+drivers/media/usb/cx231xx/cx231xx-cards.c:1321:		dev_err(dev->dev, "Failed to read PCB config\n");
+drivers/media/usb/cx231xx/cx231xx-cards.c:1453:	idx = dev->current_pcb_config.hs_config_info[0].interface_info.video_index + 1;
+drivers/media/usb/cx231xx/cx231xx-cards.c:1456:			"Video PCB interface #%d doesn't exist\n", idx);
+drivers/media/usb/cx231xx/cx231xx-cards.c:1492:	idx = dev->current_pcb_config.hs_config_info[0].interface_info.vanc_index + 1;
+drivers/media/usb/cx231xx/cx231xx-cards.c:1495:			"VBI PCB interface #%d doesn't exist\n", idx);
+drivers/media/usb/cx231xx/cx231xx-cards.c:1536:	idx = dev->current_pcb_config.hs_config_info[0].interface_info.hanc_index + 1;
+drivers/media/usb/cx231xx/cx231xx-cards.c:1539:			"Sliced CC PCB interface #%d doesn't exist\n", idx);
+drivers/media/usb/cx231xx/cx231xx-cards.c:1724:	if (dev->current_pcb_config.ts1_source != 0xff) {
+drivers/media/usb/cx231xx/cx231xx-cards.c:1726:		idx = dev->current_pcb_config.hs_config_info[0].interface_info.ts1_index + 1;
+drivers/media/usb/cx231xx/cx231xx-cards.c:1728:			dev_err(d, "TS1 PCB interface #%d doesn't exist\n",
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:2:   cx231xx-pcb-cfg.h - driver for Conexant
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:22:#ifndef _PCB_CONFIG_H_
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:23:#define _PCB_CONFIG_H_
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:73:	NO_TS_PORT = 0x0,	/* 2'b00: Neither port used. PCB not a Hybrid,
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:182:struct pcb_config {
+drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:201:enum INDEX_PCB_CONFIG{
+drivers/media/usb/cx231xx/cx231xx-avcore.c:572:		if ((dev->current_pcb_config.type == USB_BUS_POWER) &&
+drivers/media/usb/cx231xx/cx231xx-avcore.c:590:		if ((dev->current_pcb_config.type == USB_BUS_POWER) &&
+drivers/media/usb/cx231xx/cx231xx-avcore.c:2619:	struct pcb_config *pcb_config;
+drivers/media/usb/cx231xx/cx231xx-avcore.c:2622:	pcb_config = (struct pcb_config *)&dev->current_pcb_config;
+drivers/media/usb/cx231xx/cx231xx-avcore.c:2624:	if (pcb_config->config_num) {
+drivers/media/usb/cx231xx/cx231xx-core.c:504:	    dev->current_pcb_config.hs_config_info[0].interface_info.
+drivers/media/usb/cx231xx/cx231xx-core.c:539:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+drivers/media/usb/cx231xx/cx231xx-core.c:548:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+drivers/media/usb/cx231xx/cx231xx-core.c:553:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+drivers/media/usb/cx231xx/cx231xx-core.c:562:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+drivers/media/usb/cx231xx/cx231xx-core.c:574:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+drivers/media/usb/cx231xx/cx231xx-core.c:583:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+drivers/media/usb/cx231xx/cx231xx.h:44:#include "cx231xx-pcb-cfg.h"
+drivers/media/usb/cx231xx/cx231xx.h:703:	/* Cx231xx supported PCB config's */
+drivers/media/usb/cx231xx/cx231xx.h:704:	struct pcb_config current_pcb_config;
+drivers/media/usb/s2255/s2255drv.c:460:	unsigned char *pCb;
+drivers/media/usb/s2255/s2255drv.c:466:	pCb = (unsigned char *)in + height * width + (height * width / 2);
+drivers/media/usb/s2255/s2255drv.c:470:		out[i + 2] = (fmt == V4L2_PIX_FMT_YUYV) ? *pY++ : *pCb++;
+drivers/media/usb/s2255/s2255drv.c:471:		out[i + 3] = (fmt == V4L2_PIX_FMT_YUYV) ? *pCb++ : *pY++;
+drivers/media/usb/dvb-usb-v2/anysee.h:53:	u8 hw; /* PCB ID */
+drivers/media/usb/dvb-usb-v2/anysee.c:387: * PCB: ?
+drivers/media/usb/dvb-usb-v2/anysee.c:391: * PCB: PCB 507T (rev1.61)
+drivers/media/usb/dvb-usb-v2/anysee.c:397: * PCB: 507CD (rev1.1)
+drivers/media/usb/dvb-usb-v2/anysee.c:406: * PCB: 507DC (rev0.2)
+drivers/media/usb/dvb-usb-v2/anysee.c:413: * PCB: 507SI (rev2.1)
+drivers/media/usb/dvb-usb-v2/anysee.c:420: * PCB: 507FA (rev0.4)
+drivers/media/usb/dvb-usb-v2/anysee.c:428: * PCB: 507FA (rev1.1)
+drivers/media/usb/dvb-usb-v2/anysee.c:442: * PCB: 508TC (rev0.6)
+drivers/media/usb/dvb-usb-v2/anysee.c:458: * PCB: 508S2 (rev0.7)
+drivers/media/usb/dvb-usb-v2/anysee.c:466: * PCB: 508T2C (rev0.3)
+drivers/media/usb/dvb-usb-v2/anysee.c:474: * PCB: 508PTC (rev0.5)
+drivers/media/usb/dvb-usb-v2/anysee.c:490: * PCB: 508PS2 (rev0.4)
+drivers/media/dvb-frontends/tda10071_priv.h:102:#define CMD_LNB_PCB_CONFIG      0x23
+drivers/media/dvb-frontends/tda10071.c:130:	cmd.args[0] = CMD_LNB_PCB_CONFIG;
+drivers/media/dvb-frontends/cx24117.c:152:	CMD_LNBPCBCONFIG   = 0x23,
+drivers/media/dvb-frontends/cx24117.c:984:	cmd.args[0] = CMD_LNBPCBCONFIG;
+drivers/power/supply/ab8500_bmdata.c:310: * near the battery but on the PCB.
+drivers/power/supply/ab8500_btemp.c:533:		 * The PCB NTC is sourced from VTVOUT via a 230kOhm
+drivers/power/reset/at91-reset.c:78:		  "r" cpu_to_le32(AT91_SDRAMC_LPCB_POWER_DOWN),
+drivers/power/reset/at91-reset.c:121:		  "r" cpu_to_le32(AT91_DDRSDRC_LPCB_POWER_DOWN),
+drivers/isdn/hysdn/boardergo.c:108:			if (hysdn_sched_rx(card, dpr->ToPcBuf, dpr->ToPcSize, dpr->ToPcChannel)) {
+drivers/isdn/hysdn/boardergo.c:196:	memcpy(&dpr->ToPcBuf[ERG_TO_PC_BUF_SIZE - sizeof(TestText)], TestText,
+drivers/isdn/hysdn/boardergo.c:198:	if (memcmp(&dpr->ToPcBuf[ERG_TO_PC_BUF_SIZE - sizeof(TestText)], TestText,
+drivers/isdn/hysdn/boardergo.c:341:			    ((*(unsigned long *) dpr->ToPcBuf) != RDY_MAGIC))
+drivers/isdn/hysdn/boardergo.c:347:				if (EvalSysrTokData(card, dpr->ToPcBuf + RDY_MAGIC_SIZE, msg_size))
+drivers/isdn/hysdn/boardergo.h:27:	/*0E00 */ unsigned char ToPcBuf[ERG_TO_PC_BUF_SIZE];
+drivers/nfc/st-nci/spi.c:38:#define ST_NCI_SPI_MIN_SIZE 4   /* PCB(1) + NCI Packet header(3) */
+drivers/nfc/st-nci/ndlc.c:28:#define PCB_TYPE_DATAFRAME		0x80
+drivers/nfc/st-nci/ndlc.c:29:#define PCB_TYPE_SUPERVISOR		0xc0
+drivers/nfc/st-nci/ndlc.c:30:#define PCB_TYPE_MASK			PCB_TYPE_SUPERVISOR
+drivers/nfc/st-nci/ndlc.c:32:#define PCB_SYNC_ACK			0x20
+drivers/nfc/st-nci/ndlc.c:33:#define PCB_SYNC_NACK			0x10
+drivers/nfc/st-nci/ndlc.c:34:#define PCB_SYNC_WAIT			0x30
+drivers/nfc/st-nci/ndlc.c:35:#define PCB_SYNC_NOINFO			0x00
+drivers/nfc/st-nci/ndlc.c:36:#define PCB_SYNC_MASK			PCB_SYNC_WAIT
+drivers/nfc/st-nci/ndlc.c:38:#define PCB_DATAFRAME_RETRANSMIT_YES	0x00
+drivers/nfc/st-nci/ndlc.c:39:#define PCB_DATAFRAME_RETRANSMIT_NO	0x04
+drivers/nfc/st-nci/ndlc.c:40:#define PCB_DATAFRAME_RETRANSMIT_MASK	PCB_DATAFRAME_RETRANSMIT_NO
+drivers/nfc/st-nci/ndlc.c:42:#define PCB_SUPERVISOR_RETRANSMIT_YES	0x00
+drivers/nfc/st-nci/ndlc.c:43:#define PCB_SUPERVISOR_RETRANSMIT_NO	0x02
+drivers/nfc/st-nci/ndlc.c:44:#define PCB_SUPERVISOR_RETRANSMIT_MASK	PCB_SUPERVISOR_RETRANSMIT_NO
+drivers/nfc/st-nci/ndlc.c:46:#define PCB_FRAME_CRC_INFO_PRESENT	0x08
+drivers/nfc/st-nci/ndlc.c:47:#define PCB_FRAME_CRC_INFO_NOTPRESENT	0x00
+drivers/nfc/st-nci/ndlc.c:48:#define PCB_FRAME_CRC_INFO_MASK		PCB_FRAME_CRC_INFO_PRESENT
+drivers/nfc/st-nci/ndlc.c:87:	u8 pcb = PCB_TYPE_DATAFRAME | PCB_DATAFRAME_RETRANSMIT_NO |
+drivers/nfc/st-nci/ndlc.c:88:		PCB_FRAME_CRC_INFO_NOTPRESENT;
+drivers/nfc/st-nci/ndlc.c:90:	*(u8 *)skb_push(skb, 1) = pcb;
+drivers/nfc/st-nci/ndlc.c:136:	u8 pcb;
+drivers/nfc/st-nci/ndlc.c:139:		pcb = skb->data[0];
+drivers/nfc/st-nci/ndlc.c:140:		switch (pcb & PCB_TYPE_MASK) {
+drivers/nfc/st-nci/ndlc.c:141:		case PCB_TYPE_SUPERVISOR:
+drivers/nfc/st-nci/ndlc.c:142:			skb->data[0] = (pcb & ~PCB_SUPERVISOR_RETRANSMIT_MASK) |
+drivers/nfc/st-nci/ndlc.c:143:				PCB_SUPERVISOR_RETRANSMIT_YES;
+drivers/nfc/st-nci/ndlc.c:145:		case PCB_TYPE_DATAFRAME:
+drivers/nfc/st-nci/ndlc.c:146:			skb->data[0] = (pcb & ~PCB_DATAFRAME_RETRANSMIT_MASK) |
+drivers/nfc/st-nci/ndlc.c:147:				PCB_DATAFRAME_RETRANSMIT_YES;
+drivers/nfc/st-nci/ndlc.c:150:			pr_err("UNKNOWN Packet Control Byte=%d\n", pcb);
+drivers/nfc/st-nci/ndlc.c:161:	u8 pcb;
+drivers/nfc/st-nci/ndlc.c:168:		pcb = skb->data[0];
+drivers/nfc/st-nci/ndlc.c:170:		if ((pcb & PCB_TYPE_MASK) == PCB_TYPE_SUPERVISOR) {
+drivers/nfc/st-nci/ndlc.c:171:			switch (pcb & PCB_SYNC_MASK) {
+drivers/nfc/st-nci/ndlc.c:172:			case PCB_SYNC_ACK:
+drivers/nfc/st-nci/ndlc.c:180:			case PCB_SYNC_NACK:
+drivers/nfc/st-nci/ndlc.c:189:			case PCB_SYNC_WAIT:
+drivers/nfc/st-nci/ndlc.c:199:		} else if ((pcb & PCB_TYPE_MASK) == PCB_TYPE_DATAFRAME) {
+drivers/nfc/st-nci/i2c.c:37:#define ST_NCI_I2C_MIN_SIZE 4   /* PCB(1) + NCI Packet header(3) */
+drivers/thermal/ti-soc-thermal/omap5-thermal-data.c:339:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_5430_CPU,
+drivers/thermal/ti-soc-thermal/omap5-thermal-data.c:340:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_5430_CPU,
+drivers/thermal/ti-soc-thermal/omap5-thermal-data.c:346:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_5430_GPU,
+drivers/thermal/ti-soc-thermal/omap5-thermal-data.c:347:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_5430_GPU,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:413:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:414:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:420:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:421:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:427:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:428:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:434:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:435:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:441:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:442:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+drivers/thermal/ti-soc-thermal/ti-thermal.h:28:/* PCB sensor calculation constants */
+drivers/thermal/ti-soc-thermal/ti-thermal.h:29:#define OMAP_GRADIENT_SLOPE_W_PCB_4430				0
+drivers/thermal/ti-soc-thermal/ti-thermal.h:30:#define OMAP_GRADIENT_CONST_W_PCB_4430				20000
+drivers/thermal/ti-soc-thermal/ti-thermal.h:31:#define OMAP_GRADIENT_SLOPE_W_PCB_4460				1142
+drivers/thermal/ti-soc-thermal/ti-thermal.h:32:#define OMAP_GRADIENT_CONST_W_PCB_4460				-393
+drivers/thermal/ti-soc-thermal/ti-thermal.h:33:#define OMAP_GRADIENT_SLOPE_W_PCB_4470				1063
+drivers/thermal/ti-soc-thermal/ti-thermal.h:34:#define OMAP_GRADIENT_CONST_W_PCB_4470				-477
+drivers/thermal/ti-soc-thermal/ti-thermal.h:36:#define OMAP_GRADIENT_SLOPE_W_PCB_5430_CPU			100
+drivers/thermal/ti-soc-thermal/ti-thermal.h:37:#define OMAP_GRADIENT_CONST_W_PCB_5430_CPU			484
+drivers/thermal/ti-soc-thermal/ti-thermal.h:38:#define OMAP_GRADIENT_SLOPE_W_PCB_5430_GPU			464
+drivers/thermal/ti-soc-thermal/ti-thermal.h:39:#define OMAP_GRADIENT_CONST_W_PCB_5430_GPU			-5102
+drivers/thermal/ti-soc-thermal/ti-thermal.h:41:#define DRA752_GRADIENT_SLOPE_W_PCB				0
+drivers/thermal/ti-soc-thermal/ti-thermal.h:42:#define DRA752_GRADIENT_CONST_W_PCB				2000
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:43:	struct thermal_zone_device *pcb_tz;
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:83:	struct thermal_zone_device *pcb_tz = NULL;
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:88:	int pcb_temp;
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:104:	pcb_tz = data->pcb_tz;
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:105:	/* In case pcb zone is available, use the extrapolation rule with it */
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:106:	if (!IS_ERR(pcb_tz)) {
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:107:		ret = thermal_zone_get_temp(pcb_tz, &pcb_temp);
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:109:			tmp -= pcb_temp; /* got a valid PCB temp */
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:110:			slope = s->slope_pcb;
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:111:			constant = s->constant_pcb;
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:114:				"Failed to read PCB state. Using defaults\n");
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:172:	/* pcb_tz will be either valid or PTR_ERR() */
+drivers/thermal/ti-soc-thermal/ti-thermal-common.c:173:	data->pcb_tz = thermal_zone_get_zone_by_name("pcb");
+drivers/thermal/ti-soc-thermal/ti-bandgap.h:257: * @slope_pcb: sensor gradient slope info for hotspot extrapolation equation
+drivers/thermal/ti-soc-thermal/ti-bandgap.h:259: * @constant_pcb: sensor gradient const info for hotspot extrapolation equation
+drivers/thermal/ti-soc-thermal/ti-bandgap.h:275:	const int			slope_pcb;
+drivers/thermal/ti-soc-thermal/ti-bandgap.h:276:	const int			constant_pcb;
+drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:85:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_4430,
+drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:86:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_4430,
+drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:223:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_4460,
+drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:224:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_4460,
+drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:254:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_4470,
+drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:255:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_4470,
+drivers/thermal/ti-soc-thermal/omap3-thermal-data.c:94:		.slope_pcb = 0,
+drivers/thermal/ti-soc-thermal/omap3-thermal-data.c:95:		.constant_pcb = 20000,
+drivers/thermal/ti-soc-thermal/omap3-thermal-data.c:165:		.slope_pcb = 0,
+drivers/thermal/ti-soc-thermal/omap3-thermal-data.c:166:		.constant_pcb = 20000,
+drivers/infiniband/sw/rxe/rxe_net.c:315:	memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+drivers/infiniband/sw/rxe/rxe_net.c:342:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+drivers/infiniband/sw/rxe/rxe_net.c:343:	IPCB(skb)->flags &= ~(IPSKB_XFRM_TUNNEL_SIZE | IPSKB_XFRM_TRANSFORMED
+drivers/ata/pata_icside.c:81:/* ---------------- Version 5 PCB Support Functions --------------------- */
+drivers/ata/pata_icside.c:108:/* ---------------- Version 6 PCB Support Functions --------------------- */
+drivers/char/Kconfig:559:	  The telecom clock device is specific to the MPCBL0010 and MPCBL0050
+drivers/char/tlclk.c:2: * Telecom Clock driver for Intel NetStructure(tm) MPCBL0010
+drivers/char/tlclk.c:27: * MPCBL0010 ATCA computer.
+drivers/net/phy/sfp.c:81: * the same length on the PCB, which means it's possible for MOD DEF 0 to
+drivers/net/ppp/pptp.c:226:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+drivers/net/ppp/pptp.c:227:	IPCB(skb)->flags &= ~(IPSKB_XFRM_TUNNEL_SIZE | IPSKB_XFRM_TRANSFORMED | IPSKB_REROUTED);
+drivers/net/ethernet/alteon/acenic.h:76:	u32	PcB;
+drivers/net/ethernet/broadcom/genet/bcmmii.c:249:		 *		(requires PCB or receiver-side delay)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:92:#define H_QPCB0_ALL             EHEA_BMASK_IBM(0, 5)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:93:#define H_QPCB0_QP_CTL_REG      EHEA_BMASK_IBM(0, 0)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:94:#define H_QPCB0_MAX_SWQE        EHEA_BMASK_IBM(1, 1)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:95:#define H_QPCB0_MAX_RWQE        EHEA_BMASK_IBM(2, 2)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:96:#define H_QPCB0_PORT_NB         EHEA_BMASK_IBM(3, 3)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:97:#define H_QPCB0_QP_AER          EHEA_BMASK_IBM(4, 4)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:98:#define H_QPCB0_QP_TENURE       EHEA_BMASK_IBM(5, 5)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:123:#define H_QPCB1_ALL             EHEA_BMASK_IBM(0, 7)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:124:#define H_QPCB1_QPN             EHEA_BMASK_IBM(0, 0)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:125:#define H_QPCB1_ASYN_EV_EQ_NB   EHEA_BMASK_IBM(1, 1)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:126:#define H_QPCB1_SQ_CQ_HANDLE    EHEA_BMASK_IBM(2, 2)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:127:#define H_QPCB1_RQ_CQ_HANDLE    EHEA_BMASK_IBM(3, 3)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:128:#define H_QPCB1_SGEL_NB_SQ      EHEA_BMASK_IBM(4, 4)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:129:#define H_QPCB1_SGEL_NB_RQ1     EHEA_BMASK_IBM(5, 5)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:130:#define H_QPCB1_SGEL_NB_RQ2     EHEA_BMASK_IBM(6, 6)
+drivers/net/ethernet/ibm/ehea/ehea_phyp.h:131:#define H_QPCB1_SGEL_NB_RQ3     EHEA_BMASK_IBM(7, 7)
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2206:				    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF), cb0);
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2214:				     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG, 1), cb0,
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2222:				    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF), cb0);
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2230:				     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG, 1), cb0,
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2238:				    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF), cb0);
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2246:				     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG, 1), cb0,
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2254:				    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF), cb0);
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2562:					    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF),
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2573:					     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG,
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2582:					    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF),
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2669:					    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF),
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2680:					     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG,
+drivers/net/ethernet/ibm/ehea/ehea_main.c:2689:					    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF),
+drivers/net/ethernet/i825xx/ether1.h:278: *	+0 pcb issue (0x0c and 0xf3 invalid)
+drivers/net/ethernet/alacritech/slic.h:73:#define SLIC_ISR_UPCBSY			0x00020000
+drivers/net/ethernet/alacritech/slic.h:76:#define SLIC_ISR_UPCERR_MASK		(SLIC_ISR_UPCERR | SLIC_ISR_UPCBSY)
+drivers/net/hippi/rrunner.h:746:	u32	RxSpcBuf;
+drivers/net/can/usb/peak_usb/pcan_usb_fd.c:52:	u8	hw_version;	/* Hardware version (PCB) */
+drivers/net/can/usb/kvaser_usb.c:226:	u8 pcb_id[24];
+drivers/net/vrf.c:432:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+drivers/net/vrf.c:603:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+drivers/net/vrf.c:646:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+drivers/net/vrf.c:1037:	IPCB(skb)->flags |= IPSKB_L3SLAVE;
+drivers/net/wireless/intel/ipw2x00/ipw2100.c:8529:	u16 pcb_rev;
+drivers/net/gtp.c:540:		memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+drivers/crypto/nx/nx-842-pseries.c:212:		dev_err(dev, "%s: cspcbp not valid upon completion.\n",
+drivers/usb/serial/io_edgeport.h:97:	__u8	BoardRev;			/* PCB revision level (chg only if s/w visible) */
+drivers/usb/serial/io_usbvend.h:85:#define ION_DEVICE_ID_EDGEPORT_8_DUAL_CPU	0x00E	// Half of an Edgeport/8 (the kind with 2 EP/4s on 1 PCB)
+drivers/usb/serial/io_usbvend.h:440:	__u8	BoardRev;				// F07 PCB revision level (chg only if s/w visible)
+drivers/usb/serial/ark3116.c:712: * PCB, the following numbered contacts are present:
+drivers/tty/serial/mpsc.c:10: * taken from PPCBoot (now U-Boot).  Also based on drivers/serial/8250.c
+drivers/input/misc/dm355evm_keys.c:139:		 * but PCB buttons don't support that bit.
+drivers/platform/x86/eeepc-laptop.c:1139:static const struct backlight_ops eeepcbl_ops = {
+drivers/platform/x86/eeepc-laptop.c:1164:				       &eeepcbl_ops, &props);
+drivers/fmc/Kconfig:39:	  internal EEPROM of the PCB, using the firmware loader to get
+drivers/gpu/drm/mga/mga_warp.c:52:	unsigned long pcbase = dev_priv->warp->offset;
+drivers/gpu/drm/mga/mga_warp.c:119:		DRM_DEBUG(" pcbase = 0x%08lx  vcbase = %p\n", pcbase, vcbase);
+drivers/gpu/drm/mga/mga_warp.c:120:		dev_priv->warp_pipe_phys[where] = pcbase;
+drivers/gpu/drm/mga/mga_warp.c:124:		pcbase += dst_size;
+drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s:85:.b16 #sec_pcbc_e_prep #sec_do_inout
+drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s:86:.b16 #sec_pcbc_d_prep #sec_do_inout
+drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s:556:sec_pcbc_e_prep:
+drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s:565:sec_pcbc_d_prep:
+drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s.h:414:/* 0x0395: sec_pcbc_e_prep */
+drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s.h:421:/* 0x03af: sec_pcbc_d_prep */
+drivers/gpu/drm/i915/intel_pm.c:6879:	unsigned long pctx_addr = I915_READ(VLV_PCBR) & ~4095;
+drivers/gpu/drm/i915/intel_pm.c:6886:/* Check that the pcbr address is not empty. */
+drivers/gpu/drm/i915/intel_pm.c:6889:	unsigned long pctx_addr = I915_READ(VLV_PCBR) & ~4095;
+drivers/gpu/drm/i915/intel_pm.c:6891:	WARN_ON((pctx_addr >> VLV_PCBR_ADDR_SHIFT) == 0);
+drivers/gpu/drm/i915/intel_pm.c:6898:	u32 pcbr;
+drivers/gpu/drm/i915/intel_pm.c:6901:	pcbr = I915_READ(VLV_PCBR);
+drivers/gpu/drm/i915/intel_pm.c:6902:	if ((pcbr >> VLV_PCBR_ADDR_SHIFT) == 0) {
+drivers/gpu/drm/i915/intel_pm.c:6903:		DRM_DEBUG_DRIVER("BIOS didn't set up PCBR, fixing up\n");
+drivers/gpu/drm/i915/intel_pm.c:6908:		I915_WRITE(VLV_PCBR, pctx_paddr);
+drivers/gpu/drm/i915/intel_pm.c:6911:	DRM_DEBUG_DRIVER("PCBR: 0x%08x\n", I915_READ(VLV_PCBR));
+drivers/gpu/drm/i915/intel_pm.c:6918:	u32 pcbr;
+drivers/gpu/drm/i915/intel_pm.c:6921:	pcbr = I915_READ(VLV_PCBR);
+drivers/gpu/drm/i915/intel_pm.c:6922:	if (pcbr) {
+drivers/gpu/drm/i915/intel_pm.c:6924:		int pcbr_offset;
+drivers/gpu/drm/i915/intel_pm.c:6926:		pcbr_offset = (pcbr & (~4095)) - dev_priv->mm.stolen_base;
+drivers/gpu/drm/i915/intel_pm.c:6928:								      pcbr_offset,
+drivers/gpu/drm/i915/intel_pm.c:6934:	DRM_DEBUG_DRIVER("BIOS didn't set up PCBR, fixing up\n");
+drivers/gpu/drm/i915/intel_pm.c:6940:	 * register should be programmed such than the PCBR range does not
+drivers/gpu/drm/i915/intel_pm.c:6951:	I915_WRITE(VLV_PCBR, pctx_paddr);
+drivers/gpu/drm/i915/intel_pm.c:6954:	DRM_DEBUG_DRIVER("PCBR: 0x%08x\n", I915_READ(VLV_PCBR));
+drivers/gpu/drm/i915/intel_pm.c:7082:	u32 gtfifodbg, val, rc6_mode = 0, pcbr;
+drivers/gpu/drm/i915/intel_pm.c:7121:	/* For now we assume BIOS is allocating and populating the PCBR  */
+drivers/gpu/drm/i915/intel_pm.c:7122:	pcbr = I915_READ(VLV_PCBR);
+drivers/gpu/drm/i915/intel_pm.c:7126:	    (pcbr >> VLV_PCBR_ADDR_SHIFT))
+drivers/gpu/drm/i915/i915_reg.h:2569:#define VLV_PCBR	_MMIO(VLV_DISPLAY_BASE + 0x2120)
+drivers/gpu/drm/i915/i915_reg.h:2570:#define VLV_PCBR_ADDR_SHIFT	12
+drivers/gpu/drm/i915/intel_hdmi.c:1095:	 * WaEnableHDMI8bpcBefore12bpc:snb,ivb
+drivers/gpu/drm/i915/i915_drv.c:2209:	s->pcbr			= I915_READ(VLV_PCBR);
+drivers/gpu/drm/i915/i915_drv.c:2304:	I915_WRITE(VLV_PCBR,			s->pcbr);
+drivers/gpu/drm/i915/i915_drv.h:1270:	u32 pcbr;
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4385:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DIS0_MASK 0x10000000
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4386:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DIS0__SHIFT 0x1c
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4387:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DIS1_MASK 0x20000000
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4388:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DIS1__SHIFT 0x1d
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4389:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DRV_STR_MASK 0xc0000000
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4390:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DRV_STR__SHIFT 0x1e
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6729:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DIS0_MASK 0x10000000
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6730:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DIS0__SHIFT 0x1c
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6731:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DIS1_MASK 0x20000000
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6732:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DIS1__SHIFT 0x1d
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6733:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DRV_STR_MASK 0xc0000000
+drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6734:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DRV_STR__SHIFT 0x1e
+drivers/gpu/drm/gma500/mdfld_dsi_dpi.c:143:		u32 dspbase_reg = pipe ? MDFLD_DSPCBASE : MRST_DSPABASE;
+drivers/gpu/drm/gma500/mdfld_device.c:510:		.addr = MDFLD_DSPCBASE,
+drivers/gpu/drm/gma500/psb_intel_reg.h:674:#define DSPCBASE		0x72184
+drivers/gpu/drm/gma500/psb_intel_reg.h:863:#define MDFLD_DSPCBASE		0x7219c
+drivers/dma/ste_dma40.c:616:	return chan->base->virtbase + D40_DREG_PCBASE +
+drivers/dma/ste_dma40.c:2949:		addr = base->virtbase + D40_DREG_PCBASE + i * D40_DREG_PCDELTA;
+drivers/dma/ste_dma40_ll.h:10:#define D40_DREG_PCBASE		0x400
+drivers/s390/cio/chsc_sch.c:511:	memcpy(&cd->cpcb, &scpcd_area->response, scpcd_area->response.length);
+drivers/s390/net/qeth_l2_main.c:1789:	QETH_CARD_TEXT(card, 2, "brqsupcb");
+drivers/s390/net/qeth_core_main.c:2202:	QETH_DBF_TEXT(SETUP, 2, "cmsetpcb");
+drivers/s390/net/qeth_core_main.c:2380:	QETH_DBF_TEXT(SETUP, 2, "ulpstpcb");
+drivers/s390/net/qeth_core_main.c:2989:	QETH_CARD_TEXT(card, 4, "defadpcb");
+drivers/s390/net/qeth_core_main.c:3003:	QETH_CARD_TEXT(card, 3, "quyadpcb");
+drivers/s390/net/qeth_core_main.c:4171:	QETH_CARD_TEXT(card, 4, "prmadpcb");
+drivers/s390/net/qeth_core_main.c:5448:	QETH_CARD_TEXT(card, 4, "defadpcb");
+drivers/s390/net/qeth_l3_main.c:2068:		QETH_CARD_TEXT(card, 4, "arpcberr");
+drivers/s390/crypto/pkey_api.c:122:	struct CPRBX *preqcblk, *prepcblk;
+drivers/s390/crypto/pkey_api.c:134:	prepcblk = (struct CPRBX *) (cprbmem + cprbplusparamblen);
+drivers/s390/crypto/pkey_api.c:145:			((u8 *) prepcblk) + sizeof(struct CPRBX);
+drivers/s390/crypto/pkey_api.c:150:	*prepCPRB = prepcblk;
+drivers/s390/crypto/pkey_api.c:174:			     struct CPRBX *prepcblk)
+drivers/s390/crypto/pkey_api.c:183:	pxcrb->reply_control_blk_addr = (void __user *) prepcblk;
+drivers/s390/crypto/pkey_api.c:213:	struct CPRBX *preqcblk, *prepcblk;
+drivers/s390/crypto/pkey_api.c:250:	rc = alloc_and_prep_cprbmem(PARMBSIZE, &mem, &preqcblk, &prepcblk);
+drivers/s390/crypto/pkey_api.c:292:	prep_xcrb(&xcrb, cardnr, preqcblk, prepcblk);
+drivers/s390/crypto/pkey_api.c:304:	if (prepcblk->ccp_rtcode != 0) {
+drivers/s390/crypto/pkey_api.c:307:			(int) prepcblk->ccp_rtcode,
+drivers/s390/crypto/pkey_api.c:308:			(int) prepcblk->ccp_rscode);
+drivers/s390/crypto/pkey_api.c:314:	prepcblk->rpl_parmb = ((u8 *) prepcblk) + sizeof(struct CPRBX);
+drivers/s390/crypto/pkey_api.c:315:	prepparm = (struct kgrepparm *) prepcblk->rpl_parmb;
+drivers/s390/crypto/pkey_api.c:354:	struct CPRBX *preqcblk, *prepcblk;
+drivers/s390/crypto/pkey_api.c:390:	rc = alloc_and_prep_cprbmem(PARMBSIZE, &mem, &preqcblk, &prepcblk);
+drivers/s390/crypto/pkey_api.c:429:	prep_xcrb(&xcrb, cardnr, preqcblk, prepcblk);
+drivers/s390/crypto/pkey_api.c:441:	if (prepcblk->ccp_rtcode != 0) {
+drivers/s390/crypto/pkey_api.c:444:			(int) prepcblk->ccp_rtcode,
+drivers/s390/crypto/pkey_api.c:445:			(int) prepcblk->ccp_rscode);
+drivers/s390/crypto/pkey_api.c:451:	prepcblk->rpl_parmb = ((u8 *) prepcblk) + sizeof(struct CPRBX);
+drivers/s390/crypto/pkey_api.c:452:	prepparm = (struct cmrepparm *) prepcblk->rpl_parmb;
+drivers/s390/crypto/pkey_api.c:491:	struct CPRBX *preqcblk, *prepcblk;
+drivers/s390/crypto/pkey_api.c:533:	rc = alloc_and_prep_cprbmem(PARMBSIZE, &mem, &preqcblk, &prepcblk);
+drivers/s390/crypto/pkey_api.c:555:	prep_xcrb(&xcrb, cardnr, preqcblk, prepcblk);
+drivers/s390/crypto/pkey_api.c:567:	if (prepcblk->ccp_rtcode != 0) {
+drivers/s390/crypto/pkey_api.c:570:			(int) prepcblk->ccp_rtcode,
+drivers/s390/crypto/pkey_api.c:571:			(int) prepcblk->ccp_rscode);
+drivers/s390/crypto/pkey_api.c:575:	if (prepcblk->ccp_rscode != 0) {
+drivers/s390/crypto/pkey_api.c:578:			(int) prepcblk->ccp_rtcode,
+drivers/s390/crypto/pkey_api.c:579:			(int) prepcblk->ccp_rscode);
+drivers/s390/crypto/pkey_api.c:583:	prepcblk->rpl_parmb = ((u8 *) prepcblk) + sizeof(struct CPRBX);
+drivers/s390/crypto/pkey_api.c:584:	prepparm = (struct uskrepparm *) prepcblk->rpl_parmb;
+drivers/s390/crypto/pkey_api.c:678:	struct CPRBX *preqcblk, *prepcblk;
+drivers/s390/crypto/pkey_api.c:697:	rc = alloc_and_prep_cprbmem(parmbsize, &mem, &preqcblk, &prepcblk);
+drivers/s390/crypto/pkey_api.c:715:	prep_xcrb(&xcrb, cardnr, preqcblk, prepcblk);
+drivers/s390/crypto/pkey_api.c:727:	if (prepcblk->ccp_rtcode != 0) {
+drivers/s390/crypto/pkey_api.c:730:			(int) prepcblk->ccp_rtcode,
+drivers/s390/crypto/pkey_api.c:731:			(int) prepcblk->ccp_rscode);
+drivers/s390/crypto/pkey_api.c:737:	prepcblk->rpl_parmb = ((u8 *) prepcblk) + sizeof(struct CPRBX);
+drivers/s390/crypto/pkey_api.c:738:	prepparm = (struct fqrepparm *) prepcblk->rpl_parmb;
+drivers/scsi/lpfc/lpfc_init.c:7138:	phba->pcb = (phba->slim2p.virt + offsetof(struct lpfc_sli2_slim, pcb));
+drivers/scsi/lpfc/lpfc_hw.h:3236:	uint32_t cHpcb     :  1;
+drivers/scsi/lpfc/lpfc_hw.h:3239:	uint32_t pcbLen    : 24;       /* bit 23:0  of memory based port
+drivers/scsi/lpfc/lpfc_hw.h:3242:	uint32_t pcbLen    : 24;       /* bit 23:0  of memory based port
+drivers/scsi/lpfc/lpfc_hw.h:3246:	uint32_t cHpcb     :  1;
+drivers/scsi/lpfc/lpfc_hw.h:3251:	uint32_t pcbLow;       /* bit 31:0  of memory based port config block */
+drivers/scsi/lpfc/lpfc_hw.h:3252:	uint32_t pcbHigh;      /* bit 63:32 of memory based port config block */
+drivers/scsi/lpfc/lpfc_hw.h:3402:typedef struct _PCB {
+drivers/scsi/lpfc/lpfc_hw.h:3429:} PCB_t;
+drivers/scsi/lpfc/lpfc_hw.h:4205: * 256 (MAILBOX_t) + 140 (PCB_t) + ( 32 (IOCB_t) * 498 ) = < 16384
+drivers/scsi/lpfc/lpfc_hw.h:4212:			    (sizeof(MAILBOX_t) + sizeof(PCB_t) + \
+drivers/scsi/lpfc/lpfc_hw.h:4222:	PCB_t pcb;
+drivers/scsi/lpfc/lpfc.h:714:	struct _PCB *pcb;
+drivers/scsi/lpfc/lpfc_mbox.c:944: * lpfc_config_pcb_setup - Set up IOCB rings in the Port Control Block (PCB)
+drivers/scsi/lpfc/lpfc_mbox.c:948: * Block (PCB).
+drivers/scsi/lpfc/lpfc_mbox.c:951:lpfc_config_pcb_setup(struct lpfc_hba * phba)
+drivers/scsi/lpfc/lpfc_mbox.c:955:	PCB_t *pcbp = phba->pcb;
+drivers/scsi/lpfc/lpfc_mbox.c:961:	pcbp->maxRing = (psli->num_rings - 1);
+drivers/scsi/lpfc/lpfc_mbox.c:976:			pcbp->rdsc[i].cmdEntries = 0;
+drivers/scsi/lpfc/lpfc_mbox.c:977:			pcbp->rdsc[i].rspEntries = 0;
+drivers/scsi/lpfc/lpfc_mbox.c:978:			pcbp->rdsc[i].cmdAddrHigh = 0;
+drivers/scsi/lpfc/lpfc_mbox.c:979:			pcbp->rdsc[i].rspAddrHigh = 0;
+drivers/scsi/lpfc/lpfc_mbox.c:980:			pcbp->rdsc[i].cmdAddrLow = 0;
+drivers/scsi/lpfc/lpfc_mbox.c:981:			pcbp->rdsc[i].rspAddrLow = 0;
+drivers/scsi/lpfc/lpfc_mbox.c:988:		pcbp->rdsc[i].cmdEntries = pring->sli.sli3.numCiocb;
+drivers/scsi/lpfc/lpfc_mbox.c:993:		pcbp->rdsc[i].cmdAddrHigh = putPaddrHigh(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:994:		pcbp->rdsc[i].cmdAddrLow = putPaddrLow(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1000:		pcbp->rdsc[i].rspEntries = pring->sli.sli3.numRiocb;
+drivers/scsi/lpfc/lpfc_mbox.c:1004:		pcbp->rdsc[i].rspAddrHigh = putPaddrHigh(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1005:		pcbp->rdsc[i].rspAddrLow = putPaddrLow(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1205: * specified in the Port Control Block (PCB). It is an error to issue the
+drivers/scsi/lpfc/lpfc_mbox.c:1258: * Block (PCB) in the driver memory. After this command is issued, the
+drivers/scsi/lpfc/lpfc_mbox.c:1260: * the HBA. The HBA may copy the PCB information to internal storage for
+drivers/scsi/lpfc/lpfc_mbox.c:1261: * subsequent use; the driver can not change the PCB information unless it
+drivers/scsi/lpfc/lpfc_mbox.c:1282:	mb->un.varCfgPort.pcbLen = sizeof(PCB_t);
+drivers/scsi/lpfc/lpfc_mbox.c:1284:	offset = (uint8_t *)phba->pcb - (uint8_t *)phba->slim2p.virt;
+drivers/scsi/lpfc/lpfc_mbox.c:1286:	mb->un.varCfgPort.pcbLow = putPaddrLow(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1287:	mb->un.varCfgPort.pcbHigh = putPaddrHigh(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1316:	/* Now setup pcb */
+drivers/scsi/lpfc/lpfc_mbox.c:1317:	phba->pcb->type = TYPE_NATIVE_SLI2;
+drivers/scsi/lpfc/lpfc_mbox.c:1318:	phba->pcb->feature = FEATURE_INITIAL_SLI2;
+drivers/scsi/lpfc/lpfc_mbox.c:1321:	phba->pcb->mailBoxSize = sizeof(MAILBOX_t) + MAILBOX_EXT_SIZE;
+drivers/scsi/lpfc/lpfc_mbox.c:1324:	phba->pcb->mbAddrHigh = putPaddrHigh(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1325:	phba->pcb->mbAddrLow = putPaddrLow(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1383:		phba->pcb->hgpAddrHigh = putPaddrHigh(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1384:		phba->pcb->hgpAddrLow = putPaddrLow(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1398:		phba->pcb->hgpAddrLow = (bar_low & PCI_BASE_ADDRESS_MEM_MASK) +
+drivers/scsi/lpfc/lpfc_mbox.c:1402:			phba->pcb->hgpAddrHigh = bar_high;
+drivers/scsi/lpfc/lpfc_mbox.c:1404:			phba->pcb->hgpAddrHigh = 0;
+drivers/scsi/lpfc/lpfc_mbox.c:1421:	phba->pcb->pgpAddrHigh = putPaddrHigh(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1422:	phba->pcb->pgpAddrLow = putPaddrLow(pdma_addr);
+drivers/scsi/lpfc/lpfc_mbox.c:1424:	/* Use callback routine to setp rings in the pcb */
+drivers/scsi/lpfc/lpfc_mbox.c:1425:	lpfc_config_pcb_setup(phba);
+drivers/scsi/lpfc/lpfc_mbox.c:1436:	/* Swap PCB if needed */
+drivers/scsi/lpfc/lpfc_mbox.c:1437:	lpfc_sli_pcimem_bcopy(phba->pcb, phba->pcb, sizeof(PCB_t));
+drivers/scsi/lpfc/lpfc_debugfs.c:454: * Mailbox, PCB, Rings, and Registers that are located in host memory.
+drivers/scsi/lpfc/lpfc_debugfs.c:487:	len +=  snprintf(buf+len, size-len, "SLIM PCB\n");
+drivers/scsi/lpfc/lpfc_debugfs.c:488:	ptr = (uint32_t *)phba->pcb;
+drivers/scsi/lpfc/lpfc_debugfs.c:489:	i = sizeof(PCB_t);
+drivers/scsi/csiostor/t4fw_api_stor.h:444:		struct fw_fcoe_pcb_stats {
+drivers/scsi/csiostor/t4fw_api_stor.h:460:		} pcb_stats;
+drivers/scsi/qla2xxx/qla_attr.c:1797:	 * final cleanup of firmware resources (PCBs and XCBs).
+drivers/scsi/qla2xxx/qla_mbx.c:2313:		case LSC_SCODE_NOPCB:
+drivers/scsi/qla2xxx/qla_init.c:5354:			/* device not in PCB table */
+drivers/scsi/qla2xxx/qla_fw.h:878:#define LSC_SCODE_NOPCB		0x0A
+drivers/scsi/aacraid/aacraid.h:1406:	u8	mfg_pcba_serial_no[12];
+drivers/scsi/aacraid/linit.c:1345:	  !memcmp(&dev->supplement_adapter_info.mfg_pcba_serial_no[
+drivers/scsi/aacraid/linit.c:1346:	    sizeof(dev->supplement_adapter_info.mfg_pcba_serial_no)-len],
+drivers/scsi/aacraid/linit.c:1349:		  (int)sizeof(dev->supplement_adapter_info.mfg_pcba_serial_no),
+drivers/scsi/aacraid/linit.c:1350:		  dev->supplement_adapter_info.mfg_pcba_serial_no);
+drivers/scsi/aic94xx/aic94xx_hwi.h:41:#define ASD_PCBA_SN_SIZE   12
+drivers/scsi/aic94xx/aic94xx_hwi.h:109:	char   pcba_sn[ASD_PCBA_SN_SIZE+1];
+drivers/scsi/aic94xx/aic94xx_init.c:294:static ssize_t asd_show_dev_pcba_sn(struct device *dev,
+drivers/scsi/aic94xx/aic94xx_init.c:298:	return snprintf(buf, PAGE_SIZE, "%s\n", asd_ha->hw_prof.pcba_sn);
+drivers/scsi/aic94xx/aic94xx_init.c:300:static DEVICE_ATTR(pcba_sn, S_IRUGO, asd_show_dev_pcba_sn, NULL);
+drivers/scsi/aic94xx/aic94xx_init.c:489:	err = device_create_file(&asd_ha->pcidev->dev, &dev_attr_pcba_sn);
+drivers/scsi/aic94xx/aic94xx_init.c:499:	device_remove_file(&asd_ha->pcidev->dev, &dev_attr_pcba_sn);
+drivers/scsi/aic94xx/aic94xx_init.c:511:	device_remove_file(&asd_ha->pcidev->dev, &dev_attr_pcba_sn);
+drivers/scsi/aic94xx/aic94xx_init.c:799:	asd_printk("device %s: SAS addr %llx, PCBA SN %s, %d phys, %d enabled "
+drivers/scsi/aic94xx/aic94xx_init.c:802:		   asd_ha->hw_prof.pcba_sn, asd_ha->hw_prof.max_phys,
+drivers/scsi/aic94xx/aic94xx_sds.c:425:	u8    pcba_sn[ASD_PCBA_SN_SIZE];
+drivers/scsi/aic94xx/aic94xx_sds.c:713:static int asd_ms_get_pcba_sn(struct asd_ha_struct *asd_ha,
+drivers/scsi/aic94xx/aic94xx_sds.c:716:	memcpy(asd_ha->hw_prof.pcba_sn, ms->pcba_sn, ASD_PCBA_SN_SIZE);
+drivers/scsi/aic94xx/aic94xx_sds.c:717:	asd_ha->hw_prof.pcba_sn[ASD_PCBA_SN_SIZE] = '\0';
+drivers/scsi/aic94xx/aic94xx_sds.c:912:	err = asd_ms_get_pcba_sn(asd_ha, manuf_sec);
+drivers/scsi/aic94xx/aic94xx_sds.c:914:		ASD_DPRINTK("couldn't read the PCBA SN\n");
+drivers/scsi/aic94xx/aic94xx_sds.c:917:	ASD_DPRINTK("manuf sect PCBA SN %s\n", asd_ha->hw_prof.pcba_sn);
+drivers/staging/wlan-ng/hfa384x.h:297:#define HFA384x_PDR_PCB_PARTNUM		((u16)0x0001)
+drivers/staging/wlan-ng/hfa384x.h:919:struct hfa384x_pdr_pcb_partnum {
+drivers/staging/wlan-ng/hfa384x.h:923:struct hfa384x_pdr_pcb_tracenum {
+drivers/staging/wlan-ng/hfa384x.h:1084:		struct hfa384x_pdr_pcb_partnum pcb_partnum;
+drivers/staging/wlan-ng/hfa384x.h:1085:		struct hfa384x_pdr_pcb_tracenum pcb_tracenum;
+drivers/staging/wlan-ng/hfa384x_usb.c:3986:	case HFA384x_PDR_PCB_PARTNUM:
+drivers/staging/irda/drivers/via-ircc.c:36:  Tested with home-grown PCB on EPIA boards.
+drivers/ide/icside.c:83:/* ---------------- Version 5 PCB Support Functions --------------------- */
+drivers/ide/icside.c:110:/* ---------------- Version 6 PCB Support Functions --------------------- */
+log.txt:1:drivers/phy/broadcom/phy-brcm-sata.c:28:#define SATA_PCB_BANK_OFFSET				0x23c
+log.txt:2:drivers/phy/broadcom/phy-brcm-sata.c:29:#define SATA_PCB_REG_OFFSET(ofs)			((ofs) * 4)
+log.txt:3:drivers/phy/broadcom/phy-brcm-sata.c:33:/* Register offset between PHYs in PCB space */
+log.txt:4:drivers/phy/broadcom/phy-brcm-sata.c:34:#define SATA_PCB_REG_28NM_SPACE_SIZE			0x1000
+log.txt:5:drivers/phy/broadcom/phy-brcm-sata.c:39:#define SATA_PCB_REG_40NM_SPACE_SIZE			0x10
+log.txt:6:drivers/phy/broadcom/phy-brcm-sata.c:133:static inline void __iomem *brcm_sata_pcb_base(struct brcm_sata_port *port)
+log.txt:7:drivers/phy/broadcom/phy-brcm-sata.c:141:		size = SATA_PCB_REG_28NM_SPACE_SIZE;
+log.txt:8:drivers/phy/broadcom/phy-brcm-sata.c:144:		size = SATA_PCB_REG_40NM_SPACE_SIZE;
+log.txt:9:drivers/phy/broadcom/phy-brcm-sata.c:171:static void brcm_sata_phy_wr(void __iomem *pcb_base, u32 bank,
+log.txt:10:drivers/phy/broadcom/phy-brcm-sata.c:176:	writel(bank, pcb_base + SATA_PCB_BANK_OFFSET);
+log.txt:11:drivers/phy/broadcom/phy-brcm-sata.c:177:	tmp = readl(pcb_base + SATA_PCB_REG_OFFSET(ofs));
+log.txt:12:drivers/phy/broadcom/phy-brcm-sata.c:179:	writel(tmp, pcb_base + SATA_PCB_REG_OFFSET(ofs));
+log.txt:13:drivers/phy/broadcom/phy-brcm-sata.c:182:static u32 brcm_sata_phy_rd(void __iomem *pcb_base, u32 bank, u32 ofs)
+log.txt:14:drivers/phy/broadcom/phy-brcm-sata.c:184:	writel(bank, pcb_base + SATA_PCB_BANK_OFFSET);
+log.txt:15:drivers/phy/broadcom/phy-brcm-sata.c:185:	return readl(pcb_base + SATA_PCB_REG_OFFSET(ofs));
+log.txt:16:drivers/phy/broadcom/phy-brcm-sata.c:195:	void __iomem *base = brcm_sata_pcb_base(port);
+log.txt:17:drivers/phy/broadcom/phy-brcm-sata.c:231:	void __iomem *base = brcm_sata_pcb_base(port);
+log.txt:18:drivers/xen/grant-table.c:552:	struct gnttab_free_callback **pcb;
+log.txt:19:drivers/xen/grant-table.c:556:	for (pcb = &gnttab_free_callback_list; *pcb; pcb = &(*pcb)->next) {
+log.txt:20:drivers/xen/grant-table.c:557:		if (*pcb == callback) {
+log.txt:21:drivers/xen/grant-table.c:558:			*pcb = callback->next;
+log.txt:22:drivers/media/i2c/ov6650.c:94:#define REG_SPCB		0x60
+log.txt:23:drivers/media/pci/saa7134/saa7134.h:261:#define SAA7134_BOARD_SABRENT_TV_PCB05     115
+log.txt:24:drivers/media/pci/saa7134/saa7134-cards.c:3702:	[SAA7134_BOARD_SABRENT_TV_PCB05] = {
+log.txt:25:drivers/media/pci/saa7134/saa7134-cards.c:3703:		.name           = "Sabrent PCMCIA TV-PCB05",
+log.txt:26:drivers/media/pci/saa7134/saa7134-cards.c:6634:		.driver_data  = SAA7134_BOARD_SABRENT_TV_PCB05,
+log.txt:27:drivers/media/pci/ttpci/budget-patch.c:561:**      (check soldering pcb and pins)
+log.txt:28:drivers/media/pci/ttpci/av7110.c:2356: * (check soldering pcb and pins)
+log.txt:29:drivers/media/pci/bt8xx/bttv-cards.c:1204:		* just a BT848A on a small PCB!
+log.txt:30:drivers/media/pci/bt8xx/bttv-cards.c:1566:						* The PCB can take a sbx1637/sbx1673, wiring unknown.
+log.txt:31:drivers/media/pci/cx23885/cx23885.h:214:	 * clock rates, driven physically by crystals on the PCBs.
+log.txt:32:drivers/media/usb/cx231xx/Makefile:2:cx231xx-y += cx231xx-avcore.o cx231xx-417.o cx231xx-pcb-cfg.o cx231xx-vbi.o
+log.txt:33:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:2:   cx231xx-pcb-config.c - driver for Conexant
+log.txt:34:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:25:static unsigned int pcb_debug;
+log.txt:35:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:26:module_param(pcb_debug, int, 0644);
+log.txt:36:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:27:MODULE_PARM_DESC(pcb_debug, "enable pcb config debug messages [video]");
+log.txt:37:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:31:static struct pcb_config cx231xx_Scenario[] = {
+log.txt:38:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:661:	struct pcb_config *p_pcb_info;
+log.txt:39:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:673:	pcb config it is related to */
+log.txt:40:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:688:			p_pcb_info =
+log.txt:41:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:695:			p_pcb_info =
+log.txt:42:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:702:			p_pcb_info = &cx231xx_Scenario[INDEX_BUSPOWER_DIF_ONLY];
+log.txt:43:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:717:			p_pcb_info =
+log.txt:44:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:726:			p_pcb_info =
+log.txt:45:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:735:			p_pcb_info =
+log.txt:46:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:746:			p_pcb_info = &cx231xx_Scenario[INDEX_SELFPOWER_DUAL];
+log.txt:47:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:758:			p_pcb_info = &cx231xx_Scenario[INDEX_SELFPOWER_TRIPLE];
+log.txt:48:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:766:			p_pcb_info =
+log.txt:49:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:780:	memcpy(&dev->current_pcb_config, p_pcb_info,
+log.txt:50:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:781:		   sizeof(struct pcb_config));
+log.txt:51:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:783:	if (pcb_debug) {
+log.txt:52:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:788:			 (dev->current_pcb_config.index) + 1);
+log.txt:53:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:791:			 dev->current_pcb_config.type);
+log.txt:54:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:794:			 dev->current_pcb_config.mode);
+log.txt:55:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:797:			 dev->current_pcb_config.speed);
+log.txt:56:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:800:			 dev->current_pcb_config.ts1_source);
+log.txt:57:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:803:			 dev->current_pcb_config.ts2_source);
+log.txt:58:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.c:806:			 dev->current_pcb_config.analog_source);
+log.txt:59:drivers/media/usb/cx231xx/cx231xx-audio.c:696:	    dev->udev->actconfig->interface[dev->current_pcb_config.
+log.txt:60:drivers/media/usb/cx231xx/cx231xx-cards.c:1318:	/* Query cx231xx to find what pcb config it is related to */
+log.txt:61:drivers/media/usb/cx231xx/cx231xx-cards.c:1321:		dev_err(dev->dev, "Failed to read PCB config\n");
+log.txt:62:drivers/media/usb/cx231xx/cx231xx-cards.c:1453:	idx = dev->current_pcb_config.hs_config_info[0].interface_info.video_index + 1;
+log.txt:63:drivers/media/usb/cx231xx/cx231xx-cards.c:1456:			"Video PCB interface #%d doesn't exist\n", idx);
+log.txt:64:drivers/media/usb/cx231xx/cx231xx-cards.c:1492:	idx = dev->current_pcb_config.hs_config_info[0].interface_info.vanc_index + 1;
+log.txt:65:drivers/media/usb/cx231xx/cx231xx-cards.c:1495:			"VBI PCB interface #%d doesn't exist\n", idx);
+log.txt:66:drivers/media/usb/cx231xx/cx231xx-cards.c:1536:	idx = dev->current_pcb_config.hs_config_info[0].interface_info.hanc_index + 1;
+log.txt:67:drivers/media/usb/cx231xx/cx231xx-cards.c:1539:			"Sliced CC PCB interface #%d doesn't exist\n", idx);
+log.txt:68:drivers/media/usb/cx231xx/cx231xx-cards.c:1724:	if (dev->current_pcb_config.ts1_source != 0xff) {
+log.txt:69:drivers/media/usb/cx231xx/cx231xx-cards.c:1726:		idx = dev->current_pcb_config.hs_config_info[0].interface_info.ts1_index + 1;
+log.txt:70:drivers/media/usb/cx231xx/cx231xx-cards.c:1728:			dev_err(d, "TS1 PCB interface #%d doesn't exist\n",
+log.txt:71:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:2:   cx231xx-pcb-cfg.h - driver for Conexant
+log.txt:72:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:22:#ifndef _PCB_CONFIG_H_
+log.txt:73:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:23:#define _PCB_CONFIG_H_
+log.txt:74:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:73:	NO_TS_PORT = 0x0,	/* 2'b00: Neither port used. PCB not a Hybrid,
+log.txt:75:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:182:struct pcb_config {
+log.txt:76:drivers/media/usb/cx231xx/cx231xx-pcb-cfg.h:201:enum INDEX_PCB_CONFIG{
+log.txt:77:drivers/media/usb/cx231xx/cx231xx-avcore.c:572:		if ((dev->current_pcb_config.type == USB_BUS_POWER) &&
+log.txt:78:drivers/media/usb/cx231xx/cx231xx-avcore.c:590:		if ((dev->current_pcb_config.type == USB_BUS_POWER) &&
+log.txt:79:drivers/media/usb/cx231xx/cx231xx-avcore.c:2619:	struct pcb_config *pcb_config;
+log.txt:80:drivers/media/usb/cx231xx/cx231xx-avcore.c:2622:	pcb_config = (struct pcb_config *)&dev->current_pcb_config;
+log.txt:81:drivers/media/usb/cx231xx/cx231xx-avcore.c:2624:	if (pcb_config->config_num) {
+log.txt:82:drivers/media/usb/cx231xx/cx231xx-core.c:504:	    dev->current_pcb_config.hs_config_info[0].interface_info.
+log.txt:83:drivers/media/usb/cx231xx/cx231xx-core.c:539:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+log.txt:84:drivers/media/usb/cx231xx/cx231xx-core.c:548:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+log.txt:85:drivers/media/usb/cx231xx/cx231xx-core.c:553:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+log.txt:86:drivers/media/usb/cx231xx/cx231xx-core.c:562:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+log.txt:87:drivers/media/usb/cx231xx/cx231xx-core.c:574:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+log.txt:88:drivers/media/usb/cx231xx/cx231xx-core.c:583:		    dev->current_pcb_config.hs_config_info[0].interface_info.
+log.txt:89:drivers/media/usb/cx231xx/cx231xx.h:44:#include "cx231xx-pcb-cfg.h"
+log.txt:90:drivers/media/usb/cx231xx/cx231xx.h:703:	/* Cx231xx supported PCB config's */
+log.txt:91:drivers/media/usb/cx231xx/cx231xx.h:704:	struct pcb_config current_pcb_config;
+log.txt:92:drivers/media/usb/s2255/s2255drv.c:460:	unsigned char *pCb;
+log.txt:93:drivers/media/usb/s2255/s2255drv.c:466:	pCb = (unsigned char *)in + height * width + (height * width / 2);
+log.txt:94:drivers/media/usb/s2255/s2255drv.c:470:		out[i + 2] = (fmt == V4L2_PIX_FMT_YUYV) ? *pY++ : *pCb++;
+log.txt:95:drivers/media/usb/s2255/s2255drv.c:471:		out[i + 3] = (fmt == V4L2_PIX_FMT_YUYV) ? *pCb++ : *pY++;
+log.txt:96:drivers/media/usb/dvb-usb-v2/anysee.h:53:	u8 hw; /* PCB ID */
+log.txt:97:drivers/media/usb/dvb-usb-v2/anysee.c:387: * PCB: ?
+log.txt:98:drivers/media/usb/dvb-usb-v2/anysee.c:391: * PCB: PCB 507T (rev1.61)
+log.txt:99:drivers/media/usb/dvb-usb-v2/anysee.c:397: * PCB: 507CD (rev1.1)
+log.txt:100:drivers/media/usb/dvb-usb-v2/anysee.c:406: * PCB: 507DC (rev0.2)
+log.txt:101:drivers/media/usb/dvb-usb-v2/anysee.c:413: * PCB: 507SI (rev2.1)
+log.txt:102:drivers/media/usb/dvb-usb-v2/anysee.c:420: * PCB: 507FA (rev0.4)
+log.txt:103:drivers/media/usb/dvb-usb-v2/anysee.c:428: * PCB: 507FA (rev1.1)
+log.txt:104:drivers/media/usb/dvb-usb-v2/anysee.c:442: * PCB: 508TC (rev0.6)
+log.txt:105:drivers/media/usb/dvb-usb-v2/anysee.c:458: * PCB: 508S2 (rev0.7)
+log.txt:106:drivers/media/usb/dvb-usb-v2/anysee.c:466: * PCB: 508T2C (rev0.3)
+log.txt:107:drivers/media/usb/dvb-usb-v2/anysee.c:474: * PCB: 508PTC (rev0.5)
+log.txt:108:drivers/media/usb/dvb-usb-v2/anysee.c:490: * PCB: 508PS2 (rev0.4)
+log.txt:109:drivers/media/dvb-frontends/tda10071_priv.h:102:#define CMD_LNB_PCB_CONFIG      0x23
+log.txt:110:drivers/media/dvb-frontends/tda10071.c:130:	cmd.args[0] = CMD_LNB_PCB_CONFIG;
+log.txt:111:drivers/media/dvb-frontends/cx24117.c:152:	CMD_LNBPCBCONFIG   = 0x23,
+log.txt:112:drivers/media/dvb-frontends/cx24117.c:984:	cmd.args[0] = CMD_LNBPCBCONFIG;
+log.txt:113:drivers/power/supply/ab8500_bmdata.c:310: * near the battery but on the PCB.
+log.txt:114:drivers/power/supply/ab8500_btemp.c:533:		 * The PCB NTC is sourced from VTVOUT via a 230kOhm
+log.txt:115:drivers/power/reset/at91-reset.c:78:		  "r" cpu_to_le32(AT91_SDRAMC_LPCB_POWER_DOWN),
+log.txt:116:drivers/power/reset/at91-reset.c:121:		  "r" cpu_to_le32(AT91_DDRSDRC_LPCB_POWER_DOWN),
+log.txt:117:drivers/isdn/hysdn/boardergo.c:108:			if (hysdn_sched_rx(card, dpr->ToPcBuf, dpr->ToPcSize, dpr->ToPcChannel)) {
+log.txt:118:drivers/isdn/hysdn/boardergo.c:196:	memcpy(&dpr->ToPcBuf[ERG_TO_PC_BUF_SIZE - sizeof(TestText)], TestText,
+log.txt:119:drivers/isdn/hysdn/boardergo.c:198:	if (memcmp(&dpr->ToPcBuf[ERG_TO_PC_BUF_SIZE - sizeof(TestText)], TestText,
+log.txt:120:drivers/isdn/hysdn/boardergo.c:341:			    ((*(unsigned long *) dpr->ToPcBuf) != RDY_MAGIC))
+log.txt:121:drivers/isdn/hysdn/boardergo.c:347:				if (EvalSysrTokData(card, dpr->ToPcBuf + RDY_MAGIC_SIZE, msg_size))
+log.txt:122:drivers/isdn/hysdn/boardergo.h:27:	/*0E00 */ unsigned char ToPcBuf[ERG_TO_PC_BUF_SIZE];
+log.txt:123:drivers/nfc/st-nci/spi.c:38:#define ST_NCI_SPI_MIN_SIZE 4   /* PCB(1) + NCI Packet header(3) */
+log.txt:124:drivers/nfc/st-nci/ndlc.c:28:#define PCB_TYPE_DATAFRAME		0x80
+log.txt:125:drivers/nfc/st-nci/ndlc.c:29:#define PCB_TYPE_SUPERVISOR		0xc0
+log.txt:126:drivers/nfc/st-nci/ndlc.c:30:#define PCB_TYPE_MASK			PCB_TYPE_SUPERVISOR
+log.txt:127:drivers/nfc/st-nci/ndlc.c:32:#define PCB_SYNC_ACK			0x20
+log.txt:128:drivers/nfc/st-nci/ndlc.c:33:#define PCB_SYNC_NACK			0x10
+log.txt:129:drivers/nfc/st-nci/ndlc.c:34:#define PCB_SYNC_WAIT			0x30
+log.txt:130:drivers/nfc/st-nci/ndlc.c:35:#define PCB_SYNC_NOINFO			0x00
+log.txt:131:drivers/nfc/st-nci/ndlc.c:36:#define PCB_SYNC_MASK			PCB_SYNC_WAIT
+log.txt:132:drivers/nfc/st-nci/ndlc.c:38:#define PCB_DATAFRAME_RETRANSMIT_YES	0x00
+log.txt:133:drivers/nfc/st-nci/ndlc.c:39:#define PCB_DATAFRAME_RETRANSMIT_NO	0x04
+log.txt:134:drivers/nfc/st-nci/ndlc.c:40:#define PCB_DATAFRAME_RETRANSMIT_MASK	PCB_DATAFRAME_RETRANSMIT_NO
+log.txt:135:drivers/nfc/st-nci/ndlc.c:42:#define PCB_SUPERVISOR_RETRANSMIT_YES	0x00
+log.txt:136:drivers/nfc/st-nci/ndlc.c:43:#define PCB_SUPERVISOR_RETRANSMIT_NO	0x02
+log.txt:137:drivers/nfc/st-nci/ndlc.c:44:#define PCB_SUPERVISOR_RETRANSMIT_MASK	PCB_SUPERVISOR_RETRANSMIT_NO
+log.txt:138:drivers/nfc/st-nci/ndlc.c:46:#define PCB_FRAME_CRC_INFO_PRESENT	0x08
+log.txt:139:drivers/nfc/st-nci/ndlc.c:47:#define PCB_FRAME_CRC_INFO_NOTPRESENT	0x00
+log.txt:140:drivers/nfc/st-nci/ndlc.c:48:#define PCB_FRAME_CRC_INFO_MASK		PCB_FRAME_CRC_INFO_PRESENT
+log.txt:141:drivers/nfc/st-nci/ndlc.c:87:	u8 pcb = PCB_TYPE_DATAFRAME | PCB_DATAFRAME_RETRANSMIT_NO |
+log.txt:142:drivers/nfc/st-nci/ndlc.c:88:		PCB_FRAME_CRC_INFO_NOTPRESENT;
+log.txt:143:drivers/nfc/st-nci/ndlc.c:90:	*(u8 *)skb_push(skb, 1) = pcb;
+log.txt:144:drivers/nfc/st-nci/ndlc.c:136:	u8 pcb;
+log.txt:145:drivers/nfc/st-nci/ndlc.c:139:		pcb = skb->data[0];
+log.txt:146:drivers/nfc/st-nci/ndlc.c:140:		switch (pcb & PCB_TYPE_MASK) {
+log.txt:147:drivers/nfc/st-nci/ndlc.c:141:		case PCB_TYPE_SUPERVISOR:
+log.txt:148:drivers/nfc/st-nci/ndlc.c:142:			skb->data[0] = (pcb & ~PCB_SUPERVISOR_RETRANSMIT_MASK) |
+log.txt:149:drivers/nfc/st-nci/ndlc.c:143:				PCB_SUPERVISOR_RETRANSMIT_YES;
+log.txt:150:drivers/nfc/st-nci/ndlc.c:145:		case PCB_TYPE_DATAFRAME:
+log.txt:151:drivers/nfc/st-nci/ndlc.c:146:			skb->data[0] = (pcb & ~PCB_DATAFRAME_RETRANSMIT_MASK) |
+log.txt:152:drivers/nfc/st-nci/ndlc.c:147:				PCB_DATAFRAME_RETRANSMIT_YES;
+log.txt:153:drivers/nfc/st-nci/ndlc.c:150:			pr_err("UNKNOWN Packet Control Byte=%d\n", pcb);
+log.txt:154:drivers/nfc/st-nci/ndlc.c:161:	u8 pcb;
+log.txt:155:drivers/nfc/st-nci/ndlc.c:168:		pcb = skb->data[0];
+log.txt:156:drivers/nfc/st-nci/ndlc.c:170:		if ((pcb & PCB_TYPE_MASK) == PCB_TYPE_SUPERVISOR) {
+log.txt:157:drivers/nfc/st-nci/ndlc.c:171:			switch (pcb & PCB_SYNC_MASK) {
+log.txt:158:drivers/nfc/st-nci/ndlc.c:172:			case PCB_SYNC_ACK:
+log.txt:159:drivers/nfc/st-nci/ndlc.c:180:			case PCB_SYNC_NACK:
+log.txt:160:drivers/nfc/st-nci/ndlc.c:189:			case PCB_SYNC_WAIT:
+log.txt:161:drivers/nfc/st-nci/ndlc.c:199:		} else if ((pcb & PCB_TYPE_MASK) == PCB_TYPE_DATAFRAME) {
+log.txt:162:drivers/nfc/st-nci/i2c.c:37:#define ST_NCI_I2C_MIN_SIZE 4   /* PCB(1) + NCI Packet header(3) */
+log.txt:163:drivers/thermal/ti-soc-thermal/omap5-thermal-data.c:339:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_5430_CPU,
+log.txt:164:drivers/thermal/ti-soc-thermal/omap5-thermal-data.c:340:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_5430_CPU,
+log.txt:165:drivers/thermal/ti-soc-thermal/omap5-thermal-data.c:346:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_5430_GPU,
+log.txt:166:drivers/thermal/ti-soc-thermal/omap5-thermal-data.c:347:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_5430_GPU,
+log.txt:167:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:413:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+log.txt:168:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:414:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+log.txt:169:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:420:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+log.txt:170:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:421:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+log.txt:171:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:427:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+log.txt:172:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:428:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+log.txt:173:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:434:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+log.txt:174:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:435:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+log.txt:175:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:441:		.slope_pcb = DRA752_GRADIENT_SLOPE_W_PCB,
+log.txt:176:drivers/thermal/ti-soc-thermal/dra752-thermal-data.c:442:		.constant_pcb = DRA752_GRADIENT_CONST_W_PCB,
+log.txt:177:drivers/thermal/ti-soc-thermal/ti-thermal.h:28:/* PCB sensor calculation constants */
+log.txt:178:drivers/thermal/ti-soc-thermal/ti-thermal.h:29:#define OMAP_GRADIENT_SLOPE_W_PCB_4430				0
+log.txt:179:drivers/thermal/ti-soc-thermal/ti-thermal.h:30:#define OMAP_GRADIENT_CONST_W_PCB_4430				20000
+log.txt:180:drivers/thermal/ti-soc-thermal/ti-thermal.h:31:#define OMAP_GRADIENT_SLOPE_W_PCB_4460				1142
+log.txt:181:drivers/thermal/ti-soc-thermal/ti-thermal.h:32:#define OMAP_GRADIENT_CONST_W_PCB_4460				-393
+log.txt:182:drivers/thermal/ti-soc-thermal/ti-thermal.h:33:#define OMAP_GRADIENT_SLOPE_W_PCB_4470				1063
+log.txt:183:drivers/thermal/ti-soc-thermal/ti-thermal.h:34:#define OMAP_GRADIENT_CONST_W_PCB_4470				-477
+log.txt:184:drivers/thermal/ti-soc-thermal/ti-thermal.h:36:#define OMAP_GRADIENT_SLOPE_W_PCB_5430_CPU			100
+log.txt:185:drivers/thermal/ti-soc-thermal/ti-thermal.h:37:#define OMAP_GRADIENT_CONST_W_PCB_5430_CPU			484
+log.txt:186:drivers/thermal/ti-soc-thermal/ti-thermal.h:38:#define OMAP_GRADIENT_SLOPE_W_PCB_5430_GPU			464
+log.txt:187:drivers/thermal/ti-soc-thermal/ti-thermal.h:39:#define OMAP_GRADIENT_CONST_W_PCB_5430_GPU			-5102
+log.txt:188:drivers/thermal/ti-soc-thermal/ti-thermal.h:41:#define DRA752_GRADIENT_SLOPE_W_PCB				0
+log.txt:189:drivers/thermal/ti-soc-thermal/ti-thermal.h:42:#define DRA752_GRADIENT_CONST_W_PCB				2000
+log.txt:190:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:43:	struct thermal_zone_device *pcb_tz;
+log.txt:191:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:83:	struct thermal_zone_device *pcb_tz = NULL;
+log.txt:192:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:88:	int pcb_temp;
+log.txt:193:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:104:	pcb_tz = data->pcb_tz;
+log.txt:194:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:105:	/* In case pcb zone is available, use the extrapolation rule with it */
+log.txt:195:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:106:	if (!IS_ERR(pcb_tz)) {
+log.txt:196:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:107:		ret = thermal_zone_get_temp(pcb_tz, &pcb_temp);
+log.txt:197:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:109:			tmp -= pcb_temp; /* got a valid PCB temp */
+log.txt:198:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:110:			slope = s->slope_pcb;
+log.txt:199:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:111:			constant = s->constant_pcb;
+log.txt:200:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:114:				"Failed to read PCB state. Using defaults\n");
+log.txt:201:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:172:	/* pcb_tz will be either valid or PTR_ERR() */
+log.txt:202:drivers/thermal/ti-soc-thermal/ti-thermal-common.c:173:	data->pcb_tz = thermal_zone_get_zone_by_name("pcb");
+log.txt:203:drivers/thermal/ti-soc-thermal/ti-bandgap.h:257: * @slope_pcb: sensor gradient slope info for hotspot extrapolation equation
+log.txt:204:drivers/thermal/ti-soc-thermal/ti-bandgap.h:259: * @constant_pcb: sensor gradient const info for hotspot extrapolation equation
+log.txt:205:drivers/thermal/ti-soc-thermal/ti-bandgap.h:275:	const int			slope_pcb;
+log.txt:206:drivers/thermal/ti-soc-thermal/ti-bandgap.h:276:	const int			constant_pcb;
+log.txt:207:drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:85:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_4430,
+log.txt:208:drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:86:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_4430,
+log.txt:209:drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:223:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_4460,
+log.txt:210:drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:224:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_4460,
+log.txt:211:drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:254:		.slope_pcb = OMAP_GRADIENT_SLOPE_W_PCB_4470,
+log.txt:212:drivers/thermal/ti-soc-thermal/omap4-thermal-data.c:255:		.constant_pcb = OMAP_GRADIENT_CONST_W_PCB_4470,
+log.txt:213:drivers/thermal/ti-soc-thermal/omap3-thermal-data.c:94:		.slope_pcb = 0,
+log.txt:214:drivers/thermal/ti-soc-thermal/omap3-thermal-data.c:95:		.constant_pcb = 20000,
+log.txt:215:drivers/thermal/ti-soc-thermal/omap3-thermal-data.c:165:		.slope_pcb = 0,
+log.txt:216:drivers/thermal/ti-soc-thermal/omap3-thermal-data.c:166:		.constant_pcb = 20000,
+log.txt:217:drivers/infiniband/sw/rxe/rxe_net.c:315:	memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+log.txt:218:drivers/infiniband/sw/rxe/rxe_net.c:342:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+log.txt:219:drivers/infiniband/sw/rxe/rxe_net.c:343:	IPCB(skb)->flags &= ~(IPSKB_XFRM_TUNNEL_SIZE | IPSKB_XFRM_TRANSFORMED
+log.txt:220:drivers/ata/pata_icside.c:81:/* ---------------- Version 5 PCB Support Functions --------------------- */
+log.txt:221:drivers/ata/pata_icside.c:108:/* ---------------- Version 6 PCB Support Functions --------------------- */
+log.txt:222:drivers/char/Kconfig:559:	  The telecom clock device is specific to the MPCBL0010 and MPCBL0050
+log.txt:223:drivers/char/tlclk.c:2: * Telecom Clock driver for Intel NetStructure(tm) MPCBL0010
+log.txt:224:drivers/char/tlclk.c:27: * MPCBL0010 ATCA computer.
+log.txt:225:drivers/net/phy/sfp.c:81: * the same length on the PCB, which means it's possible for MOD DEF 0 to
+log.txt:226:drivers/net/ppp/pptp.c:226:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+log.txt:227:drivers/net/ppp/pptp.c:227:	IPCB(skb)->flags &= ~(IPSKB_XFRM_TUNNEL_SIZE | IPSKB_XFRM_TRANSFORMED | IPSKB_REROUTED);
+log.txt:228:drivers/net/ethernet/alteon/acenic.h:76:	u32	PcB;
+log.txt:229:drivers/net/ethernet/broadcom/genet/bcmmii.c:249:		 *		(requires PCB or receiver-side delay)
+log.txt:230:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:92:#define H_QPCB0_ALL             EHEA_BMASK_IBM(0, 5)
+log.txt:231:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:93:#define H_QPCB0_QP_CTL_REG      EHEA_BMASK_IBM(0, 0)
+log.txt:232:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:94:#define H_QPCB0_MAX_SWQE        EHEA_BMASK_IBM(1, 1)
+log.txt:233:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:95:#define H_QPCB0_MAX_RWQE        EHEA_BMASK_IBM(2, 2)
+log.txt:234:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:96:#define H_QPCB0_PORT_NB         EHEA_BMASK_IBM(3, 3)
+log.txt:235:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:97:#define H_QPCB0_QP_AER          EHEA_BMASK_IBM(4, 4)
+log.txt:236:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:98:#define H_QPCB0_QP_TENURE       EHEA_BMASK_IBM(5, 5)
+log.txt:237:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:123:#define H_QPCB1_ALL             EHEA_BMASK_IBM(0, 7)
+log.txt:238:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:124:#define H_QPCB1_QPN             EHEA_BMASK_IBM(0, 0)
+log.txt:239:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:125:#define H_QPCB1_ASYN_EV_EQ_NB   EHEA_BMASK_IBM(1, 1)
+log.txt:240:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:126:#define H_QPCB1_SQ_CQ_HANDLE    EHEA_BMASK_IBM(2, 2)
+log.txt:241:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:127:#define H_QPCB1_RQ_CQ_HANDLE    EHEA_BMASK_IBM(3, 3)
+log.txt:242:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:128:#define H_QPCB1_SGEL_NB_SQ      EHEA_BMASK_IBM(4, 4)
+log.txt:243:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:129:#define H_QPCB1_SGEL_NB_RQ1     EHEA_BMASK_IBM(5, 5)
+log.txt:244:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:130:#define H_QPCB1_SGEL_NB_RQ2     EHEA_BMASK_IBM(6, 6)
+log.txt:245:drivers/net/ethernet/ibm/ehea/ehea_phyp.h:131:#define H_QPCB1_SGEL_NB_RQ3     EHEA_BMASK_IBM(7, 7)
+log.txt:246:drivers/net/ethernet/ibm/ehea/ehea_main.c:2206:				    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF), cb0);
+log.txt:247:drivers/net/ethernet/ibm/ehea/ehea_main.c:2214:				     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG, 1), cb0,
+log.txt:248:drivers/net/ethernet/ibm/ehea/ehea_main.c:2222:				    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF), cb0);
+log.txt:249:drivers/net/ethernet/ibm/ehea/ehea_main.c:2230:				     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG, 1), cb0,
+log.txt:250:drivers/net/ethernet/ibm/ehea/ehea_main.c:2238:				    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF), cb0);
+log.txt:251:drivers/net/ethernet/ibm/ehea/ehea_main.c:2246:				     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG, 1), cb0,
+log.txt:252:drivers/net/ethernet/ibm/ehea/ehea_main.c:2254:				    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF), cb0);
+log.txt:253:drivers/net/ethernet/ibm/ehea/ehea_main.c:2562:					    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF),
+log.txt:254:drivers/net/ethernet/ibm/ehea/ehea_main.c:2573:					     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG,
+log.txt:255:drivers/net/ethernet/ibm/ehea/ehea_main.c:2582:					    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF),
+log.txt:256:drivers/net/ethernet/ibm/ehea/ehea_main.c:2669:					    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF),
+log.txt:257:drivers/net/ethernet/ibm/ehea/ehea_main.c:2680:					     EHEA_BMASK_SET(H_QPCB0_QP_CTL_REG,
+log.txt:258:drivers/net/ethernet/ibm/ehea/ehea_main.c:2689:					    EHEA_BMASK_SET(H_QPCB0_ALL, 0xFFFF),
+log.txt:259:drivers/net/ethernet/i825xx/ether1.h:278: *	+0 pcb issue (0x0c and 0xf3 invalid)
+log.txt:260:drivers/net/ethernet/alacritech/slic.h:73:#define SLIC_ISR_UPCBSY			0x00020000
+log.txt:261:drivers/net/ethernet/alacritech/slic.h:76:#define SLIC_ISR_UPCERR_MASK		(SLIC_ISR_UPCERR | SLIC_ISR_UPCBSY)
+log.txt:262:drivers/net/hippi/rrunner.h:746:	u32	RxSpcBuf;
+log.txt:263:drivers/net/can/usb/peak_usb/pcan_usb_fd.c:52:	u8	hw_version;	/* Hardware version (PCB) */
+log.txt:264:drivers/net/can/usb/kvaser_usb.c:226:	u8 pcb_id[24];
+log.txt:265:drivers/net/vrf.c:432:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+log.txt:266:drivers/net/vrf.c:603:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+log.txt:267:drivers/net/vrf.c:646:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+log.txt:268:drivers/net/vrf.c:1037:	IPCB(skb)->flags |= IPSKB_L3SLAVE;
+log.txt:269:drivers/net/wireless/intel/ipw2x00/ipw2100.c:8529:	u16 pcb_rev;
+log.txt:270:drivers/net/gtp.c:540:		memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+log.txt:271:drivers/crypto/nx/nx-842-pseries.c:212:		dev_err(dev, "%s: cspcbp not valid upon completion.\n",
+log.txt:272:drivers/usb/serial/io_edgeport.h:97:	__u8	BoardRev;			/* PCB revision level (chg only if s/w visible) */
+log.txt:273:drivers/usb/serial/io_usbvend.h:85:#define ION_DEVICE_ID_EDGEPORT_8_DUAL_CPU	0x00E	// Half of an Edgeport/8 (the kind with 2 EP/4s on 1 PCB)
+log.txt:274:drivers/usb/serial/io_usbvend.h:440:	__u8	BoardRev;				// F07 PCB revision level (chg only if s/w visible)
+log.txt:275:drivers/usb/serial/ark3116.c:712: * PCB, the following numbered contacts are present:
+log.txt:276:drivers/tty/serial/mpsc.c:10: * taken from PPCBoot (now U-Boot).  Also based on drivers/serial/8250.c
+log.txt:277:drivers/input/misc/dm355evm_keys.c:139:		 * but PCB buttons don't support that bit.
+log.txt:278:drivers/platform/x86/eeepc-laptop.c:1139:static const struct backlight_ops eeepcbl_ops = {
+log.txt:279:drivers/platform/x86/eeepc-laptop.c:1164:				       &eeepcbl_ops, &props);
+log.txt:280:drivers/fmc/Kconfig:39:	  internal EEPROM of the PCB, using the firmware loader to get
+log.txt:281:drivers/gpu/drm/mga/mga_warp.c:52:	unsigned long pcbase = dev_priv->warp->offset;
+log.txt:282:drivers/gpu/drm/mga/mga_warp.c:119:		DRM_DEBUG(" pcbase = 0x%08lx  vcbase = %p\n", pcbase, vcbase);
+log.txt:283:drivers/gpu/drm/mga/mga_warp.c:120:		dev_priv->warp_pipe_phys[where] = pcbase;
+log.txt:284:drivers/gpu/drm/mga/mga_warp.c:124:		pcbase += dst_size;
+log.txt:285:drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s:85:.b16 #sec_pcbc_e_prep #sec_do_inout
+log.txt:286:drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s:86:.b16 #sec_pcbc_d_prep #sec_do_inout
+log.txt:287:drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s:556:sec_pcbc_e_prep:
+log.txt:288:drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s:565:sec_pcbc_d_prep:
+log.txt:289:drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s.h:414:/* 0x0395: sec_pcbc_e_prep */
+log.txt:290:drivers/gpu/drm/nouveau/nvkm/engine/sec/fuc/g98.fuc0s.h:421:/* 0x03af: sec_pcbc_d_prep */
+log.txt:291:drivers/gpu/drm/i915/intel_pm.c:6879:	unsigned long pctx_addr = I915_READ(VLV_PCBR) & ~4095;
+log.txt:292:drivers/gpu/drm/i915/intel_pm.c:6886:/* Check that the pcbr address is not empty. */
+log.txt:293:drivers/gpu/drm/i915/intel_pm.c:6889:	unsigned long pctx_addr = I915_READ(VLV_PCBR) & ~4095;
+log.txt:294:drivers/gpu/drm/i915/intel_pm.c:6891:	WARN_ON((pctx_addr >> VLV_PCBR_ADDR_SHIFT) == 0);
+log.txt:295:drivers/gpu/drm/i915/intel_pm.c:6898:	u32 pcbr;
+log.txt:296:drivers/gpu/drm/i915/intel_pm.c:6901:	pcbr = I915_READ(VLV_PCBR);
+log.txt:297:drivers/gpu/drm/i915/intel_pm.c:6902:	if ((pcbr >> VLV_PCBR_ADDR_SHIFT) == 0) {
+log.txt:298:drivers/gpu/drm/i915/intel_pm.c:6903:		DRM_DEBUG_DRIVER("BIOS didn't set up PCBR, fixing up\n");
+log.txt:299:drivers/gpu/drm/i915/intel_pm.c:6908:		I915_WRITE(VLV_PCBR, pctx_paddr);
+log.txt:300:drivers/gpu/drm/i915/intel_pm.c:6911:	DRM_DEBUG_DRIVER("PCBR: 0x%08x\n", I915_READ(VLV_PCBR));
+log.txt:301:drivers/gpu/drm/i915/intel_pm.c:6918:	u32 pcbr;
+log.txt:302:drivers/gpu/drm/i915/intel_pm.c:6921:	pcbr = I915_READ(VLV_PCBR);
+log.txt:303:drivers/gpu/drm/i915/intel_pm.c:6922:	if (pcbr) {
+log.txt:304:drivers/gpu/drm/i915/intel_pm.c:6924:		int pcbr_offset;
+log.txt:305:drivers/gpu/drm/i915/intel_pm.c:6926:		pcbr_offset = (pcbr & (~4095)) - dev_priv->mm.stolen_base;
+log.txt:306:drivers/gpu/drm/i915/intel_pm.c:6928:								      pcbr_offset,
+log.txt:307:drivers/gpu/drm/i915/intel_pm.c:6934:	DRM_DEBUG_DRIVER("BIOS didn't set up PCBR, fixing up\n");
+log.txt:308:drivers/gpu/drm/i915/intel_pm.c:6940:	 * register should be programmed such than the PCBR range does not
+log.txt:309:drivers/gpu/drm/i915/intel_pm.c:6951:	I915_WRITE(VLV_PCBR, pctx_paddr);
+log.txt:310:drivers/gpu/drm/i915/intel_pm.c:6954:	DRM_DEBUG_DRIVER("PCBR: 0x%08x\n", I915_READ(VLV_PCBR));
+log.txt:311:drivers/gpu/drm/i915/intel_pm.c:7082:	u32 gtfifodbg, val, rc6_mode = 0, pcbr;
+log.txt:312:drivers/gpu/drm/i915/intel_pm.c:7121:	/* For now we assume BIOS is allocating and populating the PCBR  */
+log.txt:313:drivers/gpu/drm/i915/intel_pm.c:7122:	pcbr = I915_READ(VLV_PCBR);
+log.txt:314:drivers/gpu/drm/i915/intel_pm.c:7126:	    (pcbr >> VLV_PCBR_ADDR_SHIFT))
+log.txt:315:drivers/gpu/drm/i915/i915_reg.h:2569:#define VLV_PCBR	_MMIO(VLV_DISPLAY_BASE + 0x2120)
+log.txt:316:drivers/gpu/drm/i915/i915_reg.h:2570:#define VLV_PCBR_ADDR_SHIFT	12
+log.txt:317:drivers/gpu/drm/i915/intel_hdmi.c:1095:	 * WaEnableHDMI8bpcBefore12bpc:snb,ivb
+log.txt:318:drivers/gpu/drm/i915/i915_drv.c:2209:	s->pcbr			= I915_READ(VLV_PCBR);
+log.txt:319:drivers/gpu/drm/i915/i915_drv.c:2304:	I915_WRITE(VLV_PCBR,			s->pcbr);
+log.txt:320:drivers/gpu/drm/i915/i915_drv.h:1270:	u32 pcbr;
+log.txt:321:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4385:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DIS0_MASK 0x10000000
+log.txt:322:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4386:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DIS0__SHIFT 0x1c
+log.txt:323:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4387:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DIS1_MASK 0x20000000
+log.txt:324:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4388:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DIS1__SHIFT 0x1d
+log.txt:325:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4389:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DRV_STR_MASK 0xc0000000
+log.txt:326:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:4390:#define PB0_STRAP_GLB_REG2__STRAP_B_PCB_DRV_STR__SHIFT 0x1e
+log.txt:327:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6729:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DIS0_MASK 0x10000000
+log.txt:328:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6730:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DIS0__SHIFT 0x1c
+log.txt:329:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6731:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DIS1_MASK 0x20000000
+log.txt:330:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6732:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DIS1__SHIFT 0x1d
+log.txt:331:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6733:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DRV_STR_MASK 0xc0000000
+log.txt:332:drivers/gpu/drm/amd/include/asic_reg/bif/bif_5_0_sh_mask.h:6734:#define PB1_STRAP_GLB_REG2__STRAP_B_PCB_DRV_STR__SHIFT 0x1e
+log.txt:333:drivers/gpu/drm/gma500/mdfld_dsi_dpi.c:143:		u32 dspbase_reg = pipe ? MDFLD_DSPCBASE : MRST_DSPABASE;
+log.txt:334:drivers/gpu/drm/gma500/mdfld_device.c:510:		.addr = MDFLD_DSPCBASE,
+log.txt:335:drivers/gpu/drm/gma500/psb_intel_reg.h:674:#define DSPCBASE		0x72184
+log.txt:336:drivers/gpu/drm/gma500/psb_intel_reg.h:863:#define MDFLD_DSPCBASE		0x7219c
+log.txt:337:drivers/dma/ste_dma40.c:616:	return chan->base->virtbase + D40_DREG_PCBASE +
+log.txt:338:drivers/dma/ste_dma40.c:2949:		addr = base->virtbase + D40_DREG_PCBASE + i * D40_DREG_PCDELTA;
+log.txt:339:drivers/dma/ste_dma40_ll.h:10:#define D40_DREG_PCBASE		0x400
+log.txt:340:drivers/s390/cio/chsc_sch.c:511:	memcpy(&cd->cpcb, &scpcd_area->response, scpcd_area->response.length);
+log.txt:341:drivers/s390/net/qeth_l2_main.c:1789:	QETH_CARD_TEXT(card, 2, "brqsupcb");
+log.txt:342:drivers/s390/net/qeth_core_main.c:2202:	QETH_DBF_TEXT(SETUP, 2, "cmsetpcb");
+log.txt:343:drivers/s390/net/qeth_core_main.c:2380:	QETH_DBF_TEXT(SETUP, 2, "ulpstpcb");
+log.txt:344:drivers/s390/net/qeth_core_main.c:2989:	QETH_CARD_TEXT(card, 4, "defadpcb");
+log.txt:345:drivers/s390/net/qeth_core_main.c:3003:	QETH_CARD_TEXT(card, 3, "quyadpcb");
+log.txt:346:drivers/s390/net/qeth_core_main.c:4171:	QETH_CARD_TEXT(card, 4, "prmadpcb");
+log.txt:347:drivers/s390/net/qeth_core_main.c:5448:	QETH_CARD_TEXT(card, 4, "defadpcb");
+log.txt:348:drivers/s390/net/qeth_l3_main.c:2068:		QETH_CARD_TEXT(card, 4, "arpcberr");
+log.txt:349:drivers/s390/crypto/pkey_api.c:122:	struct CPRBX *preqcblk, *prepcblk;
+log.txt:350:drivers/s390/crypto/pkey_api.c:134:	prepcblk = (struct CPRBX *) (cprbmem + cprbplusparamblen);
+log.txt:351:drivers/s390/crypto/pkey_api.c:145:			((u8 *) prepcblk) + sizeof(struct CPRBX);
+log.txt:352:drivers/s390/crypto/pkey_api.c:150:	*prepCPRB = prepcblk;
+log.txt:353:drivers/s390/crypto/pkey_api.c:174:			     struct CPRBX *prepcblk)
+log.txt:354:drivers/s390/crypto/pkey_api.c:183:	pxcrb->reply_control_blk_addr = (void __user *) prepcblk;
+log.txt:355:drivers/s390/crypto/pkey_api.c:213:	struct CPRBX *preqcblk, *prepcblk;
+log.txt:356:drivers/s390/crypto/pkey_api.c:250:	rc = alloc_and_prep_cprbmem(PARMBSIZE, &mem, &preqcblk, &prepcblk);
+log.txt:357:drivers/s390/crypto/pkey_api.c:292:	prep_xcrb(&xcrb, cardnr, preqcblk, prepcblk);
+log.txt:358:drivers/s390/crypto/pkey_api.c:304:	if (prepcblk->ccp_rtcode != 0) {
+log.txt:359:drivers/s390/crypto/pkey_api.c:307:			(int) prepcblk->ccp_rtcode,
+log.txt:360:drivers/s390/crypto/pkey_api.c:308:			(int) prepcblk->ccp_rscode);
+log.txt:361:drivers/s390/crypto/pkey_api.c:314:	prepcblk->rpl_parmb = ((u8 *) prepcblk) + sizeof(struct CPRBX);
+log.txt:362:drivers/s390/crypto/pkey_api.c:315:	prepparm = (struct kgrepparm *) prepcblk->rpl_parmb;
+log.txt:363:drivers/s390/crypto/pkey_api.c:354:	struct CPRBX *preqcblk, *prepcblk;
+log.txt:364:drivers/s390/crypto/pkey_api.c:390:	rc = alloc_and_prep_cprbmem(PARMBSIZE, &mem, &preqcblk, &prepcblk);
+log.txt:365:drivers/s390/crypto/pkey_api.c:429:	prep_xcrb(&xcrb, cardnr, preqcblk, prepcblk);
+log.txt:366:drivers/s390/crypto/pkey_api.c:441:	if (prepcblk->ccp_rtcode != 0) {
+log.txt:367:drivers/s390/crypto/pkey_api.c:444:			(int) prepcblk->ccp_rtcode,
+log.txt:368:drivers/s390/crypto/pkey_api.c:445:			(int) prepcblk->ccp_rscode);
+log.txt:369:drivers/s390/crypto/pkey_api.c:451:	prepcblk->rpl_parmb = ((u8 *) prepcblk) + sizeof(struct CPRBX);
+log.txt:370:drivers/s390/crypto/pkey_api.c:452:	prepparm = (struct cmrepparm *) prepcblk->rpl_parmb;
+log.txt:371:drivers/s390/crypto/pkey_api.c:491:	struct CPRBX *preqcblk, *prepcblk;
+log.txt:372:drivers/s390/crypto/pkey_api.c:533:	rc = alloc_and_prep_cprbmem(PARMBSIZE, &mem, &preqcblk, &prepcblk);
+log.txt:373:drivers/s390/crypto/pkey_api.c:555:	prep_xcrb(&xcrb, cardnr, preqcblk, prepcblk);
+log.txt:374:drivers/s390/crypto/pkey_api.c:567:	if (prepcblk->ccp_rtcode != 0) {
+log.txt:375:drivers/s390/crypto/pkey_api.c:570:			(int) prepcblk->ccp_rtcode,
+log.txt:376:drivers/s390/crypto/pkey_api.c:571:			(int) prepcblk->ccp_rscode);
+log.txt:377:drivers/s390/crypto/pkey_api.c:575:	if (prepcblk->ccp_rscode != 0) {
+log.txt:378:drivers/s390/crypto/pkey_api.c:578:			(int) prepcblk->ccp_rtcode,
+log.txt:379:drivers/s390/crypto/pkey_api.c:579:			(int) prepcblk->ccp_rscode);
+log.txt:380:drivers/s390/crypto/pkey_api.c:583:	prepcblk->rpl_parmb = ((u8 *) prepcblk) + sizeof(struct CPRBX);
+log.txt:381:drivers/s390/crypto/pkey_api.c:584:	prepparm = (struct uskrepparm *) prepcblk->rpl_parmb;
+log.txt:382:drivers/s390/crypto/pkey_api.c:678:	struct CPRBX *preqcblk, *prepcblk;
+log.txt:383:drivers/s390/crypto/pkey_api.c:697:	rc = alloc_and_prep_cprbmem(parmbsize, &mem, &preqcblk, &prepcblk);
+log.txt:384:drivers/s390/crypto/pkey_api.c:715:	prep_xcrb(&xcrb, cardnr, preqcblk, prepcblk);
+log.txt:385:drivers/s390/crypto/pkey_api.c:727:	if (prepcblk->ccp_rtcode != 0) {
+log.txt:386:drivers/s390/crypto/pkey_api.c:730:			(int) prepcblk->ccp_rtcode,
+log.txt:387:drivers/s390/crypto/pkey_api.c:731:			(int) prepcblk->ccp_rscode);
+log.txt:388:drivers/s390/crypto/pkey_api.c:737:	prepcblk->rpl_parmb = ((u8 *) prepcblk) + sizeof(struct CPRBX);
+log.txt:389:drivers/s390/crypto/pkey_api.c:738:	prepparm = (struct fqrepparm *) prepcblk->rpl_parmb;
+log.txt:390:drivers/scsi/lpfc/lpfc_init.c:7138:	phba->pcb = (phba->slim2p.virt + offsetof(struct lpfc_sli2_slim, pcb));
+log.txt:391:drivers/scsi/lpfc/lpfc_hw.h:3236:	uint32_t cHpcb     :  1;
+log.txt:392:drivers/scsi/lpfc/lpfc_hw.h:3239:	uint32_t pcbLen    : 24;       /* bit 23:0  of memory based port
+log.txt:393:drivers/scsi/lpfc/lpfc_hw.h:3242:	uint32_t pcbLen    : 24;       /* bit 23:0  of memory based port
+log.txt:394:drivers/scsi/lpfc/lpfc_hw.h:3246:	uint32_t cHpcb     :  1;
+log.txt:395:drivers/scsi/lpfc/lpfc_hw.h:3251:	uint32_t pcbLow;       /* bit 31:0  of memory based port config block */
+log.txt:396:drivers/scsi/lpfc/lpfc_hw.h:3252:	uint32_t pcbHigh;      /* bit 63:32 of memory based port config block */
+log.txt:397:drivers/scsi/lpfc/lpfc_hw.h:3402:typedef struct _PCB {
+log.txt:398:drivers/scsi/lpfc/lpfc_hw.h:3429:} PCB_t;
+log.txt:399:drivers/scsi/lpfc/lpfc_hw.h:4205: * 256 (MAILBOX_t) + 140 (PCB_t) + ( 32 (IOCB_t) * 498 ) = < 16384
+log.txt:400:drivers/scsi/lpfc/lpfc_hw.h:4212:			    (sizeof(MAILBOX_t) + sizeof(PCB_t) + \
+log.txt:401:drivers/scsi/lpfc/lpfc_hw.h:4222:	PCB_t pcb;
+log.txt:402:drivers/scsi/lpfc/lpfc.h:714:	struct _PCB *pcb;
+log.txt:403:drivers/scsi/lpfc/lpfc_mbox.c:944: * lpfc_config_pcb_setup - Set up IOCB rings in the Port Control Block (PCB)
+log.txt:404:drivers/scsi/lpfc/lpfc_mbox.c:948: * Block (PCB).
+log.txt:405:drivers/scsi/lpfc/lpfc_mbox.c:951:lpfc_config_pcb_setup(struct lpfc_hba * phba)
+log.txt:406:drivers/scsi/lpfc/lpfc_mbox.c:955:	PCB_t *pcbp = phba->pcb;
+log.txt:407:drivers/scsi/lpfc/lpfc_mbox.c:961:	pcbp->maxRing = (psli->num_rings - 1);
+log.txt:408:drivers/scsi/lpfc/lpfc_mbox.c:976:			pcbp->rdsc[i].cmdEntries = 0;
+log.txt:409:drivers/scsi/lpfc/lpfc_mbox.c:977:			pcbp->rdsc[i].rspEntries = 0;
+log.txt:410:drivers/scsi/lpfc/lpfc_mbox.c:978:			pcbp->rdsc[i].cmdAddrHigh = 0;
+log.txt:411:drivers/scsi/lpfc/lpfc_mbox.c:979:			pcbp->rdsc[i].rspAddrHigh = 0;
+log.txt:412:drivers/scsi/lpfc/lpfc_mbox.c:980:			pcbp->rdsc[i].cmdAddrLow = 0;
+log.txt:413:drivers/scsi/lpfc/lpfc_mbox.c:981:			pcbp->rdsc[i].rspAddrLow = 0;
+log.txt:414:drivers/scsi/lpfc/lpfc_mbox.c:988:		pcbp->rdsc[i].cmdEntries = pring->sli.sli3.numCiocb;
+log.txt:415:drivers/scsi/lpfc/lpfc_mbox.c:993:		pcbp->rdsc[i].cmdAddrHigh = putPaddrHigh(pdma_addr);
+log.txt:416:drivers/scsi/lpfc/lpfc_mbox.c:994:		pcbp->rdsc[i].cmdAddrLow = putPaddrLow(pdma_addr);
+log.txt:417:drivers/scsi/lpfc/lpfc_mbox.c:1000:		pcbp->rdsc[i].rspEntries = pring->sli.sli3.numRiocb;
+log.txt:418:drivers/scsi/lpfc/lpfc_mbox.c:1004:		pcbp->rdsc[i].rspAddrHigh = putPaddrHigh(pdma_addr);
+log.txt:419:drivers/scsi/lpfc/lpfc_mbox.c:1005:		pcbp->rdsc[i].rspAddrLow = putPaddrLow(pdma_addr);
+log.txt:420:drivers/scsi/lpfc/lpfc_mbox.c:1205: * specified in the Port Control Block (PCB). It is an error to issue the
+log.txt:421:drivers/scsi/lpfc/lpfc_mbox.c:1258: * Block (PCB) in the driver memory. After this command is issued, the
+log.txt:422:drivers/scsi/lpfc/lpfc_mbox.c:1260: * the HBA. The HBA may copy the PCB information to internal storage for
+log.txt:423:drivers/scsi/lpfc/lpfc_mbox.c:1261: * subsequent use; the driver can not change the PCB information unless it
+log.txt:424:drivers/scsi/lpfc/lpfc_mbox.c:1282:	mb->un.varCfgPort.pcbLen = sizeof(PCB_t);
+log.txt:425:drivers/scsi/lpfc/lpfc_mbox.c:1284:	offset = (uint8_t *)phba->pcb - (uint8_t *)phba->slim2p.virt;
+log.txt:426:drivers/scsi/lpfc/lpfc_mbox.c:1286:	mb->un.varCfgPort.pcbLow = putPaddrLow(pdma_addr);
+log.txt:427:drivers/scsi/lpfc/lpfc_mbox.c:1287:	mb->un.varCfgPort.pcbHigh = putPaddrHigh(pdma_addr);
+log.txt:428:drivers/scsi/lpfc/lpfc_mbox.c:1316:	/* Now setup pcb */
+log.txt:429:drivers/scsi/lpfc/lpfc_mbox.c:1317:	phba->pcb->type = TYPE_NATIVE_SLI2;
+log.txt:430:drivers/scsi/lpfc/lpfc_mbox.c:1318:	phba->pcb->feature = FEATURE_INITIAL_SLI2;
+log.txt:431:drivers/scsi/lpfc/lpfc_mbox.c:1321:	phba->pcb->mailBoxSize = sizeof(MAILBOX_t) + MAILBOX_EXT_SIZE;
+log.txt:432:drivers/scsi/lpfc/lpfc_mbox.c:1324:	phba->pcb->mbAddrHigh = putPaddrHigh(pdma_addr);
+log.txt:433:drivers/scsi/lpfc/lpfc_mbox.c:1325:	phba->pcb->mbAddrLow = putPaddrLow(pdma_addr);
+log.txt:434:drivers/scsi/lpfc/lpfc_mbox.c:1383:		phba->pcb->hgpAddrHigh = putPaddrHigh(pdma_addr);
+log.txt:435:drivers/scsi/lpfc/lpfc_mbox.c:1384:		phba->pcb->hgpAddrLow = putPaddrLow(pdma_addr);
+log.txt:436:drivers/scsi/lpfc/lpfc_mbox.c:1398:		phba->pcb->hgpAddrLow = (bar_low & PCI_BASE_ADDRESS_MEM_MASK) +
+log.txt:437:drivers/scsi/lpfc/lpfc_mbox.c:1402:			phba->pcb->hgpAddrHigh = bar_high;
+log.txt:438:drivers/scsi/lpfc/lpfc_mbox.c:1404:			phba->pcb->hgpAddrHigh = 0;
+log.txt:439:drivers/scsi/lpfc/lpfc_mbox.c:1421:	phba->pcb->pgpAddrHigh = putPaddrHigh(pdma_addr);
+log.txt:440:drivers/scsi/lpfc/lpfc_mbox.c:1422:	phba->pcb->pgpAddrLow = putPaddrLow(pdma_addr);
+log.txt:441:drivers/scsi/lpfc/lpfc_mbox.c:1424:	/* Use callback routine to setp rings in the pcb */
+log.txt:442:drivers/scsi/lpfc/lpfc_mbox.c:1425:	lpfc_config_pcb_setup(phba);
+log.txt:443:drivers/scsi/lpfc/lpfc_mbox.c:1436:	/* Swap PCB if needed */
+log.txt:444:drivers/scsi/lpfc/lpfc_mbox.c:1437:	lpfc_sli_pcimem_bcopy(phba->pcb, phba->pcb, sizeof(PCB_t));
+log.txt:445:drivers/scsi/lpfc/lpfc_debugfs.c:454: * Mailbox, PCB, Rings, and Registers that are located in host memory.
+log.txt:446:drivers/scsi/lpfc/lpfc_debugfs.c:487:	len +=  snprintf(buf+len, size-len, "SLIM PCB\n");
+log.txt:447:drivers/scsi/lpfc/lpfc_debugfs.c:488:	ptr = (uint32_t *)phba->pcb;
+log.txt:448:drivers/scsi/lpfc/lpfc_debugfs.c:489:	i = sizeof(PCB_t);
+log.txt:449:drivers/scsi/csiostor/t4fw_api_stor.h:444:		struct fw_fcoe_pcb_stats {
+log.txt:450:drivers/scsi/csiostor/t4fw_api_stor.h:460:		} pcb_stats;
+log.txt:451:drivers/scsi/qla2xxx/qla_attr.c:1797:	 * final cleanup of firmware resources (PCBs and XCBs).
+log.txt:452:drivers/scsi/qla2xxx/qla_mbx.c:2313:		case LSC_SCODE_NOPCB:
+log.txt:453:drivers/scsi/qla2xxx/qla_init.c:5354:			/* device not in PCB table */
+log.txt:454:drivers/scsi/qla2xxx/qla_fw.h:878:#define LSC_SCODE_NOPCB		0x0A
+log.txt:455:drivers/scsi/aacraid/aacraid.h:1406:	u8	mfg_pcba_serial_no[12];
+log.txt:456:drivers/scsi/aacraid/linit.c:1345:	  !memcmp(&dev->supplement_adapter_info.mfg_pcba_serial_no[
+log.txt:457:drivers/scsi/aacraid/linit.c:1346:	    sizeof(dev->supplement_adapter_info.mfg_pcba_serial_no)-len],
+log.txt:458:drivers/scsi/aacraid/linit.c:1349:		  (int)sizeof(dev->supplement_adapter_info.mfg_pcba_serial_no),
+log.txt:459:drivers/scsi/aacraid/linit.c:1350:		  dev->supplement_adapter_info.mfg_pcba_serial_no);
+log.txt:460:drivers/scsi/aic94xx/aic94xx_hwi.h:41:#define ASD_PCBA_SN_SIZE   12
+log.txt:461:drivers/scsi/aic94xx/aic94xx_hwi.h:109:	char   pcba_sn[ASD_PCBA_SN_SIZE+1];
+log.txt:462:drivers/scsi/aic94xx/aic94xx_init.c:294:static ssize_t asd_show_dev_pcba_sn(struct device *dev,
+log.txt:463:drivers/scsi/aic94xx/aic94xx_init.c:298:	return snprintf(buf, PAGE_SIZE, "%s\n", asd_ha->hw_prof.pcba_sn);
+log.txt:464:drivers/scsi/aic94xx/aic94xx_init.c:300:static DEVICE_ATTR(pcba_sn, S_IRUGO, asd_show_dev_pcba_sn, NULL);
+log.txt:465:drivers/scsi/aic94xx/aic94xx_init.c:489:	err = device_create_file(&asd_ha->pcidev->dev, &dev_attr_pcba_sn);
+log.txt:466:drivers/scsi/aic94xx/aic94xx_init.c:499:	device_remove_file(&asd_ha->pcidev->dev, &dev_attr_pcba_sn);
+log.txt:467:drivers/scsi/aic94xx/aic94xx_init.c:511:	device_remove_file(&asd_ha->pcidev->dev, &dev_attr_pcba_sn);
+log.txt:468:drivers/scsi/aic94xx/aic94xx_init.c:799:	asd_printk("device %s: SAS addr %llx, PCBA SN %s, %d phys, %d enabled "
+log.txt:469:drivers/scsi/aic94xx/aic94xx_init.c:802:		   asd_ha->hw_prof.pcba_sn, asd_ha->hw_prof.max_phys,
+log.txt:470:drivers/scsi/aic94xx/aic94xx_sds.c:425:	u8    pcba_sn[ASD_PCBA_SN_SIZE];
+log.txt:471:drivers/scsi/aic94xx/aic94xx_sds.c:713:static int asd_ms_get_pcba_sn(struct asd_ha_struct *asd_ha,
+log.txt:472:drivers/scsi/aic94xx/aic94xx_sds.c:716:	memcpy(asd_ha->hw_prof.pcba_sn, ms->pcba_sn, ASD_PCBA_SN_SIZE);
+log.txt:473:drivers/scsi/aic94xx/aic94xx_sds.c:717:	asd_ha->hw_prof.pcba_sn[ASD_PCBA_SN_SIZE] = '\0';
+log.txt:474:drivers/scsi/aic94xx/aic94xx_sds.c:912:	err = asd_ms_get_pcba_sn(asd_ha, manuf_sec);
+log.txt:475:drivers/scsi/aic94xx/aic94xx_sds.c:914:		ASD_DPRINTK("couldn't read the PCBA SN\n");
+log.txt:476:drivers/scsi/aic94xx/aic94xx_sds.c:917:	ASD_DPRINTK("manuf sect PCBA SN %s\n", asd_ha->hw_prof.pcba_sn);
+log.txt:477:drivers/staging/wlan-ng/hfa384x.h:297:#define HFA384x_PDR_PCB_PARTNUM		((u16)0x0001)
+log.txt:478:drivers/staging/wlan-ng/hfa384x.h:919:struct hfa384x_pdr_pcb_partnum {
+log.txt:479:drivers/staging/wlan-ng/hfa384x.h:923:struct hfa384x_pdr_pcb_tracenum {
+log.txt:480:drivers/staging/wlan-ng/hfa384x.h:1084:		struct hfa384x_pdr_pcb_partnum pcb_partnum;
+log.txt:481:drivers/staging/wlan-ng/hfa384x.h:1085:		struct hfa384x_pdr_pcb_tracenum pcb_tracenum;
+log.txt:482:drivers/staging/wlan-ng/hfa384x_usb.c:3986:	case HFA384x_PDR_PCB_PARTNUM:
+log.txt:483:drivers/staging/irda/drivers/via-ircc.c:36:  Tested with home-grown PCB on EPIA boards.
+log.txt:484:drivers/ide/icside.c:83:/* ---------------- Version 5 PCB Support Functions --------------------- */
+log.txt:485:drivers/ide/icside.c:110:/* ---------------- Version 6 PCB Support Functions --------------------- */
+fs/lockd/svc.c:400:	.svo_shutdown		= svc_rpcb_cleanup,
+fs/nfs/super.c:540:			proto = RPCBIND_NETID_UDP;
+fs/nfs/super.c:543:			proto = RPCBIND_NETID_TCP;
+fs/nfs/super.c:550:			proto = RPCBIND_NETID_UDP6;
+fs/nfs/super.c:553:			proto = RPCBIND_NETID_TCP6;
+fs/nfs/callback.c:221:	svc_rpcb_cleanup(serv, net);
+fs/nfs/nfs4xdr.c:146:				1 + XDR_QUADLEN(RPCBIND_MAXNETIDLEN) + \
+fs/nfs/nfs4xdr.c:147:				1 + XDR_QUADLEN(RPCBIND_MAXUADDRLEN) + \
+fs/nfs/nfs4xdr.c:153:				1 + XDR_QUADLEN(RPCBIND_MAXNETIDLEN) + \
+fs/nfs/nfs4xdr.c:154:				1 + XDR_QUADLEN(RPCBIND_MAXUADDRLEN))
+fs/nfs/flexfilelayout/flexfilelayout.c:2145:	char portbuf[RPCBIND_MAXUADDRPLEN];
+fs/nfs/flexfilelayout/flexfilelayout.c:2146:	char addrbuf[RPCBIND_MAXUADDRLEN];
+fs/nfsd/nfssvc.c:405:	 * other initialization has been done except the rpcb information.
+fs/nfsd/nfssvc.c:407:	svc_rpcb_cleanup(serv, net);
+fs/nfsd/nfs4proc.c:2553:	.vs_rpcb_optnl		= true,
+sound/core/seq/seq_dummy.c:123:	struct snd_seq_port_callback pcb;
+sound/core/seq/seq_dummy.c:146:	memset(&pcb, 0, sizeof(pcb));
+sound/core/seq/seq_dummy.c:147:	pcb.owner = THIS_MODULE;
+sound/core/seq/seq_dummy.c:148:	pcb.event_input = dummy_input;
+sound/core/seq/seq_dummy.c:149:	pcb.private_free = dummy_free;
+sound/core/seq/seq_dummy.c:150:	pcb.private_data = rec;
+sound/core/seq/seq_dummy.c:151:	pinfo.kernel = &pcb;
+sound/core/seq/seq_ports.c:659:			      struct snd_seq_port_callback *pcbp,
+sound/core/seq/seq_ports.c:674:	portinfo.kernel = pcbp;
+sound/oss/swarm_cs4297a.c:205:#define AC97_PCBEEP_VOL          0x000a      /* none			*/
+sound/oss/swarm_cs4297a.c:1400:		cs4297a_write_ac97(s, AC97_PCBEEP_VOL, temp1);
+sound/pci/azt3328.c:580:		{ /* AC97_PC_BEEP */ IDX_MIXER_PCBEEP },
+sound/pci/azt3328.c:1131:	AZF3328_MIXER_SWITCH("Beep Playback Switch", IDX_MIXER_PCBEEP, 15, 1),
+sound/pci/azt3328.c:1132:	AZF3328_MIXER_VOL_SPECIAL("Beep Playback Volume", IDX_MIXER_PCBEEP, 0x0f, 1, 1),
+sound/pci/azt3328.c:1173:	{ IDX_MIXER_PCBEEP,		MIXER_MUTE_MASK|0x1f1f },
+sound/pci/oxygen/cm9780.h:43:#define CM9780_PCBSW		0x8000
+sound/pci/oxygen/oxygen_lib.c:529:				     CM9780_MIX2FR | CM9780_PCBSW);
+sound/pci/azt3328.h:301:#define IDX_MIXER_PCBEEP        0x08
+sound/pci/hda/hda_beep.c:163:	input_dev->name = "HDA Digital PCBeep";
+sound/pci/hda/patch_realtek.c:77:	unsigned int  enable_pcbeep:1;
+sound/pci/hda/patch_realtek.c:508:	spec->cdefine.enable_pcbeep = 1; /* assume always enabled */
+sound/pci/hda/patch_realtek.c:544:	spec->cdefine.enable_pcbeep = (ass & 0x100000) >> 20;
+sound/pci/hda/patch_realtek.c:558:	codec_dbg(codec, "SKU: enable_pcbeep=0x%x\n", spec->cdefine.enable_pcbeep);
+sound/pci/hda/patch_realtek.c:615:	 * 20		: PCBEEP input
+sound/pci/hda/patch_realtek.c:987:	return spec->cdefine.enable_pcbeep;
+sound/pci/hda/patch_realtek.c:2613:/* set PCBEEP vol = 0, mute connections */
+sound/pci/hda/patch_realtek.c:6814:		alc_update_coef_idx(codec, 0x36, 1 << 13, 1 << 5); /* Switch pcbeep path to Line in path*/
+sound/isa/sb/sb16.c:175:	/* Sound Blaster 16 'value' PnP. It says model ct4130 on the pcb, */
+sound/soc/atmel/tse850-pcm5142.c:39: * IN1, IN2, OUT1 and OUT2 are TSE-850 connectors and DAC is the PCB name
+sound/soc/codecs/wm9705.c:80:	SOC_SINGLE("PCBeep Playback Volume", AC97_PC_BEEP, 1, 15, 1),
+sound/soc/codecs/wm9705.c:103:	SOC_DAPM_SINGLE("PCBeep Playback Switch", AC97_PC_BEEP, 15, 1, 1),
+sound/soc/codecs/wm9705.c:145:	SND_SOC_DAPM_PGA("PCBEEP PGA", SND_SOC_NOPM, 0, 0, NULL, 0),
+sound/soc/codecs/wm9705.c:158:	SND_SOC_DAPM_INPUT("PCBEEP"),
+sound/soc/codecs/wm9705.c:171:	{"HP Mixer", "PCBeep Playback Switch", "PCBEEP PGA"},
+sound/soc/codecs/wm9705.c:201:	{"PCBEEP PGA", NULL, "PCBEEP"},
+sound/soc/codecs/wm9713.c:483:SND_SOC_DAPM_INPUT("PCBEEP"),
+sound/soc/codecs/wm9713.c:492:	{"Left HP Mixer", "Beep Playback Switch",    "PCBEEP"},
+sound/soc/codecs/wm9713.c:501:	{"Right HP Mixer", "Beep Playback Switch",    "PCBEEP"},
+sound/soc/codecs/wm9713.c:520:	{"Speaker Mixer", "Beep Playback Switch",    "PCBEEP"},
+sound/soc/codecs/wm9713.c:528:	{"Mono Mixer", "Beep Playback Switch",    "PCBEEP"},
+sound/soc/codecs/wm9713.c:685:	{ 0x16, 0xaaa0 },	/* PCBEEP Volume */
+sound/soc/codecs/wm9712.c:166:SOC_SINGLE("PCBeep Bypass Headphone Volume", AC97_PC_BEEP, 12, 7, 1),
+sound/soc/codecs/wm9712.c:167:SOC_SINGLE("PCBeep Bypass Speaker Volume", AC97_PC_BEEP, 8, 7, 1),
+sound/soc/codecs/wm9712.c:168:SOC_SINGLE("PCBeep Bypass Phone Volume", AC97_PC_BEEP, 4, 7, 1),
+sound/soc/codecs/wm9712.c:288:	WM9712_HP_MIXER_CTRL("PCBeep Bypass Switch", HPL_MIXER, 5),
+sound/soc/codecs/wm9712.c:298:	WM9712_HP_MIXER_CTRL("PCBeep Bypass Switch", HPR_MIXER, 5),
+sound/soc/codecs/wm9712.c:308:	SOC_DAPM_SINGLE("PCBeep Bypass Switch", AC97_PC_BEEP, 11, 1, 1),
+sound/soc/codecs/wm9712.c:317:	SOC_DAPM_SINGLE("PCBeep Bypass Switch", AC97_PC_BEEP, 7, 1, 1),
+sound/soc/codecs/wm9712.c:409:SND_SOC_DAPM_INPUT("PCBEEP"),
+sound/soc/codecs/wm9712.c:420:	{"Left HP Mixer", "PCBeep Bypass Switch", "PCBEEP"},
+sound/soc/codecs/wm9712.c:429:	{"Right HP Mixer", "PCBeep Bypass Switch", "PCBEEP"},
+sound/soc/codecs/wm9712.c:438:	{"Speaker Mixer", "PCBeep Bypass Switch", "PCBEEP"},
+sound/soc/codecs/wm9712.c:445:	{"Phone Mixer", "PCBeep Bypass Switch",  "PCBEEP"},
+sound/soc/pxa/mioa701_wm9713.c:26: *    |        +--->----->---+PCBEEP         SPKR+--->----+-+  |
+sound/soc/pxa/mioa701_wm9713.c:114:	{"PCBEEP", NULL, "GSM Line Out"},
+net/rxrpc/Kconfig:52:	select CRYPTO_PCBC
+net/rxrpc/key.c:848:	ci = crypto_alloc_skcipher("pcbc(des)", 0, CRYPTO_ALG_ASYNC);
+net/rxrpc/rxkad.c:66:	ci = crypto_alloc_skcipher("pcbc(fcrypt)", 0, CRYPTO_ALG_ASYNC);
+net/rxrpc/rxkad.c:1214:	rxkad_ci = crypto_alloc_skcipher("pcbc(fcrypt)", 0, CRYPTO_ALG_ASYNC);
+net/netfilter/ipvs/ip_vs_xmit.c:1059:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+net/netfilter/ipvs/ip_vs_xmit.c:1145:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+net/nfc/digital_technology.c:83:#define DIGITAL_ISO_DEP_I_PCB	 0x02
+net/nfc/digital_technology.c:86:#define DIGITAL_ISO_DEP_PCB_TYPE(pcb) ((pcb) & 0xC0)
+net/nfc/digital_technology.c:90:#define DIGITAL_ISO_DEP_BLOCK_HAS_DID(pcb) ((pcb) & 0x08)
+net/nfc/digital_technology.c:179:	u8 pcb;
+net/nfc/digital_technology.c:185:	pcb = *skb->data;
+net/nfc/digital_technology.c:186:	block_type = DIGITAL_ISO_DEP_PCB_TYPE(pcb);
+net/nfc/digital_technology.c:194:	if (DIGITAL_ISO_DEP_BLOCK_HAS_DID(pcb)) {
+net/nfc/digital_technology.c:195:		pr_err("DID field in ISO_DEP PCB not supported\n");
+net/nfc/digital_technology.c:208:	 * Chaining not supported so skb->len + 1 PCB byte + 2 CRC bytes must
+net/nfc/digital_technology.c:216:	*skb->data = DIGITAL_ISO_DEP_I_PCB | ddev->curr_nfc_dep_pni;
+net/sunrpc/stats.c:95:			statp->rpcbadfmt+statp->rpcbadauth+statp->rpcbadclnt,
+net/sunrpc/stats.c:96:			statp->rpcbadfmt,
+net/sunrpc/stats.c:97:			statp->rpcbadauth,
+net/sunrpc/stats.c:98:			statp->rpcbadclnt);
+net/sunrpc/Makefile:13:	    addr.o rpcb_clnt.o timer.o xdr.o \
+net/sunrpc/svcsock.c:1543:	 * be shunted to a PF_INET listener via rpcbind.
+net/sunrpc/xprtrdma/transport.c:163:	xprt->address_strings[RPC_DISPLAY_NETID] = RPCBIND_NETID_RDMA;
+net/sunrpc/xprtrdma/transport.c:175:	xprt->address_strings[RPC_DISPLAY_NETID] = RPCBIND_NETID_RDMA6;
+net/sunrpc/xprtrdma/transport.c:821:	.rpcbind		= rpcb_getport_async,	/* sunrpc/rpcb_clnt.c */
+net/sunrpc/rpcb_clnt.c:2: * In-kernel rpcbind client supporting versions 2, 3, and 4 of the rpcbind
+net/sunrpc/rpcb_clnt.c:39:#define RPCBIND_SOCK_PATHNAME	"/var/run/rpcbind.sock"
+net/sunrpc/rpcb_clnt.c:41:#define RPCBIND_PROGRAM		(100000u)
+net/sunrpc/rpcb_clnt.c:42:#define RPCBIND_PORT		(111u)
+net/sunrpc/rpcb_clnt.c:44:#define RPCBVERS_2		(2u)
+net/sunrpc/rpcb_clnt.c:45:#define RPCBVERS_3		(3u)
+net/sunrpc/rpcb_clnt.c:46:#define RPCBVERS_4		(4u)
+net/sunrpc/rpcb_clnt.c:49:	RPCBPROC_NULL,
+net/sunrpc/rpcb_clnt.c:50:	RPCBPROC_SET,
+net/sunrpc/rpcb_clnt.c:51:	RPCBPROC_UNSET,
+net/sunrpc/rpcb_clnt.c:52:	RPCBPROC_GETPORT,
+net/sunrpc/rpcb_clnt.c:53:	RPCBPROC_GETADDR = 3,		/* alias for GETPORT */
+net/sunrpc/rpcb_clnt.c:54:	RPCBPROC_DUMP,
+net/sunrpc/rpcb_clnt.c:55:	RPCBPROC_CALLIT,
+net/sunrpc/rpcb_clnt.c:56:	RPCBPROC_BCAST = 5,		/* alias for CALLIT */
+net/sunrpc/rpcb_clnt.c:57:	RPCBPROC_GETTIME,
+net/sunrpc/rpcb_clnt.c:58:	RPCBPROC_UADDR2TADDR,
+net/sunrpc/rpcb_clnt.c:59:	RPCBPROC_TADDR2UADDR,
+net/sunrpc/rpcb_clnt.c:60:	RPCBPROC_GETVERSADDR,
+net/sunrpc/rpcb_clnt.c:61:	RPCBPROC_INDIRECT,
+net/sunrpc/rpcb_clnt.c:62:	RPCBPROC_GETADDRLIST,
+net/sunrpc/rpcb_clnt.c:63:	RPCBPROC_GETSTAT,
+net/sunrpc/rpcb_clnt.c:69: * The "owner" is allowed to unset a service in the rpcbind database.
+net/sunrpc/rpcb_clnt.c:71: * For AF_LOCAL SET/UNSET requests, rpcbind treats this string as a
+net/sunrpc/rpcb_clnt.c:79:#define RPCB_OWNER_STRING	"0"
+net/sunrpc/rpcb_clnt.c:80:#define RPCB_MAXOWNERLEN	sizeof(RPCB_OWNER_STRING)
+net/sunrpc/rpcb_clnt.c:85:#define RPCB_program_sz		(1)
+net/sunrpc/rpcb_clnt.c:86:#define RPCB_version_sz		(1)
+net/sunrpc/rpcb_clnt.c:87:#define RPCB_protocol_sz	(1)
+net/sunrpc/rpcb_clnt.c:88:#define RPCB_port_sz		(1)
+net/sunrpc/rpcb_clnt.c:89:#define RPCB_boolean_sz		(1)
+net/sunrpc/rpcb_clnt.c:91:#define RPCB_netid_sz		(1 + XDR_QUADLEN(RPCBIND_MAXNETIDLEN))
+net/sunrpc/rpcb_clnt.c:92:#define RPCB_addr_sz		(1 + XDR_QUADLEN(RPCBIND_MAXUADDRLEN))
+net/sunrpc/rpcb_clnt.c:93:#define RPCB_ownerstring_sz	(1 + XDR_QUADLEN(RPCB_MAXOWNERLEN))
+net/sunrpc/rpcb_clnt.c:98:#define RPCB_mappingargs_sz	(RPCB_program_sz + RPCB_version_sz + \
+net/sunrpc/rpcb_clnt.c:99:				RPCB_protocol_sz + RPCB_port_sz)
+net/sunrpc/rpcb_clnt.c:100:#define RPCB_getaddrargs_sz	(RPCB_program_sz + RPCB_version_sz + \
+net/sunrpc/rpcb_clnt.c:101:				RPCB_netid_sz + RPCB_addr_sz + \
+net/sunrpc/rpcb_clnt.c:102:				RPCB_ownerstring_sz)
+net/sunrpc/rpcb_clnt.c:104:#define RPCB_getportres_sz	RPCB_port_sz
+net/sunrpc/rpcb_clnt.c:105:#define RPCB_setres_sz		RPCB_boolean_sz
+net/sunrpc/rpcb_clnt.c:109: * address string returned by the remote rpcbind database.
+net/sunrpc/rpcb_clnt.c:111:#define RPCB_getaddrres_sz	RPCB_addr_sz
+net/sunrpc/rpcb_clnt.c:113:static void			rpcb_getport_done(struct rpc_task *, void *);
+net/sunrpc/rpcb_clnt.c:114:static void			rpcb_map_release(void *data);
+net/sunrpc/rpcb_clnt.c:115:static const struct rpc_program	rpcb_program;
+net/sunrpc/rpcb_clnt.c:117:struct rpcbind_args {
+net/sunrpc/rpcb_clnt.c:131:static const struct rpc_procinfo rpcb_procedures2[];
+net/sunrpc/rpcb_clnt.c:132:static const struct rpc_procinfo rpcb_procedures3[];
+net/sunrpc/rpcb_clnt.c:133:static const struct rpc_procinfo rpcb_procedures4[];
+net/sunrpc/rpcb_clnt.c:135:struct rpcb_info {
+net/sunrpc/rpcb_clnt.c:140:static const struct rpcb_info rpcb_next_version[];
+net/sunrpc/rpcb_clnt.c:141:static const struct rpcb_info rpcb_next_version6[];
+net/sunrpc/rpcb_clnt.c:143:static const struct rpc_call_ops rpcb_getport_ops = {
+net/sunrpc/rpcb_clnt.c:144:	.rpc_call_done		= rpcb_getport_done,
+net/sunrpc/rpcb_clnt.c:145:	.rpc_release		= rpcb_map_release,
+net/sunrpc/rpcb_clnt.c:148:static void rpcb_wake_rpcbind_waiters(struct rpc_xprt *xprt, int status)
+net/sunrpc/rpcb_clnt.c:154:static void rpcb_map_release(void *data)
+net/sunrpc/rpcb_clnt.c:156:	struct rpcbind_args *map = data;
+net/sunrpc/rpcb_clnt.c:158:	rpcb_wake_rpcbind_waiters(map->r_xprt, map->r_status);
+net/sunrpc/rpcb_clnt.c:164:static int rpcb_get_local(struct net *net)
+net/sunrpc/rpcb_clnt.c:169:	spin_lock(&sn->rpcb_clnt_lock);
+net/sunrpc/rpcb_clnt.c:170:	if (sn->rpcb_users)
+net/sunrpc/rpcb_clnt.c:171:		sn->rpcb_users++;
+net/sunrpc/rpcb_clnt.c:172:	cnt = sn->rpcb_users;
+net/sunrpc/rpcb_clnt.c:173:	spin_unlock(&sn->rpcb_clnt_lock);
+net/sunrpc/rpcb_clnt.c:178:void rpcb_put_local(struct net *net)
+net/sunrpc/rpcb_clnt.c:181:	struct rpc_clnt *clnt = sn->rpcb_local_clnt;
+net/sunrpc/rpcb_clnt.c:182:	struct rpc_clnt *clnt4 = sn->rpcb_local_clnt4;
+net/sunrpc/rpcb_clnt.c:185:	spin_lock(&sn->rpcb_clnt_lock);
+net/sunrpc/rpcb_clnt.c:186:	if (sn->rpcb_users) {
+net/sunrpc/rpcb_clnt.c:187:		if (--sn->rpcb_users == 0) {
+net/sunrpc/rpcb_clnt.c:188:			sn->rpcb_local_clnt = NULL;
+net/sunrpc/rpcb_clnt.c:189:			sn->rpcb_local_clnt4 = NULL;
+net/sunrpc/rpcb_clnt.c:191:		shutdown = !sn->rpcb_users;
+net/sunrpc/rpcb_clnt.c:193:	spin_unlock(&sn->rpcb_clnt_lock);
+net/sunrpc/rpcb_clnt.c:197:		 * cleanup_rpcb_clnt - remove xprtsock's sysctls, unregister
+net/sunrpc/rpcb_clnt.c:206:static void rpcb_set_local(struct net *net, struct rpc_clnt *clnt,
+net/sunrpc/rpcb_clnt.c:212:	/* Protected by rpcb_create_local_mutex */
+net/sunrpc/rpcb_clnt.c:213:	sn->rpcb_local_clnt = clnt;
+net/sunrpc/rpcb_clnt.c:214:	sn->rpcb_local_clnt4 = clnt4;
+net/sunrpc/rpcb_clnt.c:215:	sn->rpcb_is_af_local = is_af_local ? 1 : 0;
+net/sunrpc/rpcb_clnt.c:217:	sn->rpcb_users = 1;
+net/sunrpc/rpcb_clnt.c:218:	dprintk("RPC:       created new rpcb local clients (rpcb_local_clnt: "
+net/sunrpc/rpcb_clnt.c:219:			"%p, rpcb_local_clnt4: %p) for net %p%s\n",
+net/sunrpc/rpcb_clnt.c:220:			sn->rpcb_local_clnt, sn->rpcb_local_clnt4,
+net/sunrpc/rpcb_clnt.c:228:static int rpcb_create_local_unix(struct net *net)
+net/sunrpc/rpcb_clnt.c:230:	static const struct sockaddr_un rpcb_localaddr_rpcbind = {
+net/sunrpc/rpcb_clnt.c:232:		.sun_path		= RPCBIND_SOCK_PATHNAME,
+net/sunrpc/rpcb_clnt.c:237:		.address	= (struct sockaddr *)&rpcb_localaddr_rpcbind,
+net/sunrpc/rpcb_clnt.c:238:		.addrsize	= sizeof(rpcb_localaddr_rpcbind),
+net/sunrpc/rpcb_clnt.c:240:		.program	= &rpcb_program,
+net/sunrpc/rpcb_clnt.c:241:		.version	= RPCBVERS_2,
+net/sunrpc/rpcb_clnt.c:257:	 * this works only if the user space portmapper is rpcbind, and
+net/sunrpc/rpcb_clnt.c:262:		dprintk("RPC:       failed to create AF_LOCAL rpcbind "
+net/sunrpc/rpcb_clnt.c:268:	clnt4 = rpc_bind_new_program(clnt, &rpcb_program, RPCBVERS_4);
+net/sunrpc/rpcb_clnt.c:271:				"rpcbind v4 client (errno %ld).\n",
+net/sunrpc/rpcb_clnt.c:276:	rpcb_set_local(net, clnt, clnt4, true);
+net/sunrpc/rpcb_clnt.c:286:static int rpcb_create_local_net(struct net *net)
+net/sunrpc/rpcb_clnt.c:288:	static const struct sockaddr_in rpcb_inaddr_loopback = {
+net/sunrpc/rpcb_clnt.c:291:		.sin_port		= htons(RPCBIND_PORT),
+net/sunrpc/rpcb_clnt.c:296:		.address	= (struct sockaddr *)&rpcb_inaddr_loopback,
+net/sunrpc/rpcb_clnt.c:297:		.addrsize	= sizeof(rpcb_inaddr_loopback),
+net/sunrpc/rpcb_clnt.c:299:		.program	= &rpcb_program,
+net/sunrpc/rpcb_clnt.c:300:		.version	= RPCBVERS_2,
+net/sunrpc/rpcb_clnt.c:309:		dprintk("RPC:       failed to create local rpcbind "
+net/sunrpc/rpcb_clnt.c:317:	 * the v4 ping will fail.  Proceed anyway, but disallow rpcb
+net/sunrpc/rpcb_clnt.c:320:	clnt4 = rpc_bind_new_program(clnt, &rpcb_program, RPCBVERS_4);
+net/sunrpc/rpcb_clnt.c:323:				"rpcbind v4 client (errno %ld).\n",
+net/sunrpc/rpcb_clnt.c:328:	rpcb_set_local(net, clnt, clnt4, false);
+net/sunrpc/rpcb_clnt.c:338:int rpcb_create_local(struct net *net)
+net/sunrpc/rpcb_clnt.c:340:	static DEFINE_MUTEX(rpcb_create_local_mutex);
+net/sunrpc/rpcb_clnt.c:343:	if (rpcb_get_local(net))
+net/sunrpc/rpcb_clnt.c:346:	mutex_lock(&rpcb_create_local_mutex);
+net/sunrpc/rpcb_clnt.c:347:	if (rpcb_get_local(net))
+net/sunrpc/rpcb_clnt.c:350:	if (rpcb_create_local_unix(net) != 0)
+net/sunrpc/rpcb_clnt.c:351:		result = rpcb_create_local_net(net);
+net/sunrpc/rpcb_clnt.c:354:	mutex_unlock(&rpcb_create_local_mutex);
+net/sunrpc/rpcb_clnt.c:358:static struct rpc_clnt *rpcb_create(struct net *net, const char *nodename,
+net/sunrpc/rpcb_clnt.c:370:		.program	= &rpcb_program,
+net/sunrpc/rpcb_clnt.c:379:		((struct sockaddr_in *)srvaddr)->sin_port = htons(RPCBIND_PORT);
+net/sunrpc/rpcb_clnt.c:382:		((struct sockaddr_in6 *)srvaddr)->sin6_port = htons(RPCBIND_PORT);
+net/sunrpc/rpcb_clnt.c:391:static int rpcb_register_call(struct sunrpc_net *sn, struct rpc_clnt *clnt, struct rpc_message *msg, bool is_set)
+net/sunrpc/rpcb_clnt.c:396:	if (is_set || !sn->rpcb_is_af_local)
+net/sunrpc/rpcb_clnt.c:402:		dprintk("RPC:       failed to contact local rpcbind "
+net/sunrpc/rpcb_clnt.c:413: * rpcb_register - set or unset a port registration with the local rpcbind svc
+net/sunrpc/rpcb_clnt.c:421: * and the rpcbind daemon returned success.  Otherwise, returns an errno
+net/sunrpc/rpcb_clnt.c:423: * dispatched, timed out, or rpcbind returned an error).
+net/sunrpc/rpcb_clnt.c:426: * information via the system's rpcbind daemon.  RPC services
+net/sunrpc/rpcb_clnt.c:433: * rpcbind database.
+net/sunrpc/rpcb_clnt.c:435: * This function uses rpcbind protocol version 2 to contact the
+net/sunrpc/rpcb_clnt.c:436: * local rpcbind daemon.
+net/sunrpc/rpcb_clnt.c:440: * address.  If the local rpcbind daemon is listening on AF_INET6,
+net/sunrpc/rpcb_clnt.c:445:int rpcb_register(struct net *net, u32 prog, u32 vers, int prot, unsigned short port)
+net/sunrpc/rpcb_clnt.c:447:	struct rpcbind_args map = {
+net/sunrpc/rpcb_clnt.c:460:			"rpcbind\n", (port ? "" : "un"),
+net/sunrpc/rpcb_clnt.c:463:	msg.rpc_proc = &rpcb_procedures2[RPCBPROC_UNSET];
+net/sunrpc/rpcb_clnt.c:465:		msg.rpc_proc = &rpcb_procedures2[RPCBPROC_SET];
+net/sunrpc/rpcb_clnt.c:469:	return rpcb_register_call(sn, sn->rpcb_local_clnt, &msg, is_set);
+net/sunrpc/rpcb_clnt.c:475:static int rpcb_register_inet4(struct sunrpc_net *sn,
+net/sunrpc/rpcb_clnt.c:480:	struct rpcbind_args *map = msg->rpc_argp;
+net/sunrpc/rpcb_clnt.c:488:		"local rpcbind\n", (port ? "" : "un"),
+net/sunrpc/rpcb_clnt.c:492:	msg->rpc_proc = &rpcb_procedures4[RPCBPROC_UNSET];
+net/sunrpc/rpcb_clnt.c:494:		msg->rpc_proc = &rpcb_procedures4[RPCBPROC_SET];
+net/sunrpc/rpcb_clnt.c:498:	result = rpcb_register_call(sn, sn->rpcb_local_clnt4, msg, is_set);
+net/sunrpc/rpcb_clnt.c:506:static int rpcb_register_inet6(struct sunrpc_net *sn,
+net/sunrpc/rpcb_clnt.c:511:	struct rpcbind_args *map = msg->rpc_argp;
+net/sunrpc/rpcb_clnt.c:519:		"local rpcbind\n", (port ? "" : "un"),
+net/sunrpc/rpcb_clnt.c:523:	msg->rpc_proc = &rpcb_procedures4[RPCBPROC_UNSET];
+net/sunrpc/rpcb_clnt.c:525:		msg->rpc_proc = &rpcb_procedures4[RPCBPROC_SET];
+net/sunrpc/rpcb_clnt.c:529:	result = rpcb_register_call(sn, sn->rpcb_local_clnt4, msg, is_set);
+net/sunrpc/rpcb_clnt.c:534:static int rpcb_unregister_all_protofamilies(struct sunrpc_net *sn,
+net/sunrpc/rpcb_clnt.c:537:	struct rpcbind_args *map = msg->rpc_argp;
+net/sunrpc/rpcb_clnt.c:540:		"local rpcbind\n",
+net/sunrpc/rpcb_clnt.c:544:	msg->rpc_proc = &rpcb_procedures4[RPCBPROC_UNSET];
+net/sunrpc/rpcb_clnt.c:546:	return rpcb_register_call(sn, sn->rpcb_local_clnt4, msg, false);
+net/sunrpc/rpcb_clnt.c:550: * rpcb_v4_register - set or unset a port registration with the local rpcbind
+net/sunrpc/rpcb_clnt.c:558: * and the rpcbind daemon returned success.  Otherwise, returns an errno
+net/sunrpc/rpcb_clnt.c:560: * dispatched, timed out, or rpcbind returned an error).
+net/sunrpc/rpcb_clnt.c:563: * information via the system's rpcbind daemon.  RPC services
+net/sunrpc/rpcb_clnt.c:573: * This function uses rpcbind protocol version 4 to contact the
+net/sunrpc/rpcb_clnt.c:574: * local rpcbind daemon.  The local rpcbind daemon must support
+net/sunrpc/rpcb_clnt.c:575: * version 4 of the rpcbind protocol in order for these functions
+net/sunrpc/rpcb_clnt.c:593:int rpcb_v4_register(struct net *net, const u32 program, const u32 version,
+net/sunrpc/rpcb_clnt.c:596:	struct rpcbind_args map = {
+net/sunrpc/rpcb_clnt.c:600:		.r_owner	= RPCB_OWNER_STRING,
+net/sunrpc/rpcb_clnt.c:607:	if (sn->rpcb_local_clnt4 == NULL)
+net/sunrpc/rpcb_clnt.c:611:		return rpcb_unregister_all_protofamilies(sn, &msg);
+net/sunrpc/rpcb_clnt.c:615:		return rpcb_register_inet4(sn, address, &msg);
+net/sunrpc/rpcb_clnt.c:617:		return rpcb_register_inet6(sn, address, &msg);
+net/sunrpc/rpcb_clnt.c:623:static struct rpc_task *rpcb_call_async(struct rpc_clnt *rpcb_clnt,
+net/sunrpc/rpcb_clnt.c:624:		struct rpcbind_args *map, const struct rpc_procinfo *proc)
+net/sunrpc/rpcb_clnt.c:632:		.rpc_client = rpcb_clnt,
+net/sunrpc/rpcb_clnt.c:634:		.callback_ops = &rpcb_getport_ops,
+net/sunrpc/rpcb_clnt.c:649:static struct rpc_clnt *rpcb_find_transport_owner(struct rpc_clnt *clnt)
+net/sunrpc/rpcb_clnt.c:666: * rpcb_getport_async - obtain the port for a given RPC service on a given host
+net/sunrpc/rpcb_clnt.c:672:void rpcb_getport_async(struct rpc_task *task)
+net/sunrpc/rpcb_clnt.c:678:	struct rpc_clnt	*rpcb_clnt;
+net/sunrpc/rpcb_clnt.c:679:	struct rpcbind_args *map;
+net/sunrpc/rpcb_clnt.c:687:	clnt = rpcb_find_transport_owner(task->tk_client);
+net/sunrpc/rpcb_clnt.c:717:	/* Don't ever use rpcbind v2 for AF_INET6 requests */
+net/sunrpc/rpcb_clnt.c:720:		proc = rpcb_next_version[xprt->bind_index].rpc_proc;
+net/sunrpc/rpcb_clnt.c:721:		bind_version = rpcb_next_version[xprt->bind_index].rpc_vers;
+net/sunrpc/rpcb_clnt.c:724:		proc = rpcb_next_version6[xprt->bind_index].rpc_proc;
+net/sunrpc/rpcb_clnt.c:725:		bind_version = rpcb_next_version6[xprt->bind_index].rpc_vers;
+net/sunrpc/rpcb_clnt.c:741:	dprintk("RPC: %5u %s: trying rpcbind version %u\n",
+net/sunrpc/rpcb_clnt.c:744:	rpcb_clnt = rpcb_create(xprt->xprt_net,
+net/sunrpc/rpcb_clnt.c:748:	if (IS_ERR(rpcb_clnt)) {
+net/sunrpc/rpcb_clnt.c:749:		status = PTR_ERR(rpcb_clnt);
+net/sunrpc/rpcb_clnt.c:750:		dprintk("RPC: %5u %s: rpcb_create failed, error %ld\n",
+net/sunrpc/rpcb_clnt.c:751:			task->tk_pid, __func__, PTR_ERR(rpcb_clnt));
+net/sunrpc/rpcb_clnt.c:755:	map = kzalloc(sizeof(struct rpcbind_args), GFP_ATOMIC);
+net/sunrpc/rpcb_clnt.c:770:	case RPCBVERS_4:
+net/sunrpc/rpcb_clnt.c:771:	case RPCBVERS_3:
+net/sunrpc/rpcb_clnt.c:776:	case RPCBVERS_2:
+net/sunrpc/rpcb_clnt.c:783:	child = rpcb_call_async(rpcb_clnt, map, proc);
+net/sunrpc/rpcb_clnt.c:784:	rpc_release_client(rpcb_clnt);
+net/sunrpc/rpcb_clnt.c:786:		/* rpcb_map_release() has freed the arguments */
+net/sunrpc/rpcb_clnt.c:797:	rpc_release_client(rpcb_clnt);
+net/sunrpc/rpcb_clnt.c:799:	rpcb_wake_rpcbind_waiters(xprt, status);
+net/sunrpc/rpcb_clnt.c:803:EXPORT_SYMBOL_GPL(rpcb_getport_async);
+net/sunrpc/rpcb_clnt.c:806: * Rpcbind child task calls this callback via tk_exit.
+net/sunrpc/rpcb_clnt.c:808:static void rpcb_getport_done(struct rpc_task *child, void *data)
+net/sunrpc/rpcb_clnt.c:810:	struct rpcbind_args *map = data;
+net/sunrpc/rpcb_clnt.c:814:	/* Garbage reply: retry with a lesser rpcbind version */
+net/sunrpc/rpcb_clnt.c:818:	/* rpcbind server doesn't support this rpcbind protocol version */
+net/sunrpc/rpcb_clnt.c:823:		/* rpcbind server not available on remote host? */
+net/sunrpc/rpcb_clnt.c:836:	dprintk("RPC: %5u rpcb_getport_done(status %d, port %u)\n",
+net/sunrpc/rpcb_clnt.c:843: * XDR functions for rpcbind
+net/sunrpc/rpcb_clnt.c:846:static void rpcb_enc_mapping(struct rpc_rqst *req, struct xdr_stream *xdr,
+net/sunrpc/rpcb_clnt.c:849:	const struct rpcbind_args *rpcb = data;
+net/sunrpc/rpcb_clnt.c:855:			rpcb->r_prog, rpcb->r_vers, rpcb->r_prot, rpcb->r_port);
+net/sunrpc/rpcb_clnt.c:857:	p = xdr_reserve_space(xdr, RPCB_mappingargs_sz << 2);
+net/sunrpc/rpcb_clnt.c:858:	*p++ = cpu_to_be32(rpcb->r_prog);
+net/sunrpc/rpcb_clnt.c:859:	*p++ = cpu_to_be32(rpcb->r_vers);
+net/sunrpc/rpcb_clnt.c:860:	*p++ = cpu_to_be32(rpcb->r_prot);
+net/sunrpc/rpcb_clnt.c:861:	*p   = cpu_to_be32(rpcb->r_port);
+net/sunrpc/rpcb_clnt.c:864:static int rpcb_dec_getport(struct rpc_rqst *req, struct xdr_stream *xdr,
+net/sunrpc/rpcb_clnt.c:867:	struct rpcbind_args *rpcb = data;
+net/sunrpc/rpcb_clnt.c:871:	rpcb->r_port = 0;
+net/sunrpc/rpcb_clnt.c:883:	rpcb->r_port = port;
+net/sunrpc/rpcb_clnt.c:887:static int rpcb_dec_set(struct rpc_rqst *req, struct xdr_stream *xdr,
+net/sunrpc/rpcb_clnt.c:901:	dprintk("RPC: %5u RPCB_%s call %s\n",
+net/sunrpc/rpcb_clnt.c:908:static void encode_rpcb_string(struct xdr_stream *xdr, const char *string,
+net/sunrpc/rpcb_clnt.c:923:static void rpcb_enc_getaddr(struct rpc_rqst *req, struct xdr_stream *xdr,
+net/sunrpc/rpcb_clnt.c:926:	const struct rpcbind_args *rpcb = data;
+net/sunrpc/rpcb_clnt.c:929:	dprintk("RPC: %5u encoding RPCB_%s call (%u, %u, '%s', '%s')\n",
+net/sunrpc/rpcb_clnt.c:932:			rpcb->r_prog, rpcb->r_vers,
+net/sunrpc/rpcb_clnt.c:933:			rpcb->r_netid, rpcb->r_addr);
+net/sunrpc/rpcb_clnt.c:935:	p = xdr_reserve_space(xdr, (RPCB_program_sz + RPCB_version_sz) << 2);
+net/sunrpc/rpcb_clnt.c:936:	*p++ = cpu_to_be32(rpcb->r_prog);
+net/sunrpc/rpcb_clnt.c:937:	*p = cpu_to_be32(rpcb->r_vers);
+net/sunrpc/rpcb_clnt.c:939:	encode_rpcb_string(xdr, rpcb->r_netid, RPCBIND_MAXNETIDLEN);
+net/sunrpc/rpcb_clnt.c:940:	encode_rpcb_string(xdr, rpcb->r_addr, RPCBIND_MAXUADDRLEN);
+net/sunrpc/rpcb_clnt.c:941:	encode_rpcb_string(xdr, rpcb->r_owner, RPCB_MAXOWNERLEN);
+net/sunrpc/rpcb_clnt.c:944:static int rpcb_dec_getaddr(struct rpc_rqst *req, struct xdr_stream *xdr,
+net/sunrpc/rpcb_clnt.c:947:	struct rpcbind_args *rpcb = data;
+net/sunrpc/rpcb_clnt.c:953:	rpcb->r_port = 0;
+net/sunrpc/rpcb_clnt.c:965:		dprintk("RPC: %5u RPCB reply: program not registered\n",
+net/sunrpc/rpcb_clnt.c:970:	if (unlikely(len > RPCBIND_MAXUADDRLEN))
+net/sunrpc/rpcb_clnt.c:976:	dprintk("RPC: %5u RPCB_%s reply: %s\n", req->rq_task->tk_pid,
+net/sunrpc/rpcb_clnt.c:982:	rpcb->r_port = rpc_get_port(sap);
+net/sunrpc/rpcb_clnt.c:987:	dprintk("RPC: %5u malformed RPCB_%s reply\n",
+net/sunrpc/rpcb_clnt.c:994: * Not all rpcbind procedures described in RFC 1833 are implemented
+net/sunrpc/rpcb_clnt.c:998:static const struct rpc_procinfo rpcb_procedures2[] = {
+net/sunrpc/rpcb_clnt.c:999:	[RPCBPROC_SET] = {
+net/sunrpc/rpcb_clnt.c:1000:		.p_proc		= RPCBPROC_SET,
+net/sunrpc/rpcb_clnt.c:1001:		.p_encode	= rpcb_enc_mapping,
+net/sunrpc/rpcb_clnt.c:1002:		.p_decode	= rpcb_dec_set,
+net/sunrpc/rpcb_clnt.c:1003:		.p_arglen	= RPCB_mappingargs_sz,
+net/sunrpc/rpcb_clnt.c:1004:		.p_replen	= RPCB_setres_sz,
+net/sunrpc/rpcb_clnt.c:1005:		.p_statidx	= RPCBPROC_SET,
+net/sunrpc/rpcb_clnt.c:1009:	[RPCBPROC_UNSET] = {
+net/sunrpc/rpcb_clnt.c:1010:		.p_proc		= RPCBPROC_UNSET,
+net/sunrpc/rpcb_clnt.c:1011:		.p_encode	= rpcb_enc_mapping,
+net/sunrpc/rpcb_clnt.c:1012:		.p_decode	= rpcb_dec_set,
+net/sunrpc/rpcb_clnt.c:1013:		.p_arglen	= RPCB_mappingargs_sz,
+net/sunrpc/rpcb_clnt.c:1014:		.p_replen	= RPCB_setres_sz,
+net/sunrpc/rpcb_clnt.c:1015:		.p_statidx	= RPCBPROC_UNSET,
+net/sunrpc/rpcb_clnt.c:1019:	[RPCBPROC_GETPORT] = {
+net/sunrpc/rpcb_clnt.c:1020:		.p_proc		= RPCBPROC_GETPORT,
+net/sunrpc/rpcb_clnt.c:1021:		.p_encode	= rpcb_enc_mapping,
+net/sunrpc/rpcb_clnt.c:1022:		.p_decode	= rpcb_dec_getport,
+net/sunrpc/rpcb_clnt.c:1023:		.p_arglen	= RPCB_mappingargs_sz,
+net/sunrpc/rpcb_clnt.c:1024:		.p_replen	= RPCB_getportres_sz,
+net/sunrpc/rpcb_clnt.c:1025:		.p_statidx	= RPCBPROC_GETPORT,
+net/sunrpc/rpcb_clnt.c:1031:static const struct rpc_procinfo rpcb_procedures3[] = {
+net/sunrpc/rpcb_clnt.c:1032:	[RPCBPROC_SET] = {
+net/sunrpc/rpcb_clnt.c:1033:		.p_proc		= RPCBPROC_SET,
+net/sunrpc/rpcb_clnt.c:1034:		.p_encode	= rpcb_enc_getaddr,
+net/sunrpc/rpcb_clnt.c:1035:		.p_decode	= rpcb_dec_set,
+net/sunrpc/rpcb_clnt.c:1036:		.p_arglen	= RPCB_getaddrargs_sz,
+net/sunrpc/rpcb_clnt.c:1037:		.p_replen	= RPCB_setres_sz,
+net/sunrpc/rpcb_clnt.c:1038:		.p_statidx	= RPCBPROC_SET,
+net/sunrpc/rpcb_clnt.c:1042:	[RPCBPROC_UNSET] = {
+net/sunrpc/rpcb_clnt.c:1043:		.p_proc		= RPCBPROC_UNSET,
+net/sunrpc/rpcb_clnt.c:1044:		.p_encode	= rpcb_enc_getaddr,
+net/sunrpc/rpcb_clnt.c:1045:		.p_decode	= rpcb_dec_set,
+net/sunrpc/rpcb_clnt.c:1046:		.p_arglen	= RPCB_getaddrargs_sz,
+net/sunrpc/rpcb_clnt.c:1047:		.p_replen	= RPCB_setres_sz,
+net/sunrpc/rpcb_clnt.c:1048:		.p_statidx	= RPCBPROC_UNSET,
+net/sunrpc/rpcb_clnt.c:1052:	[RPCBPROC_GETADDR] = {
+net/sunrpc/rpcb_clnt.c:1053:		.p_proc		= RPCBPROC_GETADDR,
+net/sunrpc/rpcb_clnt.c:1054:		.p_encode	= rpcb_enc_getaddr,
+net/sunrpc/rpcb_clnt.c:1055:		.p_decode	= rpcb_dec_getaddr,
+net/sunrpc/rpcb_clnt.c:1056:		.p_arglen	= RPCB_getaddrargs_sz,
+net/sunrpc/rpcb_clnt.c:1057:		.p_replen	= RPCB_getaddrres_sz,
+net/sunrpc/rpcb_clnt.c:1058:		.p_statidx	= RPCBPROC_GETADDR,
+net/sunrpc/rpcb_clnt.c:1064:static const struct rpc_procinfo rpcb_procedures4[] = {
+net/sunrpc/rpcb_clnt.c:1065:	[RPCBPROC_SET] = {
+net/sunrpc/rpcb_clnt.c:1066:		.p_proc		= RPCBPROC_SET,
+net/sunrpc/rpcb_clnt.c:1067:		.p_encode	= rpcb_enc_getaddr,
+net/sunrpc/rpcb_clnt.c:1068:		.p_decode	= rpcb_dec_set,
+net/sunrpc/rpcb_clnt.c:1069:		.p_arglen	= RPCB_getaddrargs_sz,
+net/sunrpc/rpcb_clnt.c:1070:		.p_replen	= RPCB_setres_sz,
+net/sunrpc/rpcb_clnt.c:1071:		.p_statidx	= RPCBPROC_SET,
+net/sunrpc/rpcb_clnt.c:1075:	[RPCBPROC_UNSET] = {
+net/sunrpc/rpcb_clnt.c:1076:		.p_proc		= RPCBPROC_UNSET,
+net/sunrpc/rpcb_clnt.c:1077:		.p_encode	= rpcb_enc_getaddr,
+net/sunrpc/rpcb_clnt.c:1078:		.p_decode	= rpcb_dec_set,
+net/sunrpc/rpcb_clnt.c:1079:		.p_arglen	= RPCB_getaddrargs_sz,
+net/sunrpc/rpcb_clnt.c:1080:		.p_replen	= RPCB_setres_sz,
+net/sunrpc/rpcb_clnt.c:1081:		.p_statidx	= RPCBPROC_UNSET,
+net/sunrpc/rpcb_clnt.c:1085:	[RPCBPROC_GETADDR] = {
+net/sunrpc/rpcb_clnt.c:1086:		.p_proc		= RPCBPROC_GETADDR,
+net/sunrpc/rpcb_clnt.c:1087:		.p_encode	= rpcb_enc_getaddr,
+net/sunrpc/rpcb_clnt.c:1088:		.p_decode	= rpcb_dec_getaddr,
+net/sunrpc/rpcb_clnt.c:1089:		.p_arglen	= RPCB_getaddrargs_sz,
+net/sunrpc/rpcb_clnt.c:1090:		.p_replen	= RPCB_getaddrres_sz,
+net/sunrpc/rpcb_clnt.c:1091:		.p_statidx	= RPCBPROC_GETADDR,
+net/sunrpc/rpcb_clnt.c:1097:static const struct rpcb_info rpcb_next_version[] = {
+net/sunrpc/rpcb_clnt.c:1099:		.rpc_vers	= RPCBVERS_2,
+net/sunrpc/rpcb_clnt.c:1100:		.rpc_proc	= &rpcb_procedures2[RPCBPROC_GETPORT],
+net/sunrpc/rpcb_clnt.c:1107:static const struct rpcb_info rpcb_next_version6[] = {
+net/sunrpc/rpcb_clnt.c:1109:		.rpc_vers	= RPCBVERS_4,
+net/sunrpc/rpcb_clnt.c:1110:		.rpc_proc	= &rpcb_procedures4[RPCBPROC_GETADDR],
+net/sunrpc/rpcb_clnt.c:1113:		.rpc_vers	= RPCBVERS_3,
+net/sunrpc/rpcb_clnt.c:1114:		.rpc_proc	= &rpcb_procedures3[RPCBPROC_GETADDR],
+net/sunrpc/rpcb_clnt.c:1121:static unsigned int rpcb_version2_counts[ARRAY_SIZE(rpcb_procedures2)];
+net/sunrpc/rpcb_clnt.c:1122:static const struct rpc_version rpcb_version2 = {
+net/sunrpc/rpcb_clnt.c:1123:	.number		= RPCBVERS_2,
+net/sunrpc/rpcb_clnt.c:1124:	.nrprocs	= ARRAY_SIZE(rpcb_procedures2),
+net/sunrpc/rpcb_clnt.c:1125:	.procs		= rpcb_procedures2,
+net/sunrpc/rpcb_clnt.c:1126:	.counts		= rpcb_version2_counts,
+net/sunrpc/rpcb_clnt.c:1129:static unsigned int rpcb_version3_counts[ARRAY_SIZE(rpcb_procedures3)];
+net/sunrpc/rpcb_clnt.c:1130:static const struct rpc_version rpcb_version3 = {
+net/sunrpc/rpcb_clnt.c:1131:	.number		= RPCBVERS_3,
+net/sunrpc/rpcb_clnt.c:1132:	.nrprocs	= ARRAY_SIZE(rpcb_procedures3),
+net/sunrpc/rpcb_clnt.c:1133:	.procs		= rpcb_procedures3,
+net/sunrpc/rpcb_clnt.c:1134:	.counts		= rpcb_version3_counts,
+net/sunrpc/rpcb_clnt.c:1137:static unsigned int rpcb_version4_counts[ARRAY_SIZE(rpcb_procedures4)];
+net/sunrpc/rpcb_clnt.c:1138:static const struct rpc_version rpcb_version4 = {
+net/sunrpc/rpcb_clnt.c:1139:	.number		= RPCBVERS_4,
+net/sunrpc/rpcb_clnt.c:1140:	.nrprocs	= ARRAY_SIZE(rpcb_procedures4),
+net/sunrpc/rpcb_clnt.c:1141:	.procs		= rpcb_procedures4,
+net/sunrpc/rpcb_clnt.c:1142:	.counts		= rpcb_version4_counts,
+net/sunrpc/rpcb_clnt.c:1145:static const struct rpc_version *rpcb_version[] = {
+net/sunrpc/rpcb_clnt.c:1148:	&rpcb_version2,
+net/sunrpc/rpcb_clnt.c:1149:	&rpcb_version3,
+net/sunrpc/rpcb_clnt.c:1150:	&rpcb_version4
+net/sunrpc/rpcb_clnt.c:1153:static struct rpc_stat rpcb_stats;
+net/sunrpc/rpcb_clnt.c:1155:static const struct rpc_program rpcb_program = {
+net/sunrpc/rpcb_clnt.c:1156:	.name		= "rpcbind",
+net/sunrpc/rpcb_clnt.c:1157:	.number		= RPCBIND_PROGRAM,
+net/sunrpc/rpcb_clnt.c:1158:	.nrvers		= ARRAY_SIZE(rpcb_version),
+net/sunrpc/rpcb_clnt.c:1159:	.version	= rpcb_version,
+net/sunrpc/rpcb_clnt.c:1160:	.stats		= &rpcb_stats,
+net/sunrpc/svc.c:358:int svc_rpcb_setup(struct svc_serv *serv, struct net *net)
+net/sunrpc/svc.c:362:	err = rpcb_create_local(net);
+net/sunrpc/svc.c:370:EXPORT_SYMBOL_GPL(svc_rpcb_setup);
+net/sunrpc/svc.c:372:void svc_rpcb_cleanup(struct svc_serv *serv, struct net *net)
+net/sunrpc/svc.c:375:	rpcb_put_local(net);
+net/sunrpc/svc.c:377:EXPORT_SYMBOL_GPL(svc_rpcb_cleanup);
+net/sunrpc/svc.c:379:static int svc_uses_rpcbind(struct svc_serv *serv)
+net/sunrpc/svc.c:398:	if (!svc_uses_rpcbind(serv))
+net/sunrpc/svc.c:400:	return svc_rpcb_setup(serv, net);
+net/sunrpc/svc.c:873: * rpcbind daemon via an rpcbind v4 SET request.
+net/sunrpc/svc.c:881:static int __svc_rpcb_register4(struct net *net, const u32 program,
+net/sunrpc/svc.c:896:		netid = RPCBIND_NETID_UDP;
+net/sunrpc/svc.c:899:		netid = RPCBIND_NETID_TCP;
+net/sunrpc/svc.c:905:	error = rpcb_v4_register(net, program, version,
+net/sunrpc/svc.c:909:	 * User space didn't support rpcbind v4, so retry this
+net/sunrpc/svc.c:910:	 * registration request with the legacy rpcbind v2 protocol.
+net/sunrpc/svc.c:913:		error = rpcb_register(net, program, version, protocol, port);
+net/sunrpc/svc.c:921: * rpcbind daemon via an rpcbind v4 SET request.
+net/sunrpc/svc.c:929:static int __svc_rpcb_register6(struct net *net, const u32 program,
+net/sunrpc/svc.c:944:		netid = RPCBIND_NETID_UDP6;
+net/sunrpc/svc.c:947:		netid = RPCBIND_NETID_TCP6;
+net/sunrpc/svc.c:953:	error = rpcb_v4_register(net, program, version,
+net/sunrpc/svc.c:957:	 * User space didn't support rpcbind version 4, so we won't
+net/sunrpc/svc.c:968: * Register a kernel RPC service via rpcbind version 4.
+net/sunrpc/svc.c:983:		error = __svc_rpcb_register4(net, program, version,
+net/sunrpc/svc.c:988:		error = __svc_rpcb_register6(net, program, version,
+net/sunrpc/svc.c:1047:			if (vers->vs_rpcb_optnl) {
+net/sunrpc/svc.c:1065: * If user space is running rpcbind, it should take the v4 UNSET
+net/sunrpc/svc.c:1076:	error = rpcb_v4_register(net, program, version, NULL, "");
+net/sunrpc/svc.c:1079:	 * User space didn't support rpcbind v4, so retry this
+net/sunrpc/svc.c:1080:	 * request with the legacy rpcbind v2 protocol.
+net/sunrpc/svc.c:1083:		error = rpcb_register(net, program, version, 0, 0);
+net/sunrpc/svc.c:1091: * are removed from the local rpcbind database (if the service is not
+net/sunrpc/svc.c:1349:	serv->sv_stats->rpcbadfmt++;
+net/sunrpc/svc.c:1358:	serv->sv_stats->rpcbadauth++;
+net/sunrpc/svc.c:1368:	serv->sv_stats->rpcbadfmt++;
+net/sunrpc/svc.c:1376:	serv->sv_stats->rpcbadfmt++;
+net/sunrpc/svc.c:1385:	serv->sv_stats->rpcbadfmt++;
+net/sunrpc/svc.c:1394:	serv->sv_stats->rpcbadfmt++;
+net/sunrpc/svc.c:1429:		serv->sv_stats->rpcbadfmt++;
+net/sunrpc/netns.h:23:	struct rpc_clnt *rpcb_local_clnt;
+net/sunrpc/netns.h:24:	struct rpc_clnt *rpcb_local_clnt4;
+net/sunrpc/netns.h:25:	spinlock_t rpcb_clnt_lock;
+net/sunrpc/netns.h:26:	unsigned int rpcb_users;
+net/sunrpc/netns.h:27:	unsigned int rpcb_is_af_local : 1;
+net/sunrpc/sunrpc_syms.c:53:	spin_lock_init(&sn->rpcb_clnt_lock);
+net/sunrpc/addr.c:9: * of the external (network) interface provided by rpcbind version 3
+net/sunrpc/addr.c:270:	char portbuf[RPCBIND_MAXUADDRPLEN];
+net/sunrpc/addr.c:271:	char addrbuf[RPCBIND_MAXUADDRLEN];
+net/sunrpc/addr.c:317:	char *c, buf[RPCBIND_MAXUADDRLEN + sizeof('\0')];
+net/sunrpc/addr.c:321:	if (uaddr_len > RPCBIND_MAXUADDRLEN)
+net/sunrpc/clnt.c:1785:		xprt->ops->rpcbind(task);
+net/sunrpc/clnt.c:1807:		dprintk("RPC: %5u rpcbind out of memory\n", task->tk_pid);
+net/sunrpc/clnt.c:1811:		dprintk("RPC: %5u remote rpcbind: RPC program/version "
+net/sunrpc/clnt.c:1824:		dprintk("RPC: %5u rpcbind request timed out\n",
+net/sunrpc/clnt.c:1828:		/* server doesn't support any rpcbind version we know of */
+net/sunrpc/clnt.c:1829:		dprintk("RPC: %5u unrecognized remote rpcbind service\n",
+net/sunrpc/clnt.c:1833:		dprintk("RPC: %5u remote rpcbind version unavailable, retrying\n",
+net/sunrpc/clnt.c:1845:		dprintk("RPC: %5u remote rpcbind unreachable: %d\n",
+net/sunrpc/clnt.c:1854:		dprintk("RPC: %5u unrecognized rpcbind error (%d)\n",
+net/sunrpc/xprtsock.c:1887:static void xs_local_rpcbind(struct rpc_task *task)
+net/sunrpc/xprtsock.c:2735:	.rpcbind		= xs_local_rpcbind,
+net/sunrpc/xprtsock.c:2754:	.rpcbind		= rpcb_getport_async,
+net/sunrpc/xprtsock.c:2775:	.rpcbind		= rpcb_getport_async,
+net/sunrpc/xprtsock.c:2933:		xs_format_peer_addresses(xprt, "local", RPCBIND_NETID_LOCAL);
+net/sunrpc/xprtsock.c:3000:		xs_format_peer_addresses(xprt, "udp", RPCBIND_NETID_UDP);
+net/sunrpc/xprtsock.c:3006:		xs_format_peer_addresses(xprt, "udp", RPCBIND_NETID_UDP6);
+net/sunrpc/xprtsock.c:3082:		xs_format_peer_addresses(xprt, "tcp", RPCBIND_NETID_TCP);
+net/sunrpc/xprtsock.c:3088:		xs_format_peer_addresses(xprt, "tcp", RPCBIND_NETID_TCP6);
+net/sunrpc/xprtsock.c:3148:					 RPCBIND_NETID_TCP);
+net/sunrpc/xprtsock.c:3152:				   RPCBIND_NETID_TCP6);
+net/xfrm/xfrm_output.c:177:	BUILD_BUG_ON(sizeof(*IPCB(skb)) > SKB_SGO_CB_OFFSET);
+net/openvswitch/actions.c:780:	memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
+net/openvswitch/actions.c:812:		IPCB(skb)->frag_max_size = mru;
+net/openvswitch/conntrack.c:480:		memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
+net/openvswitch/conntrack.c:485:		ovs_cb.mru = IPCB(skb)->frag_max_size;
+net/l2tp/l2tp_core.c:1184:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+net/l2tp/l2tp_core.c:1185:	IPCB(skb)->flags &= ~(IPSKB_XFRM_TUNNEL_SIZE | IPSKB_XFRM_TRANSFORMED |
+net/bridge/br_netfilter_hooks.c:231:	memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
+net/bridge/br_netfilter_hooks.c:358:	nf_bridge->frag_max_size = IPCB(skb)->frag_max_size;
+net/bridge/br_netfilter_hooks.c:533:			nf_bridge->frag_max_size = IPCB(skb)->frag_max_size;
+net/bridge/br_netfilter_hooks.c:601:		IPCB(skb)->frag_max_size = nf_bridge->frag_max_size;
+net/bridge/br_netfilter_hooks.c:690:		     (IPCB(skb)->frag_max_size &&
+net/bridge/br_netfilter_hooks.c:691:		      IPCB(skb)->frag_max_size > mtu))) {
+net/bridge/br_netfilter_hooks.c:733:		IPCB(skb)->frag_max_size = nf_bridge->frag_max_size;
+net/ipv4/ip_output.c:268:	BUILD_BUG_ON(sizeof(*IPCB(skb)) > SKB_SGO_CB_OFFSET);
+net/ipv4/ip_output.c:306:		IPCB(skb)->flags |= IPSKB_REROUTED;
+net/ipv4/ip_output.c:314:	if (skb->len > mtu || (IPCB(skb)->flags & IPSKB_FRAG_PMTU))
+net/ipv4/ip_output.c:364:		     !(IPCB(skb)->flags & IPSKB_FORWARDED))
+net/ipv4/ip_output.c:393:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+net/ipv4/ip_output.c:408:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+net/ipv4/ip_output.c:527:	IPCB(to)->flags = IPCB(from)->flags;
+net/ipv4/ip_output.c:549:		     (IPCB(skb)->frag_max_size &&
+net/ipv4/ip_output.c:550:		      IPCB(skb)->frag_max_size > mtu))) {
+net/ipv4/ip_output.c:592:	if (IPCB(skb)->frag_max_size && IPCB(skb)->frag_max_size < mtu)
+net/ipv4/ip_output.c:593:		mtu = IPCB(skb)->frag_max_size;
+net/ipv4/ip_output.c:601:	IPCB(skb)->flags |= IPSKB_FRAG_COMPLETE;
+net/ipv4/ip_output.c:782:		if (IPCB(skb)->flags & IPSKB_FRAG_PMTU)
+net/ipv4/ipmr.c:1709:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+net/ipv4/ipmr.c:1716:	struct ip_options *opt = &(IPCB(skb)->opt);
+net/ipv4/ipmr.c:1805:	IPCB(skb)->flags |= IPSKB_FORWARDED;
+net/ipv4/ipmr.c:1993:		dev = dev_get_by_index_rcu(net, IPCB(skb)->iif);
+net/ipv4/ipmr.c:2003:	if (IPCB(skb)->flags & IPSKB_FORWARDED)
+net/ipv4/ipmr.c:2012:		if (IPCB(skb)->opt.router_alert) {
+net/ipv4/netfilter/nf_nat_l3proto_ipv4.c:366:	    !(IPCB(skb)->flags & IPSKB_XFRM_TRANSFORMED) &&
+net/ipv4/netfilter/nf_nat_l3proto_ipv4.c:415:		else if (!(IPCB(skb)->flags & IPSKB_XFRM_TRANSFORMED) &&
+net/ipv4/tcp_output.c:1192:	if (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED)
+net/ipv4/tcp_output.c:1194:	if (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_RETRANS)
+net/ipv4/tcp_output.c:1196:	if (TCP_SKB_CB(skb)->sacked & TCPCB_LOST)
+net/ipv4/tcp_output.c:1207:	    (tcp_is_fack(tp) || (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED)))
+net/ipv4/tcp_output.c:2685:	TCP_SKB_CB(skb)->sacked |= TCP_SKB_CB(next_skb)->sacked & TCPCB_EVER_RETRANS;
+net/ipv4/tcp_output.c:2711:	if (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED)
+net/ipv4/tcp_output.c:2851:		TCP_SKB_CB(skb)->sacked |= TCPCB_EVER_RETRANS;
+net/ipv4/tcp_output.c:2865:		if (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_RETRANS) {
+net/ipv4/tcp_output.c:2869:		TCP_SKB_CB(skb)->sacked |= TCPCB_RETRANS;
+net/ipv4/tcp_output.c:2936:		} else if (!(sacked & TCPCB_LOST)) {
+net/ipv4/tcp_output.c:2937:			if (!hole && !(sacked & (TCPCB_SACKED_RETRANS|TCPCB_SACKED_ACKED)))
+net/ipv4/tcp_output.c:2948:		if (sacked & (TCPCB_SACKED_ACKED|TCPCB_SACKED_RETRANS))
+net/ipv4/ip_tunnel_core.c:73:	memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+net/ipv4/route.c:1687:		IPCB(skb)->flags |= IPSKB_DOREDIRECT;
+net/ipv4/route.c:2587:	if (IPCB(skb)->flags & IPSKB_DOREDIRECT)
+net/ipv4/udp.c:137:/* IPCB reference means this can not be used from early demux */
+net/ipv4/udp.c:142:	    skb && ipv4_l3mdev_skb(IPCB(skb)->flags))
+net/ipv4/netfilter.c:61:	if (!(IPCB(skb)->flags & IPSKB_XFRM_TRANSFORMED) &&
+net/ipv4/ip_fragment.c:354:	if (!(IPCB(skb)->flags & IPSKB_FRAG_COMPLETE) &&
+net/ipv4/ip_fragment.c:624:	IPCB(head)->frag_max_size = max(qp->max_df_size, qp->q.max_size);
+net/ipv4/ip_fragment.c:639:		IPCB(head)->flags |= IPSKB_FRAG_PMTU;
+net/ipv4/ip_fragment.c:721:			memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
+net/ipv4/tcp_rate.c:89:		rs->is_retrans	     = scb->sacked & TCPCB_RETRANS;
+net/ipv4/tcp_rate.c:103:	if (scb->sacked & TCPCB_SACKED_ACKED)
+net/ipv4/ip_forward.c:51:	if (unlikely(IPCB(skb)->frag_max_size > mtu))
+net/ipv4/ip_forward.c:66:	struct ip_options *opt	= &(IPCB(skb)->opt);
+net/ipv4/ip_forward.c:82:	struct ip_options *opt	= &(IPCB(skb)->opt);
+net/ipv4/ip_forward.c:98:	if (IPCB(skb)->opt.router_alert && ip_call_ra_chain(skb))
+net/ipv4/ip_forward.c:120:	IPCB(skb)->flags |= IPSKB_FORWARDED;
+net/ipv4/ip_forward.c:141:	if (IPCB(skb)->flags & IPSKB_DOREDIRECT && !opt->srr &&
+net/ipv4/ip_sockglue.c:75:	if (IPCB(skb)->opt.optlen == 0)
+net/ipv4/ip_sockglue.c:78:	put_cmsg(msg, SOL_IP, IP_RECVOPTS, IPCB(skb)->opt.optlen,
+net/ipv4/ip_sockglue.c:89:	if (IPCB(skb)->opt.optlen == 0)
+net/ipv4/ip_sockglue.c:105:	if (IPCB(skb)->frag_max_size == 0)
+net/ipv4/ip_sockglue.c:108:	val = IPCB(skb)->frag_max_size;
+net/ipv4/ip_sockglue.c:1218:		 * element so the iif is picked up from the prior IPCB. If iif
+net/ipv4/ip_sockglue.c:1224:		bool l3slave = ipv4_l3mdev_skb(IPCB(skb)->flags);
+net/ipv4/tcp.c:1306:				TCP_SKB_CB(skb)->sacked |= TCPCB_REPAIRED;
+net/ipv4/udp_tunnel.c:178:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+net/ipv4/tcp_input.c:941:	if (!(sacked & TCPCB_LOST) ||
+net/ipv4/tcp_input.c:942:	    ((sacked & TCPCB_LOST) && (sacked & TCPCB_SACKED_RETRANS)))
+net/ipv4/tcp_input.c:948:	if (!(TCP_SKB_CB(skb)->sacked & (TCPCB_LOST|TCPCB_SACKED_ACKED))) {
+net/ipv4/tcp_input.c:953:		TCP_SKB_CB(skb)->sacked |= TCPCB_LOST;
+net/ipv4/tcp_input.c:962:	if (!(TCP_SKB_CB(skb)->sacked & (TCPCB_LOST|TCPCB_SACKED_ACKED))) {
+net/ipv4/tcp_input.c:964:		TCP_SKB_CB(skb)->sacked |= TCPCB_LOST;
+net/ipv4/tcp_input.c:1213:	if (dup_sack && (sacked & TCPCB_RETRANS)) {
+net/ipv4/tcp_input.c:1217:		if (sacked & TCPCB_SACKED_ACKED)
+net/ipv4/tcp_input.c:1225:	if (!(sacked & TCPCB_SACKED_ACKED)) {
+net/ipv4/tcp_input.c:1228:		if (sacked & TCPCB_SACKED_RETRANS) {
+net/ipv4/tcp_input.c:1233:			if (sacked & TCPCB_LOST) {
+net/ipv4/tcp_input.c:1234:				sacked &= ~(TCPCB_LOST|TCPCB_SACKED_RETRANS);
+net/ipv4/tcp_input.c:1239:			if (!(sacked & TCPCB_RETRANS)) {
+net/ipv4/tcp_input.c:1254:			if (sacked & TCPCB_LOST) {
+net/ipv4/tcp_input.c:1255:				sacked &= ~TCPCB_LOST;
+net/ipv4/tcp_input.c:1260:		sacked |= TCPCB_SACKED_ACKED;
+net/ipv4/tcp_input.c:1280:	if (dup_sack && (sacked & TCPCB_SACKED_RETRANS)) {
+net/ipv4/tcp_input.c:1281:		sacked &= ~TCPCB_SACKED_RETRANS;
+net/ipv4/tcp_input.c:1337:	TCP_SKB_CB(prev)->sacked |= (TCP_SKB_CB(skb)->sacked & TCPCB_EVER_RETRANS);
+net/ipv4/tcp_input.c:1408:	    (TCP_SKB_CB(skb)->sacked & (TCPCB_LOST|TCPCB_SACKED_RETRANS)) == TCPCB_SACKED_RETRANS)
+net/ipv4/tcp_input.c:1421:	if ((TCP_SKB_CB(prev)->sacked & TCPCB_TAGBITS) != TCPCB_SACKED_ACKED)
+net/ipv4/tcp_input.c:1510:	    ((TCP_SKB_CB(skb)->sacked & TCPCB_TAGBITS) != TCPCB_SACKED_ACKED) ||
+net/ipv4/tcp_input.c:1971:	is_reneg = skb && (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED);
+net/ipv4/tcp_input.c:1983:		mark_lost = (!(TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED) ||
+net/ipv4/tcp_input.c:1987:		TCP_SKB_CB(skb)->sacked &= (~TCPCB_TAGBITS)|TCPCB_SACKED_ACKED;
+net/ipv4/tcp_input.c:1989:			TCP_SKB_CB(skb)->sacked &= ~TCPCB_SACKED_ACKED;
+net/ipv4/tcp_input.c:1990:			TCP_SKB_CB(skb)->sacked |= TCPCB_LOST;
+net/ipv4/tcp_input.c:2232:		    (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED))
+net/ipv4/tcp_input.c:2237:			    (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED) ||
+net/ipv4/tcp_input.c:2292:	return (TCP_SKB_CB(skb)->sacked & TCPCB_RETRANS) &&
+net/ipv4/tcp_input.c:2312: * TCPCB_EVER_RETRANS set at the present time. It seems that checking
+net/ipv4/tcp_input.c:2330:	if (unlikely(skb && TCP_SKB_CB(skb)->sacked & TCPCB_EVER_RETRANS))
+net/ipv4/tcp_input.c:2375:			TCP_SKB_CB(skb)->sacked &= ~TCPCB_LOST;
+net/ipv4/tcp_input.c:2623:		    !(TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED)) {
+net/ipv4/tcp_input.c:2624:			if (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_RETRANS) {
+net/ipv4/tcp_input.c:2625:				TCP_SKB_CB(skb)->sacked &= ~TCPCB_SACKED_RETRANS;
+net/ipv4/tcp_input.c:3111:		if (unlikely(sacked & TCPCB_RETRANS)) {
+net/ipv4/tcp_input.c:3112:			if (sacked & TCPCB_SACKED_RETRANS)
+net/ipv4/tcp_input.c:3115:		} else if (!(sacked & TCPCB_SACKED_ACKED)) {
+net/ipv4/tcp_input.c:3127:		if (sacked & TCPCB_SACKED_ACKED) {
+net/ipv4/tcp_input.c:3135:		if (sacked & TCPCB_LOST)
+net/ipv4/tcp_input.c:3173:	if (skb && (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_ACKED))
+net/ipv4/igmp.c:1016:		dev = dev_get_by_index_rcu(dev_net(dev), IPCB(skb)->iif);
+net/ipv4/ip_tunnel.c:530:			memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+net/ipv4/ip_tunnel.c:576:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+net/ipv4/ip_tunnel.c:650:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+net/ipv4/ip_vti.c:257:		memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+net/ipv4/tcp_recovery.c:11:	if (TCP_SKB_CB(skb)->sacked & TCPCB_SACKED_RETRANS) {
+net/ipv4/tcp_recovery.c:13:		TCP_SKB_CB(skb)->sacked &= ~TCPCB_SACKED_RETRANS;
+net/ipv4/tcp_recovery.c:69:		    scb->sacked & TCPCB_SACKED_ACKED)
+net/ipv4/tcp_recovery.c:88:			if ((scb->sacked & TCPCB_LOST) &&
+net/ipv4/tcp_recovery.c:89:			    !(scb->sacked & TCPCB_SACKED_RETRANS))
+net/ipv4/tcp_recovery.c:95:		} else if (!(scb->sacked & TCPCB_RETRANS)) {
+net/ipv4/tcp_recovery.c:137:	if (sacked & TCPCB_RETRANS) {
+net/ipv4/cipso_ipv4.c:2174:	struct ip_options *opt = &IPCB(skb)->opt;
+net/ipv4/cipso_ipv4.c:2250:	struct ip_options *opt = &IPCB(skb)->opt;
+net/ipv4/ip_options.c:48:	memcpy(&(IPCB(skb)->opt), opt, sizeof(struct ip_options));
+net/ipv4/ip_options.c:50:	opt = &(IPCB(skb)->opt);
+net/ipv4/ip_options.c:210:	struct ip_options *opt = &(IPCB(skb)->opt);
+net/ipv4/ip_options.c:557:	struct   ip_options *opt	= &(IPCB(skb)->opt);
+net/ipv4/ip_options.c:604:	struct ip_options *opt = &(IPCB(skb)->opt);
+net/ipv4/xfrm4_output.c:25:	if (IPCB(skb)->flags & IPSKB_XFRM_TUNNEL_SIZE)
+net/ipv4/xfrm4_output.c:68:	IPCB(skb)->flags |= IPSKB_XFRM_TUNNEL_SIZE;
+net/ipv4/xfrm4_output.c:77:	memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+net/ipv4/xfrm4_output.c:80:	IPCB(skb)->flags |= IPSKB_XFRM_TRANSFORMED;
+net/ipv4/xfrm4_output.c:92:		IPCB(skb)->flags |= IPSKB_REROUTED;
+net/ipv4/xfrm4_output.c:105:			    !(IPCB(skb)->flags & IPSKB_REROUTED));
+net/ipv4/tcp_ipv4.c:1625:	/* This is tricky : We move IPCB at its correct location into TCP_SKB_CB()
+net/ipv4/tcp_ipv4.c:1628:	memmove(&TCP_SKB_CB(skb)->header.h4, IPCB(skb),
+net/ipv4/ip_input.c:281:	opt = &(IPCB(skb)->opt);
+net/ipv4/ip_input.c:482:	memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
+net/ipv4/ip_input.c:483:	IPCB(skb)->iif = skb->skb_iif;
+net/ipv6/ip6_vti.c:546:		memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+net/ipv6/sit.c:649:		IPCB(skb)->flags = 0;
+net/ipv6/ip6_gre.c:507:		IPCB(skb)->flags = 0;
+net/ipv6/ip6_gre.c:535:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+net/ipv6/ip6_tunnel.c:1233:	memset(&(IPCB(skb)->opt), 0, sizeof(IPCB(skb)->opt));
+crypto/tcrypt.c:1185:		ret += tcrypt_test("pcbc(fcrypt)");
+crypto/Kconfig:366:config CRYPTO_PCBC
+crypto/Kconfig:367:	tristate "PCBC support"
+crypto/Kconfig:371:	  PCBC: Propagating Cipher Block Chaining mode
+crypto/Kconfig:1009:	  ECB, CBC, LRW, PCBC, XTS. The 64 bit version has additional
+crypto/Makefile:79:obj-$(CONFIG_CRYPTO_PCBC) += pcbc.o
+crypto/testmgr.c:3000:					.vecs = fcrypt_pcbc_enc_tv_template,
+crypto/testmgr.c:3004:					.vecs = fcrypt_pcbc_dec_tv_template,
+crypto/testmgr.c:3310:		.alg = "pcbc(fcrypt)",
+crypto/testmgr.c:3314:				.enc = __VECS(fcrypt_pcbc_enc_tv_template),
+crypto/testmgr.c:3315:				.dec = __VECS(fcrypt_pcbc_dec_tv_template)
+crypto/pcbc.c:2: * PCBC: Propagating Cipher Block Chaining mode
+crypto/pcbc.c:25:struct crypto_pcbc_ctx {
+crypto/pcbc.c:29:static int crypto_pcbc_setkey(struct crypto_skcipher *parent, const u8 *key,
+crypto/pcbc.c:32:	struct crypto_pcbc_ctx *ctx = crypto_skcipher_ctx(parent);
+crypto/pcbc.c:45:static int crypto_pcbc_encrypt_segment(struct skcipher_request *req,
+crypto/pcbc.c:67:static int crypto_pcbc_encrypt_inplace(struct skcipher_request *req,
+crypto/pcbc.c:91:static int crypto_pcbc_encrypt(struct skcipher_request *req)
+crypto/pcbc.c:94:	struct crypto_pcbc_ctx *ctx = crypto_skcipher_ctx(tfm);
+crypto/pcbc.c:104:			nbytes = crypto_pcbc_encrypt_inplace(req, &walk,
+crypto/pcbc.c:107:			nbytes = crypto_pcbc_encrypt_segment(req, &walk,
+crypto/pcbc.c:115:static int crypto_pcbc_decrypt_segment(struct skcipher_request *req,
+crypto/pcbc.c:139:static int crypto_pcbc_decrypt_inplace(struct skcipher_request *req,
+crypto/pcbc.c:163:static int crypto_pcbc_decrypt(struct skcipher_request *req)
+crypto/pcbc.c:166:	struct crypto_pcbc_ctx *ctx = crypto_skcipher_ctx(tfm);
+crypto/pcbc.c:176:			nbytes = crypto_pcbc_decrypt_inplace(req, &walk,
+crypto/pcbc.c:179:			nbytes = crypto_pcbc_decrypt_segment(req, &walk,
+crypto/pcbc.c:187:static int crypto_pcbc_init_tfm(struct crypto_skcipher *tfm)
+crypto/pcbc.c:191:	struct crypto_pcbc_ctx *ctx = crypto_skcipher_ctx(tfm);
+crypto/pcbc.c:202:static void crypto_pcbc_exit_tfm(struct crypto_skcipher *tfm)
+crypto/pcbc.c:204:	struct crypto_pcbc_ctx *ctx = crypto_skcipher_ctx(tfm);
+crypto/pcbc.c:209:static void crypto_pcbc_free(struct skcipher_instance *inst)
+crypto/pcbc.c:215:static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
+crypto/pcbc.c:250:	err = crypto_inst_setname(skcipher_crypto_instance(inst), "pcbc", alg);
+crypto/pcbc.c:263:	inst->alg.base.cra_ctxsize = sizeof(struct crypto_pcbc_ctx);
+crypto/pcbc.c:265:	inst->alg.init = crypto_pcbc_init_tfm;
+crypto/pcbc.c:266:	inst->alg.exit = crypto_pcbc_exit_tfm;
+crypto/pcbc.c:268:	inst->alg.setkey = crypto_pcbc_setkey;
+crypto/pcbc.c:269:	inst->alg.encrypt = crypto_pcbc_encrypt;
+crypto/pcbc.c:270:	inst->alg.decrypt = crypto_pcbc_decrypt;
+crypto/pcbc.c:272:	inst->free = crypto_pcbc_free;
+crypto/pcbc.c:288:static struct crypto_template crypto_pcbc_tmpl = {
+crypto/pcbc.c:289:	.name = "pcbc",
+crypto/pcbc.c:290:	.create = crypto_pcbc_create,
+crypto/pcbc.c:294:static int __init crypto_pcbc_module_init(void)
+crypto/pcbc.c:296:	return crypto_register_template(&crypto_pcbc_tmpl);
+crypto/pcbc.c:299:static void __exit crypto_pcbc_module_exit(void)
+crypto/pcbc.c:301:	crypto_unregister_template(&crypto_pcbc_tmpl);
+crypto/pcbc.c:304:module_init(crypto_pcbc_module_init);
+crypto/pcbc.c:305:module_exit(crypto_pcbc_module_exit);
+crypto/pcbc.c:308:MODULE_DESCRIPTION("PCBC block cipher algorithm");
+crypto/pcbc.c:309:MODULE_ALIAS_CRYPTO("pcbc");
+crypto/testmgr.h:27450:static const struct cipher_testvec fcrypt_pcbc_enc_tv_template[] = {
+crypto/testmgr.h:27511:static const struct cipher_testvec fcrypt_pcbc_dec_tv_template[] = {
+Documentation/media/v4l-drivers/saa7134-cardlist.rst:476:     - Sabrent PCMCIA TV-PCB05
+Documentation/media/v4l-drivers/bttv.rst:721:  #) These cards have a number printed on the PCB just above the tuner metal box:
+Documentation/media/v4l-drivers/bttv.rst:741:  #) There is a print on the PCB:
+Documentation/media/v4l-drivers/bttv.rst:819:  - 50692 "TV/FM Tuner" (small PCB)
+Documentation/media/v4l-drivers/bttv.rst:1008:- TV-Boostar = Terratec Terra TV+ Version 1.0 (Bt848, tda9821) "ceb105.pcb"
+Documentation/media/v4l-drivers/bttv.rst:1015:- Face to Face Capture (Bt848 capture only) (PCB "VP-2848")
+Documentation/media/v4l-drivers/bttv.rst:1016:- Face To Face TV MAX (Bt848) (PCB "VP-8482 Rev1.3")
+Documentation/media/v4l-drivers/bttv.rst:1017:- Genie TV (Bt878) (PCB "VP-8790 Rev 2.1")
+Documentation/media/v4l-drivers/bttv.rst:1036:PCB      PCI-ID      Model-Name      Eeprom  Tuner  Sound    Country
+Documentation/media/v4l-drivers/bttv.rst:1105:- MD9592 = Avermedia TVphone98 (PCI_ID=1461:0003), PCB-Rev=M168II-B (w/TDA9873H)
+Documentation/media/v4l-drivers/bttv.rst:1125:- Terra TV+ Version 1.0 (Bt848), "ceb105.PCB" printed on the PCB, TDA9821
+Documentation/media/v4l-drivers/bttv.rst:1126:- Terra TV+ Version 1.1 (Bt878), "LR74 Rev.E" printed on the PCB, TDA9821
+Documentation/media/v4l-drivers/bttv.rst:1127:- Terra TValueRadio,             "LR102 Rev.C" printed on the PCB
+Documentation/media/v4l-drivers/bttv.rst:1128:- Terra TV/Radio+ Version 1.0,   "80-CP2830100-0" TTTV3 printed on the PCB,
+Documentation/media/v4l-drivers/bttv.rst:1130:- Terra TValue Version BT878,    "80-CP2830110-0 TTTV4" printed on the PCB,
+Documentation/media/v4l-drivers/bttv.rst:1132:- Terra TValue Version 1.0       "ceb105.PCB" (really identical to Terra TV+ Version 1.0)
+Documentation/media/v4l-drivers/bttv.rst:1136:- LR74 is a newer PCB revision of ceb105 (both incl. connector for Active Radio Upgrade)
+Documentation/media/v4l-drivers/bttv.rst:1138:- Cinergy 400 (saa7134), "E877 11(S)", "PM820092D" printed on PCB
+Documentation/media/v4l-drivers/bttv.rst:1169:           a) pcb "MTV878" (CARD=75)
+Documentation/media/v4l-drivers/bttv.rst:1276:Hollywood plus (em8300, em9010, adv7175), (PCB "M340-10") MPEG DVD decoder
+Documentation/media/v4l-drivers/bttv.rst:1339:- TT-SAT PCI (PCB "Sat-PCI Rev.:1.3.1"; zr36125, vpx3225d, stc0056a, Tuner:BSKE6-155A
+Documentation/devicetree/bindings/phy/brcm-sata-phy.txt:13:- reg: register ranges for the PHY PCB interface
+Documentation/devicetree/bindings/thermal/thermal.txt:473:				  <&adc>;	/* pcb north */
+Documentation/devicetree/bindings/thermal/thermal.txt:547:		thermal-sensors = <&adc_dummy     0>, /* pcb top edge */
+Documentation/devicetree/bindings/sound/rt5663.txt:19:  Based on the different PCB layout, add the manual offset value to
+Documentation/devicetree/bindings/sound/axentia,tse850-pcm5142.txt:40:are TSE-850 connectors and DAC is the PCB name of the (filtered) output from
+Documentation/devicetree/bindings/sound/nvidia,tegra-audio-wm9712.txt:28:  * PCBEEP
+Documentation/devicetree/bindings/net/phy.txt:40:  bootstrap configuration caused by issues in PCB layout design.
+Documentation/devicetree/bindings/display/exynos/exynos-mic.txt:7:the panel PCB.
+Documentation/devicetree/bindings/arm/vexpress.txt:44:  PCB's silkscreen) in hexadecimal transcription:
+Documentation/isdn/README.HiSax:50:PCBIT-DP (OEM version of ASUSCOM NETWORK INC. ISDNLink)
+Documentation/isdn/CREDITS:41:  For lot of new ideas and the pcbit driver.
+Documentation/admin-guide/kernel-parameters.txt:2900:	pcbit=		[HW,ISDN]
+Documentation/acpi/method-tracing.txt:67:     [    0.186427]   exdebug-0398 ex_trace_point        : Method Begin [0xf58394d8:\_SB.PCI0.LPCB.ECOK] execution.
+Documentation/acpi/method-tracing.txt:80:     [    0.188903]   exdebug-0398 ex_trace_point        : Method End [0xf58394d8:\_SB.PCI0.LPCB.ECOK] execution.
+Documentation/networking/iphase.txt:137:         -Pcbr:max_pcr=<xxx>
+Documentation/networking/kapi.rst:80:.. kernel-doc:: net/sunrpc/rpcb_clnt.c
+Documentation/networking/phy.txt:82:   or the PCB traces) insert the correct 1.5-2ns delay
+Documentation/networking/phy.txt:97:   precision may be required to account for differences in PCB trace lengths
+Documentation/networking/phy.txt:124: * Modifying the PCB design to include a fixed delay (e.g: using a specifically
+Documentation/fmc/FMC-and-SDB.txt:37:The FMC card is an almost square PCB, around 70x75 millimeters, that is
+Documentation/fmc/FMC-and-SDB.txt:39:another PCB for power supply and control; such bigger circuit board is
+Documentation/fmc/carrier.txt:274:points 0 through 3 (even if the test points on the PCB are called
+arch/m68k/configs/amiga_defconfig:613:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/mac_defconfig:596:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/sun3_defconfig:565:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/bvme6000_defconfig:564:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/mvme147_defconfig:564:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/mvme16x_defconfig:564:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/apollo_defconfig:572:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/sun3x_defconfig:566:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/atari_defconfig:594:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/multi_defconfig:676:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/hp300_defconfig:574:CONFIG_CRYPTO_PCBC=m
+arch/m68k/configs/q40_defconfig:587:CONFIG_CRYPTO_PCBC=m
+arch/m68k/include/uapi/asm/Kbuild:8:generic-y += ipcbuf.h
+arch/xtensa/include/uapi/asm/ipcbuf.h:2: * include/asm-xtensa/ipcbuf.h
+arch/xtensa/include/uapi/asm/ipcbuf.h:11:#ifndef _XTENSA_IPCBUF_H
+arch/xtensa/include/uapi/asm/ipcbuf.h:12:#define _XTENSA_IPCBUF_H
+arch/xtensa/include/uapi/asm/ipcbuf.h:37:#endif /* _XTENSA_IPCBUF_H */
+arch/score/include/uapi/asm/ipcbuf.h:1:#ifndef _ASM_SCORE_IPCBUF_H
+arch/score/include/uapi/asm/ipcbuf.h:2:#define _ASM_SCORE_IPCBUF_H
+arch/score/include/uapi/asm/ipcbuf.h:4:#include <asm-generic/ipcbuf.h>
+arch/score/include/uapi/asm/ipcbuf.h:6:#endif /* _ASM_SCORE_IPCBUF_H */
+arch/frv/include/uapi/asm/ipcbuf.h:1:#include <asm-generic/ipcbuf.h>
+arch/h8300/include/uapi/asm/Kbuild:9:generic-y += ipcbuf.h
+arch/powerpc/xmon/ppc-opc.c:3005:#define PPCBRLK PPC_OPCODE_BRLOCK
+arch/powerpc/xmon/ppc-opc.c:5298:{"mfbbear",	XSPR(31,339,513), XSPR_MASK, PPCBRLK,	0,		{RT}},
+arch/powerpc/xmon/ppc-opc.c:5299:{"mfbbtar",	XSPR(31,339,514), XSPR_MASK, PPCBRLK,	0,		{RT}},
+arch/powerpc/xmon/ppc-opc.c:5651:{"mtbbear",	XSPR(31,467,513), XSPR_MASK, PPCBRLK,	0,		{RS}},
+arch/powerpc/xmon/ppc-opc.c:5652:{"mtbbtar",	XSPR(31,467,514), XSPR_MASK, PPCBRLK,	0,		{RS}},
+arch/powerpc/xmon/ppc-opc.c:5769:{"bblels",	X(31,518),	X_MASK,	     PPCBRLK,	0,		{0}},
+arch/powerpc/xmon/ppc-opc.c:5822:{"bbelr",	X(31,550),	X_MASK,	     PPCBRLK,	0,		{0}},
+arch/powerpc/configs/ppc6xx_defconfig:1169:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/amigaone_defconfig:121:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/linkstation_defconfig:136:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/ppc40x_defconfig:85:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/akebono_defconfig:133:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/currituck_defconfig:93:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/rainier_defconfig:66:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/icon_defconfig:92:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/fsp2_defconfig:124:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/taishan_defconfig:61:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/iss476-smp_defconfig:71:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/katmai_defconfig:60:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/bamboo_defconfig:55:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/ebony_defconfig:59:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/eiger_defconfig:88:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/redwood_defconfig:87:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/44x/sequoia_defconfig:67:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/mpc8272_ads_defconfig:77:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/mpc83xx_defconfig:109:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/pmac32_defconfig:313:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/cell_defconfig:210:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/ppc44x_defconfig:109:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/40x/walnut_defconfig:57:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/40x/acadia_defconfig:64:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/40x/kilauea_defconfig:72:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/40x/obs600_defconfig:72:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/40x/makalu_defconfig:62:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/40x/ep405_defconfig:64:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/ppc64e_defconfig:237:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/ps3_defconfig:171:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/pseries_defconfig:303:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/chrp32_defconfig:126:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/pq2fads_defconfig:79:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/ppc64_defconfig:344:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/mvme5100_defconfig:122:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/fsl-emb-nonhw.config:23:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/mgcoge_defconfig:84:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/ep8248e_defconfig:70:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/maple_defconfig:125:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc832x_rdb_defconfig:79:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/g5_defconfig:263:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc8315_rdb_defconfig:86:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc834x_mds_defconfig:59:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc836x_mds_defconfig:65:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/sbc834x_defconfig:73:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc834x_itx_defconfig:85:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc832x_mds_defconfig:60:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc837x_rdb_defconfig:86:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/asp8347_defconfig:72:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc8313_rdb_defconfig:87:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc837x_mds_defconfig:59:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/83xx/mpc834x_itxgp_defconfig:77:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/powernv_defconfig:304:CONFIG_CRYPTO_PCBC=m
+arch/powerpc/configs/52xx/cm5200_defconfig:79:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/52xx/motionpro_defconfig:92:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/configs/52xx/tqm5200_defconfig:93:CONFIG_CRYPTO_PCBC=y
+arch/powerpc/platforms/86xx/gef_ppc9a.c:99:/* Return the PCB revision */
+arch/powerpc/platforms/86xx/gef_ppc9a.c:100:static unsigned int gef_ppc9a_get_pcb_rev(void)
+arch/powerpc/platforms/86xx/gef_ppc9a.c:150:	seq_printf(m, "Revision\t: %u%c\n", gef_ppc9a_get_pcb_rev(),
+arch/powerpc/platforms/86xx/gef_sbc310.c:98:/* Return the PCB revision */
+arch/powerpc/platforms/86xx/gef_sbc310.c:107:/* Return the PCB revision */
+arch/powerpc/platforms/86xx/gef_sbc310.c:108:static unsigned int gef_sbc310_get_pcb_rev(void)
+arch/powerpc/platforms/86xx/gef_sbc310.c:141:	seq_printf(m, "Revision\t: %u%c\n", gef_sbc310_get_pcb_rev(),
+arch/powerpc/platforms/86xx/gef_sbc610.c:99:/* Return the PCB revision */
+arch/powerpc/platforms/86xx/gef_sbc610.c:100:static unsigned int gef_sbc610_get_pcb_rev(void)
+arch/powerpc/platforms/86xx/gef_sbc610.c:132:	seq_printf(m, "Revision\t: %u%c\n", gef_sbc610_get_pcb_rev(),
+arch/powerpc/platforms/85xx/ge_imp3a.c:135:/* Return the PCB revision */
+arch/powerpc/platforms/85xx/ge_imp3a.c:136:static unsigned int ge_imp3a_get_pcb_rev(void)
+arch/powerpc/platforms/85xx/ge_imp3a.c:184:	seq_printf(m, "Revision\t: %u%c\n", ge_imp3a_get_pcb_rev(),
+arch/powerpc/boot/cuboot-8xx.c:19:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-83xx.c:18:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-52xx.c:20:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-pq2.c:22:#include "ppcboot.h"
+arch/powerpc/boot/ppcboot-hotfoot.h:8: * ppcboot.h for historical reasons, and in the interest of having a 
+arch/powerpc/boot/ppcboot-hotfoot.h:14: * (This header is identical to ppcboot.h except for the 
+arch/powerpc/boot/ppcboot-hotfoot.h:38:#ifndef __PPCBOOT_H__
+arch/powerpc/boot/ppcboot-hotfoot.h:39:#define __PPCBOOT_H__
+arch/powerpc/boot/ppcboot-hotfoot.h:42: * Board information passed to kernel from PPCBoot
+arch/powerpc/boot/ppcboot-hotfoot.h:44: * include/asm-ppc/ppcboot.h
+arch/powerpc/boot/ppcboot-hotfoot.h:133:#endif	/* __PPCBOOT_H__ */
+arch/powerpc/boot/cuboot-warp.c:17:#include "ppcboot.h"
+arch/powerpc/boot/mvme5100.c:2: * Motorola/Emerson MVME5100 with PPCBug firmware.
+arch/powerpc/boot/cuboot-c2k.c:23:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-85xx.c:19:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-sequoia.c:33:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-hotfoot.c:21:#include "ppcboot-hotfoot.h"
+arch/powerpc/boot/cuboot-yosemite.c:21:#include "ppcboot.h"
+arch/powerpc/boot/cuboot.c:18:#include "ppcboot.h"
+arch/powerpc/boot/mvme7100.c:23:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-kilauea.c:24:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-mpc7448hpc2.c:23:#include "ppcboot.h"
+arch/powerpc/boot/ppcboot.h:26:#ifndef __PPCBOOT_H__
+arch/powerpc/boot/ppcboot.h:27:#define __PPCBOOT_H__
+arch/powerpc/boot/ppcboot.h:30: * Board information passed to kernel from PPCBoot
+arch/powerpc/boot/ppcboot.h:32: * include/asm-ppc/ppcboot.h
+arch/powerpc/boot/ppcboot.h:109:#endif	/* __PPCBOOT_H__ */
+arch/powerpc/boot/cuboot-taishan.c:27:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-acadia.c:22:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-katmai.c:27:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-rainier.c:33:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-824x.c:16:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-ebony.c:22:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-85xx-cpm2.c:19:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-bamboo.c:22:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-amigaone.c:18:#include "ppcboot.h"
+arch/powerpc/boot/cuboot-sam440ep.c:27:#include "ppcboot.h"
+arch/powerpc/include/asm/opal.h:161:int64_t opal_xscom_read(uint32_t gcid, uint64_t pcb_addr, __be64 *val);
+arch/powerpc/include/asm/opal.h:162:int64_t opal_xscom_write(uint32_t gcid, uint64_t pcb_addr, uint64_t val);
+arch/powerpc/include/uapi/asm/ipcbuf.h:1:#ifndef _ASM_POWERPC_IPCBUF_H
+arch/powerpc/include/uapi/asm/ipcbuf.h:2:#define _ASM_POWERPC_IPCBUF_H
+arch/powerpc/include/uapi/asm/ipcbuf.h:34:#endif /* _ASM_POWERPC_IPCBUF_H */
+arch/sparc/configs/sparc64_defconfig:217:CONFIG_CRYPTO_PCBC=m
+arch/sparc/configs/sparc32_defconfig:86:CONFIG_CRYPTO_PCBC=m
+arch/sparc/include/uapi/asm/ipcbuf.h:1:#ifndef __SPARC_IPCBUF_H
+arch/sparc/include/uapi/asm/ipcbuf.h:2:#define __SPARC_IPCBUF_H
+arch/sparc/include/uapi/asm/ipcbuf.h:32:#endif /* __SPARC_IPCBUF_H */
+arch/sparc/kernel/leon_pci_grpci2.c:48: * all are enabled. Use this when PCI interrupt pins are floating on PCB.
+arch/arc/boot/dts/abilis_tb100_dvk.dts:2: * Abilis Systems TB100 Development Kit PCB device tree
+arch/arc/boot/dts/abilis_tb101_dvk.dts:2: * Abilis Systems TB101 Development Kit PCB device tree
+arch/arc/include/uapi/asm/Kbuild:10:generic-y += ipcbuf.h
+arch/mips/configs/malta_kvm_defconfig:431:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/ip32_defconfig:180:CONFIG_CRYPTO_PCBC=y
+arch/mips/configs/rm200_defconfig:450:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/sb1250_swarm_defconfig:96:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/nlm_xlp_defconfig:579:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/ip27_defconfig:351:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/decstation_defconfig:98:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/gpr_defconfig:322:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/fuloong2e_defconfig:255:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/ip22_defconfig:356:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/maltaaprp_defconfig:178:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/maltasmvp_eva_defconfig:182:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/bigsur_defconfig:258:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/nlm_xlr_defconfig:533:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/malta_qemu_32r6_defconfig:178:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/jazz_defconfig:361:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/malta_defconfig:417:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/malta_kvm_guest_defconfig:433:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/mtx1_defconfig:782:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/maltaup_xpa_defconfig:424:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/lemote2f_defconfig:409:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/maltaup_defconfig:177:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/capcella_defconfig:76:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/maltasmvp_defconfig:182:CONFIG_CRYPTO_PCBC=m
+arch/mips/configs/markeins_defconfig:201:CONFIG_CRYPTO_PCBC=m
+arch/mips/kernel/mips-cpc.c:48:		return cpc_base & CM_GCR_CPC_BASE_CPCBASE;
+arch/mips/include/asm/mips-cm.h:201:#define CM_GCR_CPC_BASE_CPCBASE			GENMASK(31, 15)
+arch/mips/include/uapi/asm/Kbuild:4:generic-y += ipcbuf.h
+arch/arm64/boot/dts/zte/Makefile:2:dtb-$(CONFIG_ARCH_ZX) += zx296718-pcbox.dtb
+arch/arm64/boot/dts/zte/zx296718-pcbox.dts:13:	model = "ZTE ZX296718 PCBOX Board";
+arch/arm64/boot/dts/zte/zx296718-pcbox.dts:14:	compatible = "zte,zx296718-pcbox", "zte,zx296718";
+arch/arm64/include/uapi/asm/Kbuild:7:generic-y += ipcbuf.h
+arch/sh/boards/mach-sdk7786/setup.c:157: * clock A (slot 1 and the CPU clock). Newer revs of the PCB shove
+arch/sh/boards/mach-sdk7786/setup.c:252:	pr_info("\tPCB revision:\t%d\n", fpga_read_reg(PCBRR) & 0xf);
+arch/sh/boards/mach-cayman/setup.c:29:#define PCB INTB_PRIORITY
+arch/sh/boards/mach-cayman/setup.c:91:	IR0, IR1, IR2, IR3, PCA, PCB, PCC, PCD,	/* IRQ  0- 7 */
+arch/sh/configs/sh2007_defconfig:173:CONFIG_CRYPTO_PCBC=y
+arch/sh/configs/r7785rp_defconfig:109:CONFIG_CRYPTO_PCBC=m
+arch/sh/configs/r7780mp_defconfig:111:CONFIG_CRYPTO_PCBC=m
+arch/sh/configs/se7712_defconfig:103:CONFIG_CRYPTO_PCBC=m
+arch/sh/configs/hp6xx_defconfig:58:CONFIG_CRYPTO_PCBC=y
+arch/sh/kernel/cpu/sh4a/ubc.c:27:#define UBC_CRR_PCB	(1 << 1)
+arch/sh/kernel/cpu/sh4a/ubc.c:121:		__raw_writel(UBC_CRR_BIE | UBC_CRR_PCB, UBC_CRR(i));
+arch/sh/include/mach-sdk7786/mach/fpga.h:34:#define PCBRR		0x0f0
+arch/sh/include/mach-sdk7786/mach/fpga.h:83:#define SPCBR		0x1b0
+arch/sh/include/uapi/asm/Kbuild:8:generic-y += ipcbuf.h
+arch/c6x/include/uapi/asm/Kbuild:10:generic-y += ipcbuf.h
+arch/mn10300/unit-asb2305/pci.c:89:		__pcbdebug("=> %02hx", &BRIDGEREGL(where), value);
+arch/mn10300/unit-asb2305/pci.c:109:		__pcbdebug("=> %04hx", &BRIDGEREGL(where), value);
+arch/mn10300/unit-asb2305/pci.c:129:		__pcbdebug("=> %08x", &BRIDGEREGL(where), value);
+arch/mn10300/unit-asb2305/pci.c:148:		__pcbdebug("<= %02x", &BRIDGEREGB(where), value);
+arch/mn10300/unit-asb2305/pci.c:168:		__pcbdebug("<= %04hx", &BRIDGEREGW(where), value);
+arch/mn10300/unit-asb2305/pci.c:186:		__pcbdebug("<= %08x", &BRIDGEREGL(where), value);
+arch/mn10300/include/asm/pci.h:18:#define __pcbdebug(FMT, ADDR, ...) \
+arch/mn10300/include/asm/pci.h:32:#define __pcbdebug(FMT, ADDR, ...)		do {} while (0)
+arch/mn10300/include/uapi/asm/ipcbuf.h:1:#include <asm-generic/ipcbuf.h>
+arch/tile/configs/tilegx_defconfig:387:CONFIG_CRYPTO_PCBC=m
+arch/tile/configs/tilepro_defconfig:498:CONFIG_CRYPTO_PCBC=m
+arch/tile/include/uapi/asm/Kbuild:8:generic-y += ipcbuf.h
+arch/nios2/include/uapi/asm/Kbuild:10:generic-y += ipcbuf.h
+arch/microblaze/include/uapi/asm/Kbuild:9:generic-y += ipcbuf.h
+arch/metag/kernel/traps.c:527:static int handle_data_fault(PTBICTXEXTCB0 pcbuf, struct pt_regs *regs,
+arch/metag/kernel/traps.c:532:	ret = do_page_fault(regs, data_address, !load_fault(pcbuf), trapno);
+arch/metag/kernel/traps.c:546:	PTBICTXEXTCB0 pcbuf = (PTBICTXEXTCB0)&regs->extcb0;
+arch/metag/kernel/traps.c:554:	     (pcbuf[0].CBFlags & (TXCATCH0_WATCH1_BIT |
+arch/metag/kernel/traps.c:563:	data_address = fault_address(pcbuf);
+arch/metag/kernel/traps.c:581:		handle_data_fault(pcbuf, regs, data_address, SigNum);
+arch/metag/include/uapi/asm/Kbuild:10:generic-y += ipcbuf.h
+arch/alpha/kernel/smp.c:294:	struct pcb_struct *hwpcb, *ipcb;
+arch/alpha/kernel/smp.c:301:	hwpcb = (struct pcb_struct *) cpu->hwpcb;
+arch/alpha/kernel/smp.c:302:	ipcb = &task_thread_info(idle)->pcb;
+arch/alpha/kernel/smp.c:304:	/* Initialize the CPU's HWPCB to something just good enough for
+arch/alpha/kernel/smp.c:306:	   to the target idle task's pcb.  Reuse the stack in the mean
+arch/alpha/kernel/smp.c:307:	   time.  Precalculate the target PCBB.  */
+arch/alpha/kernel/smp.c:308:	hwpcb->ksp = (unsigned long)ipcb + sizeof(union thread_union) - 16;
+arch/alpha/kernel/smp.c:309:	hwpcb->usp = 0;
+arch/alpha/kernel/smp.c:310:	hwpcb->ptbr = ipcb->ptbr;
+arch/alpha/kernel/smp.c:311:	hwpcb->pcc = 0;
+arch/alpha/kernel/smp.c:312:	hwpcb->asn = 0;
+arch/alpha/kernel/smp.c:313:	hwpcb->unique = virt_to_phys(ipcb);
+arch/alpha/kernel/smp.c:314:	hwpcb->flags = ipcb->flags;
+arch/alpha/kernel/smp.c:315:	hwpcb->res1 = hwpcb->res2 = 0;
+arch/alpha/kernel/smp.c:319:	      hwpcb->ksp, hwpcb->ptbr, hwrpb->vptb, hwpcb->unique));
+arch/alpha/kernel/smp.c:322:	      cpuid, idle->state, ipcb->flags));
+arch/alpha/kernel/process.c:225:	current_thread_info()->pcb.unique = 0;
+arch/alpha/kernel/process.c:250:	childti->pcb.ksp = (unsigned long) childstack;
+arch/alpha/kernel/process.c:251:	childti->pcb.flags = 1;	/* set FEN, clear everything else */
+arch/alpha/kernel/process.c:261:		childti->pcb.usp = 0;
+arch/alpha/kernel/process.c:270:		childti->pcb.unique = regs->r20;
+arch/alpha/kernel/process.c:271:	childti->pcb.usp = usp ?: rdusp();
+arch/alpha/kernel/process.c:322:	dest[30] = ti == current_thread_info() ? rdusp() : ti->pcb.usp;
+arch/alpha/kernel/process.c:328:	dest[32] = ti->pcb.unique;
+arch/alpha/kernel/process.c:367:	unsigned long fp, sp = task_thread_info(t)->pcb.ksp;
+arch/alpha/kernel/process.c:397:		schedule_frame = ((unsigned long *)task_thread_info(p)->pcb.ksp)[6];
+arch/alpha/kernel/head.S:38:	/* On entry here from SRM console, the HWPCB of the per-cpu
+arch/alpha/kernel/head.S:40:	   for the UNIQUE value for this process to contain the PCBB
+arch/alpha/kernel/head.S:46:	call_pal PAL_rduniq	# Grab the target PCBB.
+arch/alpha/kernel/traps.c:397:		current_thread_info()->pcb.flags |= 1;
+arch/alpha/kernel/traps.c:398:		__reload_thread(&current_thread_info()->pcb);
+arch/alpha/kernel/ptrace.c:113:		addr = &task_thread_info(task)->pcb.usp;
+arch/alpha/kernel/ptrace.c:115:		addr = &task_thread_info(task)->pcb.unique;
+arch/alpha/boot/head.S:61:	stq	$30,0($17)	/* save KSP in PCB */
+arch/alpha/boot/main.c:23:	struct pcb_struct * pcb_va, struct pcb_struct * pcb_pa,
+arch/alpha/boot/main.c:26:static struct pcb_struct pcb_va[1];
+arch/alpha/boot/main.c:49: * PCB for that. The kernel proper should replace this PCB with
+arch/alpha/boot/main.c:66:	struct pcb_struct * pcb_pa;
+arch/alpha/boot/main.c:68:	/* Create the dummy PCB.  */
+arch/alpha/boot/main.c:69:	pcb_va->ksp = 0;
+arch/alpha/boot/main.c:70:	pcb_va->usp = 0;
+arch/alpha/boot/main.c:71:	pcb_va->ptbr = L1[1] >> 32;
+arch/alpha/boot/main.c:72:	pcb_va->asn = 0;
+arch/alpha/boot/main.c:73:	pcb_va->pcc = 0;
+arch/alpha/boot/main.c:74:	pcb_va->unique = 0;
+arch/alpha/boot/main.c:75:	pcb_va->flags = 1;
+arch/alpha/boot/main.c:76:	pcb_va->res1 = 0;
+arch/alpha/boot/main.c:77:	pcb_va->res2 = 0;
+arch/alpha/boot/main.c:78:	pcb_pa = find_pa(VPTB, pcb_va);
+arch/alpha/boot/main.c:82:	 * a1 = return address, but we give the asm the vaddr of the PCB
+arch/alpha/boot/main.c:83:	 * a2 = physical addr of PCB
+arch/alpha/boot/main.c:89:	i = switch_to_osf_pal(2, pcb_va, pcb_pa, VPTB);
+arch/alpha/boot/bootp.c:26:	struct pcb_struct * pcb_va, struct pcb_struct * pcb_pa,
+arch/alpha/boot/bootp.c:32:static struct pcb_struct pcb_va[1];
+arch/alpha/boot/bootp.c:55: * PCB for that. The kernel proper should replace this PCB with
+arch/alpha/boot/bootp.c:72:	struct pcb_struct * pcb_pa;
+arch/alpha/boot/bootp.c:74:	/* Create the dummy PCB.  */
+arch/alpha/boot/bootp.c:75:	pcb_va->ksp = 0;
+arch/alpha/boot/bootp.c:76:	pcb_va->usp = 0;
+arch/alpha/boot/bootp.c:77:	pcb_va->ptbr = L1[1] >> 32;
+arch/alpha/boot/bootp.c:78:	pcb_va->asn = 0;
+arch/alpha/boot/bootp.c:79:	pcb_va->pcc = 0;
+arch/alpha/boot/bootp.c:80:	pcb_va->unique = 0;
+arch/alpha/boot/bootp.c:81:	pcb_va->flags = 1;
+arch/alpha/boot/bootp.c:82:	pcb_va->res1 = 0;
+arch/alpha/boot/bootp.c:83:	pcb_va->res2 = 0;
+arch/alpha/boot/bootp.c:84:	pcb_pa = find_pa(VPTB, pcb_va);
+arch/alpha/boot/bootp.c:88:	 * a1 = return address, but we give the asm the vaddr of the PCB
+arch/alpha/boot/bootp.c:89:	 * a2 = physical addr of PCB
+arch/alpha/boot/bootp.c:95:	i = switch_to_osf_pal(2, pcb_va, pcb_pa, VPTB);
+arch/alpha/boot/bootpz.c:45:	struct pcb_struct * pcb_va, struct pcb_struct * pcb_pa,
+arch/alpha/boot/bootpz.c:54:static struct pcb_struct pcb_va[1];
+arch/alpha/boot/bootpz.c:104: * PCB for that. The kernel proper should replace this PCB with
+arch/alpha/boot/bootpz.c:120:	struct pcb_struct * pcb_pa;
+arch/alpha/boot/bootpz.c:122:	/* Create the dummy PCB.  */
+arch/alpha/boot/bootpz.c:123:	pcb_va->ksp = 0;
+arch/alpha/boot/bootpz.c:124:	pcb_va->usp = 0;
+arch/alpha/boot/bootpz.c:125:	pcb_va->ptbr = L1[1] >> 32;
+arch/alpha/boot/bootpz.c:126:	pcb_va->asn = 0;
+arch/alpha/boot/bootpz.c:127:	pcb_va->pcc = 0;
+arch/alpha/boot/bootpz.c:128:	pcb_va->unique = 0;
+arch/alpha/boot/bootpz.c:129:	pcb_va->flags = 1;
+arch/alpha/boot/bootpz.c:130:	pcb_va->res1 = 0;
+arch/alpha/boot/bootpz.c:131:	pcb_va->res2 = 0;
+arch/alpha/boot/bootpz.c:132:	pcb_pa = (struct pcb_struct *)find_pa((unsigned long)pcb_va);
+arch/alpha/boot/bootpz.c:136:	 * a1 = return address, but we give the asm the vaddr of the PCB
+arch/alpha/boot/bootpz.c:137:	 * a2 = physical addr of PCB
+arch/alpha/boot/bootpz.c:143:	i = switch_to_osf_pal(2, pcb_va, pcb_pa, VPTB);
+arch/alpha/include/asm/hwrpb.h:77:struct pcb_struct {
+arch/alpha/include/asm/hwrpb.h:89:	unsigned long hwpcb[16];
+arch/alpha/include/asm/hwrpb.h:102:	unsigned long halt_PCBB;
+arch/alpha/include/asm/processor.h:58:  ((tsk) == current ? rdusp() : task_thread_info(tsk)->pcb.usp)
+arch/alpha/include/asm/mmu_context.h:28:__reload_thread(struct pcb_struct *pcb)
+arch/alpha/include/asm/mmu_context.h:33:	a0 = virt_to_phys(pcb);
+arch/alpha/include/asm/mmu_context.h:157:	/* Always update the PCB ASN.  Another thread may have allocated
+arch/alpha/include/asm/mmu_context.h:160:	task_thread_info(next)->pcb.asn = mmc & HARDWARE_ASN_MASK;
+arch/alpha/include/asm/mmu_context.h:238:		task_thread_info(tsk)->pcb.ptbr
+arch/alpha/include/asm/mmu_context.h:252:	task_thread_info(tsk)->pcb.ptbr
+arch/alpha/include/asm/switch_to.h:10:    (L) = alpha_switch_to(virt_to_phys(&task_thread_info(N)->pcb), (P)); \
+arch/alpha/include/asm/thread_info.h:15:	struct pcb_struct	pcb;		/* palcode state */
+arch/alpha/include/uapi/asm/setup.h:11:#define BOOT_PCB	0x20000000
+arch/alpha/include/uapi/asm/ipcbuf.h:1:#include <asm-generic/ipcbuf.h>
+arch/alpha/mm/init.c:38:static struct pcb_struct original_pcb;
+arch/alpha/mm/init.c:91:load_PCB(struct pcb_struct *pcb)
+arch/alpha/mm/init.c:94:	pcb->ksp = sp;
+arch/alpha/mm/init.c:95:	return __reload_thread(pcb);
+arch/alpha/mm/init.c:98:/* Set up initial PCB, VPTB, and other such nicities.  */
+arch/alpha/mm/init.c:104:	unsigned long original_pcb_ptr;
+arch/alpha/mm/init.c:121:	/* Also set up the real kernel PCB while we're at it.  */
+arch/alpha/mm/init.c:122:	init_thread_info.pcb.ptbr = newptbr;
+arch/alpha/mm/init.c:123:	init_thread_info.pcb.flags = 1;	/* set FEN, clear everything else */
+arch/alpha/mm/init.c:124:	original_pcb_ptr = load_PCB(&init_thread_info.pcb);
+arch/alpha/mm/init.c:127:	/* Save off the contents of the original PCB so that we can
+arch/alpha/mm/init.c:130:	   Note that the PCB is supposed to be a physical address, but
+arch/alpha/mm/init.c:134:	if (original_pcb_ptr < PAGE_OFFSET) {
+arch/alpha/mm/init.c:135:		original_pcb_ptr = (unsigned long)
+arch/alpha/mm/init.c:136:			phys_to_virt(original_pcb_ptr);
+arch/alpha/mm/init.c:138:	original_pcb = *(struct pcb_struct *) original_pcb_ptr;
+arch/alpha/mm/init.c:274:	load_PCB(&original_pcb);
+arch/alpha/mm/fault.c:43:	struct pcb_struct *pcb;
+arch/alpha/mm/fault.c:48:	pcb = &current_thread_info()->pcb;
+arch/alpha/mm/fault.c:49:	pcb->asn = mmc & HARDWARE_ASN_MASK;
+arch/alpha/mm/fault.c:50:	pcb->ptbr = ((unsigned long) next_mm->pgd - IDENT_ADDR) >> PAGE_SHIFT;
+arch/alpha/mm/fault.c:52:	__reload_thread(pcb);
+arch/unicore32/include/uapi/asm/Kbuild:10:generic-y += ipcbuf.h
+arch/m32r/configs/m32104ut_defconfig:130:CONFIG_CRYPTO_PCBC=m
+arch/m32r/configs/usrv_defconfig:75:CONFIG_CRYPTO_PCBC=m
+arch/m32r/include/uapi/asm/ipcbuf.h:1:#include <asm-generic/ipcbuf.h>
+arch/hexagon/include/uapi/asm/Kbuild:9:generic-y += ipcbuf.h
+arch/parisc/configs/generic-64bit_defconfig:285:CONFIG_CRYPTO_PCBC=m
+arch/parisc/include/uapi/asm/ipcbuf.h:1:#ifndef __PARISC_IPCBUF_H__
+arch/parisc/include/uapi/asm/ipcbuf.h:2:#define __PARISC_IPCBUF_H__
+arch/parisc/include/uapi/asm/ipcbuf.h:32:#endif /* __PARISC_IPCBUF_H__ */
+arch/ia64/configs/tiger_defconfig:173:CONFIG_CRYPTO_PCBC=m
+arch/ia64/configs/zx1_defconfig:154:CONFIG_CRYPTO_PCBC=m
+arch/ia64/configs/generic_defconfig:217:CONFIG_CRYPTO_PCBC=m
+arch/ia64/include/uapi/asm/ipcbuf.h:1:#include <asm-generic/ipcbuf.h>
+arch/cris/include/uapi/asm/Kbuild:9:generic-y += ipcbuf.h
+arch/openrisc/include/uapi/asm/Kbuild:10:generic-y += ipcbuf.h
+arch/s390/configs/default_defconfig:670:CONFIG_CRYPTO_PCBC=m
+arch/s390/configs/performance_defconfig:613:CONFIG_CRYPTO_PCBC=m
+arch/s390/configs/gcov_defconfig:615:CONFIG_CRYPTO_PCBC=m
+arch/s390/pci/pci_clp.c:67: * Call Logical Processor with c=0, the give constant lps and an lpcb request.
+arch/s390/pci/pci_clp.c:451:static int clp_base_slpc(struct clp_req *req, struct clp_req_rsp_slpc *lpcb)
+arch/s390/pci/pci_clp.c:453:	unsigned long limit = PAGE_SIZE - sizeof(lpcb->request);
+arch/s390/pci/pci_clp.c:455:	if (lpcb->request.hdr.len != sizeof(lpcb->request) ||
+arch/s390/pci/pci_clp.c:456:	    lpcb->response.hdr.len > limit)
+arch/s390/pci/pci_clp.c:458:	return clp_req(lpcb, CLP_LPS_BASE) ? -EOPNOTSUPP : 0;
+arch/s390/pci/pci_clp.c:461:static int clp_base_command(struct clp_req *req, struct clp_req_hdr *lpcb)
+arch/s390/pci/pci_clp.c:463:	switch (lpcb->cmd) {
+arch/s390/pci/pci_clp.c:465:		return clp_base_slpc(req, (void *) lpcb);
+arch/s390/pci/pci_clp.c:471:static int clp_pci_slpc(struct clp_req *req, struct clp_req_rsp_slpc *lpcb)
+arch/s390/pci/pci_clp.c:473:	unsigned long limit = PAGE_SIZE - sizeof(lpcb->request);
+arch/s390/pci/pci_clp.c:475:	if (lpcb->request.hdr.len != sizeof(lpcb->request) ||
+arch/s390/pci/pci_clp.c:476:	    lpcb->response.hdr.len > limit)
+arch/s390/pci/pci_clp.c:478:	return clp_req(lpcb, CLP_LPS_PCI) ? -EOPNOTSUPP : 0;
+arch/s390/pci/pci_clp.c:481:static int clp_pci_list(struct clp_req *req, struct clp_req_rsp_list_pci *lpcb)
+arch/s390/pci/pci_clp.c:483:	unsigned long limit = PAGE_SIZE - sizeof(lpcb->request);
+arch/s390/pci/pci_clp.c:485:	if (lpcb->request.hdr.len != sizeof(lpcb->request) ||
+arch/s390/pci/pci_clp.c:486:	    lpcb->response.hdr.len > limit)
+arch/s390/pci/pci_clp.c:488:	if (lpcb->request.reserved2 != 0)
+arch/s390/pci/pci_clp.c:490:	return clp_req(lpcb, CLP_LPS_PCI) ? -EOPNOTSUPP : 0;
+arch/s390/pci/pci_clp.c:494:			 struct clp_req_rsp_query_pci *lpcb)
+arch/s390/pci/pci_clp.c:496:	unsigned long limit = PAGE_SIZE - sizeof(lpcb->request);
+arch/s390/pci/pci_clp.c:498:	if (lpcb->request.hdr.len != sizeof(lpcb->request) ||
+arch/s390/pci/pci_clp.c:499:	    lpcb->response.hdr.len > limit)
+arch/s390/pci/pci_clp.c:501:	if (lpcb->request.reserved2 != 0 || lpcb->request.reserved3 != 0)
+arch/s390/pci/pci_clp.c:503:	return clp_req(lpcb, CLP_LPS_PCI) ? -EOPNOTSUPP : 0;
+arch/s390/pci/pci_clp.c:507:			     struct clp_req_rsp_query_pci_grp *lpcb)
+arch/s390/pci/pci_clp.c:509:	unsigned long limit = PAGE_SIZE - sizeof(lpcb->request);
+arch/s390/pci/pci_clp.c:511:	if (lpcb->request.hdr.len != sizeof(lpcb->request) ||
+arch/s390/pci/pci_clp.c:512:	    lpcb->response.hdr.len > limit)
+arch/s390/pci/pci_clp.c:514:	if (lpcb->request.reserved2 != 0 || lpcb->request.reserved3 != 0 ||
+arch/s390/pci/pci_clp.c:515:	    lpcb->request.reserved4 != 0)
+arch/s390/pci/pci_clp.c:517:	return clp_req(lpcb, CLP_LPS_PCI) ? -EOPNOTSUPP : 0;
+arch/s390/pci/pci_clp.c:520:static int clp_pci_command(struct clp_req *req, struct clp_req_hdr *lpcb)
+arch/s390/pci/pci_clp.c:522:	switch (lpcb->cmd) {
+arch/s390/pci/pci_clp.c:524:		return clp_pci_slpc(req, (void *) lpcb);
+arch/s390/pci/pci_clp.c:526:		return clp_pci_list(req, (void *) lpcb);
+arch/s390/pci/pci_clp.c:528:		return clp_pci_query(req, (void *) lpcb);
+arch/s390/pci/pci_clp.c:530:		return clp_pci_query_grp(req, (void *) lpcb);
+arch/s390/pci/pci_clp.c:538:	struct clp_req_hdr *lpcb;
+arch/s390/pci/pci_clp.c:547:	lpcb = clp_alloc_block(GFP_KERNEL);
+arch/s390/pci/pci_clp.c:548:	if (!lpcb)
+arch/s390/pci/pci_clp.c:553:	if (copy_from_user(lpcb, uptr, PAGE_SIZE) != 0)
+arch/s390/pci/pci_clp.c:557:	if (lpcb->fmt != 0 || lpcb->reserved1 != 0 || lpcb->reserved2 != 0)
+arch/s390/pci/pci_clp.c:562:		rc = clp_base_command(req, lpcb);
+arch/s390/pci/pci_clp.c:565:		rc = clp_pci_command(req, lpcb);
+arch/s390/pci/pci_clp.c:572:	if (copy_to_user(uptr, lpcb, PAGE_SIZE) != 0)
+arch/s390/pci/pci_clp.c:578:	clp_free_block(lpcb);
+arch/s390/include/asm/clp.h:32:#define CLP_RC_8K			0x0060	/* Command requires 8K LPCB */
+arch/s390/include/uapi/asm/chsc.h:53:	struct chsc_response_struct cpcb;
+arch/s390/include/uapi/asm/ipcbuf.h:1:#ifndef __S390_IPCBUF_H__
+arch/s390/include/uapi/asm/ipcbuf.h:2:#define __S390_IPCBUF_H__
+arch/s390/include/uapi/asm/ipcbuf.h:31:#endif /* __S390_IPCBUF_H__ */
+arch/s390/defconfig:192:CONFIG_CRYPTO_PCBC=m
+arch/x86/pci/init.c:23:	pci_pcbios_init();
+arch/x86/pci/init.c:26:	 * don't check for raw_pci_ops here because we want pcbios as last
+arch/x86/pci/Makefile:3:obj-$(CONFIG_PCI_BIOS)		+= pcbios.o
+arch/x86/pci/pcbios.c:421:void __init pci_pcbios_init(void)
+arch/x86/crypto/aesni-intel_glue.c:1078:#if (defined(MODULE) && IS_ENABLED(CONFIG_CRYPTO_PCBC)) || \
+arch/x86/crypto/aesni-intel_glue.c:1079:    IS_BUILTIN(CONFIG_CRYPTO_PCBC)
+arch/x86/crypto/aesni-intel_glue.c:1081:		.algname	= "pcbc(aes)",
+arch/x86/crypto/aesni-intel_glue.c:1082:		.drvname	= "pcbc-aes-aesni",
+arch/x86/crypto/aesni-intel_glue.c:1083:		.basename	= "fpu(pcbc(__aes-aesni))",
+arch/x86/include/asm/pci_x86.h:117:extern void pci_pcbios_init(void);
+arch/x86/include/uapi/asm/ipcbuf.h:1:#include <asm-generic/ipcbuf.h>
+arch/arm/mach-omap2/vc.c:74:/* Default I2C trace length on pcb, 6.3cm. Used for capacitance calculations. */
+arch/arm/mach-omap2/vc.c:75:static u32 sr_i2c_pcb_length = 63;
+arch/arm/mach-omap2/vc.c:622:	/* PCB trace capacitance, 0.125pF / mm => mm / 8 */
+arch/arm/mach-omap2/vc.c:623:	capacitance = DIV_ROUND_UP(sr_i2c_pcb_length, 8);
+arch/arm/mach-omap2/vc.c:755: * omap_pm_setup_sr_i2c_pcb_length - set length of SR I2C traces on PCB
+arch/arm/mach-omap2/vc.c:756: * @mm: length of the PCB trace in millimetres
+arch/arm/mach-omap2/vc.c:758: * Sets the PCB trace length for the I2C channel. By default uses 63mm.
+arch/arm/mach-omap2/vc.c:760: * the PCB trace, and for setting the SR I2C channel timing parameters.
+arch/arm/mach-omap2/vc.c:762:void __init omap_pm_setup_sr_i2c_pcb_length(u32 mm)
+arch/arm/mach-omap2/vc.c:764:	sr_i2c_pcb_length = mm;
+arch/arm/mach-omap2/pm.h:144:extern void omap_pm_setup_sr_i2c_pcb_length(u32 mm);
+arch/arm/mach-omap2/pm.h:148:static inline void omap_pm_setup_sr_i2c_pcb_length(u32 mm) { }
+arch/arm/configs/dove_defconfig:131:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/iop13xx_defconfig:96:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/colibri_pxa270_defconfig:156:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/eseries_pxa_defconfig:109:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/omap1_defconfig:252:CONFIG_CRYPTO_PCBC=y
+arch/arm/configs/mv78xx0_defconfig:132:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/am200epdkit_defconfig:101:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/mini2440_defconfig:315:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/orion5x_defconfig:164:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/multi_v5_defconfig:281:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/mvebu_v5_defconfig:210:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/imote2_defconfig:352:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/ezx_defconfig:378:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/iop32x_defconfig:108:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/trizeps4_defconfig:208:CONFIG_CRYPTO_PCBC=m
+arch/arm/configs/pxa_defconfig:747:CONFIG_CRYPTO_PCBC=m
+arch/arm/mach-at91/pm.c:293:		lpr1 = saved_lpr1 & ~AT91_DDRSDRC_LPCB;
+arch/arm/mach-at91/pm.c:294:		lpr1 |= AT91_DDRSDRC_LPCB_SELF_REFRESH;
+arch/arm/mach-at91/pm.c:304:	lpr0 = saved_lpr0 & ~AT91_DDRSDRC_LPCB;
+arch/arm/mach-at91/pm.c:305:	lpr0 |= AT91_DDRSDRC_LPCB_SELF_REFRESH;
+arch/arm/mach-at91/pm.c:328:	lpr0 = saved_lpr0 & ~AT91_DDRSDRC_LPCB;
+arch/arm/mach-at91/pm.c:329:	lpr0 |= AT91_DDRSDRC_LPCB_POWER_DOWN;
+arch/arm/mach-at91/pm.c:348:		lpr1 = saved_lpr1 & ~AT91_SDRAMC_LPCB;
+arch/arm/mach-at91/pm.c:349:		lpr1 |= AT91_SDRAMC_LPCB_SELF_REFRESH;
+arch/arm/mach-at91/pm.c:353:	lpr0 = saved_lpr0 & ~AT91_SDRAMC_LPCB;
+arch/arm/mach-at91/pm.c:354:	lpr0 |= AT91_SDRAMC_LPCB_SELF_REFRESH;
+arch/arm/mach-at91/pm_suspend.S:274:	bic	r3, r3, #AT91_DDRSDRC_LPCB
+arch/arm/mach-at91/pm_suspend.S:275:	orr	r3, r3, #AT91_DDRSDRC_LPCB_SELF_REFRESH
+arch/arm/mach-at91/pm_suspend.S:295:	bic	r3, r3, #AT91_DDRSDRC_LPCB
+arch/arm/mach-at91/pm_suspend.S:296:	orr	r3, r3, #AT91_DDRSDRC_LPCB_SELF_REFRESH
+arch/arm/mach-at91/pm_suspend.S:330:	bic	r3, r3, #AT91_SDRAMC_LPCB
+arch/arm/mach-at91/pm_suspend.S:331:	orr	r3, r3, #AT91_SDRAMC_LPCB_SELF_REFRESH
+arch/arm/mach-pxa/magician.c:744:	 * NOTICE measured directly on the PCB (board_id == 0x3a), but
+arch/arm/mach-pxa/am200epd.c:100:#define PCBPWR_GPIO_PIN 16
+arch/arm/mach-pxa/am200epd.c:102:			RDY_GPIO_PIN, ERR_GPIO_PIN, PCBPWR_GPIO_PIN };
+arch/arm/mach-pxa/am200epd.c:103:static char *gpio_names[] = { "LED" , "STDBY" , "RST", "RDY", "ERR", "PCBPWR" };
+arch/arm/mach-pxa/am200epd.c:126:	gpio_direction_output(PCBPWR_GPIO_PIN, 0);
+arch/arm/mach-pxa/zeus.c:718:static int zeus_get_pcb_info(struct i2c_client *client, unsigned gpio,
+arch/arm/mach-pxa/zeus.c:722:	u8 pcb_info = 0;
+arch/arm/mach-pxa/zeus.c:725:		int pcb_bit = gpio + i + 8;
+arch/arm/mach-pxa/zeus.c:727:		if (gpio_request(pcb_bit, "pcb info")) {
+arch/arm/mach-pxa/zeus.c:728:			dev_err(&client->dev, "Can't request pcb info %d\n", i);
+arch/arm/mach-pxa/zeus.c:732:		if (gpio_direction_input(pcb_bit)) {
+arch/arm/mach-pxa/zeus.c:733:			dev_err(&client->dev, "Can't read pcb info %d\n", i);
+arch/arm/mach-pxa/zeus.c:734:			gpio_free(pcb_bit);
+arch/arm/mach-pxa/zeus.c:738:		pcb_info |= !!gpio_get_value(pcb_bit) << i;
+arch/arm/mach-pxa/zeus.c:740:		gpio_free(pcb_bit);
+arch/arm/mach-pxa/zeus.c:743:	dev_info(&client->dev, "Zeus PCB version %d issue %d\n",
+arch/arm/mach-pxa/zeus.c:744:		 pcb_info >> 4, pcb_info & 0xf);
+arch/arm/mach-pxa/zeus.c:753:		.setup		= zeus_get_pcb_info,
+arch/arm/boot/dts/armada-370-mirabox.dts:182:	/* Connected on the PCB to a USB 3.0 XHCI controller */
+arch/arm/boot/dts/armada-370-seagate-personal-cloud-2bay.dts:17: * Code name (board/PCB)        : Cumulus Max
+arch/arm/boot/dts/armada-370-seagate-nas-2bay.dts:17: * Code name (board/PCB)        : Dart 2-Bay
+arch/arm/boot/dts/ste-href-family-pinctrl.dtsi:439:				/* This is the eMMC 8 bits wide, usually PCB-mounted eMMC */
+arch/arm/boot/dts/armada-370-seagate-nas-4bay.dts:17: * Code name (board/PCB)        : Dart 4-Bay
+arch/arm/boot/dts/armada-370-seagate-personal-cloud.dts:17: * Code name (board/PCB)        : Cumulus
+arch/arm/boot/dts/sun7i-a20-pcduino3-nano.dts:66:		/* Marked "LED3" on the PCB. */
+arch/arm/boot/dts/sun7i-a20-pcduino3-nano.dts:72:		/* Marked "LED4" on the PCB. */
+arch/arm/boot/dts/tegra30-cardhu.dtsi:15: * on PCB and by reading board id eeprom.
+arch/arm/boot/dts/armada-370-synology-ds213j.dts:104:			/* Connected to a header on device's PCB */
+arch/arm/boot/dts/armada-xp-synology-ds414.dts:101:			/* Connected to a header on device's PCB. This
+arch/arm/include/uapi/asm/Kbuild:11:generic-y += ipcbuf.h
+arch/blackfin/include/uapi/asm/Kbuild:8:generic-y += ipcbuf.h
+security/selinux/hooks.c:5379:				if (IPCB(skb)->flags & IPSKB_XFRM_TRANSFORMED)
+CREDITS:945:W: http://www.fsmlabs.com/linuxppcbk.html
+include/linux/ssb/ssb.h:196:/* Information about the PCB the circuitry is soldered on. */
+include/linux/ssb/ssb.h:482:	/* ID information about the PCB. */
+include/linux/ssb/ssb.h:515:	/* Versioning information about the PCB. */
+include/linux/sunrpc/clnt.h:160:int		rpcb_create_local(struct net *);
+include/linux/sunrpc/clnt.h:161:void		rpcb_put_local(struct net *);
+include/linux/sunrpc/clnt.h:162:int		rpcb_register(struct net *, u32, u32, int, unsigned short);
+include/linux/sunrpc/clnt.h:163:int		rpcb_v4_register(struct net *net, const u32 program,
+include/linux/sunrpc/clnt.h:167:void		rpcb_getport_async(struct rpc_task *);
+include/linux/sunrpc/msg_prot.h:149:#define RPCBIND_NETID_UDP	"udp"
+include/linux/sunrpc/msg_prot.h:150:#define RPCBIND_NETID_TCP	"tcp"
+include/linux/sunrpc/msg_prot.h:151:#define RPCBIND_NETID_RDMA	"rdma"
+include/linux/sunrpc/msg_prot.h:152:#define RPCBIND_NETID_SCTP	"sctp"
+include/linux/sunrpc/msg_prot.h:153:#define RPCBIND_NETID_UDP6	"udp6"
+include/linux/sunrpc/msg_prot.h:154:#define RPCBIND_NETID_TCP6	"tcp6"
+include/linux/sunrpc/msg_prot.h:155:#define RPCBIND_NETID_RDMA6	"rdma6"
+include/linux/sunrpc/msg_prot.h:156:#define RPCBIND_NETID_SCTP6	"sctp6"
+include/linux/sunrpc/msg_prot.h:157:#define RPCBIND_NETID_LOCAL	"local"
+include/linux/sunrpc/msg_prot.h:163:#define RPCBIND_MAXNETIDLEN	(5u)
+include/linux/sunrpc/msg_prot.h:167: * out in RFC 3530.  RPCBIND_MAXUADDRLEN defines a maximum byte length
+include/linux/sunrpc/msg_prot.h:206:#define RPCBIND_MAXUADDRPLEN	sizeof(".255.255")
+include/linux/sunrpc/msg_prot.h:209:#define RPCBIND_MAXUADDR4LEN	\
+include/linux/sunrpc/msg_prot.h:210:		(INET_ADDRSTRLEN + RPCBIND_MAXUADDRPLEN)
+include/linux/sunrpc/msg_prot.h:213:#define RPCBIND_MAXUADDR6LEN	\
+include/linux/sunrpc/msg_prot.h:214:		(INET6_ADDRSTRLEN + RPCBIND_MAXUADDRPLEN)
+include/linux/sunrpc/msg_prot.h:217:#define RPCBIND_MAXUADDRLEN	RPCBIND_MAXUADDR6LEN
+include/linux/sunrpc/xprt.h:129:	void		(*rpcbind)(struct rpc_task *task);
+include/linux/sunrpc/xprt.h:192:	struct rpc_wait_queue	binding;	/* requests waiting on rpcbind */
+include/linux/sunrpc/stats.h:36:				rpcbadfmt,
+include/linux/sunrpc/stats.h:37:				rpcbadauth,
+include/linux/sunrpc/stats.h:38:				rpcbadclnt;
+include/linux/sunrpc/svc.h:404:	/* Don't register with rpcbind */
+include/linux/sunrpc/svc.h:407:	/* Don't care if the rpcbind registration fails */
+include/linux/sunrpc/svc.h:408:	bool			vs_rpcb_optnl;
+include/linux/sunrpc/svc.h:464:int svc_rpcb_setup(struct svc_serv *serv, struct net *net);
+include/linux/sunrpc/svc.h:465:void svc_rpcb_cleanup(struct svc_serv *serv, struct net *net);
+include/linux/nfs_xdr.h:1094:	char				sc_netid[RPCBIND_MAXNETIDLEN + 1];
+include/linux/nfs_xdr.h:1096:	char				sc_uaddr[RPCBIND_MAXUADDRLEN + 1];
+include/linux/mfd/syscon/atmel-mc.h:110:#define AT91_MC_SDRAMC_LPCB		BIT(0)
+include/linux/wm97xx.h:91:#define WM9705_PHIZ		0x0040	/* set PHONE and PCBEEP inputs to high impedance */
+include/linux/pnfs_osd_xdr.h:183: *       // see struct rpcb in RFC1833
+include/uapi/asm-generic/Kbuild.asm:11:mandatory-y += ipcbuf.h
+include/uapi/asm-generic/ipcbuf.h:1:#ifndef __ASM_GENERIC_IPCBUF_H
+include/uapi/asm-generic/ipcbuf.h:2:#define __ASM_GENERIC_IPCBUF_H
+include/uapi/asm-generic/ipcbuf.h:34:#endif /* __ASM_GENERIC_IPCBUF_H */
+include/uapi/linux/ipc.h:21:#include <asm/ipcbuf.h>
+include/sound/seq_kernel.h:97:int snd_seq_event_port_attach(int client, struct snd_seq_port_callback *pcbp,
+include/sound/emu10k1.h:790:/* PCB Revision */
+include/sound/emu10k1.h:791:#define A_PCB			0x5f
+include/net/tcp.h:809:#define TCPCB_SACKED_ACKED	0x01	/* SKB ACK'd by a SACK block	*/
+include/net/tcp.h:810:#define TCPCB_SACKED_RETRANS	0x02	/* SKB retransmitted		*/
+include/net/tcp.h:811:#define TCPCB_LOST		0x04	/* SKB is lost			*/
+include/net/tcp.h:812:#define TCPCB_TAGBITS		0x07	/* All tag bits			*/
+include/net/tcp.h:813:#define TCPCB_REPAIRED		0x10	/* SKB repaired (no skb_mstamp)	*/
+include/net/tcp.h:814:#define TCPCB_EVER_RETRANS	0x80	/* Ever retransmitted frame	*/
+include/net/tcp.h:815:#define TCPCB_RETRANS		(TCPCB_SACKED_RETRANS|TCPCB_EVER_RETRANS| \
+include/net/tcp.h:816:				TCPCB_REPAIRED)
+include/net/ip.h:78:#define IPCB(skb) ((struct inet_skb_parm*)((skb)->cb))
+include/net/ip.h:85:	if (skb && ipv4_l3mdev_skb(IPCB(skb)->flags))
+include/net/ip.h:86:		return IPCB(skb)->iif;
+include/net/ip.h:372:		bool forwarding = IPCB(skb)->flags & IPSKB_FORWARDED;
+include/net/ip.h:585:	return __ip_options_echo(net, dopt, skb, &IPCB(skb)->opt);
+include/soc/at91/at91sam9_sdramc.h:61:#define		AT91_SDRAMC_LPCB		(3 << 0)	/* Low-power Configurations */
+include/soc/at91/at91sam9_sdramc.h:62:#define			AT91_SDRAMC_LPCB_DISABLE		0
+include/soc/at91/at91sam9_sdramc.h:63:#define			AT91_SDRAMC_LPCB_SELF_REFRESH		1
+include/soc/at91/at91sam9_sdramc.h:64:#define			AT91_SDRAMC_LPCB_POWER_DOWN		2
+include/soc/at91/at91sam9_sdramc.h:65:#define			AT91_SDRAMC_LPCB_DEEP_POWER_DOWN	3
+include/soc/at91/at91sam9_ddrsdr.h:78:#define		AT91_DDRSDRC_LPCB	(3 << 0)		/* Low-power Configurations */
+include/soc/at91/at91sam9_ddrsdr.h:79:#define			AT91_DDRSDRC_LPCB_DISABLE		0
+include/soc/at91/at91sam9_ddrsdr.h:80:#define			AT91_DDRSDRC_LPCB_SELF_REFRESH		1
+include/soc/at91/at91sam9_ddrsdr.h:81:#define			AT91_DDRSDRC_LPCB_POWER_DOWN		2
+include/soc/at91/at91sam9_ddrsdr.h:82:#define			AT91_DDRSDRC_LPCB_DEEP_POWER_DOWN	3

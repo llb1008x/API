@@ -329,7 +329,7 @@ int myatoi(char *str)
     while( str[i]!='\0'){
     
         if( (str[i]>='0')&&(str[i]<='9'))
-        num = num*10+str[i]-'0';
+            num = num*10+str[i]-'0';
         i++;     
     }
    

@@ -1,7 +1,0 @@
-name:  安装apk重启问题
-id: 82315 
-time: default
-method: file=main.log*, key=WATCHDOG KILLING SYSTEM PROCESS:, line=15
-
-
-

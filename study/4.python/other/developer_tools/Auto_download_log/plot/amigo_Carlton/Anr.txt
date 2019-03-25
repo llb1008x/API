@@ -1,8 +1,0 @@
-name:  Anr问题
-id: 137610
-time: default
-method: file=sys_log*, key=ANR in \S+
-
-
-
-

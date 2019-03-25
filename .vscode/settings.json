@@ -1,3 +1,7 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "files.associations": {
+        "iostream": "cpp"
+    },
+    "python.pythonPath": "/home/llb/anaconda3/envs/tensorflow/bin/python"
 }

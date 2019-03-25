@@ -1,0 +1,9 @@
+CC=arm-linux-gcc
+main:main.o printf1.o
+	$(CC) -o main main.o printf1.o
+main.o:main.c 
+	$(CC) -c -o main.o main.c
+printf1.o:printf1.c 
+	$(CC) -c -o printf1.o printf1.c
+clean:
+	rm -rfv *.o main 

@@ -1,0 +1,8 @@
+name:  Thernal问题
+id: 142272
+time: default
+method: file=kernel.log*, key=set_adaptive_cpu_power_limit, line=2
+
+
+
+

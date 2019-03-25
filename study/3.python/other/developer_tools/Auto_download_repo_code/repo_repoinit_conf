@@ -1,0 +1,149 @@
+#!/bin/bash
+#===================================================================
+# 此自动化编译脚本仅适用于android平台，且使用repo and git版本控制软件的项目
+# SCM ---- 刘小惠
+#===================================================================
+VERSION_NUMBER="sv2.4"
+PROJECT_PATH=""
+PRJO_PATH_TAG=0
+PROJECT_NAME=""
+ARRA_SUM=""
+
+function guide()
+{
+	if [[ -d "$HOME/bin"  && ! -e "$HOME/bin/repo" ]]; then
+		export PATH=$PATH:$HOME/bin
+		curl http://10.8.10.22/gnrepo > $HOME/bin/repo
+	elif [ ! -d "$HOME/bin" ] ; then
+		mkdir $HOME/bin 
+		curl http://10.8.10.22/gnrepo > $HOME/bin/repo
+	else
+		echo "$HOME/bin已存在"
+		curl http://10.8.10.22/gnrepo > $HOME/bin/repo
+	fi
+	result=$(grep 'export PATH=$PATH:$HOME/bin' $HOME/.bashrc)
+	if [ -z "$result" ];then
+		echo 'export PATH=$PATH:$HOME/bin' >> $HOME/.bashrc
+		export PATH=$PATH:$HOME/bin
+	fi
+	chmod a+x $HOME/bin/repo
+}
+
+function get_input_List ()
+{
+local i=0
+local j=""
+for j in $1
+do
+	i=$(($i+1))
+	j="$i : "$j
+	echo $j
+
+	arra[$i]=$j
+	ARRA_SUM=${#arra[@]}
+done
+}
+
+
+function getProjectList()
+{
+	if [[  -d /tmp/gnbj_manifetst ]];then
+		rm -rf /tmp/gnbj_manifetst/*
+	else
+		mkdir /tmp/gnbj_manifetst
+	fi
+	pushd /tmp/gnbj_manifetst >/dev/null
+	git clone GerritServer:/manifest
+	cd manifest/
+	#PROJECT_LIST=$(find . ! -type l |grep -v ".git"|grep -v "BTREE"|grep -v "repo-test"|grep -v "manifest"|grep -v "APK"|awk -F ".xml" '{print $1}'|awk -F "./" '{print $2}')
+	PROJECT_LIST=$(find . -name "*" |grep -v ".git"|grep -v "BTREE"|grep -v "repo-test"|grep -v "manifest"|grep -v "APK"|awk -F ".xml" '{print $1}'|awk -F "./" '{print $2}'|sort -u)
+	popd >/dev/null
+}
+function getProjectName()
+{
+	local getProjectName_flag=""
+	local project_name_id=""
+	getProjectList
+	get_input_List "${PROJECT_LIST}"
+	read -p "请輸入您要下载的项目名称或项目名ID,例如：[ 1---$ARRA_SUM 或 17G08A ] :" project_name_id 
+	if [[  ${project_name_id} =~ ^[0-9]+$ ]];then
+		if [[ $project_name_id -lt "1" || $project_name_id -gt "$ARRA_SUM " ]]; then
+			echo "輸入有误,请重输入!"	
+			continue
+		fi
+		PROJECT_NAME=${arra[${project_name_id}]#*:}
+	else
+		for i in ${arra[@]#*:}
+		do
+			if [[ ${project_name_id} = $i ]];then
+				getProjectName_flag="y"
+				break
+			else
+				getProjectName_flag="n"
+			fi
+		done
+		if [[ ${getProjectName_flag} = "y" ]];then
+			PROJECT_NAME=${project_name_id}
+		else
+			echo "输入的项目名或项目名ID有误"
+			continue
+		fi
+	fi
+}
+
+function repoinit()
+{
+	while true
+	do
+		read -p "请輸入代码存放路径(必须写上全路径如""/home/ala/REPO_RES"":)默认为当前路径:" PROJECT_PATH
+		getProjectName
+		if [[ -d ${PROJECT_PATH} && ! -d ${PROJECT_PATH}/.repo ]];then
+			pushd ${PROJECT_PATH} >/dev/null
+			echo "repo init -u GerritServer:/manifest.git -m $PROJECT_NAME.xml" 
+			$HOME/bin/repo init -u GerritServer:/manifest.git -m $PROJECT_NAME.xml
+			popd >/dev/null
+		elif [[ -d ${PROJECT_PATH} && -d ${PROJECT_PATH}/.repo ]];then
+			echo "您指定目录已做过repo init,请指定新路径."
+			PRJO_PATH_TAG=1
+		else
+			echo "repo init -u GerritServer:/manifest.git -m $PROJECT_NAME.xml" 
+			$HOME/bin/repo init -u GerritServer:/manifest.git -m $PROJECT_NAME.xml
+		fi
+		break
+	done
+}
+
+function copyReviewScript()
+
+{
+	while read pergit
+	do
+	pergit=$(echo ${pergit}|awk -F "/.git" '{printf("%s",$1)}')
+	echo ${pergit}
+	pushd ${pergit} >~/null
+	pwd
+	local username=$(git config user.email|awk -F "@gionee.com" '{printf("%s",$1)}')
+	echo "username:${username}"	
+	gitdir=$(git rev-parse --git-dir); scp -r -p -P 29418 ${username}@10.8.10.19:hooks/ ${gitdir}
+	popd >~/null
+	done < <( find . -path "*.repo" -prune -o -name .git -print )
+}
+
+function main()
+{
+	echo "当前脚本版本号为：$VERSION_NUMBER"
+	guide
+	repoinit
+	while [ "$PRJO_PATH_TAG" -eq 1 ]
+	do
+		PRJO_PATH_TAG=0
+		repoinit
+	done
+	echo "repo sync" 
+	$HOME/bin/repo sync
+	#拷贝review脚本
+	copyReviewScript
+	rm -rf /tmp/gnbj_manifetst
+}
+
+main

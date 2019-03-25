@@ -1,3 +1,0 @@
----- lrc_show Matches (2 in 2 files) ----
-Lrc.c:void lrc_show(LRC_INFO *head,char song_msg[HEAD_NUM][HEAD_SIZE],LRC_INFO *expect_play_pointer,TIME m_time)
-Lrc.h:void lrc_show(LRC_INFO *head,char song_msg[HEAD_NUM][HEAD_SIZE],LRC_INFO *expect_play_pointer,TIME m_time);
